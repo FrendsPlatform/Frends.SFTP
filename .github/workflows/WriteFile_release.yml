@@ -1,0 +1,18 @@
+name: Frends.SFTP.WriteFile Release
+
+on:
+  workflow_dispatch:
+    paths:
+      paths:
+        - 'Frends.SFTP.WriteFile/**'
+        
+  
+
+jobs:
+  build:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/release.yml@main
+    with:
+      workdir: Frends.SFTP.WriteFile
+    secrets:
+      feed_api_key: ${{ secrets.TASKS_FEED_API_KEY }}
+      
