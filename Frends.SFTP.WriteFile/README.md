@@ -1,22 +1,15 @@
 # Frends.SFTP.WriteFile
 
+[![Frends.SFTP.WriteFile Main](https://github.com/FrendsPlatform/Frends.SFTP/actions/workflows/WriteFile_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.SFTP/actions/workflows/WriteFile_build_and_test_on_main.yml)
+![MyGet](https://img.shields.io/myget/frends-tasks/v/Frends.SFTP.WriteFile?label=NuGet)
+![GitHub](https://img.shields.io/github/license/FrendsPlatform/Frends.SFTP?label=License)
+![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.SFTP/Frends.SFTP.WriteFile|main)
 
-- [Installing](#installing)
-- [Tasks](#tasks)
-     - [SFTP](#SFTP)
-- [Building](#building)
-- [Contributing](#contributing)
-- [Change Log](#change-log)
+Executes file transfer through SFTP connection.
 
-# Installing
+## Installing
 
-You can install the Task via frends UI Task View by using `Import Task NuGet` button in Administration > Tasks.
-
-# Tasks
-
-## SFTP
-
-Repeats a message
+You can install the task via FRENDS UI Task View or you can find the NuGet package from the following NuGet feed
 
 ### Properties
 
@@ -46,6 +39,9 @@ To fetch result use syntax:
 
 # Building
 
+Clone a copy of the repo
+
+`git clone https://github.com/FrendsPlatform/Frends.SFTP.git`
 
 Rebuild the project
 
@@ -59,19 +55,3 @@ Create a NuGet package
 
 `dotnet pack --configuration Release`
 
-# Contributing
-When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
-
-1. Fork the repository on GitHub
-2. Clone the project to your own machine
-3. Commit changes to your own branch
-4. Push your work back up to your fork
-5. Submit a Pull request so that we can review your changes
-
-NOTE: Be sure to merge the latest from "upstream" before making a pull request!
-
-# Change Log
-
-| Version | Changes |
-| ------- | ------- |
-| 0.0.1   | Development still going on |

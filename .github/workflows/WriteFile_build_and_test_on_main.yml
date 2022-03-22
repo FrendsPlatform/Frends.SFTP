@@ -13,9 +13,24 @@ on:
 
 jobs:
   build:
-    uses: FrendsPlatform/FrendsTasks/.github/workflows/build_main.yml@main
-    with:
-      workdir: Frends.SFTP.WriteFile
-    secrets:
-      badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
+    name: Build on ubuntu-latest
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Set up fake SFTP server
+      run: docker run -p 22:22 -d atmoz/sftp foo:pass:::upload
+
+    - name: Build
+      run: dotnet build
+    
+    - name: Test
+      run: dotnet test
+      
+    - name: Pack release version of task
+      run: dotnet pack --configuration Release --include-source
+      
+    - name: Push NuGet package to the testfeed
+      run: dotnet nuget push "**/*.nupkg"  --api-key ${{ secrets.TASKS_TEST_FEED_API_KEY  }} --source https://www.myget.org/F/frends-tasks-test/api/v2/package --symbol-source https://www.myget.org/F/frends-tasks-test/symbols/api/v2/package
       
