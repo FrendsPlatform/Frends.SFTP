@@ -56,7 +56,7 @@ namespace Frends.SFTP.WriteFile.Tests
         }
 
         [Test]
-        public void WriteFileWithOperationErrorThrows()
+        public void WriteFileThatExistsThrowsError()
         {
             SFTP.WriteFile(_source, _destination, _param, new CancellationToken());
 

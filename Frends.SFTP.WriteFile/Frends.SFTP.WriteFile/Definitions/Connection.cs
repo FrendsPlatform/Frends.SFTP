@@ -25,6 +25,7 @@ namespace Frends.SFTP.WriteFile
         /// <summary>
         /// Selection for authentication type
         /// </summary>
+        [DisplayFormat(DataFormatString = "Text")]
         public AuthenticationType Authentication { get; set; } = AuthenticationType.UsernamePassword;
 
         /// <summary>
@@ -36,21 +37,21 @@ namespace Frends.SFTP.WriteFile
         /// <summary>
         /// Password
         /// </summary>
-        [UIHint(nameof(AuthenticationType), "", AuthenticationType.UsernamePassword)]
+        [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePassword)]
         [PasswordPropertyText]
         public string Password { get; set; }
 
         /// <summary>
         /// Full path to private key file.
         /// </summary>
-        [UIHint(nameof(AuthenticationType), "", AuthenticationType.PrivateKey, AuthenticationType.PrivateKeyPassphrase)]
+        [UIHint(nameof(Authentication), "", AuthenticationType.PrivateKey, AuthenticationType.PrivateKeyPassphrase)]
         [DisplayFormat(DataFormatString = "Text")]
         public string PrivateKeyFileName { get; set; }
 
         /// <summary>
         /// Passphrase for the private key file.
         /// </summary>
-        [UIHint(nameof(AuthenticationType), "", AuthenticationType.PrivateKeyPassphrase)]
+        [UIHint(nameof(Authentication), "", AuthenticationType.PrivateKeyPassphrase)]
         [PasswordPropertyText]
         public string Passphrase { get; set; }
 

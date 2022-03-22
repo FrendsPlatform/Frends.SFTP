@@ -1,4 +1,7 @@
-﻿#pragma warning disable 1591
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
+#pragma warning disable 1591
 
 namespace Frends.SFTP.WriteFile
 {
@@ -10,17 +13,14 @@ namespace Frends.SFTP.WriteFile
         /// <summary>
         /// The name of the file. Does not include the path.
         /// </summary>
-	    public string Name { get; private set; }
+        [DisplayFormat(DataFormatString = "Text")]
+	    public string FileName { get; private set; }
 
         /// <summary>
         /// The full source path of the file.
         /// </summary>
+        [DisplayFormat(DataFormatString = "Text")]
         public string SourcePath { get; private set; }
-
-        /// <summary>
-        /// The full destination path of the file.
-        /// </summary>
-        public string DestinationPath { get; private set; }
 
         /// <summary>
         /// Boolean value of the successful transfer.
@@ -32,11 +32,10 @@ namespace Frends.SFTP.WriteFile
 
         }
 
-        public Result(string name, string sourcePath, string destinationPath, bool success)
+        public Result(string name, string sourcePath, bool success)
         {
-            Name = name;
+            FileName = name;
             SourcePath = sourcePath;
-            DestinationPath = destinationPath;
             Success = success;
         }
     }
