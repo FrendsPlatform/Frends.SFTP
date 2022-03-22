@@ -5,37 +5,47 @@
 ![GitHub](https://img.shields.io/github/license/FrendsPlatform/Frends.SFTP?label=License)
 ![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.SFTP/Frends.SFTP.WriteFile|main)
 
-Executes file transfer through SFTP connection.
+Writes a file to SFTP server.
 
 ## Installing
 
 You can install the task via FRENDS UI Task View or you can find the NuGet package from the following NuGet feed
 
-### Properties
+### Source
 
 | Property | Type | Description | Example |
 | -------- | -------- | -------- | -------- |
-| Message | `string` | Some string that will be repeated. | `foo` |
+| Directory | `string` | Directory of the server. | `/` |
+| FileName | `string` | File name with extension to fetch. | `test.txt` |
 
-### Options
+### Destination
 
 | Property | Type | Description | Example |
 | -------- | -------- | -------- | -------- |
-| Amount | `int` | Amount how many times message is repeated. | `3` |
-| Delimiter | `string` | Character(s) used between replications. | `, ` |
+| Directory | `string` | Directory of the server. | `/` |
+| Operation | `enum` | Operation to determine what to do if destination file exists. | `Error` |
 
-### Returns
+### Connection
+
+| Property | Type | Description | Example |
+| -------- | -------- | -------- | -------- |
+| Address | `string` | SFTP host address. | `HOSTNAME` |
+| Port | `int` | Port number. | `22` |
+| Authentication | `enum` | Selection for authentication type. | `UsernamePassword` |
+| UserName | `string` | Username. | `foo` |
+| Password | `string` | Password. | `pass` |
+| PrivateKeyFileName | `string` | Full path to private key file. | `, ` |
+| Passphrase | `string` | Passphrase for the private key file. | `, ` |
+
+### Result
 
 A result object with parameters.
 
 | Property | Type | Description | Example |
 | -------- | -------- | -------- | -------- |
-| Replication | `string` | Repeated string. | `foo, foo, foo` |
-
-Usage:
-To fetch result use syntax:
-
-`#result.Replication`
+| FileName | `string` | The name of the file. Does not include the path. | `test.txt` |
+| SourcePath | `string` | The full source path of the file. | `C:\test.txt` |
+| Success | `bool` | Boolean value of the successful transfer. | `true` |
 
 # Building
 

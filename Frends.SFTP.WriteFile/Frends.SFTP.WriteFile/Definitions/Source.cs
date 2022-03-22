@@ -19,7 +19,7 @@ namespace Frends.SFTP.WriteFile
         public string Directory { get; set; } = "/";
 
         /// <summary>
-        /// File name/mask to fetch (for source endpoint) or destination file name with possible macros (for destination endpoint)
+        /// File name to fetch.
         /// </summary>
         [DefaultValue("\"\"")]
         public string FileName { get; set; }
