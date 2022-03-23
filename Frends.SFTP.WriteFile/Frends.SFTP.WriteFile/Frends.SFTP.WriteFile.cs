@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel;
 using Renci.SshNet;
-using Renci.SshNet.Sftp;
-using System.Text.RegularExpressions;
 
 #pragma warning disable 1591
 
@@ -11,7 +9,7 @@ namespace Frends.SFTP.WriteFile
     {
 
         /// <summary>
-        /// This is task
+        /// Writes a file to SFTP server.
         /// Documentation: https://github.com/FrendsPlatform/Frends.SFTP.WriteFile
         /// </summary>
         /// <param name="connection">Transfer connection parameters</param>
