@@ -33,11 +33,6 @@ namespace Frends.SFTP.WriteFile
         /// </summary>
         public bool Success { get; private set; }
 
-        public Result()
-        {
-
-        }
-
         public Result(string name, string sourcePath, string destinationPath, bool success)
         {
             FileName = name;

@@ -26,7 +26,7 @@ namespace Frends.SFTP.WriteFile
         {
             // Establish connectionInfo with connection parameters
             var connectionInfo = GetConnectionInfo(connection);
-            var result = new Result();
+            Result result = null;
             
             try
             {
