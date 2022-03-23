@@ -48,7 +48,7 @@ namespace Frends.SFTP.WriteFile
             }
             catch (System.Net.Sockets.SocketException ex)
             {
-                throw new Exception($"Unable to establish the socket: { ex.Message }", ex);
+                throw new Exception($"Unable to establish the socket: No such host is known.", ex);
             }
             catch (Renci.SshNet.Common.SshAuthenticationException ex)
             {
