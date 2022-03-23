@@ -23,13 +23,17 @@ jobs:
 
     - name: Build
       run: dotnet build
+      working-directory: Frends.SFTP.WriteFile
     
     - name: Test
       run: dotnet test
+      working-directory: Frends.SFTP.WriteFile
       
     - name: Pack release version of task
       run: dotnet pack --configuration Release --include-source
+      working-directory: Frends.SFTP.WriteFile
       
     - name: Push NuGet package to the testfeed
-      run: dotnet nuget push "**/*.nupkg"  --api-key ${{ secrets.TASKS_TEST_FEED_API_KEY  }} --source https://www.myget.org/F/frends-tasks-test/api/v2/package --symbol-source https://www.myget.org/F/frends-tasks-test/symbols/api/v2/package  
+      run: dotnet nuget push "**/*.nupkg"  --api-key ${{ secrets.TASKS_TEST_FEED_API_KEY  }} --source https://www.myget.org/F/frends-tasks-test/api/v2/package --symbol-source https://www.myget.org/F/frends-tasks-test/symbols/api/v2/package
+      working-directory: Frends.SFTP.WriteFile
       
