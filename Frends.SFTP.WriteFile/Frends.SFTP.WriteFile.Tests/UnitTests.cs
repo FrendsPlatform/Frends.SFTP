@@ -10,7 +10,7 @@ namespace Frends.SFTP.WriteFile.Tests
     /// <summary>
     /// NOTE: To run these unit tests, you need an SFTP test server.
     /// 
-    /// docker run -p 22:22 -d atmoz/sftp foo:pass:::upload
+    /// docker run -p 2222:22 -d atmoz/sftp foo:pass:::upload
     /// 
     /// </summary>
     [TestFixture]
@@ -29,7 +29,7 @@ namespace Frends.SFTP.WriteFile.Tests
             _param = new Connection
             {
                 Address = Dns.GetHostName(),
-                Port = 22,
+                Port = 2222,
                 UserName = "foo",
                 Authentication = Connection.AuthenticationType.UsernamePassword,
                 Password = "pass",
@@ -76,12 +76,12 @@ namespace Frends.SFTP.WriteFile.Tests
             var result1 = SFTP.WriteFile(_source, destination, _param, new CancellationToken());
 
             Assert.AreEqual(true, result1.Success);
-            Assert.AreEqual(Path.Combine(destination.Directory, "TestFile1(1).txt"), result1.DestinationPath);
+            Assert.AreEqual(destination.Directory + "/TestFile1(1).txt", result1.DestinationPath);
 
             var result2 = SFTP.WriteFile(_source, destination, _param, new CancellationToken());
 
             Assert.AreEqual(true, result2.Success);
-            Assert.AreEqual(Path.Combine(destination.Directory, "TestFile1(2).txt"), result2.DestinationPath);
+            Assert.AreEqual(destination.Directory + "/TestFile1(2).txt", result2.DestinationPath);
         }
 
         [Test]
@@ -104,7 +104,7 @@ namespace Frends.SFTP.WriteFile.Tests
 
             var result = SFTP.WriteFile(_source, destination, _param, new CancellationToken());
             Assert.AreEqual(true, result.Success);
-            Assert.AreEqual(Path.Combine(destination.Directory, "TestFile1(1).txt"), result.DestinationPath);
+            Assert.AreEqual(destination.Directory + "/TestFile1(1).txt", result.DestinationPath);
         }
 
         [Test]

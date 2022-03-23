@@ -23,6 +23,12 @@ namespace Frends.SFTP.WriteFile
         public string SourcePath { get; private set; }
 
         /// <summary>
+        /// The destination path
+        /// </summary>
+        [DisplayFormat(DataFormatString = "Text")]
+        public string DestinationPath { get; private set; }
+
+        /// <summary>
         /// Boolean value of the successful transfer.
         /// </summary>
         public bool Success { get; private set; }
@@ -32,10 +38,11 @@ namespace Frends.SFTP.WriteFile
 
         }
 
-        public Result(string name, string sourcePath, bool success)
+        public Result(string name, string sourcePath, string destinationPath, bool success)
         {
             FileName = name;
             SourcePath = sourcePath;
+            DestinationPath = destinationPath;
             Success = success;
         }
     }

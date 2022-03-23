@@ -85,11 +85,15 @@ namespace Frends.SFTP.WriteFile
                         case Destination.DestinationOperation.Rename:
                             var newFile = RenameFile(client, source, destination);
                             client.UploadFile(fs, newFile, false);
-                            return new Result(newFile, Path.Combine(source.Directory, source.FileName), true);
+                            if (destination.Directory.StartsWith("/"))
+                                return new Result(newFile, Path.Combine(source.Directory, source.FileName), destination.Directory + "/" + newFile, true);
+                            return new Result(newFile, Path.Combine(source.Directory, source.FileName), Path.Combine(destination.Directory, newFile), true);
 
                         case Destination.DestinationOperation.Overwrite:
                             client.UploadFile(fs, source.FileName, true);
-                            return new Result(source.FileName, Path.Combine(source.Directory, source.FileName), true);
+                            if (destination.Directory.StartsWith("/"))
+                                return new Result(source.FileName, Path.Combine(source.Directory, source.FileName), destination.Directory + "/" + source.FileName, true);
+                            return new Result(source.FileName, Path.Combine(source.Directory, source.FileName), Path.Combine(destination.Directory, source.FileName), true);
 
                         default:
                             throw new Exception("Error in uploading the file: The destination file already exists.");
@@ -97,7 +101,7 @@ namespace Frends.SFTP.WriteFile
                 }
 
                 client.UploadFile(fs, source.FileName, false);
-                return new Result(source.FileName, Path.Combine(source.Directory, source.FileName), true);
+                return new Result(source.FileName, Path.Combine(source.Directory, source.FileName), Path.Combine(destination.Directory, source.FileName), true);
             }
         }
 

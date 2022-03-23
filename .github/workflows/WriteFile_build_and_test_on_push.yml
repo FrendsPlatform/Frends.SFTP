@@ -19,7 +19,7 @@ jobs:
     - uses: actions/checkout@v1
 
     - name: Set up fake SFTP server
-      run: docker run -p 22:22 -d atmoz/sftp foo:pass:::upload
+      run: docker run -p 2222:22 -d atmoz/sftp foo:pass:::upload
 
     - name: Build
       run: dotnet build
