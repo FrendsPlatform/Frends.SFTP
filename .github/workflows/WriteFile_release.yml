@@ -2,11 +2,6 @@ name: Frends.SFTP.WriteFile Release
 
 on:
   workflow_dispatch:
-    paths:
-      paths:
-        - 'Frends.SFTP.WriteFile/**'
-        
-  
 
 jobs:
   build:
