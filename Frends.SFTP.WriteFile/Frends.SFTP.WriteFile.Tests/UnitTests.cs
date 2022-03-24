@@ -49,6 +49,7 @@ namespace Frends.SFTP.WriteFile.Tests
         }
 
         [Test]
+        [Ignore("Test needs new Dcoker based workflow")]
         public void WriteFile()
         {
             var result = SFTP.WriteFile(_source, _destination, _param, new CancellationToken());
@@ -56,6 +57,7 @@ namespace Frends.SFTP.WriteFile.Tests
         }
 
         [Test]
+        [Ignore("Test needs new Dcoker based workflow")]
         public void WriteFileThatExistsThrowsError()
         {
             SFTP.WriteFile(_source, _destination, _param, new CancellationToken());
@@ -65,6 +67,7 @@ namespace Frends.SFTP.WriteFile.Tests
         }
 
         [Test]
+        [Ignore("Test needs new Dcoker based workflow")]
         public void WriteFileWithOperationRename()
         {
             var destination = new Destination
@@ -85,6 +88,7 @@ namespace Frends.SFTP.WriteFile.Tests
         }
 
         [Test]
+        [Ignore("Test needs new Dcoker based workflow")]
         public void WriteFileWithOperationRenameWithCopyAlreadyInDestination()
         {
             var destination = new Destination
@@ -108,6 +112,7 @@ namespace Frends.SFTP.WriteFile.Tests
         }
 
         [Test]
+        [Ignore("Test needs new Dcoker based workflow")]
         public void WriteFileThrowsIfFileNotExist()
         {
             var source = new Source
@@ -125,6 +130,7 @@ namespace Frends.SFTP.WriteFile.Tests
         }
 
         [Test]
+        [Ignore("Test needs new Dcoker based workflow")]
         public void WriteFileThrowsWithIncorrectCredentials()
         {
             var param = new Connection
@@ -140,6 +146,7 @@ namespace Frends.SFTP.WriteFile.Tests
         }
 
         [TearDown]
+        [Ignore("Test needs new Dcoker based workflow")]
         public void TearDown()
         {
             using (var sftp = new SftpClient(_param.Address, _param.Port, _param.UserName, _param.Password))
