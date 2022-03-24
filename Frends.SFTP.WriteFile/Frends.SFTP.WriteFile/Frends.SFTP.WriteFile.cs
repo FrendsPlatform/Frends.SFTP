@@ -9,14 +9,14 @@ namespace Frends.SFTP.WriteFile
     {
 
         /// <summary>
-        /// Writes a file to SFTP server.
+        /// Writes a file with SFTP connection.
         /// Documentation: https://github.com/FrendsPlatform/Frends.SFTP.WriteFile
         /// </summary>
         /// <param name="connection">Transfer connection parameters</param>
         /// <param name="source">Source file location</param>
         /// <param name="destination">Destination directory location</param>
         /// <param name="cancellationToken"></param>
-        /// <returns>{string Replication} </returns>
+        /// <returns>Result object </returns>
         public static Result WriteFile([PropertyTab] Source source, [PropertyTab] Destination destination, [PropertyTab] Connection connection, CancellationToken cancellationToken)
         {
             return new SFTP().WriteFileInternal(connection, source, destination, cancellationToken);
