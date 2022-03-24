@@ -34,8 +34,8 @@ You can install the task via FRENDS UI Task View or you can find the NuGet packa
 | Authentication | `enum` | Selection for authentication type. | `UsernamePassword` |
 | UserName | `string` | Username. | `foo` |
 | Password | `string` | Password. | `pass` |
-| PrivateKeyFileName | `string` | Full path to private key file. | `, ` |
-| Passphrase | `string` | Passphrase for the private key file. | `, ` |
+| PrivateKeyFileName | `string` | Full path to private key file. | `C:\private.key` |
+| Passphrase | `string` | Passphrase for the private key file. | `secret` |
 
 ### Result
 
@@ -45,6 +45,7 @@ A result object with parameters.
 | -------- | -------- | -------- | -------- |
 | FileName | `string` | The name of the file. Does not include the path. | `test.txt` |
 | SourcePath | `string` | The full source path of the file. | `C:\test.txt` |
+| DestinationPath | `string` | The destination path of the file. | `C:\test.txt` |
 | Success | `bool` | Boolean value of the successful transfer. | `true` |
 
 # Building
