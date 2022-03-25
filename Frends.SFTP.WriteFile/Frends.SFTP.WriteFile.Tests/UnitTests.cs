@@ -15,7 +15,7 @@ namespace Frends.SFTP.WriteFile.Tests
     /// 
     /// </summary>
     [TestFixture]
-    //[Ignore("Test needs new Dcoker based workflow")]
+    [Ignore("Test needs new Dcoker based workflow")]
     class TestClass
     {
         private static string _workDir;
