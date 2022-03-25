@@ -1,5 +1,8 @@
 ﻿using System.ComponentModel;
 using Renci.SshNet;
+using Renci.SshNet.Common;
+using System.Net.Sockets;
+using Frends.SFTP.WriteFile.Definitions;
 
 #pragma warning disable 1591
 
@@ -7,22 +10,15 @@ namespace Frends.SFTP.WriteFile
 {
     public class SFTP
     {
-
         /// <summary>
         /// Writes a file with SFTP connection.
-        /// Documentation: https://github.com/FrendsPlatform/Frends.SFTP.WriteFile
+        /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.SFTP.WriteFile)
         /// </summary>
         /// <param name="connection">Transfer connection parameters</param>
         /// <param name="source">Source file location</param>
         /// <param name="destination">Destination directory location</param>
-        /// <param name="cancellationToken"></param>
-        /// <returns>Result object </returns>
+        /// <returns>Result object {string FileName, string SourcePath, string DestinationPath, bool Success} </returns>
         public static Result WriteFile([PropertyTab] Source source, [PropertyTab] Destination destination, [PropertyTab] Connection connection, CancellationToken cancellationToken)
-        {
-            return new SFTP().WriteFileInternal(connection, source, destination, cancellationToken);
-        }
-
-        internal Result WriteFileInternal(Connection connection, Source source, Destination destination, CancellationToken cancellationToken)
         {
             // Establish connectionInfo with connection parameters
             var connectionInfo = GetConnectionInfo(connection);
@@ -40,15 +36,15 @@ namespace Frends.SFTP.WriteFile
 
                 }
             }
-            catch (Renci.SshNet.Common.SshConnectionException ex)
+            catch (SshConnectionException ex)
             {
                 throw new Exception($"Error when establishing connection to the Server: {ex.Message}", ex);
             }
-            catch (System.Net.Sockets.SocketException ex)
+            catch (SocketException ex)
             {
                 throw new Exception($"Unable to establish the socket: No such host is known.", ex);
             }
-            catch (Renci.SshNet.Common.SshAuthenticationException ex)
+            catch (SshAuthenticationException ex)
             {
                 throw new Exception($"Authentication of SSH session failed: {ex.Message}", ex);
             }
@@ -61,10 +57,10 @@ namespace Frends.SFTP.WriteFile
         {
             switch (connect.Authentication)
             {
-                case Connection.AuthenticationType.PrivateKey:
+                case AuthenticationType.PrivateKey:
                     return new PrivateKeyConnectionInfo(connect.Address, connect.Port, connect.UserName, new PrivateKeyFile(connect.PrivateKeyFileName));
 
-                case Connection.AuthenticationType.PrivateKeyPassphrase:
+                case AuthenticationType.PrivateKeyPassphrase:
                     return new PrivateKeyConnectionInfo(connect.Address, connect.Port, connect.UserName, new PrivateKeyFile(connect.PrivateKeyFileName, connect.Passphrase));
 
                 default:
@@ -80,14 +76,14 @@ namespace Frends.SFTP.WriteFile
                 {
                     switch (destination.Operation)
                     {
-                        case Destination.DestinationOperation.Rename:
+                        case DestinationOperation.Rename:
                             var newFile = RenameFile(client, source, destination);
                             client.UploadFile(fs, newFile, false);
                             if (destination.Directory.StartsWith("/"))
                                 return new Result(newFile, Path.Combine(source.Directory, source.FileName), destination.Directory + "/" + newFile, true);
                             return new Result(newFile, Path.Combine(source.Directory, source.FileName), Path.Combine(destination.Directory, newFile), true);
 
-                        case Destination.DestinationOperation.Overwrite:
+                        case DestinationOperation.Overwrite:
                             client.UploadFile(fs, source.FileName, true);
                             if (destination.Directory.StartsWith("/"))
                                 return new Result(source.FileName, Path.Combine(source.Directory, source.FileName), destination.Directory + "/" + source.FileName, true);

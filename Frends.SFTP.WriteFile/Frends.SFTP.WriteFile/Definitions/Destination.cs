@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 #pragma warning disable 1591
 
-namespace Frends.SFTP.WriteFile
+namespace Frends.SFTP.WriteFile.Definitions
 {
     /// <summary>
     /// Destination transfer options
@@ -23,15 +23,5 @@ namespace Frends.SFTP.WriteFile
         /// </summary>
         [DefaultValue(DestinationOperation.Error)]
         public DestinationOperation Operation { get; set; } = DestinationOperation.Error;
-
-        /// <summary>
-        /// Enumeration to specify operation if destination file exists.
-        /// </summary>
-        public enum DestinationOperation
-        {
-            Rename,
-            Overwrite,
-            Error
-        }
     }
 }

@@ -1,6 +1,6 @@
 # Frends.SFTP
 
-Frends tasks for tranfering files through SFTP connection.
+Frends tasks for SFTP operations.
 
 # Tasks
 

@@ -4,6 +4,7 @@ using System;
 using System.Net;
 using System.Threading;
 using Renci.SshNet;
+using Frends.SFTP.WriteFile.Definitions;
 
 namespace Frends.SFTP.WriteFile.Tests
 {
@@ -14,6 +15,7 @@ namespace Frends.SFTP.WriteFile.Tests
     /// 
     /// </summary>
     [TestFixture]
+    //[Ignore("Test needs new Dcoker based workflow")]
     class TestClass
     {
         private static string _workDir;
@@ -31,7 +33,7 @@ namespace Frends.SFTP.WriteFile.Tests
                 Address = Dns.GetHostName(),
                 Port = 2222,
                 UserName = "foo",
-                Authentication = Connection.AuthenticationType.UsernamePassword,
+                Authentication = Enums.AuthenticationType.UsernamePassword,
                 Password = "pass",
             };
 
@@ -44,12 +46,11 @@ namespace Frends.SFTP.WriteFile.Tests
             _destination = new Destination
             {
                 Directory = "/upload",
-                Operation = Destination.DestinationOperation.Error
+                Operation = Enums.DestinationOperation.Error
             };
         }
 
         [Test]
-        [Ignore("Test needs new Dcoker based workflow")]
         public void WriteFile()
         {
             var result = SFTP.WriteFile(_source, _destination, _param, new CancellationToken());
@@ -57,7 +58,6 @@ namespace Frends.SFTP.WriteFile.Tests
         }
 
         [Test]
-        [Ignore("Test needs new Dcoker based workflow")]
         public void WriteFileThatExistsThrowsError()
         {
             SFTP.WriteFile(_source, _destination, _param, new CancellationToken());
@@ -67,13 +67,12 @@ namespace Frends.SFTP.WriteFile.Tests
         }
 
         [Test]
-        [Ignore("Test needs new Dcoker based workflow")]
         public void WriteFileWithOperationRename()
         {
             var destination = new Destination
             {
                 Directory = "/upload",
-                Operation = Destination.DestinationOperation.Rename
+                Operation = Enums.DestinationOperation.Rename
             };
             SFTP.WriteFile(_source, _destination, _param, new CancellationToken());
             var result1 = SFTP.WriteFile(_source, destination, _param, new CancellationToken());
@@ -88,13 +87,12 @@ namespace Frends.SFTP.WriteFile.Tests
         }
 
         [Test]
-        [Ignore("Test needs new Dcoker based workflow")]
         public void WriteFileWithOperationRenameWithCopyAlreadyInDestination()
         {
             var destination = new Destination
             {
                 Directory = "/upload",
-                Operation = Destination.DestinationOperation.Rename
+                Operation = Enums.DestinationOperation.Rename
             };
 
             var source = new Source
@@ -112,7 +110,6 @@ namespace Frends.SFTP.WriteFile.Tests
         }
 
         [Test]
-        [Ignore("Test needs new Dcoker based workflow")]
         public void WriteFileThrowsIfFileNotExist()
         {
             var source = new Source
@@ -123,14 +120,13 @@ namespace Frends.SFTP.WriteFile.Tests
             var destination = new Destination
             {
                 Directory = "/upload",
-                Operation = Destination.DestinationOperation.Error
+                Operation = Enums.DestinationOperation.Error
             };
             var ex = Assert.Throws<FileNotFoundException>(() => SFTP.WriteFile(source, destination, _param, new CancellationToken()));
             Assert.That(ex.Message.StartsWith("Could not find file"));
         }
 
         [Test]
-        [Ignore("Test needs new Dcoker based workflow")]
         public void WriteFileThrowsWithIncorrectCredentials()
         {
             var param = new Connection
@@ -138,7 +134,7 @@ namespace Frends.SFTP.WriteFile.Tests
                 Address = "foo.bar.com",
                 Port = 1234,
                 UserName = "demo",
-                Authentication = Connection.AuthenticationType.UsernamePassword,
+                Authentication = Enums.AuthenticationType.UsernamePassword,
                 Password = "demo",
             };
             var ex = Assert.Throws<Exception>(() => SFTP.WriteFile(_source, _destination, param, new CancellationToken()));
@@ -146,7 +142,6 @@ namespace Frends.SFTP.WriteFile.Tests
         }
 
         [TearDown]
-        [Ignore("Test needs new Dcoker based workflow")]
         public void TearDown()
         {
             using (var sftp = new SftpClient(_param.Address, _param.Port, _param.UserName, _param.Password))

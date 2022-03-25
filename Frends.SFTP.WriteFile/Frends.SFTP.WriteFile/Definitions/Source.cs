@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 #pragma warning disable 1591
 
-namespace Frends.SFTP.WriteFile
+namespace Frends.SFTP.WriteFile.Definitions
 {
     /// <summary>
     /// Source transfer options

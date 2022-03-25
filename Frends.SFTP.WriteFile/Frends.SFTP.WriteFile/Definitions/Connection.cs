@@ -1,9 +1,9 @@
-﻿#pragma warning disable 1591
-
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Frends.SFTP.WriteFile
+#pragma warning disable 1591
+
+namespace Frends.SFTP.WriteFile.Definitions
 {
     /// <summary>
     /// Parameters class usually contains parameters that are required.
@@ -54,12 +54,5 @@ namespace Frends.SFTP.WriteFile
         [UIHint(nameof(Authentication), "", AuthenticationType.PrivateKeyPassphrase)]
         [PasswordPropertyText]
         public string Passphrase { get; set; }
-
-        public enum AuthenticationType
-        {
-            UsernamePassword,
-            PrivateKey,
-            PrivateKeyPassphrase
-        }
     }
 }

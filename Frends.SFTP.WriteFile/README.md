@@ -11,43 +11,6 @@ Writes a file to SFTP server.
 
 You can install the task via FRENDS UI Task View or you can find the NuGet package from the following NuGet feed
 
-### Source
-
-| Property | Type | Description | Example |
-| -------- | -------- | -------- | -------- |
-| Directory | `string` | Directory of the server. | `/` |
-| FileName | `string` | File name with extension to fetch. | `test.txt` |
-
-### Destination
-
-| Property | Type | Description | Example |
-| -------- | -------- | -------- | -------- |
-| Directory | `string` | Directory of the server. | `/` |
-| Operation | `enum` | Operation to determine what to do if destination file exists. | `Error` |
-
-### Connection
-
-| Property | Type | Description | Example |
-| -------- | -------- | -------- | -------- |
-| Address | `string` | SFTP host address. | `HOSTNAME` |
-| Port | `int` | Port number. | `22` |
-| Authentication | `enum` | Selection for authentication type. | `UsernamePassword` |
-| UserName | `string` | Username. | `foo` |
-| Password | `string` | Password. | `pass` |
-| PrivateKeyFileName | `string` | Full path to private key file. | `C:\private.key` |
-| Passphrase | `string` | Passphrase for the private key file. | `secret` |
-
-### Result
-
-A result object with parameters.
-
-| Property | Type | Description | Example |
-| -------- | -------- | -------- | -------- |
-| FileName | `string` | The name of the file. Does not include the path. | `test.txt` |
-| SourcePath | `string` | The full source path of the file. | `C:\test.txt` |
-| DestinationPath | `string` | The destination path of the file. | `C:\test.txt` |
-| Success | `bool` | Boolean value of the successful transfer. | `true` |
-
 # Building
 
 Clone a copy of the repo
