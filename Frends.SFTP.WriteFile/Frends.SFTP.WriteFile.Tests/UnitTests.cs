@@ -33,7 +33,7 @@ namespace Frends.SFTP.WriteFile.Tests
                 Address = Dns.GetHostName(),
                 Port = 2222,
                 UserName = "foo",
-                Authentication = Enums.AuthenticationType.UsernamePassword,
+                Authentication = AuthenticationType.UsernamePassword,
                 Password = "pass",
             };
 
@@ -46,7 +46,7 @@ namespace Frends.SFTP.WriteFile.Tests
             _destination = new Destination
             {
                 Directory = "/upload",
-                Operation = Enums.DestinationOperation.Error
+                Operation = DestinationOperation.Error
             };
         }
 
@@ -72,7 +72,7 @@ namespace Frends.SFTP.WriteFile.Tests
             var destination = new Destination
             {
                 Directory = "/upload",
-                Operation = Enums.DestinationOperation.Rename
+                Operation = DestinationOperation.Rename
             };
             SFTP.WriteFile(_source, _destination, _param, new CancellationToken());
             var result1 = SFTP.WriteFile(_source, destination, _param, new CancellationToken());
@@ -92,7 +92,7 @@ namespace Frends.SFTP.WriteFile.Tests
             var destination = new Destination
             {
                 Directory = "/upload",
-                Operation = Enums.DestinationOperation.Rename
+                Operation = DestinationOperation.Rename
             };
 
             var source = new Source
@@ -120,7 +120,7 @@ namespace Frends.SFTP.WriteFile.Tests
             var destination = new Destination
             {
                 Directory = "/upload",
-                Operation = Enums.DestinationOperation.Error
+                Operation = DestinationOperation.Error
             };
             var ex = Assert.Throws<FileNotFoundException>(() => SFTP.WriteFile(source, destination, _param, new CancellationToken()));
             Assert.That(ex.Message.StartsWith("Could not find file"));
@@ -134,7 +134,7 @@ namespace Frends.SFTP.WriteFile.Tests
                 Address = "foo.bar.com",
                 Port = 1234,
                 UserName = "demo",
-                Authentication = Enums.AuthenticationType.UsernamePassword,
+                Authentication = AuthenticationType.UsernamePassword,
                 Password = "demo",
             };
             var ex = Assert.Throws<Exception>(() => SFTP.WriteFile(_source, _destination, param, new CancellationToken()));
