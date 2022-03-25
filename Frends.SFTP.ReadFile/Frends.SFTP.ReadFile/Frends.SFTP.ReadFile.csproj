@@ -15,7 +15,7 @@
 	  <PackageTags>Frends</PackageTags>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
-	  <Description>Executes file transfer through SFTP connection.</Description>
+	  <Description>Read file through SFTP connection.</Description>
 	  <PackageProjectUrl>https://frends.com/</PackageProjectUrl>
 	  <RepositoryUrl>https://github.com/FrendsPlatform/Frends.SFTP/tree/main/Frends.SFTP.ReadFile</RepositoryUrl>
   </PropertyGroup>
