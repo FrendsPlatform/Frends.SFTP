@@ -1,0 +1,18 @@
+name: Frends.SFTP.WriteFile Main
+
+on:
+  push:
+    branches:    
+      - main
+    paths:
+      - 'Frends.SFTP.WriteFile/**'
+  workflow_dispatch:
+  
+
+jobs:
+  build:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/build_main.yml@main
+    with:
+      workdir: Frends.SFTP.WriteFile
+    secrets:
+      badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
