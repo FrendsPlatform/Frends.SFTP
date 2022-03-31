@@ -31,9 +31,7 @@ namespace Frends.SFTP.ListFiles
                 using (var client = new SftpClient(connectionInfo))
                 {
                     client.Connect();
-                    client.ChangeDirectory(options.Directory);
-                    client.BufferSize = 1024;
-                    result = GetFiles(client, regexStr, options.Directory, options.IncludeType, options.IncludeSubdirectories, cancellationToken);
+                    result = GetFiles(client, regexStr, options.Directory, options, cancellationToken);
                     client.Disconnect();
 
                 }
@@ -54,6 +52,35 @@ namespace Frends.SFTP.ListFiles
             return result;
         }
 
+        private static List<Result> GetFiles(SftpClient sftp, string regexStr, string directory, Options options, CancellationToken cancellationToken)
+        {
+            var directoryList = new List<Result>();
+
+            var files = sftp.ListDirectory(directory);
+
+            foreach (var file in files)
+            {
+                if (file.Name != "." && file.Name != "..")
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    if (options.IncludeType == IncludeType.Both
+                        || (file.IsDirectory && options.IncludeType == IncludeType.Directory)
+                        || (file.IsRegularFile && options.IncludeType == IncludeType.File))
+                    {
+                        if (Regex.IsMatch(file.Name, regexStr, RegexOptions.IgnoreCase))
+                            directoryList.Add(new Result(file));
+                    }
+
+                    if (file.IsDirectory && options.IncludeSubdirectories)
+                    {
+                        directoryList.AddRange(GetFiles(sftp, regexStr, file.FullName, options, cancellationToken));
+                    }
+                }
+            }
+            return directoryList;
+        }
+
         // Helper method to create connection info
         private static ConnectionInfo GetConnectionInfo(Connection connect)
         {
@@ -70,38 +97,9 @@ namespace Frends.SFTP.ListFiles
             }
         }
 
-        private static List<Result> GetFiles(SftpClient sftp, string regexStr, string directory, IncludeType includeType, bool includeSubdirectories, CancellationToken cancellationToken)
-        {
-            var directoryList = new List<Result>();
-
-            var files = ListDirectory(sftp, directory);
-            foreach (var file in files)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                if (includeType == IncludeType.Both
-                    || (file.IsDirectory && includeType == IncludeType.Directory)
-                    || (file.IsFile && includeType == IncludeType.File))
-                {
-                    if (Regex.IsMatch(file.Name, regexStr, RegexOptions.IgnoreCase))
-                        directoryList.Add(file);
-                }
-                if (file.IsDirectory && includeSubdirectories)
-                {
-                    directoryList.AddRange(GetFiles(sftp, regexStr, file.FullPath, includeType, includeSubdirectories, cancellationToken));
-                }
-            }
-            return directoryList;
-        }
-
         private static string WildCardToRegex(string value)
         {
             return "^" + Regex.Escape(value).Replace("\\?", ".").Replace("\\*", ".*") + "$";
-        }
-
-        private static IEnumerable<Result> ListDirectory(SftpClient client, string path, Action<int> listCallback = null)
-        {
-            return client.ListDirectory(path, listCallback).Select(f => new Result(f));
         }
     }
 }

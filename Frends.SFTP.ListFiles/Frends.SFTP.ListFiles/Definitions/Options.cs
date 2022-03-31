@@ -16,7 +16,7 @@ namespace Frends.SFTP.ListFiles.Definitions
         public string Directory { get; set; } = "/";
 
         /// <summary>
-        /// Pattern to match.
+        /// Pattern to match (Optional).
         /// </summary>
         [DisplayFormat(DataFormatString = "Text")]
         public string FileMask { get; set; }

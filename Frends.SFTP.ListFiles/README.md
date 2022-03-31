@@ -5,7 +5,7 @@
 ![GitHub](https://img.shields.io/github/license/FrendsPlatform/Frends.SFTP?label=License)
 ![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.SFTP/Frends.SFTP.ListFiles|main)
 
-Lists all files from specific directory through SFTP connection.
+Lists files from specific directory through SFTP connection.
 
 ## Installing
 

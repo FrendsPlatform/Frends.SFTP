@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading;
 using Renci.SshNet;
 using Renci.SshNet.Common;
+using Renci.SshNet.Sftp;
 using Frends.SFTP.ListFiles.Definitions;
 
 namespace Frends.SFTP.ListFiles.Tests
@@ -19,9 +20,9 @@ namespace Frends.SFTP.ListFiles.Tests
     class TestClass
     {
         private static string _workDir;
-        private static string _subDir;
         private static string _testFile1;
         private static string _testFile2;
+        private static string _testFile3;
         private static string _testDataDir;
         private static Connection _connection;
         private static Options _options;
@@ -30,9 +31,9 @@ namespace Frends.SFTP.ListFiles.Tests
         public static void OneTimeSetup()
         {
             _workDir = "/upload";
-            _subDir = "/upload/subdirectory";
             _testFile1 = "TestFile1.txt";
-            _testFile2 = "TestFile1(2).txt";
+            _testFile2 = "TestFile2.txt";
+            _testFile3 = "TestFile3.csv";
             _testDataDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
 
             _connection = new Connection
@@ -53,16 +54,31 @@ namespace Frends.SFTP.ListFiles.Tests
             };
         }
 
-        [SetUp]
+        [OneTimeSetUp]
         public void Setup()
         {
             UploadTestFiles();
         }
 
-        [TearDown]
+        [OneTimeTearDown]
         public void TearDown()
         {
             DeleteTestFiles();
+        }
+
+        [Test]
+        public void ListFilesWithIncludeSubdirectoriesDisabled()
+        {
+            var options = new Options
+            {
+                Directory = "/upload",
+                FileMask = "*.txt",
+                IncludeType = IncludeType.File,
+                IncludeSubdirectories = false
+            };
+            var result = SFTP.ListFiles(options, _connection, new CancellationToken());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -74,7 +90,67 @@ namespace Frends.SFTP.ListFiles.Tests
         }
 
         [Test]
+        public void ListFilesWithoutFileMask()
+        {
+            var options = new Options
+            {
+                Directory = "/upload",
+                FileMask = "",
+                IncludeType = IncludeType.File,
+                IncludeSubdirectories = true
+            };
+            var result = SFTP.ListFiles(options, _connection, new CancellationToken());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(3));
+        }
+
+        [Test]
+        public void ListFilesWithIncludeTypeBoth()
+        {
+            var options = new Options
+            {
+                Directory = "/upload",
+                FileMask = "",
+                IncludeType = IncludeType.Both,
+                IncludeSubdirectories = true
+            };
+            var result = SFTP.ListFiles(options, _connection, new CancellationToken());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void ListFilesWithIncludeTypeDirectory()
+        {
+            var options = new Options
+            {
+                Directory = "/upload",
+                FileMask = "",
+                IncludeType = IncludeType.Directory,
+                IncludeSubdirectories = true
+            };
+            var result = SFTP.ListFiles(options, _connection, new CancellationToken());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(1));
+        }
+
+        [Test]
         public void ListFilesThrowsWithIncorrectCredentials()
+        {
+            var connection = new Connection
+            {
+                Address = Dns.GetHostName(),
+                Port = 2222,
+                UserName = "demo",
+                Authentication = AuthenticationType.UsernamePassword,
+                Password = "demo",
+            };
+            var ex = Assert.Throws<Exception>(() => SFTP.ListFiles(_options, connection, new CancellationToken()));
+            Assert.AreEqual("Authentication of SSH session failed: Permission denied (password).", ex.Message);
+        }
+
+        [Test]
+        public void ListFilesThrowsWithInvalidConnectionOptions()
         {
             var connection = new Connection
             {
@@ -99,6 +175,7 @@ namespace Frends.SFTP.ListFiles.Tests
                 using (var fs = new FileStream(testfileFullPath, FileMode.Open))
                 {
                     sftp.UploadFile(fs, _testFile1, true);
+                    sftp.UploadFile(fs, _testFile3, true);
                 }
                 testfileFullPath = Path.Combine(_testDataDir, _testFile2);
                 sftp.CreateDirectory("/upload/subdirectory");
@@ -116,15 +193,30 @@ namespace Frends.SFTP.ListFiles.Tests
             using (var sftp = new SftpClient(_connection.Address, _connection.Port, _connection.UserName, _connection.Password))
             {
                 sftp.Connect();
-                sftp.ChangeDirectory("/upload");
+                sftp.ChangeDirectory(_workDir);
                 var files = sftp.ListDirectory(".");
                 foreach (var file in files)
                 {
-                    if (file.IsDirectory)
+                    if (file.Name != "." && file.Name != "..")
                     {
-                        sftp.DeleteDirectory(file.FullName);
+                        if (file.IsDirectory)
+                        {
+                            sftp.ChangeDirectory(file.FullName);
+                            foreach(var f in sftp.ListDirectory("."))
+                            {
+                                if (f.Name != "." && f.Name != "..")
+                                {
+                                    sftp.DeleteFile(f.Name);
+                                }
+                            }
+                            sftp.ChangeDirectory(_workDir);
+                            sftp.DeleteDirectory(file.FullName);
+                        }
+                        else
+                        {
+                            sftp.DeleteFile(file.FullName);
+                        }
                     }
-                    sftp.DeleteFile(file.FullName);
                 }
                 sftp.Disconnect();
             }
