@@ -1,0 +1,19 @@
+name: Frends.SFTP.ReadFile Main
+
+on:
+  push:
+    branches:    
+      - main
+    paths:
+      - 'Frends.SFTP.ReadFile/**'
+  workflow_dispatch:
+  
+
+jobs:
+  build:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/build_main.yml@main
+    with:
+      workdir: Frends.SFTP.ReadFile
+    secrets:
+      badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
+      
