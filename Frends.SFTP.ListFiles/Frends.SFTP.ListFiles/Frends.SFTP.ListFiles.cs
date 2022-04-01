@@ -87,13 +87,13 @@ namespace Frends.SFTP.ListFiles
             switch (connect.Authentication)
             {
                 case AuthenticationType.PrivateKey:
-                    return new PrivateKeyConnectionInfo(connect.Address, connect.Port, connect.UserName, new PrivateKeyFile(connect.PrivateKeyFileName));
+                    return new PrivateKeyConnectionInfo(connect.Address, connect.Port, connect.Username, new PrivateKeyFile(connect.PrivateKeyFileName));
 
                 case AuthenticationType.PrivateKeyPassphrase:
-                    return new PrivateKeyConnectionInfo(connect.Address, connect.Port, connect.UserName, new PrivateKeyFile(connect.PrivateKeyFileName, connect.Passphrase));
+                    return new PrivateKeyConnectionInfo(connect.Address, connect.Port, connect.Username, new PrivateKeyFile(connect.PrivateKeyFileName, connect.Passphrase));
 
                 default:
-                    return new PasswordConnectionInfo(connect.Address, connect.Port, connect.UserName, connect.Password);
+                    return new PasswordConnectionInfo(connect.Address, connect.Port, connect.Username, connect.Password);
             }
         }
 

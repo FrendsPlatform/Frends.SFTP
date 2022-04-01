@@ -30,7 +30,7 @@ namespace Frends.SFTP.ListFiles.Definitions
         /// Username
         /// </summary>
         [DisplayFormat(DataFormatString = "Text")]
-        public string UserName { get; set; }
+        public string Username { get; set; }
 
         /// <summary>
         /// Password
