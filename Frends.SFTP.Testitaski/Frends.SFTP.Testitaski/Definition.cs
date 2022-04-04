@@ -8,7 +8,7 @@ using Renci.SshNet.Sftp;
 namespace Frends.Community.Sftp
 {
     /// <summary>
-    /// Enumeration to specify if the directory listing should contain files, directories or both.
+    /// Enumeration to specify if the directory bdqijbdjwqbdojwqdb should contain files, directories or both.
     /// </summary>
     public enum IncludeType
     {
