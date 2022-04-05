@@ -6,25 +6,26 @@ using System.Text.RegularExpressions;
 using Frends.SFTP.ListFiles.Definitions;
 
 #pragma warning disable 1591
+#pragma warning disable 1573
 
 namespace Frends.SFTP.ListFiles
 {
     public class SFTP
     {
         /// <summary>
-        /// Reads a file with SFTP connection.
-        /// Documentation: https://github.com/FrendsPlatform/Frends.SFTP.ReadFile
+        /// List files from set destination folder with file mask through SFTP connection.
+        /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.SFTP.ListFiles)
         /// </summary>
         /// <param name="connection">Transfer connection parameters</param>
         /// <param name="options">Source file location</param>
-        /// <param name="cancellationToken"></param>
         /// <returns>List [ Object { string FullPath, bool IsDirectory, bool IsFile, long Length, string Name, DateTime LastWriteTimeUtc, DateTime LastAccessTimeUtc, DateTime LastWriteTime, DateTime LastAccessTime } ]</returns>
         public static List<Result> ListFiles([PropertyTab] Options options, [PropertyTab] Connection connection, CancellationToken cancellationToken)
         {
             // Establish connectionInfo with connection parameters
             var connectionInfo = GetConnectionInfo(connection);
             var result = new List<Result>();
-            var regexStr = string.IsNullOrEmpty(options.FileMask) ? string.Empty : WildCardToRegex(options.FileMask);
+            var regex = "^" + Regex.Escape(options.FileMask).Replace("\\?", ".").Replace("\\*", ".*") + "$";
+            var regexStr = string.IsNullOrEmpty(options.FileMask) ? string.Empty : regex;
 
             try
             {
@@ -60,10 +61,10 @@ namespace Frends.SFTP.ListFiles
 
             foreach (var file in files)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 if (file.Name != "." && file.Name != "..")
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-
                     if (options.IncludeType == IncludeType.Both
                         || (file.IsDirectory && options.IncludeType == IncludeType.Directory)
                         || (file.IsRegularFile && options.IncludeType == IncludeType.File))
@@ -95,11 +96,6 @@ namespace Frends.SFTP.ListFiles
                 default:
                     return new PasswordConnectionInfo(connect.Address, connect.Port, connect.Username, connect.Password);
             }
-        }
-
-        private static string WildCardToRegex(string value)
-        {
-            return "^" + Regex.Escape(value).Replace("\\?", ".").Replace("\\*", ".*") + "$";
         }
     }
 }

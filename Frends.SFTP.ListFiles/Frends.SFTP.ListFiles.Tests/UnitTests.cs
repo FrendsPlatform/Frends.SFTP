@@ -4,8 +4,6 @@ using System;
 using System.Net;
 using System.Threading;
 using Renci.SshNet;
-using Renci.SshNet.Common;
-using Renci.SshNet.Sftp;
 using Frends.SFTP.ListFiles.Definitions;
 
 namespace Frends.SFTP.ListFiles.Tests
