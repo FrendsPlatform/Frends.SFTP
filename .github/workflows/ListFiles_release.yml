@@ -1,4 +1,4 @@
-name: Frends.SFTP.WriteFile Release
+name: Frends.SFTP.ListFiles Release
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ jobs:
   build:
     uses: FrendsPlatform/FrendsTasks/.github/workflows/release.yml@main
     with:
-      workdir: Frends.SFTP.WriteFile
+      workdir: Frends.SFTP.ListFiles
     secrets:
       feed_api_key: ${{ secrets.TASKS_FEED_API_KEY }}
       
