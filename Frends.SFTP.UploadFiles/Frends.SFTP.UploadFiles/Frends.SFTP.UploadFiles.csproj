@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFrameworks>net6.0;netstandard2.0</TargetFrameworks>
+	  <LangVersion>latest</LangVersion>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <IncludeSource>true</IncludeSource>
+	  <AssemblyName>Frends.SFTP.UploadFiles</AssemblyName>
+	  <RootNamespace>Frends.SFTP.UploadFiles</RootNamespace>
+
+	  <Version>1.0.0</Version>
+	  <Authors>Frends</Authors>
+	  <Copyright>Frends</Copyright>
+	  <Company>Frends</Company>
+	  <Product>Frends</Product>
+	  <PackageTags>Frends</PackageTags>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	  <Description>Upload files through SFTP connection.</Description>
+	  <PackageProjectUrl>https://frends.com/</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/FrendsPlatform/Frends.SFTP/tree/main/Frends.SFTP.UploadFiles</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="FrendsTaskMetadata.json" Pack="true" PackagePath="/">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+	<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+	<PackageReference Include="Newtonsoft.Json" Version="11.0.2">
+		<NoWarn>NU1605</NoWarn>
+	</PackageReference>
+	<PackageReference Include="Serilog" Version="2.11.0" />
+    <PackageReference Include="SSH.NET" Version="2020.0.1" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
+  </ItemGroup>
+
+</Project>
+
