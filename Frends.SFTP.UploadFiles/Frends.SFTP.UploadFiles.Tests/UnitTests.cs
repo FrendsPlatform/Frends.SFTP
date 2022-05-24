@@ -252,8 +252,7 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Password = "demo",
                 BufferSize = 32
             };
-            var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.StartsWith("SFTP transfer failed: Unable to establish the socket: No such host"));
+            Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
         }
 
         [Test]
