@@ -1,0 +1,24 @@
+name: Frends.SFTP.UploadFiles Main
+
+on:
+  push:
+    branches:    
+      - main
+    paths:
+      - 'Frends.SFTP.UploadFiles/**'
+  workflow_dispatch:
+  
+
+jobs:
+  build:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/build_main.yml@main
+    with:
+      workdir: Frends.SFTP.UploadFiles
+      env_var_name_1: HiQ_OpsTestSftpServerAddress
+      env_var_name_2: HiQ_OpsTestSftpServerUsername
+      env_var_name_3: HiQ_OpsTestSftpServerPassword
+    secrets:
+      badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
+      env_var_value_1: ${{ secrets.HIQ_OPSTESTSFTPSERVERADDRESS }}
+      env_var_value_2: ${{ secrets.HIQ_OPSTESTSFTPSERVERUSERNAME }}
+      env_var_value_3: ${{ secrets.HIQ_OPSTESTSFTPSERVERPASSWORD }}

@@ -102,12 +102,10 @@ namespace Frends.SFTP.UploadFiles.Definitions
                             }
 
                         }
-                        client.KeepAliveInterval = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
                         client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
-                        client.OperationTimeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
 
                         // TODO: Chnage BufferSize to something meaningful
-                        client.BufferSize = (_batchContext.Connection.UseLargeBuffers) ? client.BufferSize * 1024 : client.BufferSize;
+                        client.BufferSize = _batchContext.Connection.BufferSize;
 
                         client.Connect();
 

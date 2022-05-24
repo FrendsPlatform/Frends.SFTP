@@ -1,0 +1,13 @@
+name: Frends.SFTP.UploadFiles Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/release.yml@main
+    with:
+      workdir: Frends.SFTP.UploadFiles
+    secrets:
+      feed_api_key: ${{ secrets.TASKS_FEED_API_KEY }}
+      

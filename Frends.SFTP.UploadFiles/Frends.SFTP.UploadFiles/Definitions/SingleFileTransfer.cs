@@ -1,4 +1,5 @@
-﻿using Renci.SshNet;
+﻿using System.Text;
+using Renci.SshNet;
 
 namespace Frends.SFTP.UploadFiles.Definitions
 {
@@ -102,8 +103,10 @@ namespace Frends.SFTP.UploadFiles.Definitions
                     switch (BatchContext.Destination.Action)
                     {
                         case DestinationAction.Append:
-                            var content = ReadFileContent(SourceFile.FullPath);
-                            AppendDestinationFile(content);
+                            var fullPath = SourceFile.FullPath;
+                            if (!string.IsNullOrEmpty(SourceFileDuringTransfer))
+                                fullPath = SourceFileDuringTransfer;
+                            AppendDestinationFile(GetSourceFileContent(fullPath));
                             break;
                         case DestinationAction.Overwrite:
                             PutDestinationFile(removeExisting: true);
@@ -162,23 +165,10 @@ namespace Frends.SFTP.UploadFiles.Definitions
         }
 
         /// <summary>
-        /// Reads content of source file.
-        /// </summary>
-        /// <param name="SourceFilePath"></param>
-        /// <returns></returns>
-        private List<string> ReadFileContent(string SourceFilePath)
-        {
-            var LogList = new List<string>();
-            var content = File.ReadAllLines(SourceFilePath);
-            foreach (var line in content) LogList.Add(line);
-            return LogList;
-        }
-
-        /// <summary>
         /// Appends source file content to existing destination file.
         /// </summary>
         /// <param name="content"></param>
-        private void AppendDestinationFile(IEnumerable<string> content)
+        private void AppendDestinationFile(string[] content)
         {
             Trace(
                 TransferState.AppendToDestinationFile,
@@ -186,7 +176,19 @@ namespace Frends.SFTP.UploadFiles.Definitions
                 SourceFile.Name,
                 DestinationFileNameWithMacrosExpanded);
 
-            Client.AppendAllLines(DestinationFileNameWithMacrosExpanded, content);
+            var path = (BatchContext.Destination.Directory.Contains("/")) 
+                ? BatchContext.Destination.Directory + "/" + SourceFile.Name
+                : Path.Combine(BatchContext.Destination.Directory, DestinationFileNameWithMacrosExpanded);
+            if (!string.IsNullOrEmpty(DestinationFileDuringTransfer))
+                path = DestinationFileDuringTransfer;
+
+            Client.AppendAllLines(path, content, Encoding.UTF8);
+        }
+
+        private string[] GetSourceFileContent(string fullPath)
+        {
+            return File.ReadAllLines(fullPath);
+
         }
 
         /// <summary>
@@ -303,7 +305,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         private void HandleTransferError(Exception exception, string sourceFileRestoreMessage)
         {
             _result.Success = false; // the routine instance should be marked as failed if even one transfer fails
-            var errorMessage = string.Format("Failure in {0}: File '{1}' could not be transferred to '{2}'. Error: {3}", State, SourceFile.Name, DestinationFileNameWithMacrosExpanded, exception.Message);
+            var errorMessage = string.Format("Failure in {0}: File '{1}' could not be transferred to '{2}'. Error: {3}", State, SourceFile.Name, BatchContext.Destination.Directory, exception.Message);
             if (!string.IsNullOrEmpty(sourceFileRestoreMessage))
             {
                 errorMessage += " " + sourceFileRestoreMessage;

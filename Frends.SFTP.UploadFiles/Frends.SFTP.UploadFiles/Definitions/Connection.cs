@@ -79,11 +79,10 @@ namespace Frends.SFTP.UploadFiles.Definitions
         public string ServerFingerPrint { get; set; }
 
         /// <summary>
-        /// If set, will explicitly use larger buffers (4 MB for TCP receive,
-        /// 256 kB for TCP send, 2 MB for SSH buffer) instead of the defaults.
-        /// This may increase especially download speeds.
+        /// Integer value of used buffer size as KB.
+        /// Default value is 32 KB.
         /// </summary>
-        [DefaultValue(false)]
-        public bool UseLargeBuffers { get; set; }
+        [DefaultValue(32)]
+        public uint BufferSize { get; set; }
     }
 }
