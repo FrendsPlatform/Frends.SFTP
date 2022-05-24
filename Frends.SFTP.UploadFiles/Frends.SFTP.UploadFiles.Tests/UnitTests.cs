@@ -1,6 +1,8 @@
 using NUnit.Framework;
 using System.IO;
 using System;
+using System.Net;
+using System.Text;
 using System.Threading;
 using Renci.SshNet;
 using Renci.SshNet.Sftp;
@@ -10,10 +12,29 @@ using System.Linq;
 
 namespace Frends.SFTP.UploadFiles.Tests
 {
-
+    /// <summary>
+    /// NOTE: To run these unit tests, you need an SFTP test server.
+    /// 
+    /// docker run -p 22:22 -d atmoz/sftp foo:pass:::upload
+    /// 
+    /// </summary>
     [TestFixture]
     class TestClass
     {
+        /// <summary>
+        /// Test credentials for docker server
+        /// </summary>
+        private static string _dockerAddress = Dns.GetHostName();
+        private static string _dockerUsername = "foo";
+        private static string _dockerPassword = "pass";
+
+        /// <summary>
+        /// Test credentials for HiQ test server
+        /// </summary>
+        private static string _HiQOpsAddress = Environment.GetEnvironmentVariable("HiQ_OpsTestSftpServerAddress");
+        private static string _HiQOpsUsername = Environment.GetEnvironmentVariable("HiQ_OpsTestSftpServerUsername");
+        private static string _HiQOpsPassword = Environment.GetEnvironmentVariable("HiQ_OpsTestSftpServerPassword");
+
         private static Connection _connection;
         private static Source _source;
         private static Destination _destination;
@@ -30,17 +51,18 @@ namespace Frends.SFTP.UploadFiles.Tests
             _connection = new Connection
             {
                 ConnectionTimeout = 60,
-                Address = Environment.GetEnvironmentVariable("HiQ_OpsTestSftpServerAddress"),
-                Port = 22,
-                UserName = Environment.GetEnvironmentVariable("HiQ_OpsTestSftpServerUsername"),
+                Address = _dockerAddress,
+                Port = 2222,
+                UserName = _dockerUsername,
                 Authentication = AuthenticationType.UsernamePassword,
-                Password = Environment.GetEnvironmentVariable("HiQ_OpsTestSftpServerPassword"),
+                Password = _dockerPassword,
+                ServerFingerPrint = null,
                 BufferSize = 32
             };
 
             _source = new Source
             {
-                Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/"),
+                Directory = _workDir,
                 FileName = "SFTPUploadTestFile.txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Nothing,
@@ -48,7 +70,7 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             _destination = new Destination
             {
-                Directory = "/Upload",
+                Directory = "/upload/Upload",
                 Action = DestinationAction.Error
             };
 
@@ -82,11 +104,11 @@ namespace Frends.SFTP.UploadFiles.Tests
             var connection = new Connection
             {
                 ConnectionTimeout = 60,
-                Address = Environment.GetEnvironmentVariable("HiQ_OpsTestSftpServerAddress"),
-                Port = 22,
-                UserName = Environment.GetEnvironmentVariable("HiQ_OpsTestSftpServerUsername"),
+                Address = _dockerAddress,
+                Port = 2222,
+                UserName = _dockerUsername,
                 Authentication = AuthenticationType.UsernamePassword,
-                Password = Environment.GetEnvironmentVariable("HiQ_OpsTestSftpServerPassword"),
+                Password = _dockerPassword,
                 BufferSize = 256
             };
 
@@ -122,11 +144,11 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
-        public void UploadFilesWithSubdirectoryInDestination()
+        public void UploadFilesWithMultipleSubdirectoriesInDestination()
         {
             var destination = new Destination
             {
-                Directory = "/Upload/sub",
+                Directory = "/upload/Upload/sub",
                 Action = DestinationAction.Error
             };
 
@@ -153,7 +175,7 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             var destination = new Destination
             {
-                Directory = "/Upload",
+                Directory = "/upload/Upload",
                 Action = DestinationAction.Error
             };
 
@@ -223,7 +245,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             var connection = new Connection
             {
                 ConnectionTimeout = 10,
-                Address = Environment.GetEnvironmentVariable("HiQ_OpsTestSftpServerAddress"),
+                Address = _dockerAddress,
                 Port = 22,
                 UserName = "demo",
                 Authentication = AuthenticationType.UsernamePassword,
@@ -231,7 +253,7 @@ namespace Frends.SFTP.UploadFiles.Tests
                 BufferSize = 32
             };
             var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.StartsWith("SFTP transfer failed: Authentication of SSH session failed: "));
+            Assert.That(ex.Message.StartsWith("SFTP transfer failed: Unable to establish the socket: No such host"));
         }
 
         [Test]
@@ -240,16 +262,16 @@ namespace Frends.SFTP.UploadFiles.Tests
             var connection = new Connection
             {
                 ConnectionTimeout = 10,
-                Address = Environment.GetEnvironmentVariable("HiQ_OpsTestSftpServerAddress"),
+                Address = _dockerAddress,
                 Port = 51651,
-                UserName = Environment.GetEnvironmentVariable("HiQ_OpsTestSftpServerUsername"),
+                UserName = _dockerUsername,
                 Authentication = AuthenticationType.UsernamePassword,
-                Password = Environment.GetEnvironmentVariable("HiQ_OpsTestSftpServerPassword"),
+                Password = _dockerPassword,
                 BufferSize = 32
             };
 
-            var ex = Assert.Throws<SshOperationTimeoutException>(() => SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-            Assert.AreEqual("Connection failed to establish within 10000 milliseconds.", ex.Message);
+            var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
+            Assert.That(ex.Message.StartsWith("SFTP transfer failed: Unable to establish the socket: No such host is known"));
         }
 
         [Test]
@@ -289,7 +311,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         {
             var destination = new Destination
             {
-                Directory = "/Upload",
+                Directory = "/upload/Upload",
                 FileName = "%SourceFileName%%Date%%SourceFileExtension%",
                 Action = DestinationAction.Error
             };
@@ -297,7 +319,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             var result = SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var date = DateTime.Now;
-            Assert.IsTrue(CheckFileExistsInDestination("/Upload/SFTPUploadTestFile" + date.ToString(@"yyyy-MM-dd") + ".txt"));
+            Assert.IsTrue(CheckFileExistsInDestination("/upload/Upload/SFTPUploadTestFile" + date.ToString(@"yyyy-MM-dd") + ".txt"));
         }
 
         [Test]
@@ -310,17 +332,26 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             var destination = new Destination
             {
-                Directory = "/Upload",
+                Directory = "/upload/Upload",
+                FileName = "SFTPUploadTestFile.txt",
                 Action = DestinationAction.Append
             };
 
-            result = SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var source = new Source
+            {
+                Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/"),
+                FileName = "SFTPUploadTestFile2.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing
+            };
+
+            result = SFTP.UploadFiles(source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var content2 = GetTransferredFileContent(fullPath);
             Assert.AreNotEqual(content1.Length, content2.Length);
         }
 
-        //[TearDown]
+        [TearDown]
         public void TearDown()
         {
             using (var sftp = new SftpClient(_connection.Address, _connection.Port, _connection.UserName, _connection.Password))

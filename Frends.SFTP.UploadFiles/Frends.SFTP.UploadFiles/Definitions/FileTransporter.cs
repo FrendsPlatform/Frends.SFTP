@@ -122,7 +122,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
                             {
                                 try
                                 {
-                                    client.CreateDirectory(_batchContext.Destination.Directory);
+                                    CreateAllDirectories(client, _batchContext.Destination.Directory);
                                 }
                                 catch (Exception ex)
                                 {
@@ -235,6 +235,26 @@ namespace Frends.SFTP.UploadFiles.Definitions
             }
 
             return new Tuple<List<FileItem>, bool>(fileItems, true);
+        }
+
+        private static void CreateAllDirectories(SftpClient client, string path)
+        {
+            // Consistent forward slashes
+            path = path.Replace(@"\", "/");
+            foreach (string dir in path.Split('/'))
+            {
+                // Ignoring leading/ending/multiple slashes
+                if (!string.IsNullOrWhiteSpace(dir))
+                {
+                    if (!client.Exists(dir))
+                    {
+                        client.CreateDirectory(dir);
+                    }
+                    client.ChangeDirectory(dir);
+                }
+            }
+            // Going back to default directory
+            client.ChangeDirectory("/");
         }
 
         private static string[] ConvertObjectToStringArray(object objectArray)

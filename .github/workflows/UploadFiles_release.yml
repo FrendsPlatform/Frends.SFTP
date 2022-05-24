@@ -5,9 +5,10 @@ on:
 
 jobs:
   build:
-    uses: FrendsPlatform/FrendsTasks/.github/workflows/release.yml@main
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/linux_release.yml@ISSUE-9
     with:
       workdir: Frends.SFTP.UploadFiles
+      prebuild_command: docker run -p 2222:22 -d atmoz/sftp foo:pass:::upload
     secrets:
       feed_api_key: ${{ secrets.TASKS_FEED_API_KEY }}
       

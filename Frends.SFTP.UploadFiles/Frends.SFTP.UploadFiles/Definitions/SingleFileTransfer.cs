@@ -176,18 +176,31 @@ namespace Frends.SFTP.UploadFiles.Definitions
                 SourceFile.Name,
                 DestinationFileNameWithMacrosExpanded);
 
+            // Determine path to use to the destination file.
             var path = (BatchContext.Destination.Directory.Contains("/")) 
-                ? BatchContext.Destination.Directory + "/" + SourceFile.Name
+                ? BatchContext.Destination.Directory + "/" + DestinationFileNameWithMacrosExpanded
                 : Path.Combine(BatchContext.Destination.Directory, DestinationFileNameWithMacrosExpanded);
+
+            // If destination rename during transfer is enabled, use that instead 
             if (!string.IsNullOrEmpty(DestinationFileDuringTransfer))
                 path = DestinationFileDuringTransfer;
-
             Client.AppendAllLines(path, content, Encoding.UTF8);
         }
 
+        /// <summary>
+        /// Reads content of the source file 
+        /// </summary>
+        /// <param name="fullPath"></param>
+        /// <returns></returns>
         private string[] GetSourceFileContent(string fullPath)
         {
-            return File.ReadAllLines(fullPath);
+            var result = new List<string>();
+            result.Add("\n");
+            var content = File.ReadAllLines(fullPath, Encoding.UTF8);
+            foreach (var line in content)
+                result.Add(line);
+
+            return result.ToArray();
 
         }
 
