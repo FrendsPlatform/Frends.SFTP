@@ -79,6 +79,14 @@ namespace Frends.SFTP.UploadFiles.Definitions
         public string ServerFingerPrint { get; set; }
 
         /// <summary>
+        /// If set, this ecoding will be used to encode and decode command 
+        /// parameters and server responses, such as file names. Example 
+        /// values: utf-8, utf-16, windows-1252.
+        /// </summary>
+        [DefaultValue("")]
+        public string Encoding { get; set; }
+
+        /// <summary>
         /// Integer value of used buffer size as KB.
         /// Default value is 32 KB.
         /// </summary>

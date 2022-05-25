@@ -184,7 +184,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
             // If destination rename during transfer is enabled, use that instead 
             if (!string.IsNullOrEmpty(DestinationFileDuringTransfer))
                 path = DestinationFileDuringTransfer;
-            Client.AppendAllLines(path, content, Encoding.UTF8);
+            Client.AppendAllLines(path, content);
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         {
             var result = new List<string>();
             result.Add("\n");
-            var content = File.ReadAllLines(fullPath, Encoding.UTF8);
+            var content = File.ReadAllLines(fullPath);
             foreach (var line in content)
                 result.Add(line);
 

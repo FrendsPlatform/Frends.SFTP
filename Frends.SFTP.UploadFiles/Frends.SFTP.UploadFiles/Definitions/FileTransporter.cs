@@ -1,6 +1,8 @@
 ﻿using Renci.SshNet;
 using Renci.SshNet.Common;
+using Renci.SshNet.Security;
 using System.Net.Sockets;
+using System.Text;
 
 namespace Frends.SFTP.UploadFiles.Definitions
 {
@@ -69,9 +71,18 @@ namespace Frends.SFTP.UploadFiles.Definitions
                 else
                 {
                     _batchContext.SourceFiles = files;
-
+                    ConnectionInfo connectionInfo;
                     // Establish connectionInfo with connection parameters
-                    var connectionInfo = GetConnectionInfo(_batchContext.Connection);
+                    try
+                    {
+                        connectionInfo = GetConnectionInfo(_batchContext.Connection);
+                    } 
+                    catch (Exception e)
+                    {
+                        userResultMessage = $"Error when initializing connection info: {e}";
+                        _logger.NotifyError(null, "Error when initializing connection info: ", e);
+                        return FormFailedFileTransferResult(userResultMessage);
+                    }
 
                     using (var client = new SftpClient(connectionInfo))
                     {
@@ -97,7 +108,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
                             }
                             catch (Exception e)
                             {
-                                _logger.NotifyError(null, "Error when initializing connection info: ", e);
+                                _logger.NotifyError(null, "Error when checking the server fingerprint: ", e);
                                 return FormFailedFileTransferResult(userResultMessage);
                             }
 
@@ -173,6 +184,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         #region Helper methods
         private static ConnectionInfo GetConnectionInfo(Connection connect)
         {
+            ConnectionInfo connectionInfo;
             List<AuthenticationMethod> methods = new List<AuthenticationMethod>();
             PrivateKeyFile privateKey = null;
             if (connect.Authentication == AuthenticationType.UsernamePrivateKey || connect.Authentication == AuthenticationType.UsernamePasswordPrivateKey)
@@ -196,7 +208,14 @@ namespace Frends.SFTP.UploadFiles.Definitions
                     throw new ArgumentException($"Unknown Authentication type: '{connect.Authentication}'.");
             }
 
-            return new ConnectionInfo(connect.Address, connect.Port, connect.UserName, methods.ToArray());
+            connectionInfo = new ConnectionInfo(connect.Address, connect.Port, connect.UserName, methods.ToArray());
+
+            if (!string.IsNullOrEmpty(connect.Encoding))
+            {
+                var encoding = Encoding.GetEncoding(connect.Encoding);
+                connectionInfo.Encoding = encoding;
+            }
+            return connectionInfo;
         }
 
         private Tuple<List<FileItem>, bool> GetSourceFiles(Source source)

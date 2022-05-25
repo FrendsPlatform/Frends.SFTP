@@ -91,7 +91,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
-        public void UploadFiles()
+        public void UploadFiles_TestSimpleTransfer()
         {
             var result = SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
@@ -99,7 +99,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
-        public void UploadFilesTestLargerBuffers()
+        public void UploadFiles_TestWithLargerBuffers()
         {
             var connection = new Connection
             {
@@ -126,7 +126,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test] 
-        public void UploadFilesOperationLogDisabled()
+        public void UploadFiles_TestWithOperationLogDisabled()
         {
             var options = new Options
             {
@@ -144,7 +144,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
-        public void UploadFilesWithMultipleSubdirectoriesInDestination()
+        public void UploadFiles_TestWithMultipleSubdirectoriesInDestination()
         {
             var destination = new Destination
             {
@@ -158,7 +158,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
-        public void UploadFilesThatExistsThrowsError()
+        public void UploadFiles_TestTransferThatExistsThrowsError()
         {
             var result = SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
@@ -204,7 +204,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
-        public void UploadFile_TestSingleFileTransferError()
+        public void UploadFile_TestSingleFileTransferWithError()
         {
             var options = new Options
             {
@@ -225,7 +225,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
-        public void UploadFilesThrowsIfFileNotExist()
+        public void UploadFiles_TestTransferThatThrowsIfFileNotExist()
         {
             var source = new Source
             {
@@ -240,7 +240,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
-        public void UploadFilesThrowsWithIncorrectCredentials()
+        public void UploadFiles_TestTransferThatThrowsWithIncorrectCredentials()
         {
             var connection = new Connection
             {
