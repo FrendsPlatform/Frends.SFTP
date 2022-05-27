@@ -46,29 +46,6 @@ namespace Frends.SFTP.UploadFiles.Tests
         private static string _workDir;
         private static string _testResultFile = "testResultFile.txt";
 
-        [Test]
-        public void test()
-        {
-            System.Threading.Thread.Sleep(2000);
-            var psi = new ProcessStartInfo();
-            psi.FileName = "/usr/bin/docker";
-            psi.Arguments = "ps -a";
-            psi.RedirectStandardOutput = true;
-            psi.UseShellExecute = false;
-            psi.CreateNoWindow = true;
-
-            using var process = Process.Start(psi);
-
-            process.WaitForExit();
-            
-
-            var output = process.StandardOutput.ReadToEnd();
-
-            Console.WriteLine(output);
-            Assert.IsTrue(false);
-        }
-
-        /*
         [OneTimeSetUp]
         public static void Setup()
         {
@@ -542,6 +519,6 @@ N2gTujnH7HCr/afSBeL3xnYcEmeCQTxTPZofBjPC+TPd9g7MntSGBeU/Fstv0jbg
             }
 
             return File.ReadAllText(testfile);
-        }*/
+        }
     }
 }
