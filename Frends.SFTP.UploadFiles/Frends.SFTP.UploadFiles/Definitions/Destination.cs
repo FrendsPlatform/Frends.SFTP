@@ -57,7 +57,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         public FileEncoding FileContentEncoding { get; set; }
 
         /// <summary>
-        /// File encoding to be used. A partial list of possible encodings: https://en.wikipedia.org/wiki/Windows_code_page#List
+        /// File encoding to be used. A partial list of possible encodings: https://en.wikipedia.org/wiki/Windows_code_page#List.
         /// </summary>
         [UIHint(nameof(FileContentEncoding), "", FileEncoding.Other)]
         public string FileContentEncodingInString { get; set; }
