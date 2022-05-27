@@ -50,8 +50,8 @@ namespace Frends.SFTP.UploadFiles.Tests
         public void test()
         {
             var psi = new ProcessStartInfo();
-            psi.FileName = "/bin/bash";
-            psi.Arguments = "docker ps";
+            psi.FileName = "/usr/bin/docker";
+            psi.Arguments = "ps";
             psi.RedirectStandardOutput = true;
             psi.UseShellExecute = false;
             psi.CreateNoWindow = true;
@@ -59,6 +59,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             using var process = Process.Start(psi);
 
             process.WaitForExit();
+            
 
             var output = process.StandardOutput.ReadToEnd();
 
