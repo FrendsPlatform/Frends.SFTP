@@ -15,7 +15,7 @@ jobs:
     with:
       workdir: Frends.SFTP.UploadFiles
       prebuild_command: "docker run 
-      -v Frends.SFTP.UploadFiles.Tests/Volumes/ssh_host_rsa_key:/etc/ssh/ssh_host_rsa_key 
+      -v Frends.SFTP.UploadFiles.Tests/Volumes/ssh_host_rsa_key.pub:/home/foo/.ssh/keys/ssh_host_rsa_key.pub:ro
       -v Frends.SFTP.UploadFiles.Tests/Volumes/share:/home/foo/share 
       -p 2222:22 -d atmoz/sftp
       foo:pass:::upload"

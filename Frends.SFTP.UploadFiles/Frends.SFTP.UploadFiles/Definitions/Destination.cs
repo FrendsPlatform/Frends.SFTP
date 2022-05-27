@@ -38,7 +38,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         public bool EnableBomForFileName { get; set; }
 
         /// <summary>
-        /// File encoding to be used. A partial list of possible encodings: https://en.wikipedia.org/wiki/Windows_code_page#List
+        /// File encoding to be used. A partial list of possible encodings: https://en.wikipedia.org/wiki/Windows_code_page#List.
         /// </summary>
         [UIHint(nameof(FileNameEncoding), "", FileEncoding.Other)]
         public string FileNameEncodingInString { get; set; }

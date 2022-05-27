@@ -14,7 +14,7 @@
 	  <Company>Frends</Company>
 	  <Product>Frends</Product>
 	  <PackageTags>Frends</PackageTags>
-	  <PackageLicenseExpression>Apache</PackageLicenseExpression>
+	  <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
 	  <Description>Upload files through SFTP connection.</Description>
 	  <PackageProjectUrl>https://frends.com/</PackageProjectUrl>
