@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Frends.SFTP.UploadFiles.Definitions
 {
     /// <summary>
-    /// Destination transfer options
+    /// Destination transfer options.
     /// </summary>
     public class Destination
     {
