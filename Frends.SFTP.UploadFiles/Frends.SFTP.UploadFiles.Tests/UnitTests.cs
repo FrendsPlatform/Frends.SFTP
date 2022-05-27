@@ -52,7 +52,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             System.Threading.Thread.Sleep(2000);
             var psi = new ProcessStartInfo();
             psi.FileName = "/usr/bin/docker";
-            psi.Arguments = "ps -a";
+            psi.Arguments = "logs testikontti";
             psi.RedirectStandardOutput = true;
             psi.UseShellExecute = false;
             psi.CreateNoWindow = true;
