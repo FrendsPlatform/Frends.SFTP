@@ -54,7 +54,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 ConnectionTimeout = 60,
                 Address = _dockerAddress,
-                Port = 22,
+                Port = 2202,
                 UserName = _dockerUsername,
                 Authentication = AuthenticationType.UsernamePassword,
                 Password = _dockerPassword,
@@ -109,7 +109,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 ConnectionTimeout = 60,
                 Address = _dockerAddress,
-                Port = 22,
+                Port = 2202,
                 UserName = _dockerUsername,
                 Authentication = AuthenticationType.UsernamePassword,
                 Password = _dockerPassword,
@@ -254,7 +254,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 ConnectionTimeout = 10,
                 Address = _dockerAddress,
-                Port = 22,
+                Port = 2202,
                 UserName = "demo",
                 Authentication = AuthenticationType.UsernamePassword,
                 Password = "demo",
@@ -386,7 +386,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 ConnectionTimeout = 60,
                 Address = _dockerAddress,
-                Port = 2222,
+                Port = 2202,
                 UserName = _dockerUsername,
                 Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile,
                 PrivateKeyFilePassphrase = "passphrase",
@@ -438,7 +438,7 @@ N2gTujnH7HCr/afSBeL3xnYcEmeCQTxTPZofBjPC+TPd9g7MntSGBeU/Fstv0jbg
             {
                 ConnectionTimeout = 60,
                 Address = _dockerAddress,
-                Port = 2222,
+                Port = 2202,
                 UserName = _dockerUsername,
                 Authentication = AuthenticationType.UsernamePasswordPrivateKeyString,
                 PrivateKeyFilePassphrase = "passphrase",

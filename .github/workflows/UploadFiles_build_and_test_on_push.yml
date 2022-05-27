@@ -17,7 +17,7 @@ jobs:
       prebuild_command: "docker run 
       -v $PWD/Frends.SFTP.UploadFiles.Tests/Volumes/ssh_host_rsa_key.pub:/home/foo/.ssh/keys/ssh_host_rsa_key.pub:ro
       -v $PWD/Frends.SFTP.UploadFiles.Tests/Volumes/share:/home/foo/share 
-      -p 22:22 -d atmoz/sftp
+      -p 2202:22 -d atmoz/sftp
       foo:pass:::upload"
     secrets:
       badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
