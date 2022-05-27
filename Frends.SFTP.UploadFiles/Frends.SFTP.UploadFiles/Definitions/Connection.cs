@@ -44,29 +44,29 @@ namespace Frends.SFTP.UploadFiles.Definitions
         /// <summary>
         /// Password to use in the authentication to the server.
         /// </summary>
-        [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePassword)]
+        [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePassword, AuthenticationType.UsernamePasswordPrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyString)]
         [PasswordPropertyText]
         public string Password { get; set; }
 
         /// <summary>
         /// Full path to private key file.
         /// </summary>
-        [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKey, AuthenticationType.UsernamePasswordPrivateKey)]
+        [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyFile)]
         [DisplayFormat(DataFormatString = "Text")]
-        public string PrivateKeyFileName { get; set; }
+        public string PrivateKeyFile { get; set; }
 
         /// <summary>
         /// Private key as a string, supported private key formats: PKCS#8,
         /// OpenSSH/OpenSSL and PuTTY.ppk.
         /// </summary>
-        [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKey, AuthenticationType.UsernamePasswordPrivateKey)]
+        [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyString, AuthenticationType.UsernamePasswordPrivateKeyString)]
         [PasswordPropertyText]
         public string PrivateKeyString { get; set; }
 
         /// <summary>
-        /// Password for the private key file.
+        /// Passphrase for the private key file.
         /// </summary>
-        [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKey, AuthenticationType.UsernamePasswordPrivateKey)]
+        [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyFile)]
         [PasswordPropertyText]
         public string PrivateKeyFilePassphrase { get; set; }
 
@@ -77,14 +77,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
         /// </summary>
         [DefaultValue("")]
         public string ServerFingerPrint { get; set; }
-
-        /// <summary>
-        /// If set, this ecoding will be used to encode and decode command 
-        /// parameters and server responses, such as file names. Example 
-        /// values: utf-8, utf-16, windows-1252.
-        /// </summary>
-        [DefaultValue("")]
-        public string Encoding { get; set; }
 
         /// <summary>
         /// Integer value of used buffer size as KB.

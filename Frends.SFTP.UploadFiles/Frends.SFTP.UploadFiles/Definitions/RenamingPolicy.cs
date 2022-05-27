@@ -79,7 +79,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         }
 
         /// <summary>
-        /// Method for expanding source/destination endpoint directory name for macros when opening the endpoint connection
+        /// Method for expanding source/destination endpoint directory name for macros.
         /// </summary>
         /// <param name="directory">Directory path including unexpanded macros</param>
         /// <returns></returns>

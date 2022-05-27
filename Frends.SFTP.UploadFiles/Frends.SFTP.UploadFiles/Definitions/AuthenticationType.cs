@@ -8,7 +8,9 @@ namespace Frends.SFTP.UploadFiles.Definitions
     public enum AuthenticationType
     {
         UsernamePassword,
-        UsernamePrivateKey,
-        UsernamePasswordPrivateKey
+        UsernamePrivateKeyFile,
+        UsernamePrivateKeyString,
+        UsernamePasswordPrivateKeyFile,
+        UsernamePasswordPrivateKeyString
     }
 }

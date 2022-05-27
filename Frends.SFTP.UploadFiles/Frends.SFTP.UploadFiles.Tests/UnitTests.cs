@@ -14,9 +14,11 @@ namespace Frends.SFTP.UploadFiles.Tests
 {
     /// <summary>
     /// NOTE: To run these unit tests, you need an SFTP test server.
-    /// 
-    /// docker run -p 22:22 -d atmoz/sftp foo:pass:::upload
-    /// 
+    /// This run command will create a docker container which is used in the tests.
+    /// Run this command with absolute path to the Frends.SFTP.UploadFiles.Tests\Volumes diretory.
+    /*   
+        docker run -v $PWD/Volumes/ssh_host_rsa_key.pub:/home/foo/.ssh/keys/ssh_host_rsa_key.pub:ro -v $PWD/Volumes/share:/home/foo/share -p 2222:22 -d atmoz/sftp foo:pass:::upload
+    */
     /// </summary>
     [TestFixture]
     class TestClass
@@ -71,7 +73,9 @@ namespace Frends.SFTP.UploadFiles.Tests
             _destination = new Destination
             {
                 Directory = "/upload/Upload",
-                Action = DestinationAction.Error
+                Action = DestinationAction.Error,
+                FileNameEncoding = FileEncoding.UTF8,
+                EnableBomForFileName = true
             };
 
             _options = new Options
@@ -149,7 +153,9 @@ namespace Frends.SFTP.UploadFiles.Tests
             var destination = new Destination
             {
                 Directory = "/upload/Upload/sub",
-                Action = DestinationAction.Error
+                Action = DestinationAction.Error,
+                FileNameEncoding = FileEncoding.UTF8,
+                EnableBomForFileName = true
             };
 
             var result = SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
@@ -176,7 +182,9 @@ namespace Frends.SFTP.UploadFiles.Tests
             var destination = new Destination
             {
                 Directory = "/upload/Upload",
-                Action = DestinationAction.Error
+                Action = DestinationAction.Error,
+                FileNameEncoding = FileEncoding.UTF8,
+                EnableBomForFileName = true
             };
 
             var options = new Options
@@ -312,13 +320,32 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 Directory = "/upload/Upload",
                 FileName = "%SourceFileName%%Date%%SourceFileExtension%",
-                Action = DestinationAction.Error
+                Action = DestinationAction.Error,
+                FileNameEncoding = FileEncoding.UTF8,
+                EnableBomForFileName = true
             };
 
             var result = SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var date = DateTime.Now;
             Assert.IsTrue(CheckFileExistsInDestination("/upload/Upload/SFTPUploadTestFile" + date.ToString(@"yyyy-MM-dd") + ".txt"));
+        }
+
+        [Test]
+        public void UploadFiles_TestSourceDirectoryWithMacros()
+        {
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/testfolder_%Year%");
+            var source = new Source
+            {
+                Directory = path,
+                FileName = "*.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing
+            };
+
+            var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(2, result.SuccessfulTransferCount);
         }
 
         [Test]
@@ -333,7 +360,9 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 Directory = "/upload/Upload",
                 FileName = "SFTPUploadTestFile.txt",
-                Action = DestinationAction.Append
+                Action = DestinationAction.Append,
+                FileNameEncoding = FileEncoding.UTF8,
+                EnableBomForFileName = true
             };
 
             var source = new Source
@@ -348,6 +377,79 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
             var content2 = GetTransferredFileContent(fullPath);
             Assert.AreNotEqual(content1.Length, content2.Length);
+        }
+
+        [Test]
+        public void UploadFiles_TestPrivateKeyFileRsa()
+        {
+            var connection = new Connection
+            {
+                ConnectionTimeout = 60,
+                Address = _dockerAddress,
+                Port = 2222,
+                UserName = _dockerUsername,
+                Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile,
+                PrivateKeyFilePassphrase = "passphrase",
+                PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key"),
+                Password = _dockerPassword,
+                BufferSize = 32
+            };
+
+            var result = SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+        }
+
+        [Test]
+        public void UploadFiles_TestPrivateKeyFileRsaFromString()
+        {
+            var key = @"-----BEGIN RSA PRIVATE KEY-----
+Proc-Type: 4,ENCRYPTED
+DEK-Info: DES-EDE3-CBC,C823E7CC4CBAC698
+
+Fqxq2jbSKyb0a+oW96Tjoif3Kcb5zZ0FiQyiHgQozLXrecjdUwjWuedkDoZMxwG5
+bxpOnxZ/88tDzYCtCPcYCPRF8BNueUsZO8/tztTra+4NgVd/omXHG5bqb7iMB4dc
+2bIHmQ+xflefs8X72XjBUo1zG1TdacfrWag/b4D2Ftv0pOpbV1T1/T8a0IoVvaps
+oxPT4mpHAfqtYH8sP/LE0V/EBgixdEW2Gqx8O1OuzyRPf2ZJKPGknlOtA8WDvAQh
+xwFO+0jlSFwOqbf7kmFMmonLKaLT0HtJwf2GdMyVvuIu3rHkVFaVgyJ7AP4B8rSG
+ccl9MmjGxUfgqqE3ea1VHR7XyW+QvpzKEPLmw46z6BGhJ9JtKPsx9QGVsYa4sPPI
+xN0ZyK3iXvZFHljMltox+ISpgT5T+N1DaqU14//lYH5kK9N0/myszv9Ho5Y/gAS/
+lxe1hX5+4ts7aauVxoZ1En3nhA3x/l+YI6wQ53a/a25HpATcL3wkFNZS0sYT1/Q/
+8b3I4KUQkjjYcuCm6NCtjci+oP/Rfu+e02qkUXgy/vdRA7oUftSi4BAKj5qjD0d5
+q9F6IvxLlghs08CC4z635wQr7EyxK/7EN1Ae1RmoA1E1/x8wLjMdGB5bV2EeYnwK
+3CfAkT2iJ4M+uWPVULEZZTXGBFx82Ss0Qdo21n8lsPX1CUbkrUF1I40DI7VYwxll
+6T1WHClGDVlS+eT3Yso6pDdV/FO6KHQ4ayEAEZl9c0F+4rtRfuGWh4KBW8LbNO6k
+mpBJdqRTnmBsop9AHBWXQhljddmtt4/AKODIK0PBRdupsZv+SOmwq+g5ECnK8DGr
+TxCdEqD6TYf4s0TVS+SXrb6396uvuMUOHEAk9ls088eQXkPqT/MXkuT/RKIu6J7i
+qCQbuWCqoGAaGOeFvNm9YG+uoQzavr5dbEHWGywqNK9mM/uqCUdAruN78eRgr/Lg
+Fj1Hoani9iXMhjGDMFbJnjO+47RzPIkTPGP+ExPADqshLA3NEvEOQjtdjTyTQlxw
+iUTrMIWLKeGaTg7mUrDZZ9JelU6pFEld0j+jb7O9DMBLZdtndcHmHgkAoB9SwSk7
+A5FlF8X3r6zogdrZqLBsUzSahCI5KU/HdQFyg4yKQPS+/Rg7czrTI5n2zLR+WGbQ
+SFoeStnEW83JkoAk5qAaJELpKwzvxuNZfHFX8NxgaUnEKYNi+S0OdIpV7EOHwYCI
+9v5bnl/XC6cvyve4+TuzbLg8gJX2eMD97jC016t+sO2BvmcL8ksEF1SZsSIHs8tO
+ZmGPYiGDOCYdpfCff6JJPD4j5stUnjLGmEnXxEhoaHTQENg+z8ELg3X+vHsFsZTI
+CNdxqEkvWXxHr0vEYSKAu/EMNQqB3YrvrKuIJez0acRwHZspzhT0fE384Itmnh39
+o+w2UmYqEC7MQ3PQMPbnr/rhwywm1tboJVOmQaFaMkQGLea9wBvLylzBit3JX3Ku
+OX7Q/wO4lqOlFhLtRnSL0cfuhRmt59pM75Zd+euX5tv9jmCj+AQT/kiBoMhNrDGk
+N2gTujnH7HCr/afSBeL3xnYcEmeCQTxTPZofBjPC+TPd9g7MntSGBeU/Fstv0jbg
+-----END RSA PRIVATE KEY-----
+";
+            var connection = new Connection
+            {
+                ConnectionTimeout = 60,
+                Address = _dockerAddress,
+                Port = 2222,
+                UserName = _dockerUsername,
+                Authentication = AuthenticationType.UsernamePasswordPrivateKeyString,
+                PrivateKeyFilePassphrase = "passphrase",
+                PrivateKeyString = key,
+                Password = _dockerPassword,
+                BufferSize = 32
+            };
+
+            var result = SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
 
         [TearDown]

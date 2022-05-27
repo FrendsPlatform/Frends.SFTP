@@ -29,12 +29,19 @@ namespace Frends.SFTP.UploadFiles.Definitions
 
             _result = new List<SingleFileTransferResult>();
             _filePaths = ConvertObjectToStringArray(context.Source.FilePaths);
+
+            SourceDirectoryWithMacrosExtended = _renamingPolicy.ExpandDirectoryForMacros(context.Source.Directory);
         }
 
         /// <summary>
         /// List of transfer results.
         /// </summary>
         private List<SingleFileTransferResult> _result { get; set; }
+
+        /// <summary>
+        /// Source directory with its macros extended.
+        /// </summary>
+        private string SourceDirectoryWithMacrosExtended { get; set; }
 
         /// <summary>
         /// Executes file transfers
@@ -75,7 +82,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
                     // Establish connectionInfo with connection parameters
                     try
                     {
-                        connectionInfo = GetConnectionInfo(_batchContext.Connection);
+                        connectionInfo = GetConnectionInfo(_batchContext.Destination, _batchContext.Connection);
                     } 
                     catch (Exception e)
                     {
@@ -182,25 +189,51 @@ namespace Frends.SFTP.UploadFiles.Definitions
         }
 
         #region Helper methods
-        private static ConnectionInfo GetConnectionInfo(Connection connect)
+        /// <summary>
+        /// Form connection info for the SftpClient class.
+        /// </summary>
+        /// <param name="destination"></param>
+        /// <param name="connect"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        private static ConnectionInfo GetConnectionInfo(Destination destination, Connection connect)
         {
             ConnectionInfo connectionInfo;
             List<AuthenticationMethod> methods = new List<AuthenticationMethod>();
             PrivateKeyFile privateKey = null;
-            if (connect.Authentication == AuthenticationType.UsernamePrivateKey || connect.Authentication == AuthenticationType.UsernamePasswordPrivateKey)
+            if (connect.Authentication == AuthenticationType.UsernamePrivateKeyFile || connect.Authentication == AuthenticationType.UsernamePasswordPrivateKeyFile)
+            {
+                if (string.IsNullOrEmpty(connect.PrivateKeyFile))
+                    throw new ArgumentException("Private key file path was not given.");
                 privateKey = (connect.PrivateKeyFilePassphrase != null)
-                    ? new PrivateKeyFile(connect.PrivateKeyFileName, connect.PrivateKeyFilePassphrase)
-                    : new PrivateKeyFile(connect.PrivateKeyFileName);
-
+                    ? new PrivateKeyFile(connect.PrivateKeyFile, connect.PrivateKeyFilePassphrase)
+                    : new PrivateKeyFile(connect.PrivateKeyFile);
+            }
+            if (connect.Authentication == AuthenticationType.UsernamePrivateKeyString || connect.Authentication == AuthenticationType.UsernamePasswordPrivateKeyString)
+            {
+                if (string.IsNullOrEmpty(connect.PrivateKeyString))
+                    throw new ArgumentException("Private key string was not given.");
+                var stream = new MemoryStream(Encoding.UTF8.GetBytes(connect.PrivateKeyString));
+                privateKey = (connect.PrivateKeyFilePassphrase != null)
+                    ? new PrivateKeyFile(stream, connect.PrivateKeyFilePassphrase)
+                    : new PrivateKeyFile(stream, "");
+            }
             switch (connect.Authentication)
             {
                 case AuthenticationType.UsernamePassword:
                     methods.Add(new PasswordAuthenticationMethod(connect.UserName, connect.Password));
                     break;
-                case AuthenticationType.UsernamePrivateKey:
+                case AuthenticationType.UsernamePrivateKeyFile:
                     methods.Add(new PrivateKeyAuthenticationMethod(connect.UserName, privateKey));
                     break;
-                case AuthenticationType.UsernamePasswordPrivateKey:
+                case AuthenticationType.UsernamePasswordPrivateKeyFile:
+                    methods.Add(new PasswordAuthenticationMethod(connect.UserName, connect.Password));
+                    methods.Add(new PrivateKeyAuthenticationMethod(connect.UserName, privateKey));
+                    break;
+                case AuthenticationType.UsernamePrivateKeyString:
+                    methods.Add(new PrivateKeyAuthenticationMethod(connect.UserName, privateKey));
+                    break;
+                case AuthenticationType.UsernamePasswordPrivateKeyString:
                     methods.Add(new PasswordAuthenticationMethod(connect.UserName, connect.Password));
                     methods.Add(new PrivateKeyAuthenticationMethod(connect.UserName, privateKey));
                     break;
@@ -209,15 +242,43 @@ namespace Frends.SFTP.UploadFiles.Definitions
             }
 
             connectionInfo = new ConnectionInfo(connect.Address, connect.Port, connect.UserName, methods.ToArray());
+            connectionInfo.Encoding = GetEncoding(destination);
 
-            if (!string.IsNullOrEmpty(connect.Encoding))
-            {
-                var encoding = Encoding.GetEncoding(connect.Encoding);
-                connectionInfo.Encoding = encoding;
-            }
             return connectionInfo;
         }
 
+        /// <summary>
+        /// Get encoding for the file name to be transferred.
+        /// </summary>
+        /// <param name="dest"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        private static Encoding GetEncoding(Destination dest)
+        {
+            switch (dest.FileNameEncoding)
+            {
+                case FileEncoding.UTF8:
+                    return dest.EnableBomForFileName ? new UTF8Encoding(true) : new UTF8Encoding(false);
+                case FileEncoding.ASCII:
+                    return Encoding.ASCII;
+                case FileEncoding.ANSI:
+                    return Encoding.Default;
+                case FileEncoding.Unicode:
+                    return Encoding.Unicode;
+                case FileEncoding.WINDOWS1252:
+                    return Encoding.Default;
+                case FileEncoding.Other:
+                    return Encoding.GetEncoding(dest.FileNameEncodingInString);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        /// <summary>
+        /// Get source files that fit the file name / mask
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
         private Tuple<List<FileItem>, bool> GetSourceFiles(Source source)
         {
             var fileItems = new List<FileItem>();
@@ -231,11 +292,11 @@ namespace Frends.SFTP.UploadFiles.Definitions
             }
 
             // Return empty list if source directory doesn't exists.
-            if (!Directory.Exists(source.Directory))
+            if (!Directory.Exists(SourceDirectoryWithMacrosExtended))
                 return new Tuple<List<FileItem>, bool>(fileItems, false);
 
             // fetch all file names in given directory
-            var files = Directory.GetFiles(source.Directory);
+            var files = Directory.GetFiles(SourceDirectoryWithMacrosExtended);
 
             // return Tuple with empty list and success.true if files are not found.
             if (files.Count() == 0)
@@ -256,6 +317,11 @@ namespace Frends.SFTP.UploadFiles.Definitions
             return new Tuple<List<FileItem>, bool>(fileItems, true);
         }
 
+        /// <summary>
+        /// Create destination directories.
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="path"></param>
         private static void CreateAllDirectories(SftpClient client, string path)
         {
             // Consistent forward slashes
@@ -276,6 +342,11 @@ namespace Frends.SFTP.UploadFiles.Definitions
             client.ChangeDirectory("/");
         }
 
+        /// <summary>
+        /// Converts server fingerprint to string array.
+        /// </summary>
+        /// <param name="objectArray"></param>
+        /// <returns></returns>
         private static string[] ConvertObjectToStringArray(object objectArray)
         {
             var res = objectArray as object[];
@@ -298,6 +369,11 @@ namespace Frends.SFTP.UploadFiles.Definitions
             };
         }
 
+        /// <summary>
+        /// Forms the FileTransferResult which includes all SingleTransferResults.
+        /// </summary>
+        /// <param name="singleResults"></param>
+        /// <returns></returns>
         private FileTransferResult FormResultFromSingleTransferResults(List<SingleFileTransferResult> singleResults)
         {
             var success = singleResults.All(x => x.Success);
@@ -332,6 +408,11 @@ namespace Frends.SFTP.UploadFiles.Definitions
             };
         }
 
+        /// <summary>
+        /// Forms the userResultMessage for FileTransferResult object
+        /// </summary>
+        /// <param name="results"></param>
+        /// <returns></returns>
         private string GetUserResultMessage(IList<SingleFileTransferResult> results)
         {
             var userResultMessage = string.Empty;
@@ -357,6 +438,13 @@ namespace Frends.SFTP.UploadFiles.Definitions
             return string.Join(" ", args.Where(s => !string.IsNullOrWhiteSpace(s)));
         }
 
+        /// <summary>
+        /// Handles source operations in case no source files were found.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         private SingleFileTransferResult NoSourceOperation(BatchContext context, Source source)
         {
             string msg;
