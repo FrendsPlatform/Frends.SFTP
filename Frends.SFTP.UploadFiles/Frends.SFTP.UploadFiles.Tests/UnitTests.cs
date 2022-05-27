@@ -49,6 +49,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public void test()
         {
+            System.Threading.Thread.Sleep(2000);
             var psi = new ProcessStartInfo();
             psi.FileName = "/usr/bin/docker";
             psi.Arguments = "ps";
