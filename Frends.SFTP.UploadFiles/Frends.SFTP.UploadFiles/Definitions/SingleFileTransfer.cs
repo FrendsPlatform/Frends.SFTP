@@ -78,7 +78,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         public BatchContext BatchContext { get; set; }
 
         /// <summary>
-        /// Transfer state.
+        /// Transfer state for SFTP Logger.
         /// </summary>
         public TransferState State { get; set; }
 
