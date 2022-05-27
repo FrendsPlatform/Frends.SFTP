@@ -3,6 +3,7 @@ using System.IO;
 using System;
 using System.Net;
 using System.Text;
+using System.Diagnostics;
 using System.Threading;
 using Renci.SshNet;
 using Renci.SshNet.Sftp;
@@ -45,6 +46,27 @@ namespace Frends.SFTP.UploadFiles.Tests
         private static string _workDir;
         private static string _testResultFile = "testResultFile.txt";
 
+        [Test]
+        public void test()
+        {
+            var psi = new ProcessStartInfo();
+            psi.FileName = "/bin/bash";
+            psi.Arguments = "docker ps";
+            psi.RedirectStandardOutput = true;
+            psi.UseShellExecute = false;
+            psi.CreateNoWindow = true;
+
+            using var process = Process.Start(psi);
+
+            process.WaitForExit();
+
+            var output = process.StandardOutput.ReadToEnd();
+
+            Console.WriteLine(output);
+            Assert.IsTrue(true);
+        }
+
+        /*
         [OneTimeSetUp]
         public static void Setup()
         {
@@ -518,6 +540,6 @@ N2gTujnH7HCr/afSBeL3xnYcEmeCQTxTPZofBjPC+TPd9g7MntSGBeU/Fstv0jbg
             }
 
             return File.ReadAllText(testfile);
-        }
+        }*/
     }
 }
