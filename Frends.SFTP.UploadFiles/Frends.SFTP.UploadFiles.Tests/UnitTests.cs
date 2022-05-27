@@ -17,7 +17,7 @@ namespace Frends.SFTP.UploadFiles.Tests
     /// This run command will create a docker container which is used in the tests.
     /// Run this command with absolute path to the Frends.SFTP.UploadFiles.Tests\Volumes diretory.
     /*   
-        docker run -v $PWD/Volumes/ssh_host_rsa_key.pub:/home/foo/.ssh/keys/ssh_host_rsa_key.pub:ro -v $PWD/Volumes/share:/home/foo/share -p 2222:22 -d atmoz/sftp foo:pass:::upload
+        docker run -v $PWD/Volumes/ssh_host_rsa_key.pub:/home/foo/.ssh/keys/ssh_host_rsa_key.pub:ro -v $PWD/Volumes/share:/home/foo/share -p 22:22 -d atmoz/sftp foo:pass:::upload
     */
     /// </summary>
     [TestFixture]
@@ -54,7 +54,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 ConnectionTimeout = 60,
                 Address = _dockerAddress,
-                Port = 2222,
+                Port = 22,
                 UserName = _dockerUsername,
                 Authentication = AuthenticationType.UsernamePassword,
                 Password = _dockerPassword,
@@ -109,7 +109,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 ConnectionTimeout = 60,
                 Address = _dockerAddress,
-                Port = 2222,
+                Port = 22,
                 UserName = _dockerUsername,
                 Authentication = AuthenticationType.UsernamePassword,
                 Password = _dockerPassword,
