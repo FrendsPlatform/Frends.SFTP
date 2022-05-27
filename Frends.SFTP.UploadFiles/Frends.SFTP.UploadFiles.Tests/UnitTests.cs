@@ -17,7 +17,7 @@ namespace Frends.SFTP.UploadFiles.Tests
     /// This run command will create a docker container which is used in the tests.
     /// Run this command with absolute path to the Frends.SFTP.UploadFiles.Tests\Volumes diretory.
     /*   
-        docker run -v $PWD/Volumes/ssh_host_rsa_key.pub:/home/foo/.ssh/keys/ssh_host_rsa_key.pub:ro -v $PWD/Volumes/share:/home/foo/share -p 22:22 -d atmoz/sftp foo:pass:::upload
+        docker run -v $PWD/Volumes/ssh_host_rsa_key.pub:/home/foo/.ssh/keys/ssh_host_rsa_key.pub:ro -v $PWD/Volumes/share:/home/foo/share -p 2222:22 -d atmoz/sftp foo:pass:::upload
     */
     /// </summary>
     [TestFixture]
@@ -26,7 +26,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         /// <summary>
         /// Test credentials for docker server.
         /// </summary>
-        private static string _dockerAddress = Dns.GetHostName();
+        private static string _dockerAddress = "localhost";
         private static string _dockerUsername = "foo";
         private static string _dockerPassword = "pass";
 
@@ -54,7 +54,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 ConnectionTimeout = 60,
                 Address = _dockerAddress,
-                Port = 2202,
+                Port = 2222,
                 UserName = _dockerUsername,
                 Authentication = AuthenticationType.UsernamePassword,
                 Password = _dockerPassword,
@@ -109,7 +109,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 ConnectionTimeout = 60,
                 Address = _dockerAddress,
-                Port = 2202,
+                Port = 2222,
                 UserName = _dockerUsername,
                 Authentication = AuthenticationType.UsernamePassword,
                 Password = _dockerPassword,
@@ -254,7 +254,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 ConnectionTimeout = 10,
                 Address = _dockerAddress,
-                Port = 2202,
+                Port = 2222,
                 UserName = "demo",
                 Authentication = AuthenticationType.UsernamePassword,
                 Password = "demo",
@@ -386,7 +386,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 ConnectionTimeout = 60,
                 Address = _dockerAddress,
-                Port = 2202,
+                Port = 2222,
                 UserName = _dockerUsername,
                 Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile,
                 PrivateKeyFilePassphrase = "passphrase",
@@ -438,7 +438,7 @@ N2gTujnH7HCr/afSBeL3xnYcEmeCQTxTPZofBjPC+TPd9g7MntSGBeU/Fstv0jbg
             {
                 ConnectionTimeout = 60,
                 Address = _dockerAddress,
-                Port = 2202,
+                Port = 2222,
                 UserName = _dockerUsername,
                 Authentication = AuthenticationType.UsernamePasswordPrivateKeyString,
                 PrivateKeyFilePassphrase = "passphrase",
