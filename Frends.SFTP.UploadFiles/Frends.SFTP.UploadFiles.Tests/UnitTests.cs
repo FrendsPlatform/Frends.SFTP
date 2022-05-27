@@ -64,7 +64,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             var output = process.StandardOutput.ReadToEnd();
 
             Console.WriteLine(output);
-            Assert.IsTrue(true);
+            Assert.IsTrue(false);
         }
 
         /*
