@@ -24,7 +24,7 @@ namespace Frends.SFTP.UploadFiles.Tests
     class TestClass
     {
         /// <summary>
-        /// Test credentials for docker server
+        /// Test credentials for docker server.
         /// </summary>
         private static string _dockerAddress = Dns.GetHostName();
         private static string _dockerUsername = "foo";
