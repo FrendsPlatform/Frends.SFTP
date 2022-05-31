@@ -7,16 +7,17 @@ using System.Net.Sockets;
 using Frends.SFTP.UploadFiles.Definitions;
 using Serilog;
 
-#pragma warning disable 1591
-
 namespace Frends.SFTP.UploadFiles
 {
+    /// <summary>
+    /// Main class of the Task.
+    /// </summary>
     public class SFTP
     {
         private static BatchContext _batchContext;
 
         /// <summary>
-        /// Writes a file with SFTP connection.
+        /// Uploads files through SFTP connection.
         /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.SFTP.UploadFiles)
         /// </summary>
         /// <param name="info">Transfer info parameters</param>
@@ -25,7 +26,18 @@ namespace Frends.SFTP.UploadFiles
         /// <param name="destination">Destination directory location</param>
         /// <param name="options">Transfer options</param>
         /// <param name="cancellationToken">CancellationToken is given by Frends</param>
-        /// <returns>Result object {bool ActionSkiped, bool Success, string UserResultMessage, int SuccessfulTransferCount, int Failedstring FileName, string SourcePath, string DestinationPath, bool Success} </returns>
+        /// <returns>
+        /// Result object {
+        /// bool ActionSkiped, 
+        /// bool Success, 
+        /// string UserResultMessage, 
+        /// int SuccessfulTransferCount, 
+        /// int FailedTransferCount, 
+        /// IEnumerable TransferredFileNames, 
+        /// Dictionary TransferErrors, 
+        /// IEnumerable TransferredFilePaths, 
+        /// IDictionary OperationsLog} 
+        /// </returns>
         public static Result UploadFiles(
             [PropertyTab] Source source, 
             [PropertyTab] Destination destination, 

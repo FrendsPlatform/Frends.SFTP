@@ -14,9 +14,9 @@
 	  <Company>Frends</Company>
 	  <Product>Frends</Product>
 	  <PackageTags>Frends</PackageTags>
-	  <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
-	  <Description>Upload files through SFTP connection.</Description>
+	  <Description>Uploads files through SFTP connection.</Description>
 	  <PackageProjectUrl>https://frends.com/</PackageProjectUrl>
 	  <RepositoryUrl>https://github.com/FrendsPlatform/Frends.SFTP/tree/main/Frends.SFTP.UploadFiles</RepositoryUrl>
   </PropertyGroup>
@@ -25,6 +25,9 @@
     <None Include="FrendsTaskMetadata.json" Pack="true" PackagePath="/">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+	  <None Include="../../ApacheLicense.txt" Pack="true" PackagePath="">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
   </ItemGroup>
 
   <ItemGroup>

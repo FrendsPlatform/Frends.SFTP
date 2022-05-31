@@ -9,37 +9,37 @@ namespace Frends.SFTP.UploadFiles.Definitions
     /// <summary>
     /// Result object of one individual file transfer.
     /// </summary>
-    public class SingleFileTransferResult
+    internal class SingleFileTransferResult
     {
         /// <summary>
         /// Boolean value of successful tranfer state.
         /// </summary>
-        public bool Success { get; set; }
+        internal bool Success { get; set; }
 
         /// <summary>
         /// Boolean value indicating if the transfer action was skipped.
         /// </summary>
-        public bool ActionSkipped { get; set; }
+        internal bool ActionSkipped { get; set; }
 
         /// <summary>
         /// List of error messages that happened during transfer or cleanup.
         /// </summary>
-        public IList<string> ErrorMessages { get; set; }
+        internal IList<string> ErrorMessages { get; set; }
 
         /// <summary>
         /// Name of the transferred file.
         /// </summary>
-        public string TransferredFile { get; set; }
+        internal string TransferredFile { get; set; }
 
         /// <summary>
         /// Full path of the transferred file.
         /// </summary>
-        public string TransferredFilePath { get; set; }
+        internal string TransferredFilePath { get; set; }
 
         /// <summary>
         /// Constructor for the class in case of error.
         /// </summary>
-        public SingleFileTransferResult()
+        internal SingleFileTransferResult()
         {
             ErrorMessages = new List<string>();
         }

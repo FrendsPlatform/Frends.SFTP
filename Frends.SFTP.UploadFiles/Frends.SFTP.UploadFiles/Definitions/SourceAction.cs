@@ -1,4 +1,5 @@
-﻿#pragma warning disable 1591
+﻿// Pragma is for self-explanatory enum attributes.
+#pragma warning disable 1591
 
 namespace Frends.SFTP.UploadFiles.Definitions
 {

@@ -10,6 +10,7 @@ using Renci.SshNet.Sftp;
 using Renci.SshNet.Common;
 using Frends.SFTP.UploadFiles.Definitions;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace Frends.SFTP.UploadFiles.Tests
 {
@@ -104,7 +105,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
-        public void UploadFiles_TestWithLargerBuffers()
+        public void UploadFiles_TestWithLargerBuffer()
         {
             var connection = new Connection
             {
@@ -453,6 +454,62 @@ N2gTujnH7HCr/afSBeL3xnYcEmeCQTxTPZofBjPC+TPd9g7MntSGBeU/Fstv0jbg
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
 
+        [Test]
+        public void UploadFiles_TestTransferWithMD5ServerFingerprint()
+        {
+            var connection = new Connection
+            {
+                ConnectionTimeout = 60,
+                Address = _dockerAddress,
+                Port = 2222,
+                UserName = _dockerUsername,
+                Authentication = AuthenticationType.UsernamePassword,
+                ServerFingerPrint = GetServerFingerprintAsMD5String(),
+                Password = _dockerPassword,
+                BufferSize = 32
+            };
+
+            var source = new Source
+            {
+                Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/"),
+                FileName = "SFTPUploadTestFile2.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing
+            };
+
+            var result = SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+        }
+
+        [Test]
+        public void UploadFiles_TestTransferWithSHA256ServerFingerprint()
+        {
+            var connection = new Connection
+            {
+                ConnectionTimeout = 60,
+                Address = _dockerAddress,
+                Port = 2222,
+                UserName = _dockerUsername,
+                Authentication = AuthenticationType.UsernamePassword,
+                ServerFingerPrint = GetServerFingerprintAsSHA256String(),
+                Password = _dockerPassword,
+                BufferSize = 32
+            };
+
+            var source = new Source
+            {
+                Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/"),
+                FileName = "SFTPUploadTestFile2.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing
+            };
+
+            var result = SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+        }
+
         [TearDown]
         public void TearDown()
         {
@@ -519,6 +576,36 @@ N2gTujnH7HCr/afSBeL3xnYcEmeCQTxTPZofBjPC+TPd9g7MntSGBeU/Fstv0jbg
             }
 
             return File.ReadAllText(testfile);
+        }
+
+        private static string GetServerFingerprintAsSHA256String()
+        {
+            var fingerprint = "";
+            using (var client = new SftpClient(_connection.Address, _connection.Port, _connection.UserName, _connection.Password))
+            {
+                client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
+                {
+                    // First try with SHA256 typed fingerprint
+                    using (SHA256 mySHA256 = SHA256.Create())
+                    {
+                        fingerprint = Convert.ToBase64String(mySHA256.ComputeHash(e.HostKey));
+                    }
+                };
+            }
+            return fingerprint;
+        }
+
+        private static string GetServerFingerprintAsMD5String()
+        {
+            var fingerprint = "";
+            using (var client = new SftpClient(_connection.Address, _connection.Port, _connection.UserName, _connection.Password))
+            {
+                client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
+                {
+                    fingerprint = BitConverter.ToString(e.FingerPrint).Replace("-", ":");
+                };
+            }
+            return fingerprint;
         }
     }
 }

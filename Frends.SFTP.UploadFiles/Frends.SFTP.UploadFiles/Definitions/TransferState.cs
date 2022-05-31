@@ -1,11 +1,12 @@
-﻿#pragma warning disable 1591
+﻿// Pragma is for the self-explanatory enum attributes.
+#pragma warning disable 1591
 
 namespace Frends.SFTP.UploadFiles.Definitions
 {
     /// <summary>
-    /// Enumeration of the current states
+    /// Enumeration of the current states. Used in Operations log.
     /// </summary>
-    public enum TransferState
+    internal enum TransferState
     {
         RenameSourceFileBeforeTransfer,
         GetFile,

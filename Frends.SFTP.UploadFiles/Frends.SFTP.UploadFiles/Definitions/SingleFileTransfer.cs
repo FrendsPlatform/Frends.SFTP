@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Renci.SshNet;
+using Renci.SshNet.Sftp;
 
 namespace Frends.SFTP.UploadFiles.Definitions
 {
@@ -80,14 +81,14 @@ namespace Frends.SFTP.UploadFiles.Definitions
         /// <summary>
         /// Transfer state for SFTP Logger.
         /// </summary>
-        public TransferState State { get; set; }
+        internal TransferState State { get; set; }
 
         /// <summary>
         /// Method that transfers single file through sftp.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public SingleFileTransferResult TransferSingleFile()
+        internal SingleFileTransferResult TransferSingleFile()
         {
             try
             {
@@ -180,7 +181,50 @@ namespace Frends.SFTP.UploadFiles.Definitions
                 throw new Exception("Error in initializing file content encoding: ", ex);
             }
 
+            if (BatchContext.Options.RenameDestinationFileDuringTransfer)
+                RenameDestinationFile();
+
             Append(GetSourceFileContent(fullPath, encoding), encoding);
+
+            if (BatchContext.Options.RenameDestinationFileDuringTransfer)
+                RenameDestinationFile();
+        }
+
+        /// <summary>
+        /// Renames destination file as a locking mechanism.
+        /// </summary>
+        private void RenameDestinationFile()
+        {
+            SftpFileAttributes fileAttributes;
+            if (!string.IsNullOrEmpty(DestinationFileDuringTransfer))
+            {
+                fileAttributes = Client.GetAttributes(DestinationFileDuringTransfer);
+                if (fileAttributes.OthersCanWrite)
+                {
+                    Client.RenameFile(DestinationFileDuringTransfer, DestinationFileNameWithMacrosExpanded);
+                    return;
+                }
+                fileAttributes.OthersCanWrite = true;
+                Client.SetAttributes(DestinationFileDuringTransfer, fileAttributes);
+                Client.RenameFile(DestinationFileDuringTransfer, DestinationFileNameWithMacrosExpanded);
+                fileAttributes.OthersCanWrite = false;
+                Client.SetAttributes(DestinationFileNameWithMacrosExpanded, fileAttributes);
+                return;
+            }
+
+            DestinationFileDuringTransfer = Util.CreateUniqueFileName();
+            Trace(TransferState.RenameSourceFileBeforeTransfer, "Renaming destination file {0} to temporary file name {1} during transfer", DestinationFileNameWithMacrosExpanded, DestinationFileDuringTransfer);
+            fileAttributes = Client.GetAttributes(DestinationFileNameWithMacrosExpanded);
+            if (fileAttributes.OthersCanWrite)
+            {
+                Client.RenameFile(DestinationFileNameWithMacrosExpanded, DestinationFileDuringTransfer);
+                return;
+            }
+            fileAttributes.OthersCanWrite = true;
+            Client.SetAttributes(DestinationFileNameWithMacrosExpanded, fileAttributes);
+            Client.RenameFile(DestinationFileNameWithMacrosExpanded, DestinationFileDuringTransfer);
+            fileAttributes.OthersCanWrite = false;
+            Client.SetAttributes(DestinationFileDuringTransfer, fileAttributes);
         }
 
         /// <summary>
@@ -198,15 +242,27 @@ namespace Frends.SFTP.UploadFiles.Definitions
 
             // Determine path to use to the destination file.
             var path = (BatchContext.Destination.Directory.Contains("/")) 
-                ? BatchContext.Destination.Directory + "/" + DestinationFileNameWithMacrosExpanded
-                : Path.Combine(BatchContext.Destination.Directory, DestinationFileNameWithMacrosExpanded);
+                ? BatchContext.Destination.Directory + "/"
+                : BatchContext.Destination.Directory;
 
             // If destination rename during transfer is enabled, use that instead 
-            if (!string.IsNullOrEmpty(DestinationFileDuringTransfer))
-                path = DestinationFileDuringTransfer;
-            
-            
-            Client.AppendAllLines(path, content, encoding);
+            path = (!string.IsNullOrEmpty(DestinationFileDuringTransfer)) 
+                ? Path.Combine(path, DestinationFileDuringTransfer) 
+                : Path.Combine(path, DestinationFileNameWithMacrosExpanded);
+
+            var fileAttributes = Client.GetAttributes(path);
+            if (fileAttributes.OthersCanWrite)
+            {
+                Client.AppendAllLines(path, content, encoding);
+            }
+            else
+            {
+                fileAttributes.OthersCanWrite = true;
+                Client.SetAttributes(path, fileAttributes);
+                Client.AppendAllLines(path, content, encoding);
+                fileAttributes.OthersCanWrite = false;
+                Client.SetAttributes(path, fileAttributes);
+            }
         }
 
         /// <summary>

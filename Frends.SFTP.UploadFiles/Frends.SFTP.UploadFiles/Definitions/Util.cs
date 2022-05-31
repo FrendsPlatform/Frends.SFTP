@@ -1,20 +1,18 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using System.IO;
+﻿using System.Text.RegularExpressions;
 
 namespace Frends.SFTP.UploadFiles.Definitions
 {
     /// <summary>
     /// Helper methods for file modifications
     /// </summary>
-    public static class Util
+    internal static class Util
     {
         /// <summary>
         /// Creates unique filename.
         /// </summary>
         /// <param name="toDir"></param>        
         /// <returns>return full path to the unique file (toDir + unique filename)</returns>
-        public static string CreateUniqueFile(string toDir)
+        internal static string CreateUniqueFile(string toDir)
         {
 
             if (!toDir.EndsWith("/") && !toDir.EndsWith("\\"))
@@ -28,7 +26,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         /// Creates unique file name
         /// </summary>        
         /// <returns>return unique file name</returns>
-        public static string CreateUniqueFileName()
+        internal static string CreateUniqueFileName()
         {
             return Path.ChangeExtension("frends_" + DateTime.Now.Ticks + Path.GetRandomFileName(), "8CO");
         }
@@ -37,7 +35,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         /// Checks if the file name matches the given file mask. 
         /// The file mask is checked with a kludgey regular expression.
         /// </summary>
-        public static bool FileMatchesMask(string filename, string mask)
+        internal static bool FileMatchesMask(string filename, string mask)
         {
             const string regexEscape = "<regex>";
             string pattern;
@@ -62,7 +60,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         /// </summary>
         /// <param name="fingerprint"></param>
         /// <returns></returns>
-        public static byte[] ConvertFingerprintToByteArray(string fingerprint)
+        internal static byte[] ConvertFingerprintToByteArray(string fingerprint)
         {
             return fingerprint.Split(':').Select(s => Convert.ToByte(s, 16)).ToArray();
         }

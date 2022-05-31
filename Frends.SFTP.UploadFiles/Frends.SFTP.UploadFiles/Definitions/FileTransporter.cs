@@ -3,6 +3,7 @@ using Renci.SshNet.Common;
 using Renci.SshNet.Security;
 using System.Net.Sockets;
 using System.Text;
+using System.Security.Cryptography;
 
 namespace Frends.SFTP.UploadFiles.Definitions
 {
@@ -20,7 +21,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         /// <summary>
         ///     Constructor for SFTP file transfers
         /// </summary>
-        public FileTransporter(ISFTPLogger logger, BatchContext context, Guid instanceId)
+        internal FileTransporter(ISFTPLogger logger, BatchContext context, Guid instanceId)
         {
             _logger = logger;
             _batchContext = context;
@@ -98,19 +99,34 @@ namespace Frends.SFTP.UploadFiles.Definitions
                         {
                             try
                             {
-                                // If this check fails then SSH.NET will throw an SshConnectionException - with a message of "Key exchange negotiation faild".
+                                // If this check fails then SSH.NET will throw an SshConnectionException - with a message of "Key exchange negotiation failed".
                                 client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
                                 {
-
-                                    var expectedFingerprint = Util.ConvertFingerprintToByteArray(_batchContext.Connection.ServerFingerPrint);
-                                    userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                                        $"Expected fingerprint: '{_batchContext.Connection.ServerFingerPrint}', but was: '{e.FingerPrint}'";
-                                    if (e.FingerPrint.SequenceEqual(expectedFingerprint))
-                                        e.CanTrust = true;
-                                    else
+                                    // First try with SHA256 typed fingerprint
+                                    using (SHA256 mySHA256 = SHA256.Create())
                                     {
-                                        e.CanTrust = false;
+                                        var sha256Fingerprint = Convert.ToBase64String(mySHA256.ComputeHash(e.HostKey));
+                                        // Set the userResultMessage in case checking server fingerprint failes.
+                                        userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
+                                                                $"Expected fingerprint: '{_batchContext.Connection.ServerFingerPrint}', but was: '{sha256Fingerprint}'";
+                                        e.CanTrust = (sha256Fingerprint == _batchContext.Connection.ServerFingerPrint);
                                     }
+
+                                    if (!e.CanTrust)
+                                    {
+
+                                        userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
+                                                               $"Expected fingerprint: '{_batchContext.Connection.ServerFingerPrint}', but was: '{BitConverter.ToString(e.FingerPrint).Replace("-", ":")}'";
+                                        // If previous failed try with MD5 typed fingerprint
+                                        var expectedFingerprint = Util.ConvertFingerprintToByteArray(_batchContext.Connection.ServerFingerPrint);
+                                        if (e.FingerPrint.SequenceEqual(expectedFingerprint))
+                                            e.CanTrust = true;
+                                        else
+                                        {
+                                            e.CanTrust = false;
+                                        }
+                                    }
+                                    
                                 };
                             }
                             catch (Exception e)
@@ -171,17 +187,17 @@ namespace Frends.SFTP.UploadFiles.Definitions
             }
             catch (SshConnectionException ex)
             {
-                userResultMessage = $"Error when establishing connection to the Server: {ex.Message}";
+                userResultMessage = $"Error when establishing connection to the Server: {ex.Message}, {userResultMessage}";
                 return FormFailedFileTransferResult(userResultMessage);
             }
             catch (SocketException)
             {
-                userResultMessage = $"Unable to establish the socket: No such host is known.";
+                userResultMessage = $"Unable to establish the socket: No such host is known. {userResultMessage}";
                 return FormFailedFileTransferResult(userResultMessage);
             }
             catch (SshAuthenticationException ex)
             {
-                userResultMessage = $"Authentication of SSH session failed: {ex.Message}";
+                userResultMessage = $"Authentication of SSH session failed: {ex.Message}, {userResultMessage}";
                 return FormFailedFileTransferResult(userResultMessage);
             }
 
