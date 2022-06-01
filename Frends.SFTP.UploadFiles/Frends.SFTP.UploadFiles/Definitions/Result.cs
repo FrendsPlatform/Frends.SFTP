@@ -38,25 +38,63 @@
         /// <summary>
         /// List of transferred file names.
         /// </summary>
-        /// <example>["test.txt"]</example>
+        /// <example>
+        /// <code>
+        /// [
+        ///     "test.txt",
+        ///     "test2.txt"
+        /// ]
+        /// </code>
+        /// </example>
         public IEnumerable<string> TransferredFileNames { get; private set; }
 
         /// <summary>
         /// Dictionary of file names and errors messages of the failed transfers.
         /// </summary>
-        /// <example>{}</example>
+        /// <example>
+        /// <code>
+        /// {
+        ///     test.txt : 
+        ///     [
+        ///         Failure in CheckIfDestinationFileExists: File 'test.txt' could not be 
+        ///         transferred to '/upload/Upload'. Error: Unable to transfer file. Destination 
+        ///         file already exists: test.txt [Source file restored.],
+        ///     ]
+        ///     text2.txt :
+        ///     [
+        ///         Failure in CheckIfDestinationFileExists: File 'test2.txt' could not be 
+        ///         transferred to '/upload/Upload'. Error: Unable to transfer file. Destination 
+        ///         file already exists: test2.txt [Source file restored.],
+        ///     ]
+        /// }
+        /// </code>
+        /// </example>
         public Dictionary<string, IList<string>> TransferErrors { get; private set; }
 
         /// <summary>
         /// List of transferred file paths.
         /// </summary>
-        /// <example>["C:\\test\\test.txt"]</example>
+        /// <example>
+        /// <code>
+        /// [
+        ///     "C:\\test\\test.txt",
+        ///     "C:\\test\\test2.txt"
+        /// ]
+        /// </code>
+        /// </example>
         public IEnumerable<string> TransferredFilePaths { get; private set; }
 
         /// <summary>
         /// Operations logs for the transfer.
         /// </summary>
-        /// <example>{"2022-05-30 12:27:35.00Z": "FILE LIST C:\\test\\test.txt"}</example>
+        /// <example>
+        /// <code>
+        /// {
+        ///     "2022-05-30 12:27:35.00Z": "FILE LIST C:\\test\\test.txt"
+        ///     "2022-06-01 11:01:50.40Z": "RenameSourceFileBeforeTransfer: Renaming source file test.txt to temporary file name frends_637896781104694806az33q4kf.8CO before transfer"
+        /// }
+        /// </code>
+        /// </example>
         public IDictionary<string, string> OperationsLog { get; set; }
 
         internal Result(Dictionary<string, IList<string>> transferErrors)

@@ -10,7 +10,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
     /// <summary>
     ///     Main class for SFTP file transfers
     /// </summary>
-    public class FileTransporter
+    internal class FileTransporter
     {
         private readonly Guid _instanceId;
         private readonly ISFTPLogger _logger;
@@ -119,12 +119,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
                                                                $"Expected fingerprint: '{_batchContext.Connection.ServerFingerPrint}', but was: '{BitConverter.ToString(e.FingerPrint).Replace("-", ":")}'";
                                         // If previous failed try with MD5 typed fingerprint
                                         var expectedFingerprint = Util.ConvertFingerprintToByteArray(_batchContext.Connection.ServerFingerPrint);
-                                        if (e.FingerPrint.SequenceEqual(expectedFingerprint))
-                                            e.CanTrust = true;
-                                        else
-                                        {
-                                            e.CanTrust = false;
-                                        }
+                                        e.CanTrust = (e.FingerPrint.SequenceEqual(expectedFingerprint)) ? true : false;
                                     }
                                     
                                 };
@@ -138,7 +133,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
                         }
                         client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
 
-                        // TODO: Chnage BufferSize to something meaningful
                         client.BufferSize = _batchContext.Connection.BufferSize;
 
                         client.Connect();
@@ -156,7 +150,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
                             {
                                 try
                                 {
-                                    CreateAllDirectories(client, _batchContext.Destination.Directory);
+                                    CreateDestinationDirectories(client, _batchContext.Destination.Directory);
                                 }
                                 catch (Exception ex)
                                 {
@@ -205,13 +199,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
         }
 
         #region Helper methods
-        /// <summary>
-        /// Form connection info for the SftpClient class.
-        /// </summary>
-        /// <param name="destination"></param>
-        /// <param name="connect"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
         private static ConnectionInfo GetConnectionInfo(Destination destination, Connection connect)
         {
             ConnectionInfo connectionInfo;
@@ -333,12 +320,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
             return new Tuple<List<FileItem>, bool>(fileItems, true);
         }
 
-        /// <summary>
-        /// Create destination directories.
-        /// </summary>
-        /// <param name="client"></param>
-        /// <param name="path"></param>
-        private static void CreateAllDirectories(SftpClient client, string path)
+        private static void CreateDestinationDirectories(SftpClient client, string path)
         {
             // Consistent forward slashes
             path = path.Replace(@"\", "/");
@@ -358,11 +340,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             client.ChangeDirectory("/");
         }
 
-        /// <summary>
-        /// Converts server fingerprint to string array.
-        /// </summary>
-        /// <param name="objectArray"></param>
-        /// <returns></returns>
         private static string[] ConvertObjectToStringArray(object objectArray)
         {
             var res = objectArray as object[];
@@ -385,11 +362,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             };
         }
 
-        /// <summary>
-        /// Forms the FileTransferResult which includes all SingleTransferResults.
-        /// </summary>
-        /// <param name="singleResults"></param>
-        /// <returns></returns>
         private FileTransferResult FormResultFromSingleTransferResults(List<SingleFileTransferResult> singleResults)
         {
             var success = singleResults.All(x => x.Success);

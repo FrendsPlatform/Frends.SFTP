@@ -5,35 +5,21 @@ namespace Frends.SFTP.UploadFiles.Definitions
     ///<summary>
     /// Policies for creating names for remote files: expands macros etc.
     ///</summary>
-    public class RenamingPolicy
+    internal class RenamingPolicy
     {
         private IDictionary<string, Func<string, string>> MacroHandlers;
         private IDictionary<string, Func<string, string>> SourceFileNameMacroHandlers;
 
-        /// <summary>
-        /// Constructor with no parameters.
-        /// </summary>
         public RenamingPolicy() : this("", Guid.Empty)
         {
         }
 
-        /// <summary>
-        /// Contructor with parameters.
-        /// </summary>
-        /// <param name="transferName"></param>
-        /// <param name="transferId"></param>
         public RenamingPolicy(string transferName, Guid transferId)
         {
             MacroHandlers = InitializeMacroHandlers(transferName, transferId);
             SourceFileNameMacroHandlers = InitializeSourceFileNameMacroHandlers();
         }
 
-        /// <summary>
-        /// Creates a remote file name based on the settings and remote file definition
-        /// </summary>
-        /// <param name="originalFileName">The original file.</param>
-        /// <param name="remoteFileDefinition">The remote file path with macros.</param>
-        /// <returns></returns>
         public string CreateRemoteFileName(string originalFileName, string remoteFileDefinition)
         {
             if (!string.IsNullOrEmpty(remoteFileDefinition) && remoteFileDefinition.Contains("?"))
@@ -78,11 +64,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             return result;
         }
 
-        /// <summary>
-        /// Method for expanding source/destination endpoint directory name for macros.
-        /// </summary>
-        /// <param name="directory">Directory path including unexpanded macros</param>
-        /// <returns></returns>
         public string ExpandDirectoryForMacros(string directory)
         {
             if (directory.Contains("%SourceFileName%") || directory.Contains("%SourceFileExtension%"))
@@ -90,14 +71,8 @@ namespace Frends.SFTP.UploadFiles.Definitions
 
             return ExpandFileMacros(directory);
         }
-
-        /// <summary>
-        /// Creates the file path to use for source operation: Move
-        /// The SourceOperationTo should always be a directory. If it is empty, an error should be thrown
-        /// The current file name should always be appended to the directory name
-        /// The directory name cannot use file macros or file masks        
-        /// </summary>        
-        public string CreateRemoteFileNameForMove(string sourceOperationTo, string sourceFilePath)
+       
+        public string CreateRemoteFilePathForMove(string sourceOperationTo, string sourceFilePath)
         {
             var directoryName = sourceOperationTo;
             if (string.IsNullOrEmpty(directoryName))
@@ -134,12 +109,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             return invalidCharacters.ToArray();
         }
 
-
-        /// <summary>
-        /// Creates the file path to use for source operation: Rename
-        /// </summary>        
-        /// <param name="originalFilePath">The original file name with path - the path is needed so the directory settings are preserved</param>
-        /// <param name="sourceOperationTo">The new name to put files to</param>
         public string CreateRemoteFileNameForRename(string originalFilePath, string sourceOperationTo)
         {
             if (String.IsNullOrEmpty(sourceOperationTo))
@@ -151,11 +120,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             return CanonizeAndCheckPath(filePath);
         }
 
-        /// <summary>
-        /// Check if macro is indeed a macro.
-        /// </summary>
-        /// <param name="macro"></param>
-        /// <returns></returns>
         public bool IsMacro(string macro)
         {
             return IsFileMacro(macro, MacroHandlers) || IsFileMacro(macro, SourceFileNameMacroHandlers);
@@ -233,12 +197,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             return false;
         }
 
-
-        /// <summary>
-        /// Defines if string is filemask
-        /// </summary>
-        /// <param name="s">filename or filemask</param>
-        /// <returns>true if string represents filemask, false if it represents single file</returns>
         private static bool IsFileMask(string s)
         {
             bool b = false;

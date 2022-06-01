@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using Serilog.Core;
+﻿using Serilog.Core;
 using Serilog.Events;
 
 namespace Frends.SFTP.UploadFiles.Definitions
@@ -11,7 +6,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
     /// <summary>
     /// Sink that is used to store messages and events from seriolog Logger
     /// </summary>
-    public class TransferLogSink : ILogEventSink
+    internal class TransferLogSink : ILogEventSink
     {
         /// <summary>
         ///     Always store some initial log messages first

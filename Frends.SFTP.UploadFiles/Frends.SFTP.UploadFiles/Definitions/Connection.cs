@@ -66,6 +66,15 @@ namespace Frends.SFTP.UploadFiles.Definitions
         /// Private key as a string, supported private key formats: PKCS#8,
         /// PuTTY.ppk.
         /// </summary>
+        /// <example>
+        /// -----BEGIN RSA PRIVATE KEY-----
+        /// Fqxq2jbSKyb0a+oW96Tjoif3Kcb5zZ0FiQyiHgQozLXrecjdUwjWuedkDoZMxwG5
+        /// bxpOnxZ/88tDzYCtCPcYCPRF8BNueUsZO8/tztTra+4NgVd/omXHG5bqb7iMB4dc
+        /// ...
+        /// OX7Q/wO4lqOlFhLtRnSL0cfuhRmt59pM75Zd+euX5tv9jmCj+AQT/kiBoMhNrDGk
+        /// N2gTujnH7HCr/afSBeL3xnYcEmeCQTxTPZofBjPC+TPd9g7MntSGBeU/Fstv0jbg
+        /// -----END RSA PRIVATE KEY-----
+        /// </example>
         [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyString, AuthenticationType.UsernamePasswordPrivateKeyString)]
         [PasswordPropertyText]
         public string PrivateKeyString { get; set; }
@@ -83,7 +92,10 @@ namespace Frends.SFTP.UploadFiles.Definitions
         /// authentication it is recommended to use server fingerprint in 
         /// order to be sure of the server you are connecting.
         /// </summary>
-        /// <example>41:76:EA:65:62:6E:D3:68:DC:41:9A:F2:F2:20:69:9D</example>
+        /// <example>
+        /// MD5: '41:76:EA:65:62:6E:D3:68:DC:41:9A:F2:F2:20:69:9D'
+        /// SHA256: 'FBQn5eyoxpAl33Ly0gyScCGAqZeMVsfY7qss3KOM/hY='
+        /// </example>
         [DefaultValue("")]
         public string ServerFingerPrint { get; set; }
 

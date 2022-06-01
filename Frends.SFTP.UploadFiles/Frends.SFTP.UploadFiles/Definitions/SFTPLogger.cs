@@ -6,72 +6,39 @@ namespace Frends.SFTP.UploadFiles.Definitions
     /// <summary>
     /// SFTP internal logger interface
     /// </summary>
-    public interface ISFTPLogger : IDisposable
+    internal interface ISFTPLogger : IDisposable
     {
-        /// <summary>
-        /// Notifies of errors
-        /// </summary>
         void NotifyError(BatchContext context, string msg, Exception e);
 
-        /// <summary>
-        /// Notifies of info-level messages
-        /// </summary>
         void NotifyInformation(BatchContext context, string msg);
 
-        /// <summary>
-        /// Notifies of debug trace messages
-        /// </summary>
         void NotifyTrace(string message);
 
-        /// <summary>
-        /// Logs a single successful file transfer
-        /// </summary>
         void LogTransferSuccess(SingleFileTransfer transfer, BatchContext context);
 
-        /// <summary>
-        /// Logs a single failed file transfer
-        /// </summary>
         void LogTransferFailed(SingleFileTransfer transfer, BatchContext context, string errorMessage, Exception exception);
 
-        /// <summary>
-        /// Logs a batch finished event
-        /// </summary>
         void LogBatchFinished(BatchContext context, string userResultMessage, bool success, bool actionSkipped);
     }
 
-    /// <summary>
-    /// SFTP internal logger implementation
-    /// </summary>
-    public class SFTPLogger : ISFTPLogger
+    internal class SFTPLogger : ISFTPLogger
     {
         private ConcurrentBag<FileTransferInfo> _fileTransfers;
         private ILogger _log;
 
         private bool _disposed;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public SFTPLogger(ILogger log)
         {
             _fileTransfers = new ConcurrentBag<FileTransferInfo>();
             _log = log;
         }
 
-        /// <summary>
-        /// Construtor disposes the SFTPLogger
-        /// </summary>
         ~SFTPLogger()
         {
             Dispose(false);
         }
 
-        /// <summary>
-        /// Notifies Error
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="msg"></param>
-        /// <param name="e"></param>
         public void NotifyError(BatchContext context, string msg, Exception e)
         {
             try
@@ -95,11 +62,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             }
         }
 
-        /// <summary>
-        /// Notifies information
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="msg"></param>
         public void NotifyInformation(BatchContext context, string msg)
         {
             try
@@ -112,11 +74,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             }
         }
 
-        /// <summary>
-        /// Logs succesful tranfer
-        /// </summary>
-        /// <param name="transfer"></param>
-        /// <param name="context"></param>
         public void LogTransferSuccess(SingleFileTransfer transfer, BatchContext context)
         {
             try
@@ -131,14 +88,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             }
         }
 
-
-        /// <summary>
-        /// Logs failed transfer.
-        /// </summary>
-        /// <param name="transfer"></param>
-        /// <param name="context"></param>
-        /// <param name="errorMessage"></param>
-        /// <param name="exception"></param>
         public void LogTransferFailed(SingleFileTransfer transfer, BatchContext context, string errorMessage, Exception exception)
         {
             try
@@ -154,13 +103,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             }
         }
 
-        /// <summary>
-        /// Derived method from ILogger
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="userResultMessage"></param>
-        /// <param name="success"></param>
-        /// <param name="actionSkipped"></param>
         public void LogBatchFinished(BatchContext context, string userResultMessage, bool success, bool actionSkipped)
         {
             try
@@ -174,10 +116,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             }
         }
 
-        /// <summary>
-        /// Notifies Trace
-        /// </summary>
-        /// <param name="message"></param>
         public void NotifyTrace(string message)
         {
             // only log to debug trace
@@ -197,14 +135,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             return string.Format("{0}://{1}/{2}/{3}", "SFTP", context.Connection.Address, directory, endpointConfig.FileName);
         }
 
-        /// <summary>
-        /// Creates FileTransferInfo
-        /// </summary>
-        /// <param name="result"></param>
-        /// <param name="transfer"></param>
-        /// <param name="context"></param>
-        /// <param name="errorMessage"></param>
-        /// <returns></returns>
         public static FileTransferInfo CreateFileTransferInfo(TransferResult result, SingleFileTransfer transfer, BatchContext context, string errorMessage = null)
         {
             // Create 2 dummy endpoints and initialize some local variables which are needed in case if cobalt config is not
@@ -264,19 +194,12 @@ namespace Frends.SFTP.UploadFiles.Definitions
             return File.Exists(filepath) ? new FileInfo(filepath).Length : 0;
         }
 
-        /// <summary>
-        /// Method starts dispose.
-        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        /// <summary>
-        /// Virtual method dispose for SFTPLogger
-        /// </summary>
-        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed)

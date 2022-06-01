@@ -7,7 +7,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
     /// <summary>
     /// Class for executing single file transfer.
     /// </summary>
-    public class SingleFileTransfer
+    internal class SingleFileTransfer
     {
         private readonly RenamingPolicy _renamingPolicy;
         private readonly ISFTPLogger _logger;
@@ -38,56 +38,21 @@ namespace Frends.SFTP.UploadFiles.Definitions
             _result = new SingleFileTransferResult { Success = true };
         }
 
-        /// <summary>
-        /// Start time of the single file transfer.
-        /// </summary>
         public DateTime FileTransferStartTime { get; set; }
 
-        /// <summary>
-        /// SftpClient that is used to connect through sftp.
-        /// </summary>
         public SftpClient Client { get; set; }
-
-        /// <summary>
-        /// Source file as FileItem.
-        /// </summary>
         public FileItem SourceFile { get; set; }
-
-        /// <summary>
-        /// Destination file as FileItem.
-        /// </summary>
         public FileItem DestinationFile { get; set; }
-
-        /// <summary>
-        /// Destination file name with macros extended.
-        /// </summary>
         public string DestinationFileNameWithMacrosExpanded { get; set; }
-
-        /// <summary>
-        /// Source file full path during transfer.
-        /// </summary>
         private string SourceFileDuringTransfer { get; set; }
-
-        /// <summary>
-        /// Destination file name during transfer.
-        /// </summary>
         public string DestinationFileDuringTransfer { get; set; }
-
-        /// <summary>
-        /// BatchContext with all required parameters.
-        /// </summary>
-        public BatchContext BatchContext { get; set; }
+        internal BatchContext BatchContext { get; set; }
 
         /// <summary>
         /// Transfer state for SFTP Logger.
         /// </summary>
         internal TransferState State { get; set; }
 
-        /// <summary>
-        /// Method that transfers single file through sftp.
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
         internal SingleFileTransferResult TransferSingleFile()
         {
             try
@@ -134,10 +99,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             return _result;
         }
 
-        /// <summary>
-        /// Checks if destination file exists.
-        /// </summary>
-        /// <returns></returns>
         private bool DestinationFileExists(string filename)
         {
             Trace(
@@ -147,9 +108,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             return Client.Exists(filename);
         }
 
-        /// <summary>
-        /// Rename file with unique file name. 
-        /// </summary>
         private void RenameSourceFile()
         {
             var uniqueFileName = Util.CreateUniqueFileName();
@@ -162,10 +120,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             SourceFileDuringTransfer = renamedFile;
         }
 
-        /// <summary>
-        /// Handles the appending to the destination file if it exists.
-        /// </summary>
-        /// <exception cref="Exception"></exception>
         private void AppendDestinationFile()
         {
             var fullPath = SourceFile.FullPath;
@@ -190,9 +144,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
                 RenameDestinationFile();
         }
 
-        /// <summary>
-        /// Renames destination file as a locking mechanism.
-        /// </summary>
         private void RenameDestinationFile()
         {
             SftpFileAttributes fileAttributes;
@@ -227,11 +178,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             Client.SetAttributes(DestinationFileDuringTransfer, fileAttributes);
         }
 
-        /// <summary>
-        /// Appends source file content to existing destination file.
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="encoding"></param>
         private void Append(string[] content, Encoding encoding)
         {
             Trace(
@@ -265,12 +211,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             }
         }
 
-        /// <summary>
-        /// Reads content of the source file 
-        /// </summary>
-        /// <param name="fullPath"></param>
-        /// <param name="encoding"></param>
-        /// <returns></returns>
         private string[] GetSourceFileContent(string fullPath, Encoding encoding)
         {
             var result = new List<string>();
@@ -336,12 +276,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             return;
         }
 
-        /// <summary>
-        /// Get the encoding for file content when appending to existing file.
-        /// </summary>
-        /// <param name="dest"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
         private static Encoding GetEncoding(Destination dest)
         {
             switch (dest.FileNameEncoding)
@@ -363,16 +297,13 @@ namespace Frends.SFTP.UploadFiles.Definitions
             }
         }
 
-        /// <summary>
-        /// Executes operations set to the source file.
-        /// </summary>
         private void ExecuteSourceOperation()
         {
             var filePath = (string.IsNullOrEmpty(SourceFileDuringTransfer) ? SourceFile.FullPath : SourceFileDuringTransfer);
             switch (BatchContext.Source.Operation)
             {
                 case SourceOperation.Move:
-                    var moveToPath = _renamingPolicy.CreateRemoteFileNameForMove(BatchContext.Source.DirectoryToMoveAfterTransfer, SourceFile.FullPath);
+                    var moveToPath = _renamingPolicy.CreateRemoteFilePathForMove(BatchContext.Source.DirectoryToMoveAfterTransfer, SourceFile.FullPath);
                     Trace(TransferState.SourceOperationMove, "Moving source file {0} to {1}", SourceFile.FullPath, moveToPath);
                     File.Move(filePath, moveToPath);
 
@@ -413,9 +344,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             }
         }
 
-        /// <summary>
-        /// Handles the clean up for temporary source and destination files.
-        /// </summary>
         private void CleanUpFiles()
         {
             Trace(TransferState.CleanUpFiles, "Removing temporary file {0}", SourceFileDuringTransfer);
@@ -424,11 +352,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             TryToRemoveDestinationTempFile();
         }
 
-        /// <summary>
-        /// Handles transfer errors and forms error messages.
-        /// </summary>
-        /// <param name="exception"></param>
-        /// <param name="sourceFileRestoreMessage"></param>
         private void HandleTransferError(Exception exception, string sourceFileRestoreMessage)
         {
             _result.Success = false; // the routine instance should be marked as failed if even one transfer fails
@@ -443,9 +366,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             _logger.LogTransferFailed(this, BatchContext, errorMessage, exception);
         }
 
-        /// <summary>
-        /// Tries to remove temporary destination file.
-        /// </summary>
         private void TryToRemoveDestinationTempFile()
         {
             // If DestinationFileNameDuringTransfer is not set,
@@ -475,10 +395,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             }
         }
 
-        /// <summary>
-        /// Tries to remove temporary source file.
-        /// </summary>
-        /// <param name="fileName"></param>
         private void TryToRemoveLocalTempFile(string fileName)
         {
             try
@@ -498,20 +414,11 @@ namespace Frends.SFTP.UploadFiles.Definitions
             }
         }
 
-        /// <summary>
-        /// Checks whether the file is not null and exists.
-        /// </summary>
-        /// <param name="filename"></param>
-        /// <returns></returns>
         private bool FileDefinedAndExists(string filename)
         {
             return !string.IsNullOrEmpty(filename) && File.Exists(filename);
         }
 
-        /// <summary>
-        /// Restores source file in case of error. 
-        /// </summary>
-        /// <returns></returns>
         private string RestoreSourceFileAfterErrorIfItWasRenamed()
         {
             // restore the source file so we can retry the operations
@@ -542,10 +449,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             return string.Empty;
         }
 
-        /// <summary>
-        /// Checks whether source file needs to be restored. 
-        /// </summary>
-        /// <returns></returns>
         private bool ShouldSourceFileBeRestoredOnError()
         {
             if (BatchContext.Options.RenameSourceFileBeforeTransfer)

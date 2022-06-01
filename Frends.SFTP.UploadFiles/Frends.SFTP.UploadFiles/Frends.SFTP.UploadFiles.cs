@@ -119,22 +119,12 @@ namespace Frends.SFTP.UploadFiles
             }
         }        
 
-        /// <summary>
-        /// Initializes SFTPLogger. 
-        /// </summary>
-        /// <param name="notificationLogger"></param>
-        /// <returns></returns>
         private static SFTPLogger InitializeSFTPLogger(ILogger notificationLogger)
         {
             var logger = new SFTPLogger(notificationLogger);
             return logger;
         }
 
-        /// <summary>
-        /// Fetches logs for the Operations log.
-        /// </summary>
-        /// <param name="entries"></param>
-        /// <returns></returns>
         private static IDictionary<string, string> GetLogDictionary(IList<Tuple<DateTimeOffset, string>> entries)
         {
             const string dateFormat = "yyyy-MM-dd HH:mm:ss.f0Z";
