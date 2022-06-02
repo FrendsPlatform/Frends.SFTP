@@ -211,6 +211,26 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
+        public void UploadFiles_TestDestinationDirectoryWithMacros()
+        {
+            var destination = new Destination
+            {
+                Directory = "upload/Upload/test%Year%",
+                FileName = "",
+                Action = DestinationAction.Error,
+                FileNameEncoding = FileEncoding.UTF8,
+                EnableBomForFileName = true
+            };
+
+            var result = SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+            var year = DateTime.Now.Year.ToString();
+            Assert.That(Helpers.CheckFileExistsInDestination("upload/Upload/test" + year));
+
+        }
+
+        [Test]
         public void UploadFiles_TestAppendToExistingFile()
         {
             var result = SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());

@@ -18,9 +18,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
         private readonly string[] _filePaths;
         private RenamingPolicy _renamingPolicy;
 
-        /// <summary>
-        ///     Constructor for SFTP file transfers
-        /// </summary>
         internal FileTransporter(ISFTPLogger logger, BatchContext context, Guid instanceId)
         {
             _logger = logger;
@@ -32,17 +29,14 @@ namespace Frends.SFTP.UploadFiles.Definitions
             _filePaths = ConvertObjectToStringArray(context.Source.FilePaths);
 
             SourceDirectoryWithMacrosExtended = _renamingPolicy.ExpandDirectoryForMacros(context.Source.Directory);
+            DestinationDirectoryWithMacrosExtended = _renamingPolicy.ExpandDirectoryForMacros(context.Destination.Directory);
         }
 
-        /// <summary>
-        /// List of transfer results.
-        /// </summary>
         private List<SingleFileTransferResult> _result { get; set; }
 
-        /// <summary>
-        /// Source directory with its macros extended.
-        /// </summary>
         private string SourceDirectoryWithMacrosExtended { get; set; }
+
+        private string DestinationDirectoryWithMacrosExtended { get; set; }
 
         /// <summary>
         /// Executes file transfers
@@ -144,28 +138,28 @@ namespace Frends.SFTP.UploadFiles.Definitions
                         }
 
                         // Check does the destination directory exists.
-                        if (!client.Exists(_batchContext.Destination.Directory))
+                        if (!client.Exists(DestinationDirectoryWithMacrosExtended))
                         {
                             if (_batchContext.Options.CreateDestinationDirectories)
                             {
                                 try
                                 {
-                                    CreateDestinationDirectories(client, _batchContext.Destination.Directory);
+                                    CreateDestinationDirectories(client, DestinationDirectoryWithMacrosExtended);
                                 }
                                 catch (Exception ex)
                                 {
-                                    userResultMessage = $"Error while creating destination directory '{_batchContext.Destination.Directory}': {ex.Message}";
+                                    userResultMessage = $"Error while creating destination directory '{DestinationDirectoryWithMacrosExtended}': {ex.Message}";
                                     return FormFailedFileTransferResult(userResultMessage);
                                 }
                             }
                             else
                             {
-                                userResultMessage = $"Destination directory '{_batchContext.Destination.Directory}' was not found.";
+                                userResultMessage = $"Destination directory '{DestinationDirectoryWithMacrosExtended}' was not found.";
                                 return FormFailedFileTransferResult(userResultMessage);
                             }
                         }
 
-                        client.ChangeDirectory(_batchContext.Destination.Directory);
+                        client.ChangeDirectory(DestinationDirectoryWithMacrosExtended);
 
                         _batchContext.DestinationFiles = client.ListDirectory(".");
 
