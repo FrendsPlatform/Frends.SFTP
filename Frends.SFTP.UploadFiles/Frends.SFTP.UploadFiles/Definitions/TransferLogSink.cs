@@ -18,10 +18,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
 
         private readonly IList<Tuple<DateTimeOffset, string>> _initialLogMessages;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="maxLogEntries"></param>
         public TransferLogSink(int? maxLogEntries)
         {
             if (maxLogEntries != null)
@@ -35,10 +31,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             }
         }
 
-        /// <summary>
-        /// Emits new messages to the sink
-        /// </summary>
-        /// <param name="logEvent"></param>
         public void Emit(LogEvent logEvent)
         {
             if (_allMsgsBuffer != null)
@@ -56,10 +48,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
             }
         }
 
-        /// <summary>
-        /// Gets the log messages from sink
-        /// </summary>
-        /// <returns></returns>
         public IList<Tuple<DateTimeOffset, string>> GetBufferedLogMessages()
         {
             if (_allMsgsBuffer != null) return _allMsgsBuffer;

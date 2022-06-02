@@ -13,14 +13,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
         private readonly ISFTPLogger _logger;
         private SingleFileTransferResult _result;
 
-        /// <summary>
-        /// Contructor for single file transfer class.
-        /// </summary>
-        /// <param name="file"></param>
-        /// <param name="context"></param>
-        /// <param name="client"></param>
-        /// <param name="renamingPolicy"></param>
-        /// <param name="logger"></param>
         public SingleFileTransfer(FileItem file, BatchContext context, SftpClient client, RenamingPolicy renamingPolicy, ISFTPLogger logger)
         {
             _renamingPolicy = renamingPolicy;
