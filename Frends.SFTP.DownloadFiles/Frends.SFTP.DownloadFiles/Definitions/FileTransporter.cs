@@ -38,7 +38,7 @@ namespace Frends.SFTP.DownloadFiles.Definitions
         private string DestinationDirectoryWithMacrosExtended { get; set; }
 
         /// <summary>
-        /// Executes file transfers
+        /// Executes file transfers.
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
