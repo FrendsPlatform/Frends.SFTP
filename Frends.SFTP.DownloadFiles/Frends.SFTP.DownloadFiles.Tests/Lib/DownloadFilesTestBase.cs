@@ -15,7 +15,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
         protected static Info _info;
         protected static string _workDir;
         protected static string _destWorkDir;
-        protected static string _testResultFile = "testResultFile.txt";
 
         [OneTimeSetUp]
         public static void Setup()
@@ -28,7 +27,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             _source = new Source
             {
                 Directory = "/upload/Upload",
-                FileName = "SFTPUploadTestFile.txt",
+                FileName = "SFTPDownloadTestFile.txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Nothing,
             };

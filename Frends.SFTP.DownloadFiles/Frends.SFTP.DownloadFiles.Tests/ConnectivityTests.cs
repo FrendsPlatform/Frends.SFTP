@@ -54,7 +54,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var source = new Source
             {
                 Directory = _source.Directory,
-                FileName = "SFTPUploadTestFile.txt",
+                FileName = _source.FileName,
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Nothing
             };
@@ -75,7 +75,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var source = new Source
             {
                 Directory = _source.Directory,
-                FileName = "SFTPUploadTestFile.txt",
+                FileName = _source.FileName,
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Nothing
             };

@@ -82,9 +82,9 @@ namespace Frends.SFTP.DownloadFiles.Tests
         {
             var files = new List<string>
             {
-                Path.Combine(_workDir, "SFTPUploadTestFile.txt"),
-                Path.Combine(_workDir, "SFTPUploadTestFile2.txt"),
-                Path.Combine(_workDir, "SFTPUploadTestFile3.txt")
+                Path.Combine(_workDir, "SFTPDownloadTestFile.txt"),
+                Path.Combine(_workDir, "SFTPDownloadTestFile2.txt"),
+                Path.Combine(_workDir, "SFTPDownloadTestFile3.txt")
             };
             Helpers.UploadTestFiles(files, _source.Directory);
             Directory.CreateDirectory(_destWorkDir);
@@ -181,9 +181,9 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             var files = new List<string>
             {
-                Path.Combine(_workDir, "SFTPUploadTestFile.txt"),
-                Path.Combine(_workDir, "SFTPUploadTestFile2.txt"),
-                Path.Combine(_workDir, "SFTPUploadTestFile3.txt"),
+                Path.Combine(_workDir, "SFTPDownloadTestFile.txt"),
+                Path.Combine(_workDir, "SFTPDownloadTestFile2.txt"),
+                Path.Combine(_workDir, "SFTPDownloadTestFile3.txt"),
             };
             Helpers.UploadTestFiles(files, _source.Directory);
 
@@ -214,7 +214,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var date = DateTime.Now;
-            Assert.IsTrue(File.Exists(Path.Combine(_destWorkDir, "SFTPUploadTestFile" + date.ToString(@"yyyy-MM-dd") + ".txt")));
+            Assert.IsTrue(File.Exists(Path.Combine(_destWorkDir, "SFTPDownloadTestFile" + date.ToString(@"yyyy-MM-dd") + ".txt")));
         }
 
         [Test]
@@ -225,7 +225,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var source = new Source
             {
                 Directory = "/upload/Upload/testfolder_%Year%",
-                FileName = "SFTPUploadTestFile.txt",
+                FileName = _source.FileName,
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Nothing
             };
@@ -264,14 +264,14 @@ namespace Frends.SFTP.DownloadFiles.Tests
         public void DownloadFiles_TestAppendToExistingFile()
         {
             Directory.CreateDirectory(_destWorkDir);
-            File.Copy(Path.Combine(_workDir, "SFTPUploadTestFile.txt"), Path.Combine(_destWorkDir, "SFTPUploadTestFile.txt"));
-            var file1 = new FileInfo(Path.Combine(_workDir, "SFTPUploadTestFile.txt"));
-            Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, "SFTPUploadTestFile2.txt") }, _source.Directory);
+            File.Copy(Path.Combine(_workDir, _source.FileName), Path.Combine(_destWorkDir, _source.FileName));
+            var file1 = new FileInfo(Path.Combine(_workDir, _source.FileName));
+            Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, "SFTPDownloadTestFile2.txt") }, _source.Directory);
 
             var destination = new Destination
             {
                 Directory = _destWorkDir,
-                FileName = "SFTPUploadTestFile.txt",
+                FileName = _source.FileName,
                 Action = DestinationAction.Append,
                 FileNameEncoding = FileEncoding.UTF8,
                 EnableBomForFileName = true
@@ -280,14 +280,14 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var source = new Source
             {
                 Directory = "/upload/Upload",
-                FileName = "SFTPUploadTestFile2.txt",
+                FileName = "SFTPDownloadTestFile2.txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Nothing
             };
 
             var result = SFTP.DownloadFiles(source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
-            var file2 = new FileInfo(Path.Combine(_destWorkDir, "SFTPUploadTestFile.txt"));
+            var file2 = new FileInfo(Path.Combine(_destWorkDir, _source.FileName));
             Assert.AreNotEqual(file1.Length, file2.Length);
         }
     }
