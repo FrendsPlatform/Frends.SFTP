@@ -65,6 +65,9 @@ namespace Frends.SFTP.DownloadFiles.Definitions
 
                 using (var client = new SftpClient(connectionInfo))
                 {
+                    client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256");
+                    client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256@libssh.org");
+
                     // Check the fingerprint of the server if given.
                     if (!String.IsNullOrEmpty(_batchContext.Connection.ServerFingerPrint))
                     {

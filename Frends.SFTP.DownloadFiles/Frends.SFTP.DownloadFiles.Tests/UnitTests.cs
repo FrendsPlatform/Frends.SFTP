@@ -10,7 +10,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
     /// <summary>
     /// NOTE: To run these unit tests, you need an SFTP test server.
     /// This run command will create a docker container which is used in the tests.
-    /// Run this command with absolute path to the Frends.SFTP.DownloadFiles.Tests\Volumes diretory.
+    /// Run this command with absolute path to the Frends.SFTP.DownloadFiles.Tests\Volumes directory.
     /// docker-compose -f .\Frends.SFTP.DownloadFiles.Tests\docker_compose.yml up -d
     /// </summary>
     [TestFixture]
