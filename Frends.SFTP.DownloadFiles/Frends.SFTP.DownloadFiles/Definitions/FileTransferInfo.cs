@@ -2,33 +2,33 @@
 {
     internal class FileTransferInfo
     {
-        public string TransferName { get; set; } // 0
+        public string TransferName { get; set; }
 
-        public Guid BatchId { get; set; } // 1
+        public Guid BatchId { get; set; }
 
-        public string SourceFile { get; set; } // 2
+        public string SourceFile { get; set; }
 
-        public DateTime TransferStarted { get; set; } // 3
+        public DateTime TransferStarted { get; set; }
 
-        public DateTime TransferEnded { get; set; } // 4
+        public DateTime TransferEnded { get; set; }
 
-        public string DestinationFile { get; set; } // 5
+        public string DestinationFile { get; set; }
 
-        public long FileSize { get; set; } // 6
+        public long FileSize { get; set; }
 
-        public string ErrorInfo { get; set; } // 7
+        public string ErrorInfo { get; set; }
 
-        public TransferResult Result { get; set; } // 10
+        public TransferResult Result { get; set; }
 
-        public string DestinationAddress { get; set; } // 13
+        public string DestinationAddress { get; set; }
 
-        public string SourcePath { get; set; } // 15
+        public string SourcePath { get; set; }
 
-        public string DestinationPath { get; set; } // 16
+        public string DestinationPath { get; set; }
 
-        public string ServiceId { get; set; } // 17
+        public string ServiceId { get; set; }
 
-        public string RoutineUri { get; set; } // 18
+        public string RoutineUri { get; set; }
 
         public Guid SingleFileTransferId { get; set; }
 

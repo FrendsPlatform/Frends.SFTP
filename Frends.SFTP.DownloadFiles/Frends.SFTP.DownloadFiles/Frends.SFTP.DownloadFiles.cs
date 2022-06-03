@@ -17,7 +17,7 @@ namespace Frends.SFTP.DownloadFiles
 
         /// <summary>
         /// Downloads file through SFTP connection.
-        /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.SFTP.DownloadFiles)
+        /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.SFTP.DownloadFiles)
         /// </summary>
         /// <param name="info">Transfer info parameters</param>
         /// <param name="connection">Transfer connection parameters</param>
@@ -107,11 +107,6 @@ namespace Frends.SFTP.DownloadFiles
             }
         }        
 
-        /// <summary>
-        /// Initializes SFTPLogger. 
-        /// </summary>
-        /// <param name="notificationLogger"></param>
-        /// <returns></returns>
         private static SFTPLogger InitializeSFTPLogger(ILogger notificationLogger)
         {
             var logger = new SFTPLogger(notificationLogger);
