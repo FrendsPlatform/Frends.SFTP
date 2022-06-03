@@ -8,6 +8,7 @@ Frends tasks for SFTP operations.
 - [Frends.SFTP.ReadFile](Frends.SFTP.ReadFile/README.md)
 - [Frends.SFTP.ListFiles](Frends.SFTP.ListFiles/README.md)
 - [Frends.SFTP.UploadFiles](Frends.SFTP.UploadFiles/README.md)
+- [Frends.SFTP.DownloadFiles](Frends.SFTP.DownloadFiles/README.md)
 
 # Contributing
 When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
