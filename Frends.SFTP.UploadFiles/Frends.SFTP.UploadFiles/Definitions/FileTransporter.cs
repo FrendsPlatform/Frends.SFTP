@@ -88,6 +88,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
 
                     using (var client = new SftpClient(connectionInfo))
                     {
+                        //Disable support for these host key exchange algorithms relating: https://github.com/FrendsPlatform/Frends.SFTP/security/dependabot/4
                         client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256");
                         client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256@libssh.org");
 
