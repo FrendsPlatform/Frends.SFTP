@@ -260,5 +260,48 @@ namespace Frends.SFTP.UploadFiles.Tests
             var content2 = Helpers.GetTransferredFileContent(fullPath);
             Assert.AreNotEqual(content1, content2);
         }
+
+        [Test]
+        public void UploadFiles_TestSourceOperationWithMove()
+        {
+            var to = Path.Combine(_workDir, "uploaded");
+            Directory.CreateDirectory(to);
+            var source = new Source
+            {
+                Directory = _workDir,
+                FileName = "SFTPUploadTestFile.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Move,
+                DirectoryToMoveAfterTransfer = to
+            };
+
+            var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+            Assert.IsTrue(File.Exists(Path.Combine(to, source.FileName)));
+            File.Move(Path.Combine(to, source.FileName), Path.Combine(_workDir, source.FileName));
+            Directory.Delete(to);
+        }
+
+        [Test]
+        public void UploadFiles_TestSourceOperationWithRename()
+        {
+            var source = new Source
+            {
+                Directory = _workDir,
+                FileName = "SFTPUploadTestFile.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Rename,
+                FileNameAfterTransfer = "uploaded_%SourceFileName%.txt"
+            };
+
+            var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+            Assert.IsTrue(File.Exists(Path.Combine(_workDir, "uploaded_SFTPUploadTestFile.txt")));
+            File.Move(Path.Combine(_workDir, "uploaded_SFTPUploadTestFile.txt"), Path.Combine(_workDir, "SFTPUploadTestFile.txt"));
+        }
     }
 }
