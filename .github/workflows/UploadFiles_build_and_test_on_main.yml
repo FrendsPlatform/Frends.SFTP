@@ -14,6 +14,6 @@ jobs:
     uses: FrendsPlatform/FrendsTasks/.github/workflows/linux_build_main.yml@main
     with:
       workdir: Frends.SFTP.UploadFiles
-      prebuild_command: docker-compose -f ./Frends.SFTP.DownloadFiles.Tests/docker_compose.yml up -d
+      prebuild_command: docker-compose -f ./Frends.SFTP.UploadFiles.Tests/docker_compose.yml up -d && docker logs testikontti
     secrets:
       badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
