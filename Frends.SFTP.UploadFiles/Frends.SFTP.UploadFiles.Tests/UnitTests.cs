@@ -103,7 +103,7 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             result = SFTP.UploadFiles(source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsFalse(result.Success);
-            Assert.AreEqual(4, result.SuccessfulTransferCount);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.AreEqual(1, result.FailedTransferCount);
         }
 
@@ -172,7 +172,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             result = SFTP.UploadFiles(source, _destination, _connection, options, _info, new CancellationToken());
             Assert.IsFalse(result.Success);
             Assert.AreEqual(1, result.FailedTransferCount);
-            Assert.AreEqual(4, result.SuccessfulTransferCount);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
 
         [Test]

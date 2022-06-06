@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Security.Cryptography;
 using Renci.SshNet;
 using Renci.SshNet.Common;
@@ -30,6 +31,30 @@ namespace Frends.SFTP.UploadFiles.Tests
             };
 
             return connection;
+        }
+
+        internal static void CreateSourceDirectoryWithDate()
+        {
+            var workDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
+            var year = DateTime.Now.Year.ToString();
+            var dir = Path.Combine(workDir, "testfolder_" + year);
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+                if (Directory.GetFiles(dir).Length == 0)
+                {
+                    File.Copy(Path.Combine(workDir, "SFTPUploadTestFile.txt"), Path.Combine(dir, "SFTPUploadTestFile.txt"));
+                    File.Copy(Path.Combine(workDir, "SFTPUploadTestFile2.txt"), Path.Combine(dir, "SFTPUploadTestFile2.txt"));
+                }
+            } 
+        }
+
+        internal static void DeleteSourceDir()
+        {
+            var year = DateTime.Now.Year.ToString();
+            var dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/testfolder_" + year);
+            if (Directory.Exists(year))
+                Directory.Delete(dir, true);
         }
 
         internal static string GetServerFingerprintAsSHA256String()

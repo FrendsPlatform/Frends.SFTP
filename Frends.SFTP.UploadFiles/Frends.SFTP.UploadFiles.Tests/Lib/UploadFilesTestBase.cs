@@ -53,6 +53,8 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 WorkDir = null,
             };
+
+            Helpers.CreateSourceDirectoryWithDate();
         }
 
         [TearDown]
@@ -67,6 +69,8 @@ namespace Frends.SFTP.UploadFiles.Tests
                 }
                 sftp.Disconnect();
             }
+
+            Helpers.DeleteSourceDir();
         }
     }
 }
