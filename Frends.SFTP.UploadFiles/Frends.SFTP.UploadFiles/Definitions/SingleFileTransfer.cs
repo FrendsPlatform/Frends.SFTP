@@ -295,7 +295,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
             switch (BatchContext.Source.Operation)
             {
                 case SourceOperation.Move:
-                    var moveToPath = _renamingPolicy.CreateRemoteFilePathForMove(BatchContext.Source.DirectoryToMoveAfterTransfer, SourceFile.FullPath);
+                    var moveToPath = _renamingPolicy.CreateRemoteFilePathForMove(_renamingPolicy.ExpandDirectoryForMacros(BatchContext.Source.DirectoryToMoveAfterTransfer), SourceFile.FullPath);
                     Trace(TransferState.SourceOperationMove, "Moving source file {0} to {1}", SourceFile.FullPath, moveToPath);
                     File.Move(filePath, moveToPath);
 
@@ -306,7 +306,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
                     break;
 
                 case SourceOperation.Rename:
-                    var renameToPath = _renamingPolicy.CreateRemoteFileNameForRename(SourceFile.FullPath, BatchContext.Source.FileNameAfterTransfer);
+                    var renameToPath = Path.Combine(Path.GetDirectoryName(SourceFile.FullPath), _renamingPolicy.CreateRemoteFileNameForRename(SourceFile.FullPath, BatchContext.Source.FileNameAfterTransfer));
                     Trace(TransferState.SourceOperationRename, "Renaming source file {0} to {1}", SourceFile.FullPath, renameToPath);
                     File.Move(filePath, renameToPath);
 
@@ -347,7 +347,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         private void HandleTransferError(Exception exception, string sourceFileRestoreMessage)
         {
             _result.Success = false; // the routine instance should be marked as failed if even one transfer fails
-            var errorMessage = string.Format("Failure in {0}: File '{1}' could not be transferred to '{2}'. Error: {3}", State, SourceFile.Name, BatchContext.Destination.Directory, exception.Message);
+            var errorMessage = string.Format("Failure in {0}: File '{1}' could not be transferred to '{2}'. Error: {3}", State, SourceFile.Name, Path.GetDirectoryName(DestinationFileNameWithMacrosExpanded), exception.Message);
             if (!string.IsNullOrEmpty(sourceFileRestoreMessage))
             {
                 errorMessage += " " + sourceFileRestoreMessage;
@@ -367,7 +367,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
                 return;
             }
 
-            // If RenameDestinationFileDuringTransfer=False, there is no temporary file that could be deleted
+            // If RenameDestinationFileDuringTransfer=cd reposFalse, there is no temporary file that could be deleted
             if (!BatchContext.Options.RenameDestinationFileDuringTransfer)
             {
                 return;

@@ -11,21 +11,25 @@ Uploads a file to SFTP server. Operations log is implemented by using Serilog li
 
 You can install the task via FRENDS UI Task View or you can find the NuGet package from the following NuGet feed
 
-# Building
+## Building
 
-Clone a copy of the repo
+### Clone a copy of the repo
 
 `git clone https://github.com/FrendsPlatform/Frends.SFTP.git`
 
-Rebuild the project
+### Build the project
 
 `dotnet build`
 
-Run tests
+### Run tests
+
+Run the Docker compose from solution root using
+
+`docker-compose -f .\Frends.SFTP.UploadFiles.Tests\docker_compose.yml up -d`
 
 `dotnet test`
 
-Create a NuGet package
+### Create a NuGet package
 
 `dotnet pack --configuration Release`
 

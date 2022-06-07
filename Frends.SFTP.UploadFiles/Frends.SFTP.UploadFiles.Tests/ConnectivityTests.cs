@@ -103,15 +103,5 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
-
-        [Test]
-        public void UploadFiles_TestThrowsWithWrongPort()
-        {
-            var connection = Helpers.GetSftpConnection();
-            connection.Port = 51651;
-
-            var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.StartsWith("SFTP transfer failed: Unable to establish the socket: No such host is known"));
-        }
     }
 }
