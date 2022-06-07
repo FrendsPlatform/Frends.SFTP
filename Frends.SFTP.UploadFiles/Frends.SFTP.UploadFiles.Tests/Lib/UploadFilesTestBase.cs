@@ -53,8 +53,6 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 WorkDir = null,
             };
-
-            Helpers.CreateSourceDirectoryWithDate();
         }
 
         [TearDown]

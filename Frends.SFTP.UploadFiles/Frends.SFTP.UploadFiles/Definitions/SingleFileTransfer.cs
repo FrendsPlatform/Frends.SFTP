@@ -295,7 +295,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
             switch (BatchContext.Source.Operation)
             {
                 case SourceOperation.Move:
-                    var moveToPath = _renamingPolicy.CreateRemoteFilePathForMove(BatchContext.Source.DirectoryToMoveAfterTransfer, SourceFile.FullPath);
+                    var moveToPath = _renamingPolicy.CreateRemoteFilePathForMove(_renamingPolicy.ExpandDirectoryForMacros(BatchContext.Source.DirectoryToMoveAfterTransfer), SourceFile.FullPath);
                     Trace(TransferState.SourceOperationMove, "Moving source file {0} to {1}", SourceFile.FullPath, moveToPath);
                     File.Move(filePath, moveToPath);
 
@@ -367,7 +367,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
                 return;
             }
 
-            // If RenameDestinationFileDuringTransfer=False, there is no temporary file that could be deleted
+            // If RenameDestinationFileDuringTransfer=cd reposFalse, there is no temporary file that could be deleted
             if (!BatchContext.Options.RenameDestinationFileDuringTransfer)
             {
                 return;
