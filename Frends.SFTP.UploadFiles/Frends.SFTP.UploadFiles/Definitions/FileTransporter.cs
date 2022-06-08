@@ -131,7 +131,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
                         }
                         client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
 
-                        client.BufferSize = _batchContext.Connection.BufferSize;
+                        client.BufferSize = _batchContext.Connection.BufferSize * 1024;
 
                         client.Connect();
 
@@ -162,14 +162,16 @@ namespace Frends.SFTP.UploadFiles.Definitions
                                 return FormFailedFileTransferResult(userResultMessage);
                             }
                         }
-
-                        client.ChangeDirectory(DestinationDirectoryWithMacrosExtended);
+                        else
+                        {
+                            client.ChangeDirectory(DestinationDirectoryWithMacrosExtended);
+                        }
 
                         _batchContext.DestinationFiles = client.ListDirectory(".");
 
                         foreach (var file in files)
                         {
-                            var singleTransfer = new SingleFileTransfer(file, _batchContext, client, _renamingPolicy, _logger);
+                            var singleTransfer = new SingleFileTransfer(file, DestinationDirectoryWithMacrosExtended, _batchContext, client, _renamingPolicy, _logger);
                             var result = singleTransfer.TransferSingleFile();
                             _result.Add(result);
                         }
@@ -320,22 +322,30 @@ namespace Frends.SFTP.UploadFiles.Definitions
 
         private static void CreateDestinationDirectories(SftpClient client, string path)
         {
+            var current = client.WorkingDirectory;
             // Consistent forward slashes
-            path = path.Replace(@"\", "/");
-            foreach (string dir in path.Split('/'))
+            foreach (string dir in path.Replace(@"\", "/").Split('/'))
             {
-                // Ignoring leading/ending/multiple slashes
                 if (!string.IsNullOrWhiteSpace(dir))
                 {
-                    if (!client.Exists(dir))
+                    if (!TryToChangeDir(client, dir) && ("/" + dir != client.WorkingDirectory))
                     {
                         client.CreateDirectory(dir);
+                        client.ChangeDirectory(dir);
+                        current = client.WorkingDirectory;
                     }
-                    client.ChangeDirectory(dir);
                 }
             }
-            // Going back to default directory
-            client.ChangeDirectory("/");
+        }
+
+        // Check whether the directory exists by trying to change workingDirectory into it.
+        private static bool TryToChangeDir(SftpClient client, string dir)
+        {
+            try
+            {
+                client.ChangeDirectory(dir);
+                return true;
+            } catch { return false; }
         }
 
         private static string[] ConvertObjectToStringArray(object objectArray)

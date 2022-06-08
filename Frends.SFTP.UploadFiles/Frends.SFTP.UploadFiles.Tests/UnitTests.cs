@@ -216,5 +216,23 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsFalse(result.Success);
             Assert.That(result.FailedTransferCount == 1);
         }
+
+        [Test]
+        public void UploadFiles_SourceOperationNothingWithRenamingDisable()
+        {
+            var options = new Options
+            {
+                ThrowErrorOnFail = false,
+                RenameSourceFileBeforeTransfer = false,
+                RenameDestinationFileDuringTransfer = false,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true
+            };
+            var result = SFTP.UploadFiles(_source, _destination, _connection, options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+
+            Assert.IsTrue(File.Exists(Path.Combine(_workDir, _source.FileName)));
+        }
     }
 }

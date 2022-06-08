@@ -38,6 +38,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         /// </summary>
         /// <example>true</example>
         [UIHint(nameof(FileNameEncoding), "", FileEncoding.UTF8)]
+        [DefaultValue(false)]
         public bool EnableBomForFileName { get; set; }
 
         /// <summary>
@@ -74,6 +75,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         /// </summary>
         /// <example>true</example>
         [UIHint(nameof(FileContentEncoding), "", FileEncoding.UTF8)]
+        [DefaultValue(false)]
         public bool EnableBomForContent { get; set; }
     }
 }

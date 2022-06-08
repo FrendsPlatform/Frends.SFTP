@@ -13,7 +13,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         private readonly ISFTPLogger _logger;
         private SingleFileTransferResult _result;
 
-        public SingleFileTransfer(FileItem file, BatchContext context, SftpClient client, RenamingPolicy renamingPolicy, ISFTPLogger logger)
+        public SingleFileTransfer(FileItem file, string destinationDirectory, BatchContext context, SftpClient client, RenamingPolicy renamingPolicy, ISFTPLogger logger)
         {
             _renamingPolicy = renamingPolicy;
             _logger = logger;
@@ -23,9 +23,9 @@ namespace Frends.SFTP.UploadFiles.Definitions
             SourceFile = file;
             BatchContext = context;
 
-            DestinationFileNameWithMacrosExpanded = renamingPolicy.CreateRemoteFileName(
+            DestinationFileWithMacrosExpanded = Path.Combine(destinationDirectory, renamingPolicy.CreateRemoteFileName(
                     file.Name,
-                    context.Destination.FileName);
+                    context.Destination.FileName));
 
             _result = new SingleFileTransferResult { Success = true };
         }
@@ -35,7 +35,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         public SftpClient Client { get; set; }
         public FileItem SourceFile { get; set; }
         public FileItem DestinationFile { get; set; }
-        public string DestinationFileNameWithMacrosExpanded { get; set; }
+        public string DestinationFileWithMacrosExpanded { get; set; }
         private string SourceFileDuringTransfer { get; set; }
         public string DestinationFileDuringTransfer { get; set; }
         internal BatchContext BatchContext { get; set; }
@@ -52,11 +52,11 @@ namespace Frends.SFTP.UploadFiles.Definitions
                 _result.TransferredFile = SourceFile.Name;
                 _result.TransferredFilePath = SourceFile.FullPath;
                 if (BatchContext.Options.RenameSourceFileBeforeTransfer)
-                    RenameSourceFile();
+                    SourceFileDuringTransfer = RenameSourceFile();
                 else 
                     SourceFileDuringTransfer = SourceFile.FullPath;
 
-                if (DestinationFileExists(DestinationFileNameWithMacrosExpanded))
+                if (DestinationFileExists(Path.GetFileName(DestinationFileWithMacrosExpanded)))
                 {
                     switch (BatchContext.Destination.Action)
                     {
@@ -67,7 +67,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
                             PutDestinationFile(removeExisting: true);
                             break;
                         case DestinationAction.Error:
-                            throw new DestinationFileExistsException(DestinationFileNameWithMacrosExpanded);
+                            throw new DestinationFileExistsException(Path.GetFileName(DestinationFileWithMacrosExpanded));
                     }
                 }
                 else
@@ -86,21 +86,25 @@ namespace Frends.SFTP.UploadFiles.Definitions
             {
                 var sourceFileRestoreMessage = RestoreSourceFileAfterErrorIfItWasRenamed();
                 HandleTransferError(ex, sourceFileRestoreMessage);
+
+                var destinationFileRestoreMessage = RestoreDestinationFileAfterErrorIfItWasRenamed(Client);
+                if (!string.IsNullOrEmpty(destinationFileRestoreMessage))
+                    HandleTransferError(ex, destinationFileRestoreMessage);
+
             }
-            CleanUpFiles();
             return _result;
         }
 
-        private bool DestinationFileExists(string filename)
+        private bool DestinationFileExists(string fileName)
         {
             Trace(
                 TransferState.CheckIfDestinationFileExists,
                 "Checking if destination file {0} exists",
                 SourceFile.NameWithMacrosExtended);
-            return Client.Exists(filename);
+            return Client.Exists(fileName);
         }
 
-        private void RenameSourceFile()
+        private string RenameSourceFile()
         {
             var uniqueFileName = Util.CreateUniqueFileName();
             var workdir = (!string.IsNullOrEmpty(BatchContext.Info.WorkDir) ? BatchContext.Info.WorkDir : Path.GetDirectoryName(SourceFile.FullPath));
@@ -109,7 +113,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
             Trace(TransferState.RenameSourceFileBeforeTransfer, "Renaming source file {0} to temporary file name {1} before transfer", SourceFile.Name, uniqueFileName);
             File.Move(SourceFile.FullPath, renamedFile);
 
-            SourceFileDuringTransfer = renamedFile;
+            return renamedFile;
         }
 
         private void AppendDestinationFile()
@@ -138,36 +142,16 @@ namespace Frends.SFTP.UploadFiles.Definitions
 
         private void RenameDestinationFile()
         {
-            SftpFileAttributes fileAttributes;
             if (!string.IsNullOrEmpty(DestinationFileDuringTransfer))
             {
-                fileAttributes = Client.GetAttributes(DestinationFileDuringTransfer);
-                if (fileAttributes.OthersCanWrite)
-                {
-                    Client.RenameFile(DestinationFileDuringTransfer, DestinationFileNameWithMacrosExpanded);
-                    return;
-                }
-                fileAttributes.OthersCanWrite = true;
-                Client.SetAttributes(DestinationFileDuringTransfer, fileAttributes);
-                Client.RenameFile(DestinationFileDuringTransfer, DestinationFileNameWithMacrosExpanded);
-                fileAttributes.OthersCanWrite = false;
-                Client.SetAttributes(DestinationFileNameWithMacrosExpanded, fileAttributes);
+                Client.RenameFile(DestinationFileDuringTransfer, Path.GetFileName(DestinationFileWithMacrosExpanded));
                 return;
             }
 
             DestinationFileDuringTransfer = Util.CreateUniqueFileName();
-            Trace(TransferState.RenameSourceFileBeforeTransfer, "Renaming destination file {0} to temporary file name {1} during transfer", DestinationFileNameWithMacrosExpanded, DestinationFileDuringTransfer);
-            fileAttributes = Client.GetAttributes(DestinationFileNameWithMacrosExpanded);
-            if (fileAttributes.OthersCanWrite)
-            {
-                Client.RenameFile(DestinationFileNameWithMacrosExpanded, DestinationFileDuringTransfer);
-                return;
-            }
-            fileAttributes.OthersCanWrite = true;
-            Client.SetAttributes(DestinationFileNameWithMacrosExpanded, fileAttributes);
-            Client.RenameFile(DestinationFileNameWithMacrosExpanded, DestinationFileDuringTransfer);
-            fileAttributes.OthersCanWrite = false;
-            Client.SetAttributes(DestinationFileDuringTransfer, fileAttributes);
+            Trace(TransferState.RenameDestinationFile, "Renaming destination file {0} to temporary file name {1} during transfer", Path.GetFileName(DestinationFileWithMacrosExpanded), DestinationFileDuringTransfer);
+            Client.RenameFile(Path.GetFileName(DestinationFileWithMacrosExpanded), DestinationFileDuringTransfer);
+            return;
         }
 
         private void Append(string[] content, Encoding encoding)
@@ -176,31 +160,16 @@ namespace Frends.SFTP.UploadFiles.Definitions
                 TransferState.AppendToDestinationFile,
                 "Appending file {0} to existing file {1}",
                 SourceFile.Name,
-                DestinationFileNameWithMacrosExpanded);
+                Path.GetFileName(DestinationFileWithMacrosExpanded));
 
-            // Determine path to use to the destination file.
-            var path = (BatchContext.Destination.Directory.Contains("/")) 
-                ? BatchContext.Destination.Directory + "/"
-                : BatchContext.Destination.Directory;
+            var path = Client.WorkingDirectory;
 
             // If destination rename during transfer is enabled, use that instead 
             path = (!string.IsNullOrEmpty(DestinationFileDuringTransfer)) 
-                ? Path.Combine(path, DestinationFileDuringTransfer) 
-                : Path.Combine(path, DestinationFileNameWithMacrosExpanded);
+                ? path + "/" + DestinationFileDuringTransfer
+                : path + "/" + DestinationFileWithMacrosExpanded;
 
-            var fileAttributes = Client.GetAttributes(path);
-            if (fileAttributes.OthersCanWrite)
-            {
-                Client.AppendAllLines(path, content, encoding);
-            }
-            else
-            {
-                fileAttributes.OthersCanWrite = true;
-                Client.SetAttributes(path, fileAttributes);
-                Client.AppendAllLines(path, content, encoding);
-                fileAttributes.OthersCanWrite = false;
-                Client.SetAttributes(path, fileAttributes);
-            }
+            Client.AppendAllLines(path, content, encoding);
         }
 
         private string[] GetSourceFileContent(string fullPath, Encoding encoding)
@@ -223,38 +192,38 @@ namespace Frends.SFTP.UploadFiles.Definitions
         {
             var doRename = BatchContext.Options.RenameDestinationFileDuringTransfer;
 
-            DestinationFileDuringTransfer = doRename ? Util.CreateUniqueFileName() : DestinationFileNameWithMacrosExpanded;
+            DestinationFileDuringTransfer = doRename ? Util.CreateUniqueFileName() : Path.GetFileName(DestinationFileWithMacrosExpanded);
             Trace(
                 TransferState.PutFile,
                 "Uploading {0}destination file {1}",
                 doRename ? "temporary " : string.Empty,
                 DestinationFileDuringTransfer);
 
-            using (FileStream fs = new FileStream(SourceFileDuringTransfer, FileMode.Open))
+            using (var fs = File.OpenRead(SourceFileDuringTransfer))
             {
                 Client.UploadFile(fs, DestinationFileDuringTransfer, removeExisting);
             }
 
-            if (doRename)
+            if (!doRename) return;
+
+            if (removeExisting)
             {
-                if (removeExisting)
-                {
-                    Trace(
-                        TransferState.DeleteDestinationFile,
-                        "Deleting destination file {0} that is to be overwritten",
-                        DestinationFileNameWithMacrosExpanded);
-
-                    Client.DeleteFile(DestinationFileNameWithMacrosExpanded);
-                }
-
                 Trace(
-                    TransferState.RenameDestinationFile,
-                    "Renaming temporary destination file {0} to target file {1}",
-                    DestinationFileDuringTransfer,
-                    DestinationFileNameWithMacrosExpanded);
+                    TransferState.DeleteDestinationFile,
+                    "Deleting destination file {0} that is to be overwritten",
+                    Path.GetFileName(DestinationFileWithMacrosExpanded));
 
-                Client.RenameFile(DestinationFileDuringTransfer, DestinationFileNameWithMacrosExpanded);
+                Client.DeleteFile(DestinationFileWithMacrosExpanded);
             }
+
+            Trace(
+                TransferState.RenameDestinationFile,
+                "Renaming temporary destination file {0} to target file {1}",
+                DestinationFileDuringTransfer,
+                Path.GetFileName(DestinationFileWithMacrosExpanded));
+
+            Client.RenameFile(DestinationFileDuringTransfer, Path.GetFileName(DestinationFileWithMacrosExpanded));
+
         }
 
         /// <summary>
@@ -262,9 +231,9 @@ namespace Frends.SFTP.UploadFiles.Definitions
         /// </summary>
         private void RestoreModified()
         {
-            var fileAttributes = Client.GetAttributes(DestinationFileNameWithMacrosExpanded);
+            var fileAttributes = Client.GetAttributes(DestinationFileWithMacrosExpanded);
             fileAttributes.LastWriteTime = SourceFile.Modified;
-            Client.SetAttributes(DestinationFileNameWithMacrosExpanded, fileAttributes);
+            Client.SetAttributes(DestinationFileWithMacrosExpanded, fileAttributes);
             return;
         }
 
@@ -338,16 +307,23 @@ namespace Frends.SFTP.UploadFiles.Definitions
 
         private void CleanUpFiles()
         {
-            Trace(TransferState.CleanUpFiles, "Removing temporary file {0}", SourceFileDuringTransfer);
-            TryToRemoveLocalTempFile(SourceFileDuringTransfer);
-
-            TryToRemoveDestinationTempFile();
+            if (BatchContext.Options.RenameSourceFileBeforeTransfer && !Path.GetFileName(SourceFileDuringTransfer).Equals(SourceFile.FullPath))
+            {
+                Trace(TransferState.CleanUpFiles, "Removing temporary file {0}", Path.GetFileName(SourceFileDuringTransfer));
+                TryToRemoveLocalTempFile(SourceFileDuringTransfer);
+            }
+                
+            if (BatchContext.Options.RenameDestinationFileDuringTransfer && !Path.GetFileName(DestinationFileDuringTransfer).Equals(Path.GetFileName(DestinationFileWithMacrosExpanded)))
+            {
+                Trace(TransferState.CleanUpFiles, "Removing temporary file {0}", Path.GetFileName(DestinationFileDuringTransfer));
+                TryToRemoveDestinationTempFile();
+            }
         }
 
         private void HandleTransferError(Exception exception, string sourceFileRestoreMessage)
         {
             _result.Success = false; // the routine instance should be marked as failed if even one transfer fails
-            var errorMessage = string.Format("Failure in {0}: File '{1}' could not be transferred to '{2}'. Error: {3}", State, SourceFile.Name, Path.GetDirectoryName(DestinationFileNameWithMacrosExpanded), exception.Message);
+            var errorMessage = string.Format("Failure in {0}: File '{1}' could not be transferred to '{2}'. Error: {3}", State, SourceFile.Name, Path.GetDirectoryName(DestinationFileWithMacrosExpanded), exception.Message);
             if (!string.IsNullOrEmpty(sourceFileRestoreMessage))
             {
                 errorMessage += " " + sourceFileRestoreMessage;
@@ -441,22 +417,43 @@ namespace Frends.SFTP.UploadFiles.Definitions
             return string.Empty;
         }
 
+        private string RestoreDestinationFileAfterErrorIfItWasRenamed(SftpClient client)
+        {
+            if (!string.IsNullOrEmpty(DestinationFileDuringTransfer))
+            {
+                try
+                {
+                    if (BatchContext.Options.RenameDestinationFileDuringTransfer)
+                    {
+                        client.RenameFile(Path.GetFileName(DestinationFileDuringTransfer), Path.GetFileName(DestinationFileWithMacrosExpanded));
+                        return string.Empty;
+                    }
+                } catch (Exception ex)
+                {
+                    var message = string.Format(
+                        "Could not restore original destination file '{0}' from temporary file '{1}'. Error: {2}.",
+                        Path.GetFileName(DestinationFileWithMacrosExpanded),
+                        Path.GetFileName(DestinationFileDuringTransfer),
+                        ex.Message);
+
+                    _logger.NotifyError(BatchContext, message, ex);
+                    return string.Format("[{0}]", message);
+                }
+            }
+
+            return string.Empty;
+        }
+
         private bool ShouldSourceFileBeRestoredOnError()
         {
             if (BatchContext.Options.RenameSourceFileBeforeTransfer)
-            {
                 return true;
-            }
 
             if (BatchContext.Source.Operation == SourceOperation.Move)
-            {
                 return true;
-            }
 
             if (BatchContext.Source.Operation == SourceOperation.Rename)
-            {
                 return true;
-            }
 
             return false;
         }
