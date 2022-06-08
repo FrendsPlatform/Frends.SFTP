@@ -4,9 +4,6 @@ using Renci.SshNet.Sftp;
 
 namespace Frends.SFTP.UploadFiles.Definitions
 {
-    /// <summary>
-    /// Class for executing single file transfer.
-    /// </summary>
     internal class SingleFileTransfer
     {
         private readonly RenamingPolicy _renamingPolicy;

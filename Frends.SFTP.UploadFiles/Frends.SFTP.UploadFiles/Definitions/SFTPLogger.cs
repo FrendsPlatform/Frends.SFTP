@@ -150,7 +150,6 @@ namespace Frends.SFTP.UploadFiles.Definitions
                 sourceFile = transfer.SourceFile.Name;
                 destinationFile = Path.GetFileName(transfer.DestinationFileWithMacrosExpanded);
                 localFileName = context.Info.WorkDir;
-                //customData = transfer.ExtendedTransferContext.CustomData;
                 singleFileTransferId = Guid.NewGuid();
             }
 

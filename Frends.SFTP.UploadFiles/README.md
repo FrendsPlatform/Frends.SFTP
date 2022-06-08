@@ -5,7 +5,7 @@
 ![GitHub](https://img.shields.io/github/license/FrendsPlatform/Frends.SFTP?label=License)
 ![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.SFTP/Frends.SFTP.UploadFiles|main)
 
-Uploads a file to SFTP server. Operations log is implemented by using Serilog library. 
+Uploads a file to SFTP server. Operations log is implemented by using Serilog library. Appending to Azure Blob Storage is not supported.
 
 ## Installing
 

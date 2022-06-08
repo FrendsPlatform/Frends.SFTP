@@ -49,7 +49,7 @@ namespace Frends.SFTP.UploadFiles.Definitions
         public string FileNameEncodingInString { get; set; }
 
         /// <summary>
-        /// Operation to determine what to do if destination file exists.
+        /// Operation to determine what to do if destination file exists. Appending is not supported to Azure Blob Storage.
         /// </summary>
         /// <example>DestinationAction.Error</example>
         [DefaultValue(DestinationAction.Error)]
