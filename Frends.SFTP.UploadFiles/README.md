@@ -23,9 +23,11 @@ You can install the task via FRENDS UI Task View or you can find the NuGet packa
 
 ### Run tests
 
-Run the Docker compose from solution root using
+cd Frends.SFTP.UploadFiles.Tests
 
-`docker-compose -f .\Frends.SFTP.UploadFiles.Tests\ up -d`
+Run the Docker compose from Frends.SFTP.UploadFiles.Tests directory using
+
+`docker-compose up -d`
 
 `dotnet test`
 

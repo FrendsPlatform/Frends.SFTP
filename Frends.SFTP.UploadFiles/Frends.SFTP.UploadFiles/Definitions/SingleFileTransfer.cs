@@ -37,7 +37,7 @@ internal class SingleFileTransfer
     internal BatchContext BatchContext { get; set; }
 
     /// <summary>
-    /// Transfer state for SFTP Logger.
+    /// Transfer state for SFTP Logger
     /// </summary>
     internal TransferState State { get; set; }
 
