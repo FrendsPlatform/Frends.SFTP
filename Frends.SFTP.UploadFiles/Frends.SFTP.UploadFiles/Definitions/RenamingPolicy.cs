@@ -23,21 +23,14 @@ internal class RenamingPolicy
     public string CreateRemoteFileName(string originalFileName, string remoteFileDefinition)
     {
         if (!string.IsNullOrEmpty(remoteFileDefinition) && remoteFileDefinition.Contains("?"))
-        {
             throw new ArgumentException("Character '?' not allowed in remote filename.", "remoteFileDefinition");
-        }
 
         if (string.IsNullOrEmpty(originalFileName))
-        {
             throw new ArgumentException("Original filename must be set.", "originalFileName");
-        }
 
         var originalFileNameWithoutPath = Path.GetFileName(originalFileName);
 
-        if (string.IsNullOrEmpty(remoteFileDefinition))
-        {
-            return originalFileNameWithoutPath;
-        }
+        if (string.IsNullOrEmpty(remoteFileDefinition)) return originalFileNameWithoutPath;
 
         if (!IsFileMask(remoteFileDefinition) &&
             !IsFileMacro(remoteFileDefinition, MacroHandlers) &&
@@ -47,19 +40,14 @@ internal class RenamingPolicy
             var remoteFileName = Path.GetFileName(remoteFileDefinition);
 
             if (string.IsNullOrEmpty(remoteFileName))
-            {
                 remoteFileDefinition = Path.Combine(remoteFileDefinition, originalFileNameWithoutPath);
-            }
 
             return remoteFileDefinition;
         }
 
         var result = this.ExpandMacrosAndMasks(originalFileName, remoteFileDefinition);
 
-        if (result.EndsWith("\\"))
-        {
-            result = Path.Combine(result, originalFileNameWithoutPath);
-        }
+        if (result.EndsWith("\\")) result = Path.Combine(result, originalFileNameWithoutPath);
 
         return result;
     }
@@ -161,10 +149,7 @@ internal class RenamingPolicy
     {
         //remove extension if it is wanted to be changed, new extension is added later on to new filename
         if (mask.Contains("*."))
-        {
-            if (Path.HasExtension(filename))
-                filename = Path.GetFileNameWithoutExtension(filename);
-        }
+            if (Path.HasExtension(filename)) filename = Path.GetFileNameWithoutExtension(filename);
 
         int i = mask.IndexOf("*");
         if (i >= 0)
