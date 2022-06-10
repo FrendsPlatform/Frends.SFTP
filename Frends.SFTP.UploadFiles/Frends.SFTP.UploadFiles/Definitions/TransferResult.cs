@@ -1,8 +1,8 @@
-﻿namespace Frends.SFTP.UploadFiles.Definitions
+﻿namespace Frends.SFTP.UploadFiles.Definitions;
+
+internal enum TransferResult
 {
-    internal enum TransferResult
-    {
-        Success,
-        Fail
-    }
+    Success,
+    Fail
 }
+

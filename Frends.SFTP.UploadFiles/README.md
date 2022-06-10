@@ -25,7 +25,7 @@ You can install the task via FRENDS UI Task View or you can find the NuGet packa
 
 Run the Docker compose from solution root using
 
-`docker-compose -f .\Frends.SFTP.UploadFiles.Tests\docker_compose.yml up -d`
+`docker-compose -f .\Frends.SFTP.UploadFiles.Tests\ up -d`
 
 `dotnet test`
 

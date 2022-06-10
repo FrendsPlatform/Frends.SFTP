@@ -1,8 +1,8 @@
-﻿namespace Frends.SFTP.UploadFiles.Definitions
+﻿namespace Frends.SFTP.UploadFiles.Definitions;
+
+internal enum EndPoint
 {
-    internal enum EndPoint
-    {
-        Source,
-        Destination
-    }
+    Source,
+    Destination
 }
+
