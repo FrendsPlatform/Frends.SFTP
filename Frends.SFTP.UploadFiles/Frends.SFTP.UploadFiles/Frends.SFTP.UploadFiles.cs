@@ -178,7 +178,7 @@ public class SFTP
         }
         catch (Exception e)
         {
-            return $"Error while creating log: \n{e.ToString()}";
+            return $"Error while creating log: \n{e}";
         }
     }        
 

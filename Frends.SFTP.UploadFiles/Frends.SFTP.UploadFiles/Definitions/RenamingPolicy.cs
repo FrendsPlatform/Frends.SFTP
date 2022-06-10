@@ -7,12 +7,8 @@ namespace Frends.SFTP.UploadFiles.Definitions;
 ///</summary>
 internal class RenamingPolicy
 {
-    private IDictionary<string, Func<string, string>> MacroHandlers;
-    private IDictionary<string, Func<string, string>> SourceFileNameMacroHandlers;
-
-    public RenamingPolicy() : this("", Guid.Empty)
-    {
-    }
+    private readonly IDictionary<string, Func<string, string>> MacroHandlers;
+    private readonly IDictionary<string, Func<string, string>> SourceFileNameMacroHandlers;
 
     public RenamingPolicy(string transferName, Guid transferId)
     {
@@ -22,11 +18,11 @@ internal class RenamingPolicy
 
     public string CreateRemoteFileName(string originalFileName, string remoteFileDefinition)
     {
-        if (!string.IsNullOrEmpty(remoteFileDefinition) && remoteFileDefinition.Contains("?"))
-            throw new ArgumentException("Character '?' not allowed in remote filename.", "remoteFileDefinition");
+        if (!string.IsNullOrEmpty(remoteFileDefinition) && remoteFileDefinition.Contains('?'))
+            throw new ArgumentException("Character '?' not allowed in remote filename.", nameof(remoteFileDefinition));
 
         if (string.IsNullOrEmpty(originalFileName))
-            throw new ArgumentException("Original filename must be set.", "originalFileName");
+            throw new ArgumentException("Original filename must be set.", nameof(originalFileName));
 
         var originalFileNameWithoutPath = Path.GetFileName(originalFileName);
 
@@ -45,7 +41,7 @@ internal class RenamingPolicy
             return remoteFileDefinition;
         }
 
-        var result = this.ExpandMacrosAndMasks(originalFileName, remoteFileDefinition);
+        var result = ExpandMacrosAndMasks(originalFileName, remoteFileDefinition);
 
         if (result.EndsWith("\\")) result = Path.Combine(result, originalFileNameWithoutPath);
 
@@ -71,7 +67,7 @@ internal class RenamingPolicy
 
         // this should always be a directory
         if (!directoryName.EndsWith("/"))
-            directoryName = directoryName + "/";
+            directoryName += "/";
         var sourceFileName = Path.GetFileName(sourceFilePath);
         return Path.Combine(directoryName, sourceFileName);
     }
@@ -102,11 +98,6 @@ internal class RenamingPolicy
         filePath = ExpandMacrosAndMasks(originalFilePath, filePath);
 
         return CanonizeAndCheckPath(filePath);
-    }
-
-    public bool IsMacro(string macro)
-    {
-        return IsFileMacro(macro, MacroHandlers) || IsFileMacro(macro, SourceFileNameMacroHandlers);
     }
 
     private string ExpandMacrosAndMasks(string originalFilePath, string filePath)
@@ -178,8 +169,8 @@ internal class RenamingPolicy
     {
         bool b = false;
         if (s == null) return false;
-        if (s.IndexOf("*") >= 0) b = true;
-        if (s.IndexOf("?") >= 0) b = true;
+        if (s.Contains("*")) b = true;
+        if (s.Contains("?")) b = true;
         return b;
     }
 

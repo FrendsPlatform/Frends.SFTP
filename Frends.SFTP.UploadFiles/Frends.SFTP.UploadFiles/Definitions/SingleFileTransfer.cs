@@ -67,9 +67,7 @@ internal class SingleFileTransfer
                 }
             }
             else
-            {
                 PutDestinationFile();
-            }
 
             if (BatchContext.Options.PreserveLastModified)
                 RestoreModified();
