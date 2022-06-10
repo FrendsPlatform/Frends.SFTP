@@ -126,9 +126,7 @@ public class SFTP
         using (var logger = InitializeSFTPLogger(operationsLogger))
         {
             if (string.IsNullOrEmpty(info.ProcessUri))
-            {
                 fileTransferLog.Warning("ProcessUri is empty. This means the transfer view cannot link to the correct page");
-            }
 
             Guid executionId;
             if (!Guid.TryParse(info.TaskExecutionID, out executionId))
@@ -208,7 +206,7 @@ public class SFTP
         {
             return new Dictionary<string, string>
             {
-                { DateTimeOffset.Now.ToString(dateFormat), $"Error while creating operation log: \n{e.ToString()}" }
+                { DateTimeOffset.Now.ToString(dateFormat), $"Error while creating operation log: \n{e}" }
             };
         }
     }

@@ -76,18 +76,14 @@ internal class RenamingPolicy
     {
         var directoryName = sourceOperationTo;
         if (string.IsNullOrEmpty(directoryName))
-        {
             throw new ArgumentException("When using move as a source operation, you should always define a directory", "sourceOperationTo");
-        }
 
 
         directoryName = CanonizeAndCheckPath(directoryName);
 
         // this should always be a directory
         if (!directoryName.EndsWith("/"))
-        {
             directoryName = directoryName + "/";
-        }
         var sourceFileName = Path.GetFileName(sourceFilePath);
         return Path.Combine(directoryName, sourceFileName);
     }
@@ -152,7 +148,7 @@ internal class RenamingPolicy
         return filename;
     }
 
-    private string ExpandFileMasks(string filePath, string originalFileName)
+    private static string ExpandFileMasks(string filePath, string originalFileName)
     {
         string filename = filePath;
         if (IsFileMask(filename))
@@ -181,17 +177,13 @@ internal class RenamingPolicy
         return mask;
     }
 
-    private bool IsFileMacro(string s, IDictionary<string, Func<string, string>> macroDictionary)
+    private static bool IsFileMacro(string s, IDictionary<string, Func<string, string>> macroDictionary)
     {
-        if (s == null)
-        {
-            return false;
-        }
+        if (s == null) return false;
 
         foreach (var key in macroDictionary.Keys)
         {
-            if (s.ToUpperInvariant().Contains(key.ToUpperInvariant()))
-                return true;
+            if (s.ToUpperInvariant().Contains(key.ToUpperInvariant())) return true;
         }
 
         return false;
@@ -200,22 +192,13 @@ internal class RenamingPolicy
     private static bool IsFileMask(string s)
     {
         bool b = false;
-        if (s == null)
-        {
-            return false;
-        }
-        if (s.IndexOf("*") >= 0)
-        {
-            b = true;
-        }
-        if (s.IndexOf("?") >= 0)
-        {
-            b = true;
-        }
+        if (s == null) return false;
+        if (s.IndexOf("*") >= 0) b = true;
+        if (s.IndexOf("?") >= 0) b = true;
         return b;
     }
 
-    private IDictionary<string, Func<string, string>> InitializeSourceFileNameMacroHandlers()
+    private static IDictionary<string, Func<string, string>> InitializeSourceFileNameMacroHandlers()
     {
         return new Dictionary<string, Func<string, string>>
             {
@@ -224,7 +207,7 @@ internal class RenamingPolicy
             };
     }
 
-    private IDictionary<string, Func<string, string>> InitializeMacroHandlers(string transferName, Guid transferId)
+    private static IDictionary<string, Func<string, string>> InitializeMacroHandlers(string transferName, Guid transferId)
     {
         return new Dictionary<string, Func<string, string>>
             {
@@ -257,7 +240,7 @@ internal class RenamingPolicy
         return ExpandMacrosFromDictionary(fileDefinition, MacroHandlers, "");
     }
 
-    private string ExpandMacrosFromDictionary(string fileDefinition, IDictionary<string, Func<string, string>> macroHandlers, string originalFile)
+    private static string ExpandMacrosFromDictionary(string fileDefinition, IDictionary<string, Func<string, string>> macroHandlers, string originalFile)
     {
         foreach (var macroHandler in macroHandlers)
         {

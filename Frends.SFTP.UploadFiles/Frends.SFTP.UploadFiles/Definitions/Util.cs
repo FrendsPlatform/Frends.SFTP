@@ -10,10 +10,7 @@ internal static class Util
     internal static string CreateUniqueFile(string toDir)
     {
 
-        if (!toDir.EndsWith("/") && !toDir.EndsWith("\\"))
-        {
-            toDir = toDir + "\\";
-        }
+        if (!toDir.EndsWith("/") && !toDir.EndsWith("\\")) toDir += "\\";
 
         return Path.GetFullPath(toDir + (DateTime.Now.Ticks + Path.GetRandomFileName()));
     }

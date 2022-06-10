@@ -265,9 +265,7 @@ internal class SingleFileTransfer
                 File.Move(filePath, moveToPath);
 
                 if (SourceFile.FullPath == null)
-                {
                     _logger.NotifyInformation(BatchContext, "Source end point returned null as the moved file. It should return the name of the moved file.");
-                }
                 break;
 
             case SourceOperation.Rename:
@@ -276,9 +274,7 @@ internal class SingleFileTransfer
                 File.Move(filePath, renameToPath);
 
                 if (SourceFile.FullPath == null)
-                {
                     _logger.NotifyInformation(BatchContext, "Source end point returned null as the renamed file. It should return the name of the renamed file.");
-                }
                 break;
 
             case SourceOperation.Delete:
@@ -320,10 +316,7 @@ internal class SingleFileTransfer
     {
         _result.Success = false; // the routine instance should be marked as failed if even one transfer fails
         var errorMessage = string.Format("Failure in {0}: File '{1}' could not be transferred to '{2}'. Error: {3}", State, SourceFile.Name, Path.GetDirectoryName(DestinationFileWithMacrosExpanded), exception.Message);
-        if (!string.IsNullOrEmpty(sourceFileRestoreMessage))
-        {
-            errorMessage += " " + sourceFileRestoreMessage;
-        }
+        if (!string.IsNullOrEmpty(sourceFileRestoreMessage)) errorMessage += " " + sourceFileRestoreMessage;
 
         _result.ErrorMessages.Add(errorMessage);
 

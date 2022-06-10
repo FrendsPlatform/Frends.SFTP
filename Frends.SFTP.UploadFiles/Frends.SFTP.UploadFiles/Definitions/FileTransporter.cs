@@ -1,6 +1,5 @@
 ﻿using Renci.SshNet;
 using Renci.SshNet.Common;
-using Renci.SshNet.Security;
 using System.Net.Sockets;
 using System.Text;
 using System.Security.Cryptography;
@@ -117,7 +116,7 @@ internal class FileTransporter
                                                             $"Expected fingerprint: '{_batchContext.Connection.ServerFingerPrint}', but was: '{BitConverter.ToString(e.FingerPrint).Replace("-", ":")}'";
                                     // If previous failed try with MD5 typed fingerprint
                                     var expectedFingerprint = Util.ConvertFingerprintToByteArray(_batchContext.Connection.ServerFingerPrint);
-                                    e.CanTrust = e.FingerPrint.SequenceEqual(expectedFingerprint) ? true : false;
+                                    e.CanTrust = e.FingerPrint.SequenceEqual(expectedFingerprint);
                                 }
                                     
                             };
@@ -163,9 +162,7 @@ internal class FileTransporter
                         }
                     }
                     else
-                    {
                         client.ChangeDirectory(DestinationDirectoryWithMacrosExtended);
-                    }
 
                     _batchContext.DestinationFiles = client.ListDirectory(".");
 
@@ -410,7 +407,7 @@ internal class FileTransporter
     /// </summary>
     /// <param name="results"></param>
     /// <returns></returns>
-    private string GetUserResultMessage(IList<SingleFileTransferResult> results)
+    private static string GetUserResultMessage(IList<SingleFileTransferResult> results)
     {
         var userResultMessage = string.Empty;
 

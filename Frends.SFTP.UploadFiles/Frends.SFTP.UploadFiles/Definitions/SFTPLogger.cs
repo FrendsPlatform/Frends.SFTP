@@ -43,10 +43,7 @@ internal class SFTPLogger : ISFTPLogger
     {
         try
         {
-            if (context == null)
-            {
-                context = new BatchContext();
-            }
+            if (context == null) context = new BatchContext();
 
             var sourceEndPointName = GetEndPointName(context, EndPoint.Source ,"unknown source end point");
             var destinationEndPointName = GetEndPointName(context, EndPoint.Destination, "unknown destination end point");
@@ -125,10 +122,7 @@ internal class SFTPLogger : ISFTPLogger
     private static string GetEndPointName(BatchContext context, EndPoint endpoint, string defaultValue)
     {
         dynamic endpointConfig = (endpoint == EndPoint.Source) ? context.Source : context.Destination;
-        if (endpointConfig == null || context.Connection.Address == null)
-        {
-            return defaultValue;
-        }
+        if (endpointConfig == null || context.Connection.Address == null) return defaultValue;
 
         var directory = endpointConfig.Directory;
 
@@ -200,10 +194,7 @@ internal class SFTPLogger : ISFTPLogger
 
     protected virtual void Dispose(bool disposing)
     {
-        if (_disposed)
-        {
-            return;
-        }
+        if (_disposed) return;
 
         _fileTransfers = null;
         _log = null;
