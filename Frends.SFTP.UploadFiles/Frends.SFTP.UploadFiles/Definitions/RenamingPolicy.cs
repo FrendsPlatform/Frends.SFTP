@@ -169,8 +169,8 @@ internal class RenamingPolicy
     {
         bool b = false;
         if (s == null) return false;
-        if (s.Contains("*")) b = true;
-        if (s.Contains("?")) b = true;
+        if (s.Contains('*')) b = true;
+        if (s.Contains('?')) b = true;
         return b;
     }
 

@@ -30,7 +30,6 @@ internal class SingleFileTransfer
 
     public SftpClient Client { get; set; }
     public FileItem SourceFile { get; set; }
-    public FileItem DestinationFile { get; set; }
     public string DestinationFileWithMacrosExpanded { get; set; }
     private string SourceFileDuringTransfer { get; set; }
     public string DestinationFileDuringTransfer { get; set; }
@@ -254,7 +253,7 @@ internal class SingleFileTransfer
 
     private void ExecuteSourceOperation()
     {
-        var filePath = (string.IsNullOrEmpty(SourceFileDuringTransfer) ? SourceFile.FullPath : SourceFileDuringTransfer);
+        var filePath = string.IsNullOrEmpty(SourceFileDuringTransfer) ? SourceFile.FullPath : SourceFileDuringTransfer;
         switch (BatchContext.Source.Operation)
         {
             case SourceOperation.Move:
