@@ -5,7 +5,7 @@
 ![GitHub](https://img.shields.io/github/license/FrendsPlatform/Frends.SFTP?label=License)
 ![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.SFTP/Frends.SFTP.UploadFiles|main)
 
-Uploads a file to SFTP server. Operations log is implemented by using Serilog library. 
+Uploads a file to SFTP server. Operations log is implemented by using Serilog library. Appending to Azure Blob Storage is not supported.
 
 ## Installing
 
@@ -23,9 +23,11 @@ You can install the task via FRENDS UI Task View or you can find the NuGet packa
 
 ### Run tests
 
-Run the Docker compose from solution root using
+cd Frends.SFTP.UploadFiles.Tests
 
-`docker-compose -f .\Frends.SFTP.UploadFiles.Tests\docker_compose.yml up -d`
+Run the Docker compose from Frends.SFTP.UploadFiles.Tests directory using
+
+`docker-compose up -d`
 
 `dotnet test`
 

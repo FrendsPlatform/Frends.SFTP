@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="TestData\testfolder_2022\**" />
+    <EmbeddedResource Remove="TestData\testfolder_2022\**" />
+    <None Remove="TestData\testfolder_2022\**" />
+  </ItemGroup>
+
+  <ItemGroup>
 	<PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
     <PackageReference Include="nunit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
