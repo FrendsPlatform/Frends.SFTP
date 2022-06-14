@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using Renci.SshNet.Common;
 using System.IO;
 using System;
 using System.Threading;

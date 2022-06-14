@@ -7,14 +7,6 @@ namespace Frends.SFTP.DownloadFiles.Definitions;
 /// </summary>
 internal static class Util
 {
-    internal static string CreateUniqueFile(string toDir)
-    {
-
-        if (!toDir.EndsWith("/") && !toDir.EndsWith("\\")) toDir += "\\";
-
-        return Path.GetFullPath(toDir + (DateTime.Now.Ticks + Path.GetRandomFileName()));
-    }
-
     internal static string CreateUniqueFileName()
     {
         return Path.ChangeExtension("frends_" + DateTime.Now.Ticks + Path.GetRandomFileName(), "8CO");

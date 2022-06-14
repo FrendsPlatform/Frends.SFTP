@@ -119,7 +119,7 @@ internal class SFTPLogger : ISFTPLogger
         _log.Debug(message);
     }
 
-    private string GetEndPointName(BatchContext context, EndPoint endpoint, string defaultValue)
+    private static string GetEndPointName(BatchContext context, EndPoint endpoint, string defaultValue)
     {
         dynamic endpointConfig = (endpoint == EndPoint.Source) ? context.Source : context.Destination;
         if (endpointConfig == null || context.Connection.Address == null) return defaultValue;

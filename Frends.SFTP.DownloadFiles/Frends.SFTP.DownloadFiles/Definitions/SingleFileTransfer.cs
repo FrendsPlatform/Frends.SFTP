@@ -75,13 +75,9 @@ internal class SingleFileTransfer
                         throw new DestinationFileExistsException(Path.GetFileName(DestinationFileWithMacrosExpanded));
                 }
             }
-            else
-            {
-                PutDestinationFile();
-            }
+            else PutDestinationFile();
 
-            if (BatchContext.Options.PreserveLastModified)
-                RestoreModified();
+            if (BatchContext.Options.PreserveLastModified) RestoreModified();
 
             ExecuteSourceOperation();
             _logger.LogTransferSuccess(this, BatchContext);
@@ -92,7 +88,7 @@ internal class SingleFileTransfer
             var sourceFileRestoreMessage = RestoreSourceFileAfterErrorIfItWasRenamed();
             HandleTransferError(ex, sourceFileRestoreMessage);
 
-            var destinationFileRestoreMessage = RestoreDestinationFileAfterErrorIfItWasRenamed(Client);
+            var destinationFileRestoreMessage = RestoreDestinationFileAfterErrorIfItWasRenamed();
             if (!string.IsNullOrEmpty(destinationFileRestoreMessage))
                 HandleTransferError(ex, destinationFileRestoreMessage);
         }
@@ -169,7 +165,7 @@ internal class SingleFileTransfer
             DestinationFile.Name);
 
         // Determine path to use to the destination file.
-        var path = (BatchContext.Destination.Directory.Contains("/"))
+        var path = (BatchContext.Destination.Directory.Contains('/'))
             ? BatchContext.Destination.Directory + "/"
             : BatchContext.Destination.Directory;
 
@@ -178,7 +174,7 @@ internal class SingleFileTransfer
             ? Path.Combine(path, Path.GetFileName(DestinationFileDuringTransfer))
             : Path.Combine(path, DestinationFile.Name);
 
-        File.AppendAllLines(path, content);
+        File.AppendAllLines(path, content, encoding);
     }
 
     private string[] GetSourceFileContent(string filePath, Encoding encoding)
@@ -189,9 +185,7 @@ internal class SingleFileTransfer
         content = Client.ReadAllLines(filePath, encoding);
             
         foreach (var line in content)
-        {
             result.Add(line);
-        }
 
         return result.ToArray();
 
@@ -251,10 +245,10 @@ internal class SingleFileTransfer
 
     private static Encoding GetEncoding(Destination dest)
     {
-        switch (dest.FileNameEncoding)
+        switch (dest.FileContentEncoding)
         {
             case FileEncoding.UTF8:
-                return dest.EnableBomForFileName ? new UTF8Encoding(true) : new UTF8Encoding(false);
+                return dest.EnableBomForContent ? new UTF8Encoding(true) : new UTF8Encoding(false);
             case FileEncoding.ASCII:
                 return Encoding.ASCII;
             case FileEncoding.ANSI:
@@ -264,9 +258,9 @@ internal class SingleFileTransfer
             case FileEncoding.WINDOWS1252:
                 return Encoding.Default;
             case FileEncoding.Other:
-                return Encoding.GetEncoding(dest.FileNameEncodingInString);
+                return Encoding.GetEncoding(dest.FileContentEncodingInString);
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{dest.FileContentEncoding}'.");
         }
     }
 
@@ -422,7 +416,7 @@ internal class SingleFileTransfer
         return string.Empty;
     }
 
-    private string RestoreDestinationFileAfterErrorIfItWasRenamed(SftpClient client)
+    private string RestoreDestinationFileAfterErrorIfItWasRenamed()
     {
         if (!string.IsNullOrEmpty(DestinationFileDuringTransfer))
         {

@@ -35,7 +35,6 @@ public class Connection
     /// Selection for authentication type
     /// </summary>
     /// <example>AuthenticationType.UsernamePassword</example>
-    [DisplayFormat(DataFormatString = "Text")]
     public AuthenticationType Authentication { get; set; } = AuthenticationType.UsernamePassword;
 
     /// <summary>

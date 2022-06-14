@@ -65,7 +65,7 @@ public class Destination
     /// <summary>
     /// File encoding to be used. A partial list of possible encodings: https://en.wikipedia.org/wiki/Windows_code_page#List.
     /// </summary>
-    /// <example>utf-64</example>
+    /// <example>utf-8</example>
     [UIHint(nameof(FileContentEncoding), "", FileEncoding.Other)]
     public string FileContentEncodingInString { get; set; }
 

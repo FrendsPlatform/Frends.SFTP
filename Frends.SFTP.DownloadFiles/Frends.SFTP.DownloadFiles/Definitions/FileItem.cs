@@ -8,8 +8,6 @@ internal class FileItem
 
     public string Name { get; set; }
 
-    public string NameWithMacrosExtended { get; set; }
-
     public string FullPath { get; set; }
 
     public long Size { get; set; }
@@ -32,10 +30,5 @@ internal class FileItem
         Size = fi.Length;
         FullPath = fullPath;
     }
-
-    /// <summary>
-    /// Default constructor, use only for testing.
-    /// </summary>
-    public FileItem() { }
 }
 

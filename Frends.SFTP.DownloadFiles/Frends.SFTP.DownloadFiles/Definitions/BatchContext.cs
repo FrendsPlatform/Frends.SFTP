@@ -9,8 +9,6 @@ internal class BatchContext
 {
     public Info Info { get; set; }
 
-    public string TempWorkDir { get; set; }
-
     public Options Options { get; set; }
 
     public Guid InstanceId { get; set; }

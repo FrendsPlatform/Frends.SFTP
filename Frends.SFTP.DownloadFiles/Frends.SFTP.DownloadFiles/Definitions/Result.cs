@@ -97,11 +97,6 @@ public class Result
     /// </example>
     public IDictionary<string, string> OperationsLog { get; set; }
 
-    internal Result(Dictionary<string, IList<string>> transferErrors)
-    {
-        TransferErrors = transferErrors;
-    }
-
     internal Result(FileTransferResult result)
     {
         ActionSkipped = result.ActionSkipped;
@@ -113,28 +108,6 @@ public class Result
         TransferErrors = result.TransferErrors;
         TransferredFilePaths = result.TransferredFilePaths;
         OperationsLog = result.OperationsLog;
-    }
-
-    internal Result(
-        bool actionSkipped, 
-        bool success, 
-        string userResultMessage, 
-        int successfulTransferCount, 
-        int failedTransferCount, 
-        IEnumerable<string> transferredFileNames, 
-        Dictionary<string, IList<string>> transferErrors, 
-        IEnumerable<string> transferredFilePaths, 
-        IDictionary<string, string> operationsLog)
-    {
-        ActionSkipped = actionSkipped;
-        Success = success;
-        UserResultMessage = userResultMessage;
-        SuccessfulTransferCount = successfulTransferCount;
-        FailedTransferCount = failedTransferCount;
-        TransferredFileNames = transferredFileNames;
-        TransferErrors = transferErrors;
-        TransferredFilePaths = transferredFilePaths;
-        OperationsLog = operationsLog;
     }
 }
 

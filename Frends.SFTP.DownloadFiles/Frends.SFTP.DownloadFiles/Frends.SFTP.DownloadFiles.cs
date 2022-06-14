@@ -167,7 +167,7 @@ public class SFTP
         }
         catch (Exception e)
         {
-            return $"Error while creating log: \n{e.ToString()}";
+            return $"Error while creating log: \n{e}";
         }
     }        
 
@@ -200,7 +200,7 @@ public class SFTP
         {
             return new Dictionary<string, string>
             {
-                { DateTimeOffset.Now.ToString(dateFormat), $"Error while creating operation log: \n{e.ToString()}" }
+                { DateTimeOffset.Now.ToString(dateFormat), $"Error while creating operation log: \n{e}" }
             };
         }
     }

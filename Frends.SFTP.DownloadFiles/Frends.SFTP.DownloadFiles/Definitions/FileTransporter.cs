@@ -164,6 +164,7 @@ internal class FileTransporter
 
                     foreach (var file in files)
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
                         var singleTransfer = new SingleFileTransfer(file, _batchContext, client, _renamingPolicy, _logger);
                         var result = singleTransfer.TransferSingleFile();
                         _result.Add(result);
@@ -266,7 +267,7 @@ internal class FileTransporter
             case FileEncoding.Other:
                 return Encoding.GetEncoding(dest.FileNameEncodingInString);
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{dest.FileNameEncoding}'.");
         }
     }
 
@@ -294,7 +295,7 @@ internal class FileTransporter
         var files = client.ListDirectory(SourceDirectoryWithMacrosExtended).ToList();
 
         // return Tuple with empty list and success.true if files are not found.
-        if (files.Count() == 0) return new Tuple<List<FileItem>, bool>(fileItems, true);
+        if (files.Count == 0) return new Tuple<List<FileItem>, bool>(fileItems, true);
 
         // create List of FileItems from found files.
         foreach (var file in files)
@@ -328,7 +329,7 @@ internal class FileTransporter
         return res?.OfType<string>().ToArray();
     }
 
-    private FileTransferResult FormFailedFileTransferResult(string userResultMessage)
+    private static FileTransferResult FormFailedFileTransferResult(string userResultMessage)
     {
         return new FileTransferResult
         {
@@ -403,7 +404,7 @@ internal class FileTransporter
         return userResultMessage;
     }
 
-    private string MessageJoin(params string[] args)
+    private static string MessageJoin(params string[] args)
     {
         return string.Join(" ", args.Where(s => !string.IsNullOrWhiteSpace(s)));
     }
