@@ -1,144 +1,199 @@
 ﻿using System.ComponentModel;
 using Renci.SshNet;
 using Renci.SshNet.Common;
-using System.Net.Sockets;
+using System.Security.Cryptography;
+using System.Text;
 using Frends.SFTP.WriteFile.Definitions;
-
-#pragma warning disable 1591
+using Frends.SFTP.WriteFile.Enums;
 
 namespace Frends.SFTP.WriteFile
 {
+    /// <summary>
+    /// Main class for the task.
+    /// </summary>
     public class SFTP
     {
         /// <summary>
-        /// Writes a file with SFTP connection.
-        /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.SFTP.WriteFile)
+        /// Writes string content to a file through SFTP connection.
+        /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.SFTP.WriteFile)
         /// </summary>
         /// <param name="connection">Transfer connection parameters</param>
-        /// <param name="source">Source file location</param>
-        /// <param name="destination">Destination directory location</param>
-        /// <returns>Result object {string FileName, string SourcePath, string DestinationPath, bool Success} </returns>
-        public static Result WriteFile([PropertyTab] Source source, [PropertyTab] Destination destination, [PropertyTab] Connection connection, CancellationToken cancellationToken)
+        /// <param name="input">Write options with full path and string content</param>
+        /// <param name="cancellationToken">CancellationToken is given by Frends</param>
+        /// <returns>Result object {bool Success, string Path, double SizeInMegaBytes} </returns>
+        public static Result WriteFile([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
         {
+            var encoding = GetEncoding(input.FileEncoding, input.EnableBom, input.EncodingInString);
+
+            ConnectionInfo connectionInfo;
             // Establish connectionInfo with connection parameters
-            var connectionInfo = GetConnectionInfo(connection);
-            Result result = null;
-            
             try
             {
-                using (var client = new SftpClient(connectionInfo))
-                {
-                    client.Connect();
-                    client.ChangeDirectory(destination.Directory);
-                    client.BufferSize = 1024;
-                    result = TransferSingleFile(client, source, destination);
-                    client.Disconnect();
+                connectionInfo = GetConnectionInfo(input, connection);
+                connectionInfo.Encoding = encoding;
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException($"Error when initializing connection info: {e}");
+            }
 
+            using var client = new SftpClient(connectionInfo);
+
+            //Disable support for these host key exchange algorithms relating: https://github.com/FrendsPlatform/Frends.SFTP/security/dependabot/4
+            client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256");
+            client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256@libssh.org");
+
+            // Check the fingerprint of the server if given.
+            if (!String.IsNullOrEmpty(connection.ServerFingerPrint))
+            {
+                var userResultMessage = "";
+                try
+                {
+                    // If this check fails then SSH.NET will throw an SshConnectionException - with a message of "Key exchange negotiation failed".
+                    client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
+                    {
+                        // First try with SHA256 typed fingerprint
+                        using (SHA256 mySHA256 = SHA256.Create())
+                        {
+                            var sha256Fingerprint = Convert.ToBase64String(mySHA256.ComputeHash(e.HostKey));
+                            // Set the userResultMessage in case checking server fingerprint failes.
+                            userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
+                                                    $"Expected fingerprint: '{connection.ServerFingerPrint}', but was: '{sha256Fingerprint}'";
+                            e.CanTrust = (sha256Fingerprint == connection.ServerFingerPrint);
+                        }
+
+                        if (!e.CanTrust)
+                        {
+
+                            userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
+                                                    $"Expected fingerprint: '{connection.ServerFingerPrint}', but was: '{BitConverter.ToString(e.FingerPrint).Replace("-", ":")}'";
+                            // If previous failed try with MD5 typed fingerprint
+                            var expectedFingerprint = ConvertFingerprintToByteArray(connection.ServerFingerPrint);
+                            e.CanTrust = e.FingerPrint.SequenceEqual(expectedFingerprint);
+                        }
+
+                    };
+                }
+                catch
+                {
+                    throw new ArgumentException($"Error when checking the server fingerprint: {userResultMessage}");
                 }
             }
-            catch (SshConnectionException ex)
+
+            client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+
+            client.BufferSize = connection.BufferSize * 1024;
+
+            client.Connect();
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
+            switch (input.WriteBehaviour)
             {
-                throw new Exception($"Error when establishing connection to the Server: {ex.Message}", ex);
+                case WriteOperation.Append:
+                    var content = "\n" + input.Content;
+                    client.AppendAllText(input.Path, content, encoding);
+                    break;
+                case WriteOperation.Overwrite:
+                    client.WriteAllText(input.Path, input.Content, encoding);
+                    break;
+                case WriteOperation.Error:
+                    if (client.Exists(input.Path))
+                        throw new ArgumentException($"File already exists: {input.Path}");
+                    client.WriteAllText(input.Path, input.Content, encoding);
+                    break;
+                default:
+                    throw new ArgumentException($"Unknown WriteBehaviour type: '{input.WriteBehaviour}'.");
             }
-            catch (SocketException ex)
-            {
-                throw new Exception($"Unable to establish the socket: No such host is known.", ex);
-            }
-            catch (SshAuthenticationException ex)
-            {
-                throw new Exception($"Authentication of SSH session failed: {ex.Message}", ex);
-            }
+            var result = new Result(client.Get(input.Path));
+
+            client.Disconnect();
+            client.Dispose();
 
             return result;
         }
 
-        // Helper method to create connection info
-        private static ConnectionInfo GetConnectionInfo(Connection connect)
+        #region Helper methods
+        private static ConnectionInfo GetConnectionInfo(Input input, Connection connect)
         {
+            ConnectionInfo connectionInfo;
+            List<AuthenticationMethod> methods = new List<AuthenticationMethod>();
+            PrivateKeyFile privateKey = null;
+            if (connect.Authentication == AuthenticationType.UsernamePrivateKeyFile || connect.Authentication == AuthenticationType.UsernamePasswordPrivateKeyFile)
+            {
+                if (string.IsNullOrEmpty(connect.PrivateKeyFile))
+                    throw new ArgumentException("Private key file path was not given.");
+                privateKey = (connect.PrivateKeyFilePassphrase != null)
+                    ? new PrivateKeyFile(connect.PrivateKeyFile, connect.PrivateKeyFilePassphrase)
+                    : new PrivateKeyFile(connect.PrivateKeyFile);
+            }
+            if (connect.Authentication == AuthenticationType.UsernamePrivateKeyString || connect.Authentication == AuthenticationType.UsernamePasswordPrivateKeyString)
+            {
+                if (string.IsNullOrEmpty(connect.PrivateKeyString))
+                    throw new ArgumentException("Private key string was not given.");
+                var stream = new MemoryStream(Encoding.UTF8.GetBytes(connect.PrivateKeyString));
+                privateKey = (connect.PrivateKeyFilePassphrase != null)
+                    ? new PrivateKeyFile(stream, connect.PrivateKeyFilePassphrase)
+                    : new PrivateKeyFile(stream, "");
+            }
             switch (connect.Authentication)
             {
-                case AuthenticationType.PrivateKey:
-                    return new PrivateKeyConnectionInfo(connect.Address, connect.Port, connect.UserName, new PrivateKeyFile(connect.PrivateKeyFileName));
-
-                case AuthenticationType.PrivateKeyPassphrase:
-                    return new PrivateKeyConnectionInfo(connect.Address, connect.Port, connect.UserName, new PrivateKeyFile(connect.PrivateKeyFileName, connect.Passphrase));
-
+                case AuthenticationType.UsernamePassword:
+                    methods.Add(new PasswordAuthenticationMethod(connect.UserName, connect.Password));
+                    break;
+                case AuthenticationType.UsernamePrivateKeyFile:
+                    methods.Add(new PrivateKeyAuthenticationMethod(connect.UserName, privateKey));
+                    break;
+                case AuthenticationType.UsernamePasswordPrivateKeyFile:
+                    methods.Add(new PasswordAuthenticationMethod(connect.UserName, connect.Password));
+                    methods.Add(new PrivateKeyAuthenticationMethod(connect.UserName, privateKey));
+                    break;
+                case AuthenticationType.UsernamePrivateKeyString:
+                    methods.Add(new PrivateKeyAuthenticationMethod(connect.UserName, privateKey));
+                    break;
+                case AuthenticationType.UsernamePasswordPrivateKeyString:
+                    methods.Add(new PasswordAuthenticationMethod(connect.UserName, connect.Password));
+                    methods.Add(new PrivateKeyAuthenticationMethod(connect.UserName, privateKey));
+                    break;
                 default:
-                    return new PasswordConnectionInfo(connect.Address, connect.Port, connect.UserName, connect.Password);
+                    throw new ArgumentException($"Unknown Authentication type: '{connect.Authentication}'.");
             }
+
+            connectionInfo = new ConnectionInfo(connect.Address, connect.Port, connect.UserName, methods.ToArray());
+
+            return connectionInfo;
         }
 
-        private static Result TransferSingleFile(SftpClient client, Source source, Destination destination)
+        /// <summary>
+        /// Get encoding for the file name to be transferred.
+        /// </summary>
+        private static Encoding GetEncoding(FileEncoding optionsFileEncoding, bool optionsEnableBom, string optionsEncodingInString)
         {
-            using (FileStream fs = new FileStream(Path.Combine(source.Directory, source.FileName), FileMode.Open))
+            switch (optionsFileEncoding)
             {
-                if (CheckIfFileExists(client, source.FileName))
-                {
-                    switch (destination.Operation)
-                    {
-                        case DestinationOperation.Rename:
-                            var newFile = RenameFile(client, source, destination);
-                            client.UploadFile(fs, newFile, false);
-                            if (destination.Directory.StartsWith("/"))
-                                return new Result(newFile, Path.Combine(source.Directory, source.FileName), destination.Directory + "/" + newFile, true);
-                            return new Result(newFile, Path.Combine(source.Directory, source.FileName), Path.Combine(destination.Directory, newFile), true);
-
-                        case DestinationOperation.Overwrite:
-                            client.UploadFile(fs, source.FileName, true);
-                            if (destination.Directory.StartsWith("/"))
-                                return new Result(source.FileName, Path.Combine(source.Directory, source.FileName), destination.Directory + "/" + source.FileName, true);
-                            return new Result(source.FileName, Path.Combine(source.Directory, source.FileName), Path.Combine(destination.Directory, source.FileName), true);
-
-                        default:
-                            throw new Exception("Error in uploading the file: The destination file already exists.");
-                    }
-                }
-
-                client.UploadFile(fs, source.FileName, false);
-                return new Result(source.FileName, Path.Combine(source.Directory, source.FileName), Path.Combine(destination.Directory, source.FileName), true);
+                case FileEncoding.UTF8:
+                    return optionsEnableBom ? new UTF8Encoding(true) : new UTF8Encoding(false);
+                case FileEncoding.ASCII:
+                    return Encoding.ASCII;
+                case FileEncoding.ANSI:
+                    return Encoding.Default;
+                case FileEncoding.Unicode:
+                    return Encoding.Unicode;
+                case FileEncoding.WINDOWS1252:
+                    return Encoding.Default;
+                case FileEncoding.Other:
+                    return Encoding.GetEncoding(optionsEncodingInString);
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
-        // Finds all the files in directory and checks if source file exists in destination directory.
-        private static bool CheckIfFileExists(SftpClient client, string fileName)
+        private static byte[] ConvertFingerprintToByteArray(string fingerprint)
         {
-            foreach (var file in client.ListDirectory("."))
-            {
-                if (file.Name.Equals(fileName))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return fingerprint.Split(':').Select(s => Convert.ToByte(s, 16)).ToArray();
         }
 
-        private static string RenameFile(SftpClient client, Source source, Destination destination)
-        {
-            var files = ListDestinationFileNames(client);
-            var file = source.FileName;
-            var extension = Path.GetExtension(file);
-            int index = 1;
-            while (files.Contains(Path.GetFileName(file)))
-            {
-                var filename = string.Format("{0}({1})", Path.GetFileNameWithoutExtension(source.FileName), index++);
-                file = filename + extension;
-            }
-
-            return file;
-        }
-
-        private static List<string> ListDestinationFileNames(SftpClient client)
-        {
-            var files = client.ListDirectory(".");
-            var result = new List<string>();
-
-            foreach (var file in files)
-            {
-                result.Add(file.Name);
-            }
-
-            return result;
-        }
+        #endregion
     }
 }

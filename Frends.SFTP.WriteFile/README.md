@@ -5,27 +5,33 @@
 ![GitHub](https://img.shields.io/github/license/FrendsPlatform/Frends.SFTP?label=License)
 ![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.SFTP/Frends.SFTP.WriteFile|main)
 
-Writes a file to SFTP server.
+Writes string content to a file through SFTP connection.
 
 ## Installing
 
 You can install the task via FRENDS UI Task View or you can find the NuGet package from the following NuGet feed
 
-# Building
+## Building
 
-Clone a copy of the repo
+### Clone a copy of the repo
 
 `git clone https://github.com/FrendsPlatform/Frends.SFTP.git`
 
-Rebuild the project
+### Build the project
 
 `dotnet build`
 
-Run tests
+### Run tests
+
+cd Frends.SFTP.WriteFile.Tests
+
+Run the Docker compose from Frends.SFTP.WriteFile.Tests directory using
+
+`docker-compose up -d`
 
 `dotnet test`
 
-Create a NuGet package
+### Create a NuGet package
 
 `dotnet pack --configuration Release`
 
