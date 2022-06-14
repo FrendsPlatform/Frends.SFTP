@@ -384,7 +384,7 @@ internal class FileTransporter
     /// </summary>
     /// <param name="results"></param>
     /// <returns></returns>
-    private string GetUserResultMessage(IList<SingleFileTransferResult> results)
+    private static string GetUserResultMessage(IList<SingleFileTransferResult> results)
     {
         var userResultMessage = string.Empty;
 
