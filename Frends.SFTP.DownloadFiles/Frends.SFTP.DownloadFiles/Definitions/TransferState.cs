@@ -1,20 +1,20 @@
-﻿namespace Frends.SFTP.DownloadFiles.Definitions
+﻿namespace Frends.SFTP.DownloadFiles.Definitions;
+
+internal enum TransferState
 {
-    internal enum TransferState
-    {
-        RenameSourceFileBeforeTransfer,
-        GetFile,
-        MessageProcessing,
-        PutFile,
-        SourceOperationMove,
-        SourceOperationRename,
-        SourceOperationDelete,
-        RestoreSourceFile,
-        RemoveTemporaryDestinationFile,
-        AppendToDestinationFile,
-        DeleteDestinationFile,
-        RenameDestinationFile,
-        CleanUpFiles,
-        CheckIfDestinationFileExists
-    }
+    RenameSourceFileBeforeTransfer,
+    GetFile,
+    MessageProcessing,
+    PutFile,
+    SourceOperationMove,
+    SourceOperationRename,
+    SourceOperationDelete,
+    RestoreSourceFile,
+    RemoveTemporaryDestinationFile,
+    AppendToDestinationFile,
+    DeleteDestinationFile,
+    RenameDestinationFile,
+    CleanUpFiles,
+    CheckIfDestinationFileExists
 }
+

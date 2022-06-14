@@ -1,8 +1,8 @@
-﻿namespace Frends.SFTP.DownloadFiles.Definitions
+﻿namespace Frends.SFTP.DownloadFiles.Definitions;
+
+internal enum EndPoint
 {
-    internal enum EndPoint
-    {
-        Source,
-        Destination
-    }
+    Source,
+    Destination
 }
+
