@@ -12,9 +12,9 @@ internal static class Helpers
     /// <summary>
     /// Test credentials for docker server.
     /// </summary>
-    private static string _dockerAddress = "localhost";
-    private static string _dockerUsername = "foo";
-    private static string _dockerPassword = "pass";
+    readonly static string _dockerAddress = "localhost";
+    readonly static string _dockerUsername = "foo";
+    readonly static string _dockerPassword = "pass";
 
     internal static Connection GetSftpConnection()
     {
@@ -69,26 +69,10 @@ internal static class Helpers
         {
             if ((file.Name != ".") && (file.Name != ".."))
             {
-                if (file.IsDirectory)
-                {
-                    DeleteDirectory(client, file.FullName);
-                }
-                else
-                {
-                    client.DeleteFile(file.FullName);
-                }
+                if (file.IsDirectory) DeleteDirectory(client, file.FullName);
+                else client.DeleteFile(file.FullName);
             }
         }
-    }
-
-    private static bool TryToChangeDir(SftpClient client, string dir)
-    {
-        try
-        {
-            client.ChangeDirectory(dir);
-            return true;
-        }
-        catch { return false; }
     }
 
     internal static bool DestinationFileExists(string path)

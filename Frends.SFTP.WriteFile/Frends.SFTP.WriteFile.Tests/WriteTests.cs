@@ -38,13 +38,13 @@ class WriteTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Error
         };
 
-        var result = SFTP.WriteFile(input, connection, new CancellationToken());
+        SFTP.WriteFile(input, connection, new CancellationToken());
         Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
 
         input.Content = "test";
         input.WriteBehaviour = WriteOperation.Append;
 
-        result = SFTP.WriteFile(input, connection, new CancellationToken());
+        SFTP.WriteFile(input, connection, new CancellationToken());
         Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
         Assert.AreEqual("test\ntest", Helpers.GetDestinationFileContent(input.Path));
     }

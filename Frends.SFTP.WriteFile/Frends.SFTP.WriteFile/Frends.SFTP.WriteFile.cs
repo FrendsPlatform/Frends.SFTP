@@ -19,9 +19,8 @@ public class SFTP
     /// </summary>
     /// <param name="connection">Transfer connection parameters</param>
     /// <param name="input">Write options with full path and string content</param>
-    /// <param name="cancellationToken">CancellationToken is given by Frends</param>
     /// <returns>Result object {string Path, double SizeInMegaBytes} </returns>
-    public static Result WriteFile([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
+    public static Result WriteFile([PropertyTab] Input input, [PropertyTab] Connection connection)
     {
         var encoding = GetEncoding(input.FileEncoding, input.EnableBom, input.EncodingInString);
 
@@ -29,7 +28,7 @@ public class SFTP
         // Establish connectionInfo with connection parameters
         try
         {
-            connectionInfo = GetConnectionInfo(input, connection);
+            connectionInfo = GetConnectionInfo(connection);
             connectionInfo.Encoding = encoding;
         }
         catch (Exception e)
@@ -86,8 +85,6 @@ public class SFTP
 
         client.Connect();
 
-        cancellationToken.ThrowIfCancellationRequested();
-
         if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
         switch (input.WriteBehaviour)
         {
@@ -115,7 +112,7 @@ public class SFTP
     }
 
     #region Helper methods
-    private static ConnectionInfo GetConnectionInfo(Input input, Connection connect)
+    private static ConnectionInfo GetConnectionInfo(Connection connect)
     {
         ConnectionInfo connectionInfo;
         List<AuthenticationMethod> methods = new List<AuthenticationMethod>();
@@ -185,7 +182,7 @@ public class SFTP
             case FileEncoding.Other:
                 return Encoding.GetEncoding(optionsEncodingInString);
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{optionsFileEncoding}'.");
         }
     }
 
