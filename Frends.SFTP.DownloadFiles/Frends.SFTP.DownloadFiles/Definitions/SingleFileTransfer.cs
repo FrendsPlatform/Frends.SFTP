@@ -207,8 +207,7 @@ internal class SingleFileTransfer
             "Downloading {0}destination file {1}",
             doRename ? "temporary " : string.Empty,
             Path.GetFileName(DestinationFileDuringTransfer));
-        var fileMode = removeExisting ? FileMode.Truncate : FileMode.Create;
-        using (var fs = File.Open(DestinationFileDuringTransfer, fileMode))
+        using (var fs = File.Open(DestinationFileDuringTransfer, FileMode.Create))
         {
             Client.DownloadFile(SourceFileDuringTransfer, fs);
         }
