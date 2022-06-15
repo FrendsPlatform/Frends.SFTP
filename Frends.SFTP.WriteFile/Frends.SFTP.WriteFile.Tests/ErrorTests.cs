@@ -2,7 +2,6 @@
 using Renci.SshNet.Common;
 using System;
 using System.IO;
-using System.Threading;
 using System.Net.Sockets;
 using Frends.SFTP.WriteFile.Definitions;
 using Frends.SFTP.WriteFile.Enums;
@@ -24,10 +23,10 @@ public class ErrorTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Error
         };
 
-        var result = SFTP.WriteFile(input, connection, new CancellationToken());
+        var result = SFTP.WriteFile(input, connection);
         Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
 
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(input, connection, new CancellationToken()));
+        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(input, connection));
         Assert.AreEqual($"File already exists: {input.Path}", ex.Message);
 
         Helpers.DeleteDestinationFile(input.Path);
@@ -46,7 +45,7 @@ public class ErrorTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Error
         };
 
-        Assert.Throws<SocketException>(() => SFTP.WriteFile(input, connection, new CancellationToken()));
+        Assert.Throws<SocketException>(() => SFTP.WriteFile(input, connection));
     }
 
     [Test]
@@ -64,7 +63,7 @@ public class ErrorTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Error
         };
 
-        var ex = Assert.Throws<SshAuthenticationException>(() => SFTP.WriteFile(input, connection, new CancellationToken()));
+        var ex = Assert.Throws<SshAuthenticationException>(() => SFTP.WriteFile(input, connection));
         Assert.AreEqual("Permission denied (password).", ex.Message);
     }
 
@@ -84,7 +83,7 @@ public class ErrorTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Error
         };
 
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(input, connection, new CancellationToken()));
+        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(input, connection));
         Assert.That(ex.Message.StartsWith("Error when initializing connection info:"));
     }
 
@@ -104,7 +103,7 @@ public class ErrorTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Error
         };
 
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(input, connection, new CancellationToken()));
+        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(input, connection));
         Assert.That(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
@@ -126,7 +125,7 @@ public class ErrorTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Error
         };
 
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(input, connection, new CancellationToken()));
+        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(input, connection));
         Assert.That(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
@@ -146,7 +145,7 @@ public class ErrorTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Error
         };
 
-        var ex = Assert.Throws<SshConnectionException>(() => SFTP.WriteFile(input, connection, new CancellationToken()));
+        var ex = Assert.Throws<SshConnectionException>(() => SFTP.WriteFile(input, connection));
         Assert.AreEqual("Key exchange negotiation failed.", ex.Message);
     }
 }

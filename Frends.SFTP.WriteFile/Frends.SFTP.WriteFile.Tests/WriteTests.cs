@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using System.Threading;
 using Frends.SFTP.WriteFile.Definitions;
 using Frends.SFTP.WriteFile.Enums;
 
@@ -20,7 +19,7 @@ class WriteTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Error
         };
 
-        var result = SFTP.WriteFile(input, connection, new CancellationToken());
+        var result = SFTP.WriteFile(input, connection);
         Assert.AreEqual("/write/test.txt", result.Path);
         Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
         Assert.AreEqual("test", Helpers.GetDestinationFileContent(input.Path));
@@ -38,13 +37,13 @@ class WriteTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Error
         };
 
-        SFTP.WriteFile(input, connection, new CancellationToken());
+        SFTP.WriteFile(input, connection);
         Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
 
         input.Content = "test";
         input.WriteBehaviour = WriteOperation.Append;
 
-        SFTP.WriteFile(input, connection, new CancellationToken());
+        SFTP.WriteFile(input, connection);
         Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
         Assert.AreEqual("test\ntest", Helpers.GetDestinationFileContent(input.Path));
     }
@@ -61,13 +60,13 @@ class WriteTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Overwrite
         };
 
-        var result = SFTP.WriteFile(input, connection, new CancellationToken());
+        var result = SFTP.WriteFile(input, connection);
         Assert.AreEqual("/write/test.txt", result.Path);
         Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
         Assert.AreEqual("test", Helpers.GetDestinationFileContent(input.Path));
 
         input.Content = "something else";
-        SFTP.WriteFile(input, connection, new CancellationToken());
+        SFTP.WriteFile(input, connection);
         Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
         Assert.AreEqual("something else", Helpers.GetDestinationFileContent(input.Path));
     }
@@ -84,7 +83,7 @@ class WriteTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Error
         };
 
-        var result = SFTP.WriteFile(input, connection, new CancellationToken());
+        var result = SFTP.WriteFile(input, connection);
         Assert.AreEqual("/write/test.txt", result.Path);
         Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
         Assert.AreEqual("", Helpers.GetDestinationFileContent(input.Path));
@@ -102,30 +101,30 @@ class WriteTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Overwrite
         };
 
-        var result = SFTP.WriteFile(input, connection, new CancellationToken());
+        var result = SFTP.WriteFile(input, connection);
         Assert.AreEqual("/write/test.txt", result.Path);
         
         input.FileEncoding = FileEncoding.ASCII;
-        result = SFTP.WriteFile(input, connection, new CancellationToken());
+        result = SFTP.WriteFile(input, connection);
         Assert.AreEqual("/write/test.txt", result.Path);
 
         input.FileEncoding = FileEncoding.UTF8;
         input.EnableBom = true;
-        result = SFTP.WriteFile(input, connection, new CancellationToken());
+        result = SFTP.WriteFile(input, connection);
         Assert.AreEqual("/write/test.txt", result.Path);
 
         input.FileEncoding = FileEncoding.UTF8;
         input.EnableBom = false;
-        result = SFTP.WriteFile(input, connection, new CancellationToken());
+        result = SFTP.WriteFile(input, connection);
         Assert.AreEqual("/write/test.txt", result.Path);
 
         input.FileEncoding = FileEncoding.WINDOWS1252;
-        result = SFTP.WriteFile(input, connection, new CancellationToken());
+        result = SFTP.WriteFile(input, connection);
         Assert.AreEqual("/write/test.txt", result.Path);
 
         input.FileEncoding = FileEncoding.Other;
         input.EncodingInString = "utf-8";
-        result = SFTP.WriteFile(input, connection, new CancellationToken());
+        result = SFTP.WriteFile(input, connection);
         Assert.AreEqual("/write/test.txt", result.Path);
     }
 }

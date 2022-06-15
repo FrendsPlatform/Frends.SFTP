@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
 using NUnit.Framework;
 using Frends.SFTP.WriteFile.Definitions;
 using Frends.SFTP.WriteFile.Enums;
@@ -23,7 +22,7 @@ public class ConnectivityTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Error
         };
 
-        var result = SFTP.WriteFile(input, connection, new CancellationToken());
+        var result = SFTP.WriteFile(input, connection);
         Assert.AreEqual("/write/test.txt", result.Path);
         Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
         Assert.AreEqual("test", Helpers.GetDestinationFileContent(input.Path));
@@ -42,7 +41,7 @@ public class ConnectivityTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Error
         };
 
-        var result = SFTP.WriteFile(input, connection, new CancellationToken());
+        var result = SFTP.WriteFile(input, connection);
         Assert.AreEqual("/write/test.txt", result.Path);
         Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
         Assert.AreEqual("test", Helpers.GetDestinationFileContent(input.Path));
@@ -61,7 +60,7 @@ public class ConnectivityTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Error
         };
 
-        var result = SFTP.WriteFile(input, connection, new CancellationToken());
+        var result = SFTP.WriteFile(input, connection);
         Assert.AreEqual("/write/test.txt", result.Path);
         Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
         Assert.AreEqual("test", Helpers.GetDestinationFileContent(input.Path));
@@ -83,7 +82,7 @@ public class ConnectivityTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Error
         };
 
-        var result = SFTP.WriteFile(input, connection, new CancellationToken());
+        var result = SFTP.WriteFile(input, connection);
         Assert.AreEqual("/write/test.txt", result.Path);
         Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
         Assert.AreEqual("test", Helpers.GetDestinationFileContent(input.Path));
@@ -107,7 +106,7 @@ public class ConnectivityTests : WriteFileTestBase
             WriteBehaviour = WriteOperation.Error
         };
 
-        var result = SFTP.WriteFile(input, connection, new CancellationToken());
+        var result = SFTP.WriteFile(input, connection);
         Assert.AreEqual("/write/test.txt", result.Path);
         Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
         Assert.AreEqual("test", Helpers.GetDestinationFileContent(input.Path));
