@@ -1,8 +1,8 @@
-name: Frends.SFTP.ListFiles Test
+name: Frends.SFTP.ListFiles Main
 
 on:
   push:
-    branches-ignore:
+    branches:
       - main
     paths:
       - 'Frends.SFTP.ListFiles/**'
@@ -11,10 +11,9 @@ on:
 
 jobs:
   build:
-    uses: FrendsPlatform/FrendsTasks/.github/workflows/build_test.yml@main
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/build_main.yml@main
     with:
       workdir: Frends.SFTP.ListFiles
     secrets:
       badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
-      test_feed_api_key: ${{ secrets.TASKS_TEST_FEED_API_KEY }}
       
