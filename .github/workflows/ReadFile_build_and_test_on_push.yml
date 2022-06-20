@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    uses: FrendsPlatform/FrendsTasks/.github/workflows/build_test.yml@main
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/linux_build_test.yml@main
     with:
       workdir: Frends.SFTP.ReadFile
       prebuild_command: docker-compose -f ./Frends.SFTP.ReadFile.Tests/docker-compose.yml up -d
