@@ -1,44 +1,42 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using Renci.SshNet.Sftp;
 
-#pragma warning disable 1591
+namespace Frends.SFTP.ReadFile.Definitions;
 
-namespace Frends.SFTP.ReadFile.Definitions
+/// <summary>
+/// Return object with private setters
+/// </summary>
+public class Result
 {
     /// <summary>
-    /// Return object with private setters
+    /// Content of the file in string format.
     /// </summary>
-    public class Result
+    /// <example>This is a test file</example>
+    public string Content { get; private set; }
+
+    /// <summary>
+    /// Full name of the file.
+    /// </summary>
+    /// <example>c:\source\Test.txt</example>
+	public string Path { get; private set; }
+
+    /// <summary>
+    /// Size of the read file.
+    /// </summary>
+    /// <example>0</example>
+    public double SizeInMegaBytes { get; private set; }
+
+    /// <summary>
+    /// Timestamp of when the file was last modified.
+    /// </summary>
+    /// <example>2022-06-14T12:45:28.6058477+03:00</example>
+    public DateTime LastWriteTime { get; private set; }
+
+    internal Result(SftpFile file, string content)
     {
-        /// <summary>
-        /// The name of the file. Does not include the path.
-        /// </summary>
-        [DisplayFormat(DataFormatString = "Text")]
-	    public string FileName { get; private set; }
-
-        /// <summary>
-        /// The full source path of the file.
-        /// </summary>
-        [DisplayFormat(DataFormatString = "Text")]
-        public string SourcePath { get; private set; }
-
-        /// <summary>
-        /// The destination path
-        /// </summary>
-        [DisplayFormat(DataFormatString = "Text")]
-        public string DestinationPath { get; private set; }
-
-        /// <summary>
-        /// Boolean value of the successful transfer.
-        /// </summary>
-        public bool Success { get; private set; }
-
-        public Result(string name, string sourcePath, string destinationPath, bool success)
-        {
-            FileName = name;
-            SourcePath = sourcePath;
-            DestinationPath = destinationPath;
-            Success = success;
-        }
+        Content = content;
+        Path = file.FullName;
+        SizeInMegaBytes = Math.Round((file.Length / 1024d / 1024d), 3);
+        LastWriteTime = file.LastWriteTime;
     }
 }
+

@@ -21,8 +21,4 @@
     <ProjectReference Include="..\Frends.SFTP.ReadFile\Frends.SFTP.ReadFile.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="TestData\Downloads\" />
-  </ItemGroup>
-
 </Project>
