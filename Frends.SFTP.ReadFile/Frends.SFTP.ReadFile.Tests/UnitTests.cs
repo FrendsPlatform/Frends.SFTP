@@ -12,11 +12,10 @@ namespace Frends.SFTP.ReadFile.Tests
     /// <summary>
     /// NOTE: To run these unit tests, you need an SFTP test server.
     /// 
-    /// docker run -p 2222:22 -d atmoz/sftp foo:pass:::upload
+    /// docker-compose up -d
     /// 
     /// </summary>
     [TestFixture]
-    [Ignore("Test needs new Docker based workflow")]
     class TestClass
     {
         private static string _workDir;
@@ -53,6 +52,7 @@ namespace Frends.SFTP.ReadFile.Tests
                 Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/Downloads/"),
                 Operation = DestinationOperation.Error
             };
+            if (!Directory.Exists(_destination.Directory)) Directory.CreateDirectory(_destination.Directory);
         }
 
         [SetUp]
@@ -68,6 +68,12 @@ namespace Frends.SFTP.ReadFile.Tests
         {
             DeleteTestFilesFromSftp();
             DeleteLocalTestFiles();
+        }
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            Directory.Delete(_localDownloadDir, true);
         }
 
         [Test]

@@ -11,11 +11,10 @@ namespace Frends.SFTP.ListFiles.Tests
     /// <summary>
     /// NOTE: To run these unit tests, you need an SFTP test server.
     /// 
-    /// docker run -p 2222:22 -d atmoz/sftp foo:pass:::upload
+    /// docker-compose up -d
     /// 
     /// </summary>
     [TestFixture]
-    [Ignore("Test needs new Docker based workflow")]
     class TestClass
     {
         private static string _workDir;
