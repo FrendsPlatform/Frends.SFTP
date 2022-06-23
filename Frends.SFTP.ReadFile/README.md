@@ -17,6 +17,10 @@ You can install the task via FRENDS UI Task View or you can find the NuGet packa
 
 `git clone https://github.com/FrendsPlatform/Frends.SFTP.git`
 
+### Change directory to task directory.
+
+`cd Frends.SFTP/Frends.SFTP.ReadFile`
+
 ### Build the project
 
 `dotnet build`

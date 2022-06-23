@@ -11,21 +11,30 @@ Lists files from specific directory through SFTP connection.
 
 You can install the task via FRENDS UI Task View or you can find the NuGet package from the following NuGet feed
 
-# Building
+## Building
 
-Clone a copy of the repo
+### Clone a copy of the repo
 
 `git clone https://github.com/FrendsPlatform/Frends.SFTP.git`
 
-Rebuild the project
+### Change directory to task directory.
+
+`cd Frends.SFTP/Frends.SFTP.ListFiles`
+
+### Build the project
 
 `dotnet build`
 
-Run tests
+### Run tests
+
+`cd Frends.SFTP.ListFiles.Tests`
+
+Run the Docker compose from Frends.SFTP.ListFiles.Tests directory using
+
+`docker-compose up -d`
 
 `dotnet test`
 
-Create a NuGet package
+### Create a NuGet package
 
 `dotnet pack --configuration Release`
-
