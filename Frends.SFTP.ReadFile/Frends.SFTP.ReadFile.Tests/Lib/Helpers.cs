@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Security.Cryptography;
-using System.Text;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using Frends.SFTP.ReadFile.Definitions;

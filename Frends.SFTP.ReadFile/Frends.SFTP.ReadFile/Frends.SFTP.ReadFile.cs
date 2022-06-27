@@ -28,7 +28,7 @@ public class SFTP
         // Establish connectionInfo with connection parameters
         try
         {
-            connectionInfo = GetConnectionInfo(input, connection);
+            connectionInfo = GetConnectionInfo(connection);
             connectionInfo.Encoding = encoding;
         }
         catch (Exception e)
@@ -98,7 +98,7 @@ public class SFTP
     }
 
     #region Helper methods
-    private static ConnectionInfo GetConnectionInfo(Input input, Connection connect)
+    private static ConnectionInfo GetConnectionInfo(Connection connect)
     {
         ConnectionInfo connectionInfo;
         List<AuthenticationMethod> methods = new List<AuthenticationMethod>();
