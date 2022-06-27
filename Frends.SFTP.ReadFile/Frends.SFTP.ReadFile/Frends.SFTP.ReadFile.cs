@@ -168,7 +168,7 @@ public class SFTP
             case FileEncoding.Other:
                 return Encoding.GetEncoding(optionsEncodingInString);
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{optionsFileEncoding}'.");
         }
     }
 
