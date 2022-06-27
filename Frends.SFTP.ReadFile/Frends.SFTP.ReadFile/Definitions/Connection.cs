@@ -1,59 +1,111 @@
-﻿#pragma warning disable 1591
-
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Frends.SFTP.ReadFile.Enums;
 
-namespace Frends.SFTP.ReadFile.Definitions
+namespace Frends.SFTP.ReadFile.Definitions;
+
+/// <summary>
+/// Parameters class usually contains parameters that are required.
+/// </summary>
+public class Connection
 {
     /// <summary>
-    /// Parameters class usually contains parameters that are required.
+    /// The lenght of time, in seconds, until the connection times out.
+    /// You can use value -1 to indicate that the connection does not time out.
+    /// Default value is 60 seconds.
     /// </summary>
-    public class Connection
-    {
-        /// <summary>
-        /// SFTP host address
-        /// </summary>
-        [DisplayFormat(DataFormatString = "Text")]
-        public string Address { get; set; }
+    /// <example>60</example>
+    [DefaultValue(60)]
+    public int ConnectionTimeout { get; set; }
 
-        /// <summary>
-        /// Port number
-        /// </summary>
-        [DefaultValue(22)]
-        public int Port { get; set; } = 22;
+    /// <summary>
+    /// SFTP host address
+    /// </summary>
+    /// <example>localhost</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    public string Address { get; set; }
 
-        /// <summary>
-        /// Selection for authentication type
-        /// </summary>
-        [DisplayFormat(DataFormatString = "Text")]
-        public AuthenticationType Authentication { get; set; } = AuthenticationType.UsernamePassword;
+    /// <summary>
+    /// Port number to use in the connection to the server.
+    /// </summary>
+    /// <example>22</example>
+    [DefaultValue(22)]
+    public int Port { get; set; } = 22;
 
-        /// <summary>
-        /// Username
-        /// </summary>
-        [DisplayFormat(DataFormatString = "Text")]
-        public string UserName { get; set; }
+    /// <summary>
+    /// Selection for authentication type
+    /// </summary>
+    /// <example>AuthenticationType.UsernamePassword</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    public AuthenticationType Authentication { get; set; } = AuthenticationType.UsernamePassword;
 
-        /// <summary>
-        /// Password
-        /// </summary>
-        [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePassword)]
-        [PasswordPropertyText]
-        public string Password { get; set; }
+    /// <summary>
+    /// Username to use for authentication to the server. Note that the file endpoint only supports
+    /// username for remote shares and the username must be in the format DOMAIN\Username.
+    /// </summary>
+    /// <example>foo</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    public string UserName { get; set; }
 
-        /// <summary>
-        /// Full path to private key file.
-        /// </summary>
-        [UIHint(nameof(Authentication), "", AuthenticationType.PrivateKey, AuthenticationType.PrivateKeyPassphrase)]
-        [DisplayFormat(DataFormatString = "Text")]
-        public string PrivateKeyFileName { get; set; }
+    /// <summary>
+    /// Password to use in the authentication to the server.
+    /// </summary>
+    /// <example>pass</example>
+    [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePassword, AuthenticationType.UsernamePasswordPrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyString)]
+    [PasswordPropertyText]
+    public string Password { get; set; }
 
-        /// <summary>
-        /// Passphrase for the private key file.
-        /// </summary>
-        [UIHint(nameof(Authentication), "", AuthenticationType.PrivateKeyPassphrase)]
-        [PasswordPropertyText]
-        public string Passphrase { get; set; }
+    /// <summary>
+    /// Full path to private key file.
+    /// </summary>
+    /// <example>C:\path\to\private\key</example>
+    [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyFile)]
+    [DisplayFormat(DataFormatString = "Text")]
+    public string PrivateKeyFile { get; set; }
 
-    }
+    /// <summary>
+    /// Private key as a string, supported private key formats: PKCS#8,
+    /// PuTTY.ppk.
+    /// </summary>
+    /// <example>
+    /// -----BEGIN RSA PRIVATE KEY-----
+    /// Fqxq2jbSKyb0a+oW96Tjoif3Kcb5zZ0FiQyiHgQozLXrecjdUwjWuedkDoZMxwG5
+    /// bxpOnxZ/88tDzYCtCPcYCPRF8BNueUsZO8/tztTra+4NgVd/omXHG5bqb7iMB4dc
+    /// ...
+    /// OX7Q/wO4lqOlFhLtRnSL0cfuhRmt59pM75Zd+euX5tv9jmCj+AQT/kiBoMhNrDGk
+    /// N2gTujnH7HCr/afSBeL3xnYcEmeCQTxTPZofBjPC+TPd9g7MntSGBeU/Fstv0jbg
+    /// -----END RSA PRIVATE KEY-----
+    /// </example>
+    [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyString, AuthenticationType.UsernamePasswordPrivateKeyString)]
+    [PasswordPropertyText]
+    public string PrivateKeyString { get; set; }
+
+    /// <summary>
+    /// Passphrase for the private key file.
+    /// </summary>
+    /// <example>passphrase</example>
+    [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyFile)]
+    [PasswordPropertyText]
+    public string PrivateKeyFilePassphrase { get; set; }
+
+    /// <summary>
+    /// Fingerprint of the SFTP server. When using "Username-Password" 
+    /// authentication it is recommended to use server fingerprint in 
+    /// order to be sure of the server you are connecting.
+    /// </summary>
+    /// <example>
+    /// MD5: '41:76:EA:65:62:6E:D3:68:DC:41:9A:F2:F2:20:69:9D'
+    /// SHA256: 'FBQn5eyoxpAl33Ly0gyScCGAqZeMVsfY7qss3KOM/hY='
+    /// </example>
+    [DefaultValue("")]
+    public string ServerFingerPrint { get; set; }
+
+    /// <summary>
+    /// Integer value of used buffer size as KB.
+    /// Default value is 32 KB.
+    /// </summary>
+    /// <example>32</example>
+    [DefaultValue(32)]
+    public uint BufferSize { get; set; }
 }
+
