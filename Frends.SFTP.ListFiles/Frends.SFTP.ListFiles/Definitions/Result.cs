@@ -1,71 +1,77 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Renci.SshNet.Sftp;
+﻿using Renci.SshNet.Sftp;
 
-#pragma warning disable 1591
+namespace Frends.SFTP.ListFiles.Definitions;
 
-namespace Frends.SFTP.ListFiles.Definitions
+/// <summary>
+/// Return object with private setters.
+/// </summary>
+public class Result
 {
     /// <summary>
-    /// Return object with private setters.
+    /// Full path of directory or file.
     /// </summary>
-    public class Result
+    /// <example>/directory/test.txt</example>
+    public string FullPath { get; private set; }
+
+    /// <summary>
+    /// Boolean value of Result object being directory.
+    /// </summary>
+    /// <example>false</example>
+    public bool IsDirectory { get; private set; }
+
+    /// <summary>
+    /// Boolean value of Result object being file.
+    /// </summary>
+    /// <example>true</example>
+    public bool IsFile { get; private set; }
+
+    /// <summary>
+    /// File size in bytes.
+    /// </summary>
+    /// <example>4</example>
+    public long Length { get; private set; }
+
+    /// <summary>
+    /// Name of the file with extension.
+    /// </summary>
+    /// <example>test.txt</example>
+    public string Name { get; private set; }
+
+    /// <summary>
+    /// Timestamps for last write in UTC timezone.
+    /// </summary>
+    /// <example>2022-06-28T11:05:58Z</example>
+    public DateTime LastWriteTimeUtc { get; private set; }
+
+    /// <summary>
+    /// Timestamps for last access in UTC timezone.
+    /// </summary>
+    /// <example>2022-06-28T11:05:58Z</example>
+    public DateTime LastAccessTimeUtc { get; private set; }
+
+    /// <summary>
+    /// Timestamps for last write in current timezone.
+    /// </summary>
+    /// <example>2022-06-28T14:05:58+03:00</example>
+    public DateTime LastWriteTime { get; private set; }
+
+    /// <summary>
+    /// Timestamps for last access in current timezone.
+    /// </summary>
+    /// <example>2022-06-28T14:05:58+03:00</example>
+    public DateTime LastAccessTime { get; private set; }
+
+    internal Result(SftpFile file)
     {
-        /// <summary>
-        /// Full path of directory or file.
-        /// </summary>
-        public string FullPath { get; private set; }
-
-        /// <summary>
-        /// Boolean value of Result object being directory.
-        /// </summary>
-        public bool IsDirectory { get; private set; }
-
-        /// <summary>
-        /// Boolean value of Result object being file.
-        /// </summary>
-        public bool IsFile { get; private set; }
-
-        /// <summary>
-        /// File size in bytes.
-        /// </summary>
-        public long Length { get; private set; }
-
-        /// <summary>
-        /// Name of the file with extension.
-        /// </summary>
-        public string Name { get; private set; }
-
-        /// <summary>
-        /// Timestamps for last write in UTC timezone.
-        /// </summary>
-        public DateTime LastWriteTimeUtc { get; private set; }
-
-        /// <summary>
-        /// Timestamps for last access in UTC timezone.
-        /// </summary>
-        public DateTime LastAccessTimeUtc { get; private set; }
-
-        /// <summary>
-        /// Timestamps for last write in current timezone.
-        /// </summary>
-        public DateTime LastWriteTime { get; private set; }
-
-        /// <summary>
-        /// Timestamps for last access in current timezone.
-        /// </summary>
-        public DateTime LastAccessTime { get; private set; }
-
-        public Result(SftpFile file)
-        {
-            this.FullPath = file.FullName;
-            this.IsDirectory = file.IsDirectory;
-            this.IsFile = file.IsRegularFile;
-            this.Length = file.Length;
-            this.Name = file.Name;
-            this.LastWriteTimeUtc = file.LastWriteTimeUtc;
-            this.LastAccessTimeUtc = file.LastAccessTimeUtc;
-            this.LastWriteTime = file.LastWriteTime;
-            this.LastAccessTime = file.LastAccessTime;
-        }
+        FullPath = file.FullName;
+        IsDirectory = file.IsDirectory;
+        IsFile = file.IsRegularFile;
+        Length = file.Length;
+        Name = file.Name;
+        LastWriteTimeUtc = file.LastWriteTimeUtc;
+        LastAccessTimeUtc = file.LastAccessTimeUtc;
+        LastWriteTime = file.LastWriteTime;
+        LastAccessTime = file.LastAccessTime;
     }
 }
+
