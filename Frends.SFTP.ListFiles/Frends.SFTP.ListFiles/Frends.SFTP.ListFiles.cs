@@ -169,9 +169,7 @@ namespace Frends.SFTP.ListFiles
                     }
 
                     if (file.IsDirectory && input.IncludeSubdirectories)
-                    {
                         directoryList.AddRange(GetFiles(sftp, regexStr, file.FullName, input, cancellationToken));
-                    }
                 }
             }
             return directoryList;
