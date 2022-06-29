@@ -7,7 +7,7 @@
 	  <AssemblyName>Frends.SFTP.ListFiles</AssemblyName>
 	  <RootNamespace>Frends.SFTP.ListFiles</RootNamespace>
 
-	  <Version>1.0.1</Version>
+	  <Version>1.0.2</Version>
 	  <Authors>Frends</Authors>
 	  <Copyright>Frends</Copyright>
 	  <Company>Frends</Company>
@@ -15,7 +15,7 @@
 	  <PackageTags>Frends</PackageTags>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
-	  <Description>Executes file transfer through SFTP connection.</Description>
+	  <Description>Lists files from specific directory through SFTP connection.</Description>
 	  <PackageProjectUrl>https://frends.com/</PackageProjectUrl>
 	  <RepositoryUrl>https://github.com/FrendsPlatform/Frends.SFTP/tree/main/Frends.SFTP.ListFiles</RepositoryUrl>
   </PropertyGroup>
@@ -30,6 +30,7 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 	<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="SSH.NET" Version="2020.0.2" />
+    <PackageReference Include="SshKeyGenerator" Version="1.1.50" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
   </ItemGroup>
 
