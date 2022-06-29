@@ -14,7 +14,7 @@ public class Source
     /// <example>/upload/</example>
     [DefaultValue("/")]
     [DisplayFormat(DataFormatString = "Text")]
-    public string Directory { get; set; } = "/";
+    public string Directory { get; set; }
 
     /// <summary>
     /// File name or file mask of the files to be fetched.

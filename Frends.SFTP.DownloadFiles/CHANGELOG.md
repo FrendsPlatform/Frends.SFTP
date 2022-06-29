@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.23 - 2022-06-29
+### Fixed
+- Fixed issue with forward slash being added to the source directory.
+
 ## [1.0.2] - 2022-06-15
 ### Fixed
 - Fixed issue with download failes when RenameDestinationFileDuringTransfer was enabled and destination file existed.
