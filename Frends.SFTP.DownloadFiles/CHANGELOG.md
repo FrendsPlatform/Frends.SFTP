@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.23 - 2022-06-29
+## [1.0.3] - 2022-06-29
 ### Fixed
 - Fixed issue with forward slash being added to the source directory.
 
