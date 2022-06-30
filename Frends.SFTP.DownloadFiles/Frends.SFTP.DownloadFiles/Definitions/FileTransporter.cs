@@ -300,13 +300,17 @@ internal class FileTransporter
         // create List of FileItems from found files.
         foreach (var file in files)
         {
+            var name = file.Name;
+            if (file.Name.Equals(".") || file.Name.Equals("..")) continue;
+
+            if (file.IsDirectory) continue;
+
             if (Util.FileMatchesMask(Path.GetFileName(file.FullName), source.FileName))
             {
                 FileItem item = new FileItem(file);
                 _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath}");
                 fileItems.Add(item);
             }
-                    
         }
         return new Tuple<List<FileItem>, bool>(fileItems, true);
     }
