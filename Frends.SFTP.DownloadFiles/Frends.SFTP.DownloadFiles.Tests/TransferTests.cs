@@ -19,6 +19,24 @@ class TransferTests : DownloadFilesTestBase
         Assert.AreEqual(1, result.SuccessfulTransferCount);
     }
 
+    [Test]
+    public void DownloadFiles_TestDownloadWithFileMask()
+    {
+        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
+
+        var source = new Source
+        {
+            Directory = _source.Directory,
+            FileName = "*",
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Nothing
+        };
+
+        var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(1, result.SuccessfulTransferCount);
+    }
+
     [Test] 
     public void DownloadFiles_TestWithOperationLogDisabled()
     {

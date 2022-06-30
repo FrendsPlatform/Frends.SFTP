@@ -138,5 +138,25 @@ internal static class Helpers
         }
         return exists;
     }
+
+    internal static void CreateSubDirectory(string path)
+    {
+        using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+        {
+            client.Connect();
+            client.CreateDirectory(path);
+            client.Disconnect();
+        }
+    }
+
+    internal static void DeleteSubDirectory(string path)
+    {
+        using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+        {
+            client.Connect();
+            client.DeleteDirectory(path);
+            client.Disconnect();
+        }
+    }
 }
 

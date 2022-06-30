@@ -45,4 +45,23 @@ class ErrorTests : DownloadFilesTestBase
         var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
         Assert.That(ex.Message.StartsWith("SFTP transfer failed: Unable to establish the socket: No such host is known"));
     }
+
+    [Test]
+    public void DownloadFiles_TestWithSubDirNameAsFileMask()
+    {
+        var path = "/upload/test";
+        Helpers.CreateSubDirectory(path);
+        var source = new Source
+        {
+            Directory = "/upload",
+            FileName = "test",
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Nothing,
+        };
+
+        var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
+        Assert.That(ex.Message.StartsWith("SFTP transfer failed: 1 Errors: No source files found from directory"));
+
+        Helpers.DeleteSubDirectory(path);
+    }
 }
