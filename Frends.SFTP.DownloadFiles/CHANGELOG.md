@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.5] - 2022-07-12
+### Fixed
+- Fixed issue where PreserveModified caused exceptions.
+- Added logger usage in places where it was needed to make the operations log and error info more informative.
+- Refactored some lines.
+
 ## [1.0.4] - 2022-06-30
 ### Fixed
 - Fixed issue where '.' and '..' directories were also fetched when using '*' character as  source file mask.

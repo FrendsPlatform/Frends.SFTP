@@ -58,7 +58,7 @@ internal class FileTransporter
             } 
             catch (Exception e)
             {
-                userResultMessage = $"Error when initializing connection info: {e}";
+                userResultMessage = $"Error when initializing connection info: {e}.";
                 _logger.NotifyError(null, "Error when initializing connection info: ", e);
                 return FormFailedFileTransferResult(userResultMessage);
             }
@@ -73,6 +73,7 @@ internal class FileTransporter
                 {
                     try
                     {
+                        _logger.NotifyInformation(_batchContext, "Checking server fingerprint.");
                         // If this check fails then SSH.NET will throw an SshConnectionException - with a message of "Key exchange negotiation failed".
                         client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
                         {
@@ -82,14 +83,14 @@ internal class FileTransporter
                                 var sha256Fingerprint = Convert.ToBase64String(mySHA256.ComputeHash(e.HostKey));
                                 // Set the userResultMessage in case checking server fingerprint failes.
                                 userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                                        $"Expected fingerprint: '{_batchContext.Connection.ServerFingerPrint}', but was: '{sha256Fingerprint}'";
+                                                        $"Expected fingerprint: '{_batchContext.Connection.ServerFingerPrint}', but was: '{sha256Fingerprint}'.";
                                 e.CanTrust = (sha256Fingerprint == _batchContext.Connection.ServerFingerPrint);
                             }
 
                             if (!e.CanTrust)
                             {
                                 userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                                        $"Expected fingerprint: '{_batchContext.Connection.ServerFingerPrint}', but was: '{BitConverter.ToString(e.FingerPrint).Replace("-", ":")}'";
+                                                        $"Expected fingerprint: '{_batchContext.Connection.ServerFingerPrint}', but was: '{BitConverter.ToString(e.FingerPrint).Replace("-", ":")}'.";
                                 // If previous failed try with MD5 typed fingerprint
                                 var expectedFingerprint = Util.ConvertFingerprintToByteArray(_batchContext.Connection.ServerFingerPrint);
                                 e.CanTrust = (e.FingerPrint.SequenceEqual(expectedFingerprint));
@@ -108,6 +109,7 @@ internal class FileTransporter
 
                 client.BufferSize = _batchContext.Connection.BufferSize * 1024;
 
+                _logger.NotifyInformation(_batchContext, $"Connecting to {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using Sftp.");
                 client.Connect();
 
                 if (!client.IsConnected)
@@ -176,16 +178,19 @@ internal class FileTransporter
         catch (SshConnectionException ex)
         {
             userResultMessage = $"Error when establishing connection to the Server: {ex.Message}";
+            _logger.NotifyError(_batchContext, userResultMessage, ex);
             return FormFailedFileTransferResult(userResultMessage);
         }
-        catch (SocketException)
+        catch (SocketException ex)
         {
             userResultMessage = $"Unable to establish the socket: No such host is known.";
+            _logger.NotifyError(_batchContext, userResultMessage, ex);
             return FormFailedFileTransferResult(userResultMessage);
         }
         catch (SshAuthenticationException ex)
         {
             userResultMessage = $"Authentication of SSH session failed: {ex.Message}";
+            _logger.NotifyError(_batchContext, userResultMessage, ex);
             return FormFailedFileTransferResult(userResultMessage);
         }
 
@@ -288,7 +293,7 @@ internal class FileTransporter
             return new Tuple<List<FileItem>, bool>(fileItems, false);
         }
 
-        // Return empty list if source directory doesn't exists.
+        // Return empty list and success.false value if source directory doesn't exists.
         if (!client.Exists(SourceDirectoryWithMacrosExtended)) return new Tuple<List<FileItem>, bool>(fileItems, false);
 
         // fetch all file names in given directory
@@ -308,7 +313,7 @@ internal class FileTransporter
             if (Util.FileMatchesMask(Path.GetFileName(file.FullName), source.FileName))
             {
                 FileItem item = new FileItem(file);
-                _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath}");
+                _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath}.");
                 fileItems.Add(item);
             }
         }
@@ -362,14 +367,6 @@ internal class FileTransporter
 
         var transferredFileResults = singleResults.Where(r => r.Success && !r.ActionSkipped).ToList();
 
-        var fileNames = from result in singleResults
-                        where result.Success
-                        select result.TransferredFile;
-
-        var filePaths = from result in singleResults
-                        where result.Success
-                        select result.TransferredFilePath;
-
         return new FileTransferResult {
             ActionSkipped = actionSkipped,
             Success = success,
@@ -395,13 +392,13 @@ internal class FileTransporter
         var errorMessages = results.SelectMany(x => x.ErrorMessages).ToList();
         if (errorMessages.Any())
             userResultMessage = MessageJoin(userResultMessage,
-                string.Format("{0} Errors: {1}", errorMessages.Count, string.Join(", ", errorMessages)));
+                string.Format("{0} Errors: {1}.", errorMessages.Count, string.Join(", \n", errorMessages)));
 
-        var transferredFiles = results.Select(x => x.TransferredFile).Where(x => x != null).ToList();
+        var transferredFiles = results.Where(x => x.Success).Select(x => x.TransferredFile).ToList();
         if (transferredFiles.Any())
             userResultMessage = MessageJoin(userResultMessage,
-                string.Format("{0} files transferred: {1}", transferredFiles.Count,
-                    string.Join(", ", transferredFiles)));
+                string.Format("{0} files transferred: {1}.", transferredFiles.Count,
+                    string.Join(", \n", transferredFiles)));
         else
             userResultMessage = MessageJoin(userResultMessage, "No files transferred.");
 
@@ -428,10 +425,10 @@ internal class FileTransporter
 
         if (context.Source.FilePaths == null)
             msg =
-                $"No source files found from directory '{SourceDirectoryWithMacrosExtended}' with file mask '{source.FileName}' for transfer '{transferName}'";
+                $"No source files found from directory '{SourceDirectoryWithMacrosExtended}' with file mask '{source.FileName}' for transfer '{transferName}'.";
         else
             msg =
-                $"No source files found from FilePaths '{string.Join(", ", context.Source.FilePaths)}' for transfer '{transferName}'";
+                $"No source files found from FilePaths '{string.Join(", ", context.Source.FilePaths)}' for transfer '{transferName}'.";
 
         switch (_batchContext.Source.Action)
         {
@@ -444,7 +441,7 @@ internal class FileTransporter
             case SourceAction.Ignore:
                 return new SingleFileTransferResult { Success = true, ActionSkipped = true, ErrorMessages = { msg } };
             default:
-                throw new Exception("Unknown operation in NoSourceOperation");
+                throw new Exception("Unknown operation in NoSourceOperation.");
         }
     }
 

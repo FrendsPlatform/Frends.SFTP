@@ -158,5 +158,17 @@ internal static class Helpers
             client.Disconnect();
         }
     }
+
+    internal static void SetTestFileLastModified(string path, DateTime date)
+    {
+        using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+        {
+            client.Connect();
+            var attributes = client.GetAttributes(path);
+            attributes.LastWriteTime = date;
+            client.SetAttributes(path, attributes);
+            client.Disconnect();
+        }
+    }
 }
 

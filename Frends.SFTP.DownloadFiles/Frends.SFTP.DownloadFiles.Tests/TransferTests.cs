@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System.IO;
 using System.Collections.Generic;
 using System.Threading;
+using System.Linq;
 using Frends.SFTP.DownloadFiles.Definitions;
 
 namespace Frends.SFTP.DownloadFiles.Tests;
@@ -452,6 +453,40 @@ class TransferTests : DownloadFilesTestBase
         Assert.AreEqual(1, result.SuccessfulTransferCount);
 
         Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, _source.FileName)));
+    }
+
+    [Test]
+    public void DownloadFiles_TestPreserveLastModified()
+    {
+        var sourcePath = Path.Combine(_workDir, _source.FileName);
+        Helpers.UploadTestFiles(new List<string> { sourcePath }, _source.Directory);
+        var date = File.GetLastWriteTime(sourcePath);
+        Helpers.SetTestFileLastModified(_source.Directory + "/" + _source.FileName, date);
+        var destination = new Destination
+        {
+            Directory = Path.Combine(_workDir, "destination"),
+            Action = DestinationAction.Overwrite,
+            FileNameEncoding = FileEncoding.UTF8,
+            EnableBomForFileName = true
+        };
+
+        var options = new Options
+        {
+            ThrowErrorOnFail = true,
+            RenameSourceFileBeforeTransfer = true,
+            RenameDestinationFileDuringTransfer = false,
+            CreateDestinationDirectories = true,
+            PreserveLastModified = true,
+            OperationLog = true
+        };
+
+        var result = SFTP.DownloadFiles(_source, destination, _connection, options, _info, new CancellationToken());
+        var destFilePath = Path.Combine(destination.Directory, _source.FileName);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+        Assert.IsTrue(File.Exists(destFilePath));
+        Assert.AreEqual(date.ToString(), File.GetLastWriteTime(destFilePath).ToString());
     }
 }
 
