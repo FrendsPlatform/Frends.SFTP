@@ -2,8 +2,9 @@
 
 ## [1.0.5] - 2022-07-12
 ### Fixed
-- Fixed issue where PreserveModified caused exceptions.
+- Fixed issue where PreserveModified caused exceptions because the method used wrong file path.
 - Added logger usage in places where it was needed to make the operations log and error info more informative.
+- Modified the logger usage that the logger.NotifyInformation is done after the action so it's easier to see where errors has occurred.
 - Refactored some lines.
 
 ## [1.0.4] - 2022-06-30

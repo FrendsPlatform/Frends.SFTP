@@ -38,6 +38,11 @@ internal class FileTransporter
     private string DestinationDirectoryWithMacrosExtended { get; set; }
 
     /// <summary>
+    /// Transfer state for SFTP Logger
+    /// </summary>
+    public TransferState State { get; set; }
+
+    /// <summary>
     /// Executes file transfers.
     /// </summary>
     /// <param name="cancellationToken"></param>
@@ -73,7 +78,7 @@ internal class FileTransporter
                 {
                     try
                     {
-                        _logger.NotifyInformation(_batchContext, "Checking server fingerprint.");
+                        Trace(TransferState.Connection, "Checking server fingerprint.");
                         // If this check fails then SSH.NET will throw an SshConnectionException - with a message of "Key exchange negotiation failed".
                         client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
                         {
@@ -109,7 +114,8 @@ internal class FileTransporter
 
                 client.BufferSize = _batchContext.Connection.BufferSize * 1024;
 
-                _logger.NotifyInformation(_batchContext, $"Connecting to {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using Sftp.");
+                Trace(TransferState.Connection, $"Connecting to {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using SFTP.");
+
                 client.Connect();
 
                 if (!client.IsConnected)
@@ -117,6 +123,7 @@ internal class FileTransporter
                     _logger.NotifyError(null, "Error while connecting to destination: ", new SshConnectionException(userResultMessage));
                     return FormFailedFileTransferResult(userResultMessage);
                 }
+                _logger.NotifyInformation(_batchContext, $"Connection has been stablished to target {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using SFTP.");
 
                 // Fetch source file info and check if files were returned.
                 var (files, success) = GetSourceFiles(client, _batchContext.Source);
@@ -443,6 +450,18 @@ internal class FileTransporter
             default:
                 throw new Exception("Unknown operation in NoSourceOperation.");
         }
+    }
+
+    /// <summary>
+    /// Handles logging of actions.
+    /// </summary>
+    /// <param name="state"></param>
+    /// <param name="format"></param>
+    /// <param name="args"></param>
+    private void Trace(TransferState state, string format, params object[] args)
+    {
+        State = state;
+        _logger.NotifyTrace(string.Format("{0}: {1}", state, string.Format(format, args)));
     }
 
     #endregion
