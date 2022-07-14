@@ -78,7 +78,7 @@ internal class FileTransporter
                 {
                     try
                     {
-                        Trace(TransferState.Connection, "Checking server fingerprint.");
+                        SetCurrentState(TransferState.Connection, "Checking server fingerprint.");
                         // If this check fails then SSH.NET will throw an SshConnectionException - with a message of "Key exchange negotiation failed".
                         client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
                         {
@@ -114,7 +114,7 @@ internal class FileTransporter
 
                 client.BufferSize = _batchContext.Connection.BufferSize * 1024;
 
-                Trace(TransferState.Connection, $"Connecting to {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using SFTP.");
+                SetCurrentState(TransferState.Connection, $"Connecting to {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using SFTP.");
 
                 client.Connect();
 
@@ -399,13 +399,12 @@ internal class FileTransporter
         var errorMessages = results.SelectMany(x => x.ErrorMessages).ToList();
         if (errorMessages.Any())
             userResultMessage = MessageJoin(userResultMessage,
-                string.Format("{0} Errors: {1}.", errorMessages.Count, string.Join(", \n", errorMessages)));
+                $"{errorMessages.Count} Errors: {string.Join(", \n", errorMessages)}.");
 
         var transferredFiles = results.Where(x => x.Success).Select(x => x.TransferredFile).ToList();
         if (transferredFiles.Any())
             userResultMessage = MessageJoin(userResultMessage,
-                string.Format("{0} files transferred: {1}.", transferredFiles.Count,
-                    string.Join(", \n", transferredFiles)));
+                $"{transferredFiles.Count} files transferred: {string.Join(", \n", transferredFiles)}.");
         else
             userResultMessage = MessageJoin(userResultMessage, "No files transferred.");
 
@@ -452,16 +451,10 @@ internal class FileTransporter
         }
     }
 
-    /// <summary>
-    /// Handles logging of actions.
-    /// </summary>
-    /// <param name="state"></param>
-    /// <param name="format"></param>
-    /// <param name="args"></param>
-    private void Trace(TransferState state, string format, params object[] args)
+    private void SetCurrentState(TransferState state, string msg)
     {
         State = state;
-        _logger.NotifyTrace(string.Format("{0}: {1}", state, string.Format(format, args)));
+        _logger.NotifyTrace($"{state}: {msg}");
     }
 
     #endregion
