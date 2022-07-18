@@ -483,5 +483,57 @@ class TransferTests : DownloadFilesTestBase
         Assert.IsFalse(result.Success);
         Assert.IsTrue(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
     }
+
+    [Test]
+    public void DownloadFiles_NoSourceFilesAndIgnoreShouldNotThrowException()
+    {
+        Helpers.CreateSubDirectory("/upload/Upload");
+        var options = new Options
+        {
+            ThrowErrorOnFail = true,
+            RenameSourceFileBeforeTransfer = true,
+            RenameDestinationFileDuringTransfer = true,
+            CreateDestinationDirectories = true,
+            PreserveLastModified = true,
+            OperationLog = true
+        };
+
+        var source = new Source
+        {
+            Directory = _source.Directory,
+            FileName = _source.FileName,
+            Action = SourceAction.Ignore,
+            Operation = SourceOperation.Delete
+        };
+
+        var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+        Assert.IsTrue(result.ActionSkipped);
+    }
+
+    [Test]
+    public void DownloadFiles_NoSourceFilesAndInfoShouldNotThrowException()
+    {
+        Helpers.CreateSubDirectory("/upload/Upload");
+        var options = new Options
+        {
+            ThrowErrorOnFail = true,
+            RenameSourceFileBeforeTransfer = true,
+            RenameDestinationFileDuringTransfer = true,
+            CreateDestinationDirectories = true,
+            PreserveLastModified = true,
+            OperationLog = true
+        };
+
+        var source = new Source
+        {
+            Directory = _source.Directory,
+            FileName = _source.FileName,
+            Action = SourceAction.Info,
+            Operation = SourceOperation.Delete
+        };
+
+        var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+        Assert.IsTrue(result.ActionSkipped);
+    }
 }
 
