@@ -1,8 +1,16 @@
 # Changelog
 
+## [2.0.0] - 2022-07-15
+### Fixed
+- [Breaking] Changed the implementation to work similar to Cobalt by moving the source file to local Temp folder before transfering to destination.
+- Fixed issue where PreserveModified caused exceptions because the method used wrong file path.
+- Fixed bug where source files were deleted if RenameSourceFileBeforeTransfer was enabled and SourceOperation.Move had directory that didn't exist.'
+- Added logger usage in places where it was needed to make the operations log and error info more informative.
+- Modified the logger usage that the logger.NotifyInformation is done after the action so it's easier to see where errors has occurred.
+
 ## [1.0.4] - 2022-06-30
 ### Fixed
-- Fixed issue where '.' and '..' directories were also fetched when using '*' character as  source file mask.
+- Fixed issue where '.' and '..' directories were also fetched when using '*' character as source file mask.
 - Added check for GetSourceFiles so that only files are fetched and not directories.
 - Updated Microsoft.Extension.DependencyInjection library.
 

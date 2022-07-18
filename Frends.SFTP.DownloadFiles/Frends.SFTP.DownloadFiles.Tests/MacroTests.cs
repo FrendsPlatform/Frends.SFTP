@@ -53,7 +53,7 @@ internal class MacroTests : DownloadFilesTestBase
     public void DownloadFiles_TestDestinationDirectoryWithMacros()
     {
         Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
+        var year = DateTime.Now.Year.ToString();
         var destination = new Destination
         {
             Directory = Path.Combine(_destWorkDir, "test%Year%"),
@@ -67,7 +67,7 @@ internal class MacroTests : DownloadFilesTestBase
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-        var dir = Path.Combine(_destWorkDir, "test2022");
+        var dir = Path.Combine(_destWorkDir, "test" + year);
 
         var exists = File.Exists(Path.Combine(dir, _source.FileName));
         Assert.IsTrue(exists);

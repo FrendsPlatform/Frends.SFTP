@@ -453,5 +453,35 @@ class TransferTests : DownloadFilesTestBase
 
         Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, _source.FileName)));
     }
+
+    [Test]
+    public void DownloadFiles_TestWithSourceMoveToNonExistingDirectoryShouldReturnUnsuccessfulTransfer()
+    {
+        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
+        Directory.CreateDirectory(_destWorkDir);
+
+        var options = new Options
+        {
+            ThrowErrorOnFail = false,
+            RenameSourceFileBeforeTransfer = true,
+            RenameDestinationFileDuringTransfer = true,
+            CreateDestinationDirectories = true,
+            PreserveLastModified = true,
+            OperationLog = true
+        };
+
+        var source = new Source
+        {
+            Directory = _source.Directory,
+            FileName = _source.FileName,
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Move,
+            DirectoryToMoveAfterTransfer = "/upload/test"
+        };
+
+        var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+        Assert.IsFalse(result.Success);
+        Assert.IsTrue(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
+    }
 }
 
