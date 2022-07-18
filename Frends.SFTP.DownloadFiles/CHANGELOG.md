@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.0.1] - 2022-07-18
+### Fixed
+- Fixed issue with task throwing exception when no source files found and source action info or ignore selected.
+
 ## [2.0.0] - 2022-07-15
 ### Fixed
 - [Breaking] Changed the implementation to work similar to Cobalt by moving the source file to local Temp folder before transfering to destination.
