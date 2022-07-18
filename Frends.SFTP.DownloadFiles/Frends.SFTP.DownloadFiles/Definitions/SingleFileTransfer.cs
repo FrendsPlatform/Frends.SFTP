@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.IO;
 using Renci.SshNet;
 
 namespace Frends.SFTP.DownloadFiles.Definitions;
@@ -121,6 +120,7 @@ internal class SingleFileTransfer
             $"Checking if destination file {Path.GetFileName(path)} exists.");
         var exists = File.Exists(path);
         _logger.NotifyInformation(BatchContext, $"FILE EXISTS {path}: {exists}.");
+
         return exists;
     }
 
@@ -227,8 +227,8 @@ internal class SingleFileTransfer
     {
         var doRename = BatchContext.Options.RenameDestinationFileDuringTransfer;
 
-        DestinationFileDuringTransfer = doRename 
-            ? Path.Combine(Path.GetDirectoryName(DestinationFileWithMacrosExpanded), Util.CreateUniqueFileName()) 
+        DestinationFileDuringTransfer = doRename
+            ? Path.Combine(Path.GetDirectoryName(DestinationFileWithMacrosExpanded), Util.CreateUniqueFileName())
             : DestinationFileWithMacrosExpanded;
 
         var helper = doRename ? "temporary " : string.Empty;
