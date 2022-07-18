@@ -379,7 +379,7 @@ internal class FileTransporter
 
         return new FileTransferResult {
             ActionSkipped = actionSkipped,
-            Success = transferErrors.Any() ? false : success,
+            Success = success,
             UserResultMessage = userResultMessage,
             SuccessfulTransferCount = singleResults.Count(s => s.Success && !s.ActionSkipped),
             FailedTransferCount = singleResults.Count(s => !s.Success && !s.ActionSkipped),
