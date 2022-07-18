@@ -330,7 +330,7 @@ internal class SingleFileTransfer
             var file = Client.Get(filePath);
             if (!Client.Exists(moveToPath))
             {
-                var msg = $"Operation failed: Source file {SourceFile.Name} couldn't be moved to given directory {moveToPath} because it didn't exist.";
+                var msg = $"Operation failed: Source file {SourceFile.Name} couldn't be moved to given directory {moveToPath} because the directory didn't exist.";
                 _logger.NotifyError(BatchContext, msg, new ArgumentException("Failure in moving the source file."));
                 _result.ErrorMessages.Add($"Failure in source operation: {msg}");
             }
@@ -339,7 +339,7 @@ internal class SingleFileTransfer
                 : Path.Combine(moveToPath, SourceFile.Name);
 
             file.MoveTo(destFileName);
-            if (!Client.Exists(destFileName)) throw new Exception("");
+            if (!Client.Exists(destFileName)) throw new Exception($"Failure in source operation: Failure in moving the source file.");
 
             _logger.NotifyInformation(BatchContext, $"Source file {SourceFileDuringTransfer} moved to target {destFileName}.");
             SourceFile = new FileItem(file);
@@ -429,7 +429,7 @@ internal class SingleFileTransfer
             {
                 if ((File.GetAttributes(filePath) & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
                 {
-                    File.SetAttributes(filePath, FileAttributes.Normal); // Clear flags so readonly doesn't cause any problems CO-469
+                    File.SetAttributes(filePath, FileAttributes.Normal);
                 }
                 File.Delete(filePath);
                 _logger.NotifyInformation(BatchContext, $"FILE DELETE: Temporary source file {filePath} removed.");

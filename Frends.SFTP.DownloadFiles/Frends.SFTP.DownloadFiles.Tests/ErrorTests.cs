@@ -81,7 +81,7 @@ class ErrorTests : DownloadFilesTestBase
         };
 
         var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
-        Assert.That(ex.Message.Contains($"Operation failed: Source file {_source.FileName} couldn't be moved to given directory {source.DirectoryToMoveAfterTransfer} because it didn't exist."));
+        Assert.That(ex.Message.Contains($"Operation failed: Source file {_source.FileName} couldn't be moved to given directory {source.DirectoryToMoveAfterTransfer} because the directory didn't exist."));
         Assert.IsTrue(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
     }
 }
