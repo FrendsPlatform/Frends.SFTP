@@ -64,4 +64,24 @@ class ErrorTests : DownloadFilesTestBase
 
         Helpers.DeleteSubDirectory(path);
     }
+
+    [Test]
+    public void DownloadFiles_TestThrowsWithSourceMoveToNonExistingDirectoryShouldReturnUnsuccessfulTransfer()
+    {
+        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
+        Directory.CreateDirectory(_destWorkDir);
+
+        var source = new Source
+        {
+            Directory = _source.Directory,
+            FileName = _source.FileName,
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Move,
+            DirectoryToMoveAfterTransfer = "/upload/test"
+        };
+
+        var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
+        Assert.That(ex.Message.Contains($"Operation failed: Source file {_source.FileName} couldn't be moved to given directory {source.DirectoryToMoveAfterTransfer} because it didn't exist."));
+        Assert.IsTrue(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
+    }
 }

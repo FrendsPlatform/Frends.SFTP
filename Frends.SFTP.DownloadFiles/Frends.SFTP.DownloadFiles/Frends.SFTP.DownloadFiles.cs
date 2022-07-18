@@ -115,18 +115,19 @@ public class SFTP
         using (var logger = InitializeSFTPLogger(operationsLogger))
         {
             if (string.IsNullOrEmpty(info.ProcessUri))
-                fileTransferLog.Warning("ProcessUri is empty. This means the transfer view cannot link to the correct page");
+                fileTransferLog.Warning("ProcessUri is empty. This means the transfer view cannot link to the correct page.");
 
             Guid executionId;
             if (!Guid.TryParse(info.TaskExecutionID, out executionId))
             {
-                fileTransferLog.Warning("'{0}' is not a valid task execution ID, will default to random Guid", info.TaskExecutionID);
+                fileTransferLog.Warning("'{0}' is not a valid task execution ID, will default to random Guid.", info.TaskExecutionID);
                 executionId = Guid.NewGuid();
             }
 
             _batchContext = new BatchContext
             {
                 Info = info,
+                TempWorkDir = InitializeTemporaryWorkPath(info.WorkDir),
                 Options = options,
                 InstanceId = executionId,
                 ServiceId = info.TransferName,
@@ -144,13 +145,29 @@ public class SFTP
 
             if (options.ThrowErrorOnFail && !result.Success)
                 throw new Exception($"SFTP transfer failed: {result.UserResultMessage}. " +
-                                    $"Latest operations: \n{GetLogLines(transferSink.GetBufferedLogMessages())}");
+                                    $"Latest operations: \n{GetLogLines(transferSink.GetBufferedLogMessages())}.");
 
             if (options.OperationLog)
                 result.OperationsLog = GetLogDictionary(transferSink.GetBufferedLogMessages());
 
             return new Result(result);
         }
+    }
+
+    private static string InitializeTemporaryWorkPath(string workDir)
+    {
+        var tempWorkDir = GetTemporaryWorkPath(workDir);
+        Directory.CreateDirectory(tempWorkDir);
+        return tempWorkDir;
+    }
+
+    private static string GetTemporaryWorkPath(string workDir)
+    {
+        var tempWorkDirBase = workDir;
+
+        if (string.IsNullOrEmpty(workDir)) tempWorkDirBase = Path.GetTempPath();
+
+        return Path.Combine(tempWorkDirBase, Path.GetRandomFileName());
     }
 
     /// <summary>
@@ -200,7 +217,7 @@ public class SFTP
         {
             return new Dictionary<string, string>
             {
-                { DateTimeOffset.Now.ToString(dateFormat), $"Error while creating operation log: \n{e}" }
+                { DateTimeOffset.Now.ToString(dateFormat), $"Error while creating operation log: \n{e}." }
             };
         }
     }

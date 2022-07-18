@@ -15,6 +15,8 @@ internal enum TransferState
     DeleteDestinationFile,
     RenameDestinationFile,
     CleanUpFiles,
-    CheckIfDestinationFileExists
+    CheckIfDestinationFileExists,
+    RestoreModified,
+    Connection
 }
 
