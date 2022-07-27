@@ -58,7 +58,7 @@ class MacroTests : UploadFilesTestBase
     {
         var destination = new Destination
         {
-            Directory = "upload/Upload/test%Year%",
+            Directory = "/upload/Upload/test%Year%",
             FileName = "",
             Action = DestinationAction.Error,
             FileNameEncoding = FileEncoding.UTF8,
