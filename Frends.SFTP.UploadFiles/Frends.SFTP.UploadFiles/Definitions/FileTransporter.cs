@@ -428,7 +428,7 @@ internal class FileTransporter
             userResultMessage = MessageJoin(userResultMessage,
                 $"{errorMessages.Count} Errors: {string.Join(", \n", errorMessages)}.");
 
-        var transferredFiles = results.Select(x => x.TransferredFile).Where(x => x != null).ToList();
+        var transferredFiles = results.Where(x => x.Success).Select(x => x.TransferredFile).ToList();
         if (transferredFiles.Any())
             userResultMessage = MessageJoin(userResultMessage,
                 $"{transferredFiles.Count} files transferred: {string.Join(", ", transferredFiles)}.");

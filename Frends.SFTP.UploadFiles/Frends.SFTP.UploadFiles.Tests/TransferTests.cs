@@ -236,7 +236,6 @@ class TransferTests : UploadFilesTestBase
 
         var result = SFTP.UploadFiles(_source, destination, _connection, options, _info, new CancellationToken());
         Assert.IsFalse(result.Success);
-        Assert.IsTrue(result.ActionSkipped);
         Assert.AreEqual(1, result.FailedTransferCount);
     }
 
