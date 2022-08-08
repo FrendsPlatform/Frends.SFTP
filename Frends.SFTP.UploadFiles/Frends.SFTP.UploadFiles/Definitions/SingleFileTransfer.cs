@@ -271,7 +271,7 @@ internal class SingleFileTransfer
             case FileEncoding.Other:
                 return Encoding.GetEncoding(dest.FileNameEncodingInString);
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{dest.FileContentEncoding}'.");
         }
     }
 

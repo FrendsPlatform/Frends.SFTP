@@ -1,8 +1,8 @@
 # Changelog
 
-# [2.0.0] - 2022-07-27
-###
-- [Breaking] Changed the implementation to work similar to Cobalt by moving the source file to local Temp folder before transfering to destination.
+# [2.0.0] - 2022-08-08
+### Fixed
+- [Breaking] Changed the implementation to work similar to Cobalt by moving the source file to local Temp folder before transferring to destination.
 - Fixed issue where PreserveModified caused exceptions because the method used wrong file path.
 - Fixed bug where source files were deleted if RenameSourceFileBeforeTransfer was enabled and SourceOperation.Move had directory that didn't exist.
 - Added logger usage in places where it was needed to make the operations log and error info more informative.
