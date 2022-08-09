@@ -38,6 +38,11 @@ internal class FileTransporter
     private string DestinationDirectoryWithMacrosExtended { get; set; }
 
     /// <summary>
+    /// Transfer state for SFTP Logger
+    /// </summary>
+    public TransferState State { get; set; }
+
+    /// <summary>
     /// Executes file transfers
     /// </summary>
     /// <param name="cancellationToken"></param>
@@ -57,6 +62,7 @@ internal class FileTransporter
             if (!success)
             {
                 userResultMessage = $"Directory '{_batchContext.Source.Directory}' doesn't exists.";
+                _logger.NotifyInformation(_batchContext, userResultMessage);
                 return FormFailedFileTransferResult(userResultMessage);
             }
 
@@ -96,6 +102,7 @@ internal class FileTransporter
                     {
                         try
                         {
+                            SetCurrentState(TransferState.Connection, "Checking server fingerprint.");
                             // If this check fails then SSH.NET will throw an SshConnectionException - with a message of "Key exchange negotiation failed".
                             client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
                             {
@@ -132,6 +139,8 @@ internal class FileTransporter
 
                     client.BufferSize = _batchContext.Connection.BufferSize * 1024;
 
+                    SetCurrentState(TransferState.Connection, $"Connecting to {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using SFTP.");
+
                     client.Connect();
 
                     if (!client.IsConnected)
@@ -140,6 +149,8 @@ internal class FileTransporter
                         return FormFailedFileTransferResult(userResultMessage);
                     }
 
+                    _logger.NotifyInformation(_batchContext, $"Connection has been stablished to target {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using SFTP.");
+
                     // Check does the destination directory exists.
                     if (!client.Exists(DestinationDirectoryWithMacrosExtended))
                     {
@@ -147,24 +158,28 @@ internal class FileTransporter
                         {
                             try
                             {
+                                SetCurrentState(TransferState.CreateDestinationDirectories, $"Creating destination directory {DestinationDirectoryWithMacrosExtended}.");
                                 CreateDestinationDirectories(client, DestinationDirectoryWithMacrosExtended);
+                                _logger.NotifyInformation(_batchContext, $"DIRECTORY CREATE: Destination directory {DestinationDirectoryWithMacrosExtended} created.");
                             }
                             catch (Exception ex)
                             {
                                 userResultMessage = $"Error while creating destination directory '{DestinationDirectoryWithMacrosExtended}': {ex.Message}";
+                                _logger.NotifyError(_batchContext, userResultMessage, ex);
                                 return FormFailedFileTransferResult(userResultMessage);
                             }
                         }
                         else
                         {
                             userResultMessage = $"Destination directory '{DestinationDirectoryWithMacrosExtended}' was not found.";
+                            _logger.NotifyError(_batchContext, userResultMessage, new ArgumentException("No such directory."));
                             return FormFailedFileTransferResult(userResultMessage);
                         }
                     }
                     else
-                        client.ChangeDirectory(DestinationDirectoryWithMacrosExtended);
+                        // client.ChangeDirectory(DestinationDirectoryWithMacrosExtended);
 
-                    _batchContext.DestinationFiles = client.ListDirectory(".");
+                    _batchContext.DestinationFiles = client.ListDirectory(DestinationDirectoryWithMacrosExtended);
 
                     foreach (var file in files)
                     {
@@ -180,17 +195,24 @@ internal class FileTransporter
         catch (SshConnectionException ex)
         {
             userResultMessage = $"Error when establishing connection to the Server: {ex.Message}, {userResultMessage}";
+            _logger.NotifyError(_batchContext, userResultMessage, ex);
             return FormFailedFileTransferResult(userResultMessage);
         }
-        catch (SocketException)
+        catch (SocketException ex)
         {
             userResultMessage = $"Unable to establish the socket: No such host is known. {userResultMessage}";
+            _logger.NotifyError(_batchContext, userResultMessage, ex);
             return FormFailedFileTransferResult(userResultMessage);
         }
         catch (SshAuthenticationException ex)
         {
             userResultMessage = $"Authentication of SSH session failed: {ex.Message}, {userResultMessage}";
+            _logger.NotifyError(_batchContext, userResultMessage, ex);
             return FormFailedFileTransferResult(userResultMessage);
+        }
+        finally
+        {
+            CleanTempFiles(_batchContext);
         }
 
         return FormResultFromSingleTransferResults(_result);
@@ -306,10 +328,10 @@ internal class FileTransporter
         // create List of FileItems from found files.
         foreach (var file in files)
         {
-            if (Util.FileMatchesMask(Path.GetFileName(file), source.FileName))
+            if (Path.GetFileName(file).Equals(source.FileName) || Util.FileMatchesMask(Path.GetFileName(file), source.FileName))
             {
                 FileItem item = new FileItem(Path.GetFullPath(file));
-                _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath}");
+                _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath}.");
                 fileItems.Add(item);
             }
                     
@@ -320,7 +342,6 @@ internal class FileTransporter
 
     private static void CreateDestinationDirectories(SftpClient client, string path)
     {
-        var current = client.WorkingDirectory;
         // Consistent forward slashes
         foreach (string dir in path.Replace(@"\", "/").Split('/'))
         {
@@ -330,7 +351,6 @@ internal class FileTransporter
                 {
                     client.CreateDirectory(dir);
                     client.ChangeDirectory(dir);
-                    current = client.WorkingDirectory;
                 }
             }
         }
@@ -376,18 +396,10 @@ internal class FileTransporter
 
         _logger.LogBatchFinished(_batchContext, userResultMessage, success, actionSkipped);
 
-        var transferErrors = singleResults.Where(r => !r.Success).GroupBy(r => r.TransferredFile ?? "--unknown--")
+        var transferErrors = singleResults.Where(r => r.ErrorMessages.Any()).GroupBy(r => r.TransferredFile ?? "--unknown--")
                 .ToDictionary(rg => rg.Key, rg => (IList<string>)rg.SelectMany(r => r.ErrorMessages).ToList());
 
         var transferredFileResults = singleResults.Where(r => r.Success && !r.ActionSkipped).ToList();
-
-        var fileNames = from result in singleResults
-                        where result.Success
-                        select result.TransferredFile;
-
-        var filePaths = from result in singleResults
-                        where result.Success
-                        select result.TransferredFilePath;
 
         return new FileTransferResult {
             ActionSkipped = actionSkipped,
@@ -414,13 +426,12 @@ internal class FileTransporter
         var errorMessages = results.SelectMany(x => x.ErrorMessages).ToList();
         if (errorMessages.Any())
             userResultMessage = MessageJoin(userResultMessage,
-                string.Format("{0} Errors: {1}", errorMessages.Count, string.Join(", ", errorMessages)));
+                $"{errorMessages.Count} Errors: {string.Join(", \n", errorMessages)}.");
 
-        var transferredFiles = results.Select(x => x.TransferredFile).Where(x => x != null).ToList();
+        var transferredFiles = results.Where(x => x.Success).Select(x => x.TransferredFile).ToList();
         if (transferredFiles.Any())
             userResultMessage = MessageJoin(userResultMessage,
-                string.Format("{0} files transferred: {1}", transferredFiles.Count,
-                    string.Join(", ", transferredFiles)));
+                $"{transferredFiles.Count} files transferred: {string.Join(", ", transferredFiles)}.");
         else
             userResultMessage = MessageJoin(userResultMessage, "No files transferred.");
 
@@ -447,7 +458,7 @@ internal class FileTransporter
 
         if (context.Source.FilePaths == null)
             msg =
-                $"No source files found from directory '{source.Directory}' with file mask '{source.FileName}' for transfer '{transferName}'";
+                $"No source files found from directory '{SourceDirectoryWithMacrosExtended}' with file mask '{source.FileName}' for transfer '{transferName}'";
         else
             msg =
                 $"No source files found from FilePaths '{string.Join(", ", context.Source.FilePaths)}' for transfer '{transferName}'";
@@ -465,6 +476,25 @@ internal class FileTransporter
             default:
                 throw new Exception("Unknown operation in NoSourceOperation");
         }
+    }
+
+    private void CleanTempFiles(BatchContext context)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(context.TempWorkDir) && Directory.Exists(context.TempWorkDir))
+                Directory.Delete(context.TempWorkDir, true);
+        }
+        catch (Exception ex)
+        {
+            _logger.NotifyError(context, "Temp workdir cleanup failed.", ex);
+        }
+    }
+
+    private void SetCurrentState(TransferState state, string msg)
+    {
+        State = state;
+        _logger.NotifyTrace($"{state}: {msg}");
     }
 
     #endregion

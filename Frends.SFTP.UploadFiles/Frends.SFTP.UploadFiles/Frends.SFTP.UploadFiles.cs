@@ -138,6 +138,7 @@ public class SFTP
             _batchContext = new BatchContext
             {
                 Info = info,
+                TempWorkDir = InitializeTemporaryWorkPath(info.WorkDir),
                 Options = options,
                 InstanceId = executionId,
                 ServiceId = info.TransferName,
@@ -162,6 +163,22 @@ public class SFTP
 
             return new Result(result);
         }
+    }
+
+    private static string InitializeTemporaryWorkPath(string workDir)
+    {
+        var tempWorkDir = GetTemporaryWorkPath(workDir);
+        Directory.CreateDirectory(tempWorkDir);
+        return tempWorkDir;
+    }
+
+    private static string GetTemporaryWorkPath(string workDir)
+    {
+        var tempWorkDirBase = workDir;
+
+        if (string.IsNullOrEmpty(workDir)) tempWorkDirBase = Path.GetTempPath();
+
+        return Path.Combine(tempWorkDirBase, Path.GetRandomFileName());
     }
 
     /// <summary>

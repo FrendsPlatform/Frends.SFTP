@@ -12,9 +12,9 @@ internal static class Helpers
     /// <summary>
     /// Test credentials for docker server.
     /// </summary>
-    private static string _dockerAddress = "localhost";
-    private static string _dockerUsername = "foo";
-    private static string _dockerPassword = "pass";
+    readonly static string _dockerAddress = "localhost";
+    readonly static string _dockerUsername = "foo";
+    readonly static string _dockerPassword = "pass";
 
     internal static Connection GetSftpConnection()
     {
@@ -37,7 +37,7 @@ internal static class Helpers
     {
         var year = DateTime.Now.Year.ToString();
         var dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/testfolder_" + year);
-        if (Directory.Exists(year))
+        if (Directory.Exists(dir))
             Directory.Delete(dir, true);
     }
 
@@ -99,6 +99,17 @@ internal static class Helpers
         }
     }
 
+    internal static string GetLastWriteTimeFromDestination(string path)
+    {
+        using (var sftp = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+        {
+            sftp.Connect();
+            var date = sftp.GetLastWriteTime(path);
+            sftp.Disconnect();
+            return date.ToString();
+        }
+    }
+
     internal static void DeleteDirectory(SftpClient client, string dir)
     {
             
@@ -107,17 +118,28 @@ internal static class Helpers
             if ((file.Name != ".") && (file.Name != ".."))
             {
                 if (file.IsDirectory)
-                {
                     DeleteDirectory(client, file.FullName);
-                }
                 else
-                {
                     client.DeleteFile(file.FullName);
-                }
             }
         }
         if (client.Exists(dir))
             client.DeleteDirectory(dir);
+    }
+
+    internal static void UploadSingleTestFile(string dir, string pathToFile)
+    {
+        var path = dir + "/" + Path.GetFileName(pathToFile);
+        using (var sftp = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+        {
+            sftp.Connect();
+            if (!sftp.Exists(dir)) sftp.CreateDirectory(dir);
+            using (var fs = File.Open(pathToFile, FileMode.Open))
+            {
+                sftp.UploadFile(fs, path);
+            }
+            sftp.Disconnect();
+        }
     }
 }
 
