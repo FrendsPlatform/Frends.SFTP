@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.0.2] - 2022-08-10
+### Fixed
+- Fixed issue where when using Rename options and appending / overwrite the task would throw an exception because the work directory given by user was used with renaming destination file.
+
 ## [2.0.1] - 2022-07-18
 ### Fixed
 - Fixed issue with task throwing exception when no source files found and source action info or ignore selected.

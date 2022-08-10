@@ -106,7 +106,7 @@ internal class SingleFileTransfer
         else
             SourceFileDuringTransfer = SourceFile.FullPath;
 
-        SetCurrentState(TransferState.GetFile, $"Downloading source file {Path.GetFileName(SourceFileDuringTransfer)} to local temp file {WorkFileInfo.WorkFilePath}");
+        SetCurrentState(TransferState.GetFile, $"Downloading temporary source file {Path.GetFileName(SourceFileDuringTransfer)} to local temp folder {WorkFileInfo.WorkFileDir}");
         using (var fs = File.Open(Path.Combine(WorkFileInfo.WorkFileDir, Path.GetFileName(SourceFileDuringTransfer)), FileMode.Create))
         {
             Client.DownloadFile(SourceFileDuringTransfer, fs);
@@ -177,8 +177,7 @@ internal class SingleFileTransfer
         }
         else
         {
-            var path = (!string.IsNullOrEmpty(BatchContext.Info.WorkDir)) ? BatchContext.Info.WorkDir : Path.GetDirectoryName(DestinationFile.FullPath);
-            DestinationFileDuringTransfer = Path.Combine(path, Util.CreateUniqueFileName());
+            DestinationFileDuringTransfer = Path.Combine(Path.GetDirectoryName(DestinationFile.FullPath), Util.CreateUniqueFileName());
             SetCurrentState(TransferState.RenameDestinationFile, $"Renaming destination file {DestinationFile.Name} to temporary file name {Path.GetFileName(DestinationFileDuringTransfer)} during transfer.");
             File.Move(DestinationFile.FullPath, DestinationFileDuringTransfer);
             _logger.NotifyInformation(BatchContext, $"FILE RENAME: Destination file {DestinationFile.Name} renamed to target {Path.GetFileName(DestinationFileDuringTransfer)}.");
@@ -189,17 +188,12 @@ internal class SingleFileTransfer
     {
         SetCurrentState(
             TransferState.AppendToDestinationFile,
-            $"Appending file {SourceFile.Name} to existing file {DestinationFile.Name}.");
-
-        // Determine path to use to the destination file.
-        var path = (BatchContext.Destination.Directory.Contains('/'))
-            ? BatchContext.Destination.Directory + "/"
-            : BatchContext.Destination.Directory;
+            $"Appending file {Path.GetFileName(SourceFileDuringTransfer)} to existing file {DestinationFile.Name}.");
 
         // If destination rename during transfer is enabled, use that instead 
-        path = (!string.IsNullOrEmpty(DestinationFileDuringTransfer)) 
-            ? Path.Combine(path, Path.GetFileName(DestinationFileDuringTransfer))
-            : Path.Combine(path, DestinationFile.Name);
+        var path = (!string.IsNullOrEmpty(DestinationFileDuringTransfer)) 
+            ? DestinationFileDuringTransfer
+            : DestinationFile.FullPath;
 
         File.AppendAllLines(path, content, encoding);
         _logger.NotifyInformation(BatchContext, $"FILE APPEND: Source file appended to target {DestinationFile.Name}.");
@@ -371,13 +365,14 @@ internal class SingleFileTransfer
 
     private void CleanUpFiles()
     {
-        SetCurrentState(TransferState.CleanUpFiles, $"Checking if temporary source file {WorkFileInfo.WorkFilePath} exists.");
-        var exists = !string.IsNullOrEmpty(WorkFileInfo.WorkFilePath) && File.Exists(WorkFileInfo.WorkFilePath);
-        _logger.NotifyInformation(BatchContext, $"FILE EXISTS {WorkFileInfo.WorkFilePath}: {exists}");
+        var temporarySourceFile = Path.Combine(WorkFileInfo.WorkFileDir, Path.GetFileName(SourceFileDuringTransfer));
+        SetCurrentState(TransferState.CleanUpFiles, $"Checking if temporary source file {temporarySourceFile} exists.");
+        var exists = !string.IsNullOrEmpty(temporarySourceFile) && File.Exists(temporarySourceFile);
+        _logger.NotifyInformation(BatchContext, $"FILE EXISTS {temporarySourceFile}: {exists}");
         if (exists)
         {
-            SetCurrentState(TransferState.CleanUpFiles, $"Removing temporary source file {WorkFileInfo.WorkFilePath}.");
-            TryToRemoveLocalTempFile(WorkFileInfo.WorkFilePath);
+            SetCurrentState(TransferState.CleanUpFiles, $"Removing temporary source file {temporarySourceFile}.");
+            TryToRemoveLocalTempFile(temporarySourceFile);
         }
 
         exists = !string.IsNullOrEmpty(DestinationFileDuringTransfer) && File.Exists(DestinationFileDuringTransfer) && BatchContext.Options.RenameDestinationFileDuringTransfer;
