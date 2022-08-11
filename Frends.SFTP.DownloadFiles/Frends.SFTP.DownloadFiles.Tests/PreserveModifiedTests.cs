@@ -22,9 +22,9 @@ class PreserveModifiedTests : DownloadFilesTestBase
         destination = new Destination
         {
             Directory = Path.Combine(_workDir, "destination"),
-            Action = DestinationAction.Overwrite,
             FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
+            EnableBomForFileName = true,
+            Action = DestinationAction.Overwrite,
         };
 
         options = new Options

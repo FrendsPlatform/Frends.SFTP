@@ -79,7 +79,7 @@ class SourceOperationTests : DownloadFilesTestBase
 
         var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
         Assert.IsFalse(result.Success);
-        Assert.IsTrue(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
+        Assert.IsTrue(Helpers.SourceFileExists(Path.Combine(_source.Directory, _source.FileName).Replace("\\", "/")));
     }
 
     [Test]

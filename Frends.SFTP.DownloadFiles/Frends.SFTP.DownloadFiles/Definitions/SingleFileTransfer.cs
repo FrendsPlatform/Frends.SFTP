@@ -17,6 +17,7 @@ internal class SingleFileTransfer
         FileTransferStartTime = DateTime.UtcNow;
         Client = client;
         SourceFile = file;
+        WorkFile = file;
         BatchContext = context;
 
         DestinationFileWithMacrosExpanded = Path.Combine(
@@ -32,6 +33,8 @@ internal class SingleFileTransfer
     public DateTime FileTransferStartTime { get; set; }
 
     public WorkFileInfo WorkFileInfo { get; set; }
+
+    public FileItem WorkFile { get; set; }
 
     public SftpClient Client { get; set; }
 
@@ -328,9 +331,9 @@ internal class SingleFileTransfer
                 _logger.NotifyError(BatchContext, msg, new ArgumentException("Failure in moving the source file."));
                 _result.ErrorMessages.Add($"Failure in source operation: {msg}");
             }
-            var destFileName = moveToPath.Contains("/")
-                ? moveToPath + "/" + SourceFile.Name
-                : Path.Combine(moveToPath, SourceFile.Name);
+            var destFileName = Path.Combine(moveToPath, SourceFile.Name);
+            if (Client.Exists(destFileName)) throw new Exception($"Failure in source operation: File {Path.GetFileName(destFileName)} exists in move to directory.");
+            destFileName = (moveToPath.Contains("/")) ? destFileName.Replace("\\", "/") : destFileName;
 
             file.MoveTo(destFileName);
             if (!Client.Exists(destFileName)) throw new Exception($"Failure in source operation: Failure in moving the source file.");
@@ -358,7 +361,10 @@ internal class SingleFileTransfer
                 _result.ErrorMessages.Add($"Failure in source operation: {msg}");
             }
 
-            if (SourceFile.FullPath == null)
+            var file = Client.Get(rename);
+            WorkFile = new FileItem(file);
+
+            if (WorkFile.FullPath == null)
                 _logger.NotifyInformation(BatchContext, "Source end point returned null as the renamed file. It should return the name of the renamed file.");
         }
     }
@@ -451,7 +457,10 @@ internal class SingleFileTransfer
             {
                 if (ShouldSourceFileBeRestoredOnError())
                 {
-                    Client.RenameFile(SourceFileDuringTransfer, SourceFile.FullPath);
+                    if (BatchContext.Source.Operation == SourceOperation.Move)
+                        RestoreSourceFileIfItWasMoved();
+                    if (!Path.GetFileName(WorkFile.Name).Equals(SourceFile.Name) || !SourceFileDuringTransfer.Equals(SourceFile.FullPath)) 
+                        Client.RenameFile(SourceFileDuringTransfer, SourceFile.FullPath);
                     return "[Source file restored.]";
                 }
             }
@@ -465,6 +474,27 @@ internal class SingleFileTransfer
         }
 
         return string.Empty;
+    }
+
+    private void RestoreSourceFileIfItWasMoved()
+    {
+        var filePath = _renamingPolicy.ExpandDirectoryForMacros(BatchContext.Source.DirectoryToMoveAfterTransfer);
+
+        var destFileName = Path.Combine(filePath, SourceFile.Name);
+        destFileName = (filePath.Contains('/')) ? destFileName.Replace("\\", "/") : destFileName;
+
+        if (!Client.Exists(destFileName)) return;
+
+        var file = Client.Get(destFileName);
+
+        var restorePath = Path.Combine(BatchContext.Source.Directory, SourceFile.Name);
+        restorePath = (BatchContext.Source.Directory.Contains('/')) ? restorePath.Replace("\\", "/") : restorePath;
+
+        file.MoveTo(restorePath);
+
+        var path = file.FullName;
+
+        if (!Client.Exists(path)) throw new ArgumentException("Failure in restoring moved source file.");
     }
 
     private string RestoreDestinationFileAfterErrorIfItWasRenamed()

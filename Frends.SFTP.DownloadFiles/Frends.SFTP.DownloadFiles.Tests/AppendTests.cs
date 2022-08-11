@@ -22,9 +22,11 @@ class AppendTests : DownloadFilesTestBase
         {
             Directory = _destWorkDir,
             FileName = _source.FileName,
-            Action = DestinationAction.Append,
             FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
+            EnableBomForFileName = true,
+            Action = DestinationAction.Append,
+            FileContentEncoding = FileEncoding.UTF8,
+            EnableBomForContent = true
         };
 
         var source = new Source
@@ -32,7 +34,7 @@ class AppendTests : DownloadFilesTestBase
             Directory = "/upload/Upload",
             FileName = "SFTPDownloadTestFile2.txt",
             Action = SourceAction.Error,
-            Operation = SourceOperation.Nothing
+            Operation = SourceOperation.Nothing,
         };
 
         var result = SFTP.DownloadFiles(source, destination, _connection, _options, _info, new CancellationToken());
@@ -60,10 +62,13 @@ class AppendTests : DownloadFilesTestBase
         var destination = new Destination
         {
             Directory = _destWorkDir,
-            Action = DestinationAction.Append,
             FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
+            EnableBomForFileName = true,
+            Action = DestinationAction.Append,
+            FileContentEncoding = FileEncoding.UTF8,
+            EnableBomForContent = true
         };
+
         var result = SFTP.DownloadFiles(_source, destination, _connection, options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);
         var content1 = File.ReadAllText(Path.Combine(destination.Directory, _source.FileName));
@@ -93,9 +98,11 @@ class AppendTests : DownloadFilesTestBase
         var destination = new Destination
         {
             Directory = _destWorkDir,
-            Action = DestinationAction.Append,
             FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
+            EnableBomForFileName = true,
+            Action = DestinationAction.Append,
+            FileContentEncoding = FileEncoding.UTF8,
+            EnableBomForContent = true
         };
         var result = SFTP.DownloadFiles(_source, destination, _connection, options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);
@@ -126,9 +133,11 @@ class AppendTests : DownloadFilesTestBase
         var destination = new Destination
         {
             Directory = _destWorkDir,
-            Action = DestinationAction.Append,
             FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
+            EnableBomForFileName = true,
+            Action = DestinationAction.Append,
+            FileContentEncoding = FileEncoding.UTF8,
+            EnableBomForContent = true
         };
         var result = SFTP.DownloadFiles(_source, destination, _connection, options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);
@@ -159,9 +168,11 @@ class AppendTests : DownloadFilesTestBase
         var destination = new Destination
         {
             Directory = _destWorkDir,
-            Action = DestinationAction.Append,
             FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
+            EnableBomForFileName = true,
+            Action = DestinationAction.Append,
+            FileContentEncoding = FileEncoding.UTF8,
+            EnableBomForContent = true
         };
 
         var result = SFTP.DownloadFiles(_source, destination, _connection, options, _info, new CancellationToken());
@@ -193,9 +204,11 @@ class AppendTests : DownloadFilesTestBase
         var destination = new Destination
         {
             Directory = _destWorkDir,
-            Action = DestinationAction.Append,
             FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
+            EnableBomForFileName = true,
+            Action = DestinationAction.Append,
+            FileContentEncoding = FileEncoding.UTF8,
+            EnableBomForContent = true
         };
 
         var source = new Source

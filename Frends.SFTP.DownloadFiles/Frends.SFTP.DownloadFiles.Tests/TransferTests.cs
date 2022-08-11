@@ -67,8 +67,6 @@ class TransferTests : DownloadFilesTestBase
         {
             Directory = Path.Combine(_destWorkDir, "another\\folder"),
             Action = DestinationAction.Error,
-            FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
         };
 
         var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
@@ -93,9 +91,9 @@ class TransferTests : DownloadFilesTestBase
         var destination = new Destination
         {
             Directory = _destWorkDir,
-            Action = DestinationAction.Error,
             FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
+            EnableBomForFileName = true,
+            Action = DestinationAction.Error,
         };
 
         var options = new Options
@@ -192,8 +190,6 @@ class TransferTests : DownloadFilesTestBase
         {
             Directory = Path.Combine(_workDir, "destination"),
             Action = DestinationAction.Overwrite,
-            FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
         };
 
         var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
@@ -212,8 +208,6 @@ class TransferTests : DownloadFilesTestBase
         {
             Directory = Path.Combine(_workDir, "destination"),
             Action = DestinationAction.Overwrite,
-            FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
         };
 
         var options = new Options
@@ -283,6 +277,24 @@ class TransferTests : DownloadFilesTestBase
 
         var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
         Assert.IsTrue(result.ActionSkipped);
+    }
+
+    [Test]
+    public void DownloadFiles_TestNoSourceShouldNotCreateOperationsLogWhenSourceActionIsIgnore()
+    {
+        Directory.CreateDirectory(_destWorkDir);
+
+        var source = new Source
+        {
+            Directory = "/upload/",
+            FileName = _source.FileName,
+            Action = SourceAction.Ignore,
+            Operation = SourceOperation.Nothing,
+        };
+
+        var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(0, result.OperationsLog.Count);
     }
 }
 
