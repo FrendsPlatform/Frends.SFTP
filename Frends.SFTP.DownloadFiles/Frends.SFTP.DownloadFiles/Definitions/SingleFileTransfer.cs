@@ -429,9 +429,7 @@ internal class SingleFileTransfer
             if (FileDefinedAndExists(filePath))
             {
                 if ((File.GetAttributes(filePath) & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
-                {
                     File.SetAttributes(filePath, FileAttributes.Normal);
-                }
                 File.Delete(filePath);
                 _logger.NotifyInformation(BatchContext, $"FILE DELETE: Temporary source file {filePath} removed.");
             }
