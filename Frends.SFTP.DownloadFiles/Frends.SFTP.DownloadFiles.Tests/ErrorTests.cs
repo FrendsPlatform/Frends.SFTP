@@ -84,4 +84,74 @@ class ErrorTests : DownloadFilesTestBase
         Assert.That(ex.Message.Contains($"Operation failed: Source file {_source.FileName} couldn't be moved to given directory {source.DirectoryToMoveAfterTransfer} because the directory didn't exist."));
         Assert.IsTrue(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
     }
+
+    [Test]
+    public void DownloadFiles_TestThrowsSourceMoveToDestinationFileExists()
+    {
+        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
+        Directory.CreateDirectory(_destWorkDir);
+        Helpers.CreateSubDirectory("/upload/uploaded");
+        File.Copy(Path.Combine(_workDir, _source.FileName), Path.Combine(_destWorkDir, _source.FileName));
+
+        var options = new Options
+        {
+            ThrowErrorOnFail = false,
+            RenameSourceFileBeforeTransfer = false,
+            RenameDestinationFileDuringTransfer = true,
+            CreateDestinationDirectories = true,
+            PreserveLastModified = false,
+            OperationLog = true
+        };
+
+        var source = new Source
+        {
+            Directory = _source.Directory,
+            FileName = _source.FileName,
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Move,
+            DirectoryToMoveAfterTransfer = "/upload/uploaded/"
+        };
+
+        var destination = new Destination
+        {
+            Directory = _destWorkDir,
+            FileNameEncoding = FileEncoding.UTF8,
+            EnableBomForFileName = true,
+            Action = DestinationAction.Error,
+        };
+
+        var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(source, destination, _connection, _options, _info, new CancellationToken()));
+        Assert.That(ex.Message.StartsWith($"SFTP transfer failed: 1 Errors: Failure in CheckIfDestination"));
+        Assert.IsTrue(Helpers.SourceFileExists(Path.Combine(_source.Directory, _source.FileName).Replace("\\", "/")));
+    }
+
+    [Test]
+    public void DownloadFiles_TestThrowsSourceMoveToDestinationFileExistsWithRenameSourceFileBeforeTransfer()
+    {
+        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
+        Directory.CreateDirectory(_destWorkDir);
+        Helpers.CreateSubDirectory("/upload/uploaded");
+        File.Copy(Path.Combine(_workDir, _source.FileName), Path.Combine(_destWorkDir, _source.FileName));
+
+        var source = new Source
+        {
+            Directory = _source.Directory,
+            FileName = _source.FileName,
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Move,
+            DirectoryToMoveAfterTransfer = "/upload/uploaded/"
+        };
+
+        var destination = new Destination
+        {
+            Directory = _destWorkDir,
+            FileNameEncoding = FileEncoding.UTF8,
+            EnableBomForFileName = true,
+            Action = DestinationAction.Error,
+        };
+
+        var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(source, destination, _connection, _options, _info, new CancellationToken()));
+        Assert.That(ex.Message.StartsWith($"SFTP transfer failed: 1 Errors: Failure in CheckIfDestination"));
+        Assert.IsTrue(Helpers.SourceFileExists(Path.Combine(_source.Directory, _source.FileName).Replace("\\", "/")));
+    }
 }

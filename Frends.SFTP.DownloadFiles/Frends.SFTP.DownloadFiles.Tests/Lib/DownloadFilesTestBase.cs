@@ -59,15 +59,18 @@ public class DownloadFilesTestBase
     [TearDown]
     public void TearDown()
     {
-        using (var sftp = new SftpClient(_connection.Address, _connection.Port, _connection.UserName, _connection.Password))
+        try
         {
-            sftp.Connect();
-            if (sftp.Exists(_source.Directory))
+            using (var sftp = new SftpClient(_connection.Address, _connection.Port, _connection.UserName, _connection.Password))
             {
-                Helpers.DeleteDirectory(sftp, _source.Directory);
+                sftp.Connect();
+                if (sftp.Exists(_source.Directory))
+                    Helpers.DeleteDirectory(sftp, "/upload/");
+                sftp.Disconnect();
             }
-            sftp.Disconnect();
-                
+        } catch (Exception) { throw; }
+        finally
+        {
             if (Directory.Exists(_destWorkDir))
                 Directory.Delete(_destWorkDir, true);
         }

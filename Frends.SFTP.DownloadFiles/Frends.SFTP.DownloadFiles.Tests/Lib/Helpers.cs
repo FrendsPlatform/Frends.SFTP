@@ -16,6 +16,7 @@ internal static class Helpers
     readonly static string _dockerAddress = "localhost";
     readonly static string _dockerUsername = "foo";
     readonly static string _dockerPassword = "pass";
+    readonly static string _baseDir = "/upload/";
 
     internal static Connection GetSftpConnection()
     {
@@ -75,7 +76,7 @@ internal static class Helpers
                 else client.DeleteFile(file.FullName);
             }
         }
-        if (client.Exists(dir)) client.DeleteDirectory(dir);
+        if (client.Exists(dir) && !dir.Equals(_baseDir)) client.DeleteDirectory(dir);
     }
 
     internal static void UploadTestFiles(List<string> paths, string destination, string to = null)
@@ -100,8 +101,6 @@ internal static class Helpers
 
     internal static void CreateSourceDirectories(SftpClient client, string path)
     {
-
-        var current = client.WorkingDirectory;
         // Consistent forward slashes
         foreach (string dir in path.Replace(@"\", "/").Split('/'))
         {
@@ -111,7 +110,6 @@ internal static class Helpers
                 {
                     client.CreateDirectory(dir);
                     client.ChangeDirectory(dir);
-                    current = client.WorkingDirectory;
                 }
             }
         }
@@ -144,7 +142,8 @@ internal static class Helpers
         using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
         {
             client.Connect();
-            client.CreateDirectory(path);
+            if (!client.Exists(path))
+                client.CreateDirectory(path);
             client.Disconnect();
         }
     }

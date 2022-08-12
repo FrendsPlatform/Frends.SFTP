@@ -15,6 +15,8 @@ internal class SingleFileTransferResult
 
     internal string TransferredFilePath { get; set; }
 
+    internal bool EnableOperationsLog { get; set; } = true;
+
     internal SingleFileTransferResult()
     {
         ErrorMessages = new List<string>();

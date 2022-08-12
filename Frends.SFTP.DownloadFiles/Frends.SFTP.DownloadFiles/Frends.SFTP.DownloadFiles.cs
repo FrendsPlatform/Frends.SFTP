@@ -147,7 +147,9 @@ public class SFTP
                 throw new Exception($"SFTP transfer failed: {result.UserResultMessage}. " +
                                     $"Latest operations: \n{GetLogLines(transferSink.GetBufferedLogMessages())}.");
 
-            if (options.OperationLog)
+            if (result.OperationsLog == null)
+                result.OperationsLog = new Dictionary<string, string>();
+            else if (options.OperationLog)
                 result.OperationsLog = GetLogDictionary(transferSink.GetBufferedLogMessages());
 
             return new Result(result);

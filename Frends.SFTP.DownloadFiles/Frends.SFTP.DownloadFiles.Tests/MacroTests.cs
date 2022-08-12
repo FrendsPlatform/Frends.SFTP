@@ -20,8 +20,6 @@ internal class MacroTests : DownloadFilesTestBase
             Directory = _destination.Directory,
             FileName = "%SourceFileName%%Date%%SourceFileExtension%",
             Action = DestinationAction.Error,
-            FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
         };
 
         var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
@@ -58,9 +56,9 @@ internal class MacroTests : DownloadFilesTestBase
         {
             Directory = Path.Combine(_destWorkDir, "test%Year%"),
             FileName = "",
-            Action = DestinationAction.Error,
             FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
+            EnableBomForFileName = true,
+            Action = DestinationAction.Error,
         };
 
         var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());

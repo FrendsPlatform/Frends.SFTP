@@ -132,6 +132,7 @@ internal class FileTransporter
                 if (!success)
                 {
                     userResultMessage = $"Directory '{SourceDirectoryWithMacrosExtended}' doesn't exists.";
+                    _logger.NotifyInformation(_batchContext, userResultMessage);
                     return FormFailedFileTransferResult(userResultMessage);
                 }
 
@@ -386,7 +387,7 @@ internal class FileTransporter
             TransferredFileNames = transferredFileResults.Select(r => r.TransferredFile ?? "--unknown--").ToList(),
             TransferErrors = transferErrors,
             TransferredFilePaths = transferredFileResults.Select(r => r.TransferredFilePath ?? "--unknown--").ToList(),
-            OperationsLog = new Dictionary<string, string>() 
+            OperationsLog = (singleResults.Any(x => !x.EnableOperationsLog)) ? null : new Dictionary<string, string>() 
         };
     }
 
@@ -448,7 +449,7 @@ internal class FileTransporter
                 _logger.NotifyInformation(context, msg);
                 return new SingleFileTransferResult { Success = true, ActionSkipped = true, ErrorMessages = { msg } };
             case SourceAction.Ignore:
-                return new SingleFileTransferResult { Success = true, ActionSkipped = true, ErrorMessages = { msg } };
+                return new SingleFileTransferResult { Success = true, ActionSkipped = true, ErrorMessages = { msg }, EnableOperationsLog = false };
             default:
                 throw new Exception("Unknown operation in NoSourceOperation.");
         }

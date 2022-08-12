@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.2] - 2022-08-10
+### Fixed
+- Fixed issue where when using Rename options and appending / overwrite the task would throw an exception because the work directory given by user was used with renaming destination file.
+- Added error message if a file with the same name as source file exists in DirectoryToMoveAfterTransfer.
+- Fixed issue where when using SourceOperation.Move the source file cannot be restored when exception occurs.  
+- Fixed issue that if SourceOperation is ignore and no source files were found no operations log is created.
+- Removed FileEncoding UTF-16 which was not implemented and threw exception if selected.
+
 ## [2.0.1] - 2022-07-18
 ### Fixed
 - Fixed issue with task throwing exception when no source files found and source action info or ignore selected.
