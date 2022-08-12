@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using System.IO;
-using System;
 using System.Threading;
 using System.Collections.Generic;
 using Frends.SFTP.DownloadFiles.Definitions;

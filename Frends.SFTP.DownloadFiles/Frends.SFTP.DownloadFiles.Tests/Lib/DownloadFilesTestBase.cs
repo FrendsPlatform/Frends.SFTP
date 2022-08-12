@@ -65,9 +65,7 @@ public class DownloadFilesTestBase
             {
                 sftp.Connect();
                 if (sftp.Exists(_source.Directory))
-                {
                     Helpers.DeleteDirectory(sftp, "/upload/");
-                }
                 sftp.Disconnect();
             }
         } catch (Exception) { throw; }

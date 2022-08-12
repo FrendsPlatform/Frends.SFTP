@@ -101,8 +101,6 @@ internal static class Helpers
 
     internal static void CreateSourceDirectories(SftpClient client, string path)
     {
-
-        var current = client.WorkingDirectory;
         // Consistent forward slashes
         foreach (string dir in path.Replace(@"\", "/").Split('/'))
         {
@@ -112,7 +110,6 @@ internal static class Helpers
                 {
                     client.CreateDirectory(dir);
                     client.ChangeDirectory(dir);
-                    current = client.WorkingDirectory;
                 }
             }
         }

@@ -202,7 +202,7 @@ internal class SingleFileTransfer
         _logger.NotifyInformation(BatchContext, $"FILE APPEND: Source file appended to target {DestinationFile.Name}.");
     }
 
-    private string[] GetSourceFileContent(string filePath, Encoding encoding)
+    private static string[] GetSourceFileContent(string filePath, Encoding encoding)
     {
         var result = new List<string>();
         result.Add("\n");
@@ -442,7 +442,7 @@ internal class SingleFileTransfer
         }
     }
 
-    private bool FileDefinedAndExists(string path)
+    private static bool FileDefinedAndExists(string path)
     {
         return !string.IsNullOrEmpty(path) && File.Exists(path);
     }
