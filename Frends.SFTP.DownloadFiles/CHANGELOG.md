@@ -4,6 +4,7 @@
 ### Fixed
 - Fixed issue with server fingerprint given by user in hex format was not accepted.
 - Fixed issue when using invalid server fingerprint in MD5 string format throws wrong error message.
+- Fixed issue that Sha256 was only accepted in Base64 format.
 - Added support for Sha1 based server fingerprints.
 
 ## [2.0.2] - 2022-08-10
