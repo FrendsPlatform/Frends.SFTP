@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.3] - 2022-08-19
+### Fixed
+- Fixed issue with server fingerprint given by user in hex format was not accepted.
+- Fixed issue when using invalid server fingerprint in MD5 string format throws wrong error message.
+- Added support for Sha1 based server fingerprints.
+
 ## [2.0.2] - 2022-08-10
 ### Fixed
 - Fixed issue where when using Rename options and appending / overwrite the task would throw an exception because the work directory given by user was used with renaming destination file.
