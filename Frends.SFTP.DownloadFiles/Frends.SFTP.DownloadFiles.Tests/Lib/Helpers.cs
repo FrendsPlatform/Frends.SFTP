@@ -141,106 +141,56 @@ internal static class Helpers
         }
     }
 
-    internal static string GetServerFingerprintAsMD5HexString()
+    internal static Tuple<byte[], byte[]> GetServerFingerPrintAndHostKey()
     {
-        var fingerprint = "";
+        Tuple<byte[], byte[]> result = null;
         using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
         {
             client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
             {
-                fingerprint = BitConverter.ToString(e.FingerPrint).Replace("-", ":");
+                result = new Tuple<byte[], byte[]>(e.FingerPrint, e.HostKey);
                 e.CanTrust = true;
             };
             client.Connect();
             client.Disconnect();
         }
-
-        return fingerprint;
+        return result;
     }
 
-    internal static string GetServerFingerprintAsSHA256Base64String()
+    internal static string ConvertToMD5Hex(byte[] fingerPrint)
+    {
+        return BitConverter.ToString(fingerPrint).Replace("-", ":");
+    }
+
+    internal static string ConvertToSHA256Hash(byte[] hostKey)
     {
         var fingerprint = "";
-        using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+        using (SHA256 mySHA256 = SHA256.Create())
         {
-            client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
-            {
-                using (SHA256 mySHA256 = SHA256.Create())
-                {
-                    fingerprint = Convert.ToBase64String(mySHA256.ComputeHash(e.HostKey));
-                }
-                e.CanTrust = true;
-            };
-            client.Connect();
-            client.Disconnect();
+            fingerprint = Convert.ToBase64String(mySHA256.ComputeHash(hostKey));
         }
-
         return fingerprint;
     }
 
-    internal static string GetServerFingerprintAsSHA256HexString()
+    internal static string ConvertToSHA256Hex(byte[] hostKey)
     {
         var fingerprint = "";
-        using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+        using (SHA256 mySHA256 = SHA256.Create())
         {
-            client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
-            {
-                using (SHA256 mySHA256 = SHA256.Create())
-                {
-                    fingerprint = ToHex(mySHA256.ComputeHash(e.HostKey));
-                }
-                e.CanTrust = true;
-            };
-            client.Connect();
-            client.Disconnect();
+            fingerprint = ToHex(mySHA256.ComputeHash(hostKey));
         }
-
         return fingerprint;
     }
 
-    internal static string GetServerFingerprintAsSHA1String()
+    internal static string ConvertToSHA1(byte[] hostKey)
     {
         var fingerprint = "";
-        using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+        using (var sha1 = SHA1.Create())
         {
-            client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
-            {
-                using (var sha1 = SHA1.Create())
-                {
-                    var hash = sha1.ComputeHash(e.HostKey);
-                    fingerprint = string.Concat(hash.Select(b => b.ToString("x2")));
-                }
-                e.CanTrust = true;
-            };
-            client.Connect();
-            client.Disconnect();
+            var hash = sha1.ComputeHash(hostKey);
+            fingerprint = string.Concat(hash.Select(b => b.ToString("x2")));
         }
-
         return fingerprint;
-    }
-
-    internal static string HexStringToB64String(string input)
-    {
-        return Convert.ToBase64String(ConvertHexStringToHex(input));
-    }
-
-    internal static byte[] ConvertHexStringToHex(string hex)
-    {
-        var arr = new byte[hex.Length / 2];
-        for (var i = 0; i < arr.Length; i++)
-        {
-            arr[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
-        }
-        return arr;
-    }
-
-    internal static string ConvertHexStringToBase64(string hexString)
-    {
-        Func<char, int> parseNybble = c => (c >= '0' && c <= '9') ? c - '0' : char.ToLower(c) - 'a' + 10;
-        var bytes = Enumerable.Range(0, hexString.Length / 2)
-            .Select(x => (byte)((parseNybble(hexString[x * 2]) << 4) | parseNybble(hexString[x * 2 + 1])))
-            .ToArray();
-        return Convert.ToBase64String(bytes);
     }
 
     internal static string ToHex(byte[] bytes)

@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Frends.SFTP.DownloadFiles.Definitions;
@@ -95,7 +96,25 @@ internal static class Util
             return false;
         }
 
-        return Regex.IsMatch(input, "^[0-9a-fA-f]{40}$");
+        return Regex.IsMatch(input, "^[0-9a-fA-F]{40}$");
+    }
+
+    internal static bool IsSha256(string input)
+    {
+        if (String.IsNullOrEmpty(input))
+        {
+            return false;
+        }
+
+        if (Regex.IsMatch(input, "^[0-9a-fA-F]{64}$"))
+            return true;
+
+        try
+        {
+            Convert.FromBase64String(input);
+            return true;
+        } 
+        catch { return false; }
     }
 }
 
