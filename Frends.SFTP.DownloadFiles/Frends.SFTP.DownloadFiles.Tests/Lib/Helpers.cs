@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Collections.Generic;
 using Renci.SshNet;
 using Renci.SshNet.Common;
+using Renci.SshNet.Security;
 using Frends.SFTP.DownloadFiles.Definitions;
 
 namespace Frends.SFTP.DownloadFiles.Tests;
@@ -146,6 +147,9 @@ internal static class Helpers
         Tuple<byte[], byte[]> result = null;
         using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
         {
+            client.ConnectionInfo.HostKeyAlgorithms.Clear();
+            client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) => { return new KeyHostAlgorithm("ssh-rsa", new RsaKey(), data); });
+
             client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
             {
                 result = new Tuple<byte[], byte[]>(e.FingerPrint, e.HostKey);

@@ -111,6 +111,8 @@ internal static class Util
 
         try
         {
+            if (!input.EndsWith("="))
+                input += '=';
             Convert.FromBase64String(input);
             return true;
         } 

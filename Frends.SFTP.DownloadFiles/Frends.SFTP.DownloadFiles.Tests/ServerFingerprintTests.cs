@@ -14,14 +14,12 @@ public class ServerFingerprintTests : DownloadFilesTestBase
     internal static string _MD5;
     internal static string _Sha256Hex;
     internal static string _Sha256Hash;
-    internal static string _Sha1;
 
     [OneTimeSetUp]
     public static void OneTimeSetup()
     {
         var (fingerPrint, hostKey) = Helpers.GetServerFingerPrintAndHostKey();
         _MD5 = Helpers.ConvertToMD5Hex(fingerPrint);
-        _Sha1 = Helpers.ConvertToSHA1(hostKey);
         _Sha256Hex = Helpers.ConvertToSHA256Hex(hostKey);
         _Sha256Hash = Helpers.ConvertToSHA256Hash(hostKey);
     }
@@ -31,6 +29,21 @@ public class ServerFingerprintTests : DownloadFilesTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.ServerFingerPrint = _Sha256Hex;
+
+        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
+
+        var result = SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
+        Assert.IsTrue(result.Success);
+        Assert.IsFalse(result.ActionSkipped);
+        Assert.AreEqual(1, result.SuccessfulTransferCount);
+    }
+
+    [Test]
+    public void DownloadFiles_TestTransferWithExpectedServerFingerprintAsHexSha256WithAltercations()
+    {
+        var connection = Helpers.GetSftpConnection();
+        connection.ServerFingerPrint = _Sha256Hash.Replace("=", "");
+        var test = connection.ServerFingerPrint;
 
         Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
 
@@ -55,10 +68,10 @@ public class ServerFingerprintTests : DownloadFilesTestBase
     }
 
     [Test]
-    public void DownloadFiles_TestTransferWithExpectedServerFingerprintAsSha1()
+    public void DownloadFiles_TestTransferWithExpectedServerFingerprintAsMD5()
     {
         var connection = Helpers.GetSftpConnection();
-        connection.ServerFingerPrint = _Sha1;
+        connection.ServerFingerPrint = _MD5;
 
         Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
 
@@ -69,10 +82,10 @@ public class ServerFingerprintTests : DownloadFilesTestBase
     }
 
     [Test]
-    public void DownloadFiles_TestTransferWithExpectedServerFingerprintAsMD5()
+    public void DownloadFiles_TestTransferWithExpectedServerFingerprintAsMD5ToLower()
     {
         var connection = Helpers.GetSftpConnection();
-        connection.ServerFingerPrint = _MD5;
+        connection.ServerFingerPrint = _MD5.ToLower();
 
         Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
 
@@ -124,7 +137,7 @@ public class ServerFingerprintTests : DownloadFilesTestBase
     public void DownloadFiles_TestThrowsTransferWithInvalidExpectedServerFingerprintAsSha256()
     {
         var connection = Helpers.GetSftpConnection();
-        connection.ServerFingerPrint = "FBQn5eyoxpAl33Ly0gyScCGAqZeMVsfY7qss3KOM/hY=";
+        connection.ServerFingerPrint = "nuDEsWN4tfEQ684+x+7RySiCwj+GXmX2CfBaBHeSqO8=";
 
         Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
 
@@ -133,15 +146,16 @@ public class ServerFingerprintTests : DownloadFilesTestBase
     }
 
     [Test]
-    public void DownloadFiles_TestThrowsTransferWithInvalidExpectedServerFingerprintAsSha1()
+    public void DownloadFiles_TestThrowsTransferWithInvalidExpectedServerFingerprint()
     {
         var connection = Helpers.GetSftpConnection();
-        connection.ServerFingerPrint = "f6b1fa0ac7d00c615c340c2f3c8db92d2fabe905";
+        connection.ServerFingerPrint = "nuDEsWN4tfEQ684x7RySiCwjGXmX2CfBaBHeSqO8vfiurenvire56";
 
         Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
 
         var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
         Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: Error when establishing connection to the Server: Key exchange negotiation failed.."));
+        Assert.That(ex.Message.Contains("Expected server fingerprint was given in unsupported format."));
     }
 }
 
