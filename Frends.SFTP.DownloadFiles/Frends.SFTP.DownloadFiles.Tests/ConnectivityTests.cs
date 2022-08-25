@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using NUnit.Framework;
+using System.Net.Sockets;
 using Frends.SFTP.DownloadFiles.Definitions;
 
 namespace Frends.SFTP.DownloadFiles.Tests;
@@ -41,48 +42,6 @@ public class ConnectivityTests : DownloadFilesTestBase
 
         var result = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
         Assert.That(result.Message.StartsWith("SFTP transfer failed: Authentication of SSH session failed: Permission denied (password)"));
-    }
-
-    [Test]
-    public void DownloadFiles_TestTransferWithMD5ServerFingerprint()
-    {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
-        var connection = Helpers.GetSftpConnection();
-        connection.ServerFingerPrint = Helpers.GetServerFingerprintAsMD5String();
-
-        var source = new Source
-        {
-            Directory = _source.Directory,
-            FileName = _source.FileName,
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Nothing
-        };
-
-        var result = SFTP.DownloadFiles(source, _destination, connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
-    }
-
-    [Test]
-    public void DownloadFiles_TestTransferWithSHA256ServerFingerprint()
-    {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
-        var connection = Helpers.GetSftpConnection();
-        connection.ServerFingerPrint = Helpers.GetServerFingerprintAsSHA256String();
-
-        var source = new Source
-        {
-            Directory = _source.Directory,
-            FileName = _source.FileName,
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Nothing
-        };
-
-        var result = SFTP.DownloadFiles(source, _destination, connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
     }
 
     [Test]

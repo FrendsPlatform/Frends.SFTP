@@ -89,7 +89,8 @@ public class Connection
     /// <summary>
     /// Fingerprint of the SFTP server. When using "Username-Password" 
     /// authentication it is recommended to use server fingerprint in 
-    /// order to be sure of the server you are connecting.
+    /// order to be sure of the server you are connecting. Supported 
+    /// formats for server fingerprints: MD5 and SHA256. 
     /// </summary>
     /// <example>
     /// MD5: '41:76:EA:65:62:6E:D3:68:DC:41:9A:F2:F2:20:69:9D'
