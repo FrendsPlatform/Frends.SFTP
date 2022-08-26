@@ -9,7 +9,6 @@ namespace Frends.SFTP.UploadFiles.Tests;
 [TestFixture]
 class ErrorTesting : UploadFilesTestBase
 {
-
     [Test]
     public void UploadFiles_TestTransferThatThrowsIfFileNotExist()
     {
@@ -43,6 +42,29 @@ class ErrorTesting : UploadFilesTestBase
 
         var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
         Assert.That(ex.Message.StartsWith("SFTP transfer failed: Unable to establish the socket: No such host is known"));
+    }
+
+    [Test]
+    public void UploadFiles_TestThrowsMovedSourceFileIsRestored()
+    {
+        Helpers.UploadSingleTestFile(_destination.Directory, Path.Combine(_workDir, _source.FileName));
+        
+        var connection = Helpers.GetSftpConnection();
+        var source = new Source
+        {
+            Directory = _workDir,
+            FileName = "SFTPUploadTestFile1.txt",
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Move,
+            DirectoryToMoveAfterTransfer = Path.Combine(_workDir, "moved")
+        };
+        Directory.CreateDirectory(source.DirectoryToMoveAfterTransfer);
+
+        var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken()));
+        Assert.That(ex.Message.StartsWith($"SFTP transfer failed: 1 Errors: Failure in CheckIfDestination"));
+        Assert.IsTrue(File.Exists(Path.Combine(_source.Directory, _source.FileName)));
+
+        Directory.Delete(source.DirectoryToMoveAfterTransfer, true);
     }
 }
 

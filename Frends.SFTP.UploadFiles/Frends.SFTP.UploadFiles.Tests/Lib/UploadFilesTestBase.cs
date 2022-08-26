@@ -17,7 +17,7 @@ public class UploadFilesTestBase
     protected static string _testResultFile = "testResultFile.txt";
 
     [OneTimeSetUp]
-    public static void Setup()
+    public static void OneTimeSetup()
     {
         _workDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
 
@@ -26,7 +26,7 @@ public class UploadFilesTestBase
         _source = new Source
         {
             Directory = _workDir,
-            FileName = "SFTPUploadTestFile.txt",
+            FileName = "SFTPUploadTestFile1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Nothing,
         };
@@ -55,6 +55,12 @@ public class UploadFilesTestBase
         };
     }
 
+    [SetUp]
+    public void Setup()
+    {
+        Helpers.CreateDummyFiles(2);
+    }
+
     [TearDown]
     public void TearDown()
     {
@@ -68,7 +74,7 @@ public class UploadFilesTestBase
             sftp.Disconnect();
         }
 
-        Helpers.DeleteSourceDir();
+        Helpers.DeleteDummyFiles();
     }
 }
 

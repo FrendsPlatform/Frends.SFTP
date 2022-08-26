@@ -112,7 +112,7 @@ class TransferTests : UploadFilesTestBase
         var source = new Source
         {
             Directory = _workDir,
-            FileName = "*File.txt",
+            FileName = "*File1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Nothing
         };
@@ -149,7 +149,7 @@ class TransferTests : UploadFilesTestBase
         var destination = new Destination
         {
             Directory = "/upload/Upload",
-            FileName = "SFTPUploadTestFile.txt",
+            FileName = "SFTPUploadTestFile1.txt",
             Action = DestinationAction.Append,
             FileNameEncoding = FileEncoding.UTF8,
             EnableBomForFileName = true
@@ -177,7 +177,7 @@ class TransferTests : UploadFilesTestBase
         var source = new Source
         {
             Directory = _workDir,
-            FileName = "SFTPUploadTestFile.txt",
+            FileName = "SFTPUploadTestFile1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Move,
             DirectoryToMoveAfterTransfer = to
@@ -188,8 +188,6 @@ class TransferTests : UploadFilesTestBase
         Assert.AreEqual(1, result.SuccessfulTransferCount);
 
         Assert.IsTrue(File.Exists(Path.Combine(to, source.FileName)));
-        File.Move(Path.Combine(to, source.FileName), Path.Combine(_workDir, source.FileName));
-        Directory.Delete(to);
     }
 
     [Test]
@@ -198,7 +196,7 @@ class TransferTests : UploadFilesTestBase
         var source = new Source
         {
             Directory = _workDir,
-            FileName = "SFTPUploadTestFile.txt",
+            FileName = "SFTPUploadTestFile1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Rename,
             FileNameAfterTransfer = "uploaded_%SourceFileName%.txt"
@@ -208,8 +206,7 @@ class TransferTests : UploadFilesTestBase
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-        Assert.IsTrue(File.Exists(Path.Combine(_workDir, "uploaded_SFTPUploadTestFile.txt")));
-        File.Move(Path.Combine(_workDir, "uploaded_SFTPUploadTestFile.txt"), Path.Combine(_workDir, "SFTPUploadTestFile.txt"));
+        Assert.IsTrue(File.Exists(Path.Combine(_workDir, "uploaded_SFTPUploadTestFile1.txt")));
     }
 
     [Test]
@@ -232,7 +229,7 @@ class TransferTests : UploadFilesTestBase
             Action = DestinationAction.Error,
         };
 
-        Helpers.UploadSingleTestFile(_destination.Directory, Path.Combine(_workDir, "SFTPUploadTestFile.txt"));
+        Helpers.UploadSingleTestFile(_destination.Directory, Path.Combine(_workDir, "SFTPUploadTestFile1.txt"));
 
         var result = SFTP.UploadFiles(_source, destination, _connection, options, _info, new CancellationToken());
         Assert.IsFalse(result.Success);
@@ -275,7 +272,7 @@ class TransferTests : UploadFilesTestBase
         var source = new Source
         {
             Directory = _workDir,
-            FileName = "SFTPUploadTestFile.txt",
+            FileName = "SFTPUploadTestFile1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Move,
             DirectoryToMoveAfterTransfer = to
@@ -286,8 +283,6 @@ class TransferTests : UploadFilesTestBase
         Assert.AreEqual(1, result.SuccessfulTransferCount);
 
         Assert.IsTrue(File.Exists(Path.Combine(to, source.FileName)));
-        File.Move(Path.Combine(to, source.FileName), Path.Combine(_workDir, source.FileName));
-        Directory.Delete(to, true);
     }
 
     [Test]
@@ -306,7 +301,7 @@ class TransferTests : UploadFilesTestBase
         var source = new Source
         {
             Directory = _workDir,
-            FileName = "SFTPUploadTestFile.txt",
+            FileName = "SFTPUploadTestFile1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Rename,
             FileNameAfterTransfer = "uploaded_%SourceFileName%%SourceFileExtension%"
@@ -317,7 +312,6 @@ class TransferTests : UploadFilesTestBase
         Assert.AreEqual(1, result.SuccessfulTransferCount);
 
         Assert.IsTrue(File.Exists(Path.Combine(_workDir, "uploaded_" + source.FileName)));
-        File.Move(Path.Combine(_workDir, "uploaded_" + source.FileName), Path.Combine(_workDir, source.FileName));
     }
 
     [Test]
@@ -339,7 +333,7 @@ class TransferTests : UploadFilesTestBase
         var source = new Source
         {
             Directory = _workDir,
-            FileName = "SFTPUploadTestFile.txt",
+            FileName = "SFTPUploadTestFile1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Move,
             DirectoryToMoveAfterTransfer = to
@@ -350,8 +344,6 @@ class TransferTests : UploadFilesTestBase
         Assert.AreEqual(1, result.SuccessfulTransferCount);
 
         Assert.IsTrue(File.Exists(Path.Combine(to, source.FileName)));
-        File.Move(Path.Combine(to, source.FileName), Path.Combine(_workDir, source.FileName));
-        Directory.Delete(to, true);
     }                                                                                             
 
     [Test]
@@ -370,7 +362,7 @@ class TransferTests : UploadFilesTestBase
         var source = new Source
         {
             Directory = _workDir,
-            FileName = "SFTPUploadTestFile.txt",
+            FileName = "SFTPUploadTestFile1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Rename,
             FileNameAfterTransfer = "uploaded_%SourceFileName%%SourceFileExtension%"
@@ -381,8 +373,6 @@ class TransferTests : UploadFilesTestBase
         Assert.AreEqual(1, result.SuccessfulTransferCount);
 
         Assert.IsTrue(File.Exists(Path.Combine(_workDir, "uploaded_" + source.FileName)));
-
-        File.Move(Path.Combine(_workDir, "uploaded_SFTPUploadTestFile.txt"), Path.Combine(_workDir, "SFTPUploadTestFile.txt"));
     }
 
     [Test]
@@ -391,7 +381,7 @@ class TransferTests : UploadFilesTestBase
         var destination = new Destination
         {
             Directory = "/upload/Upload",
-            FileName = "SFTPUploadTestFile.txt",
+            FileName = "SFTPUploadTestFile1.txt",
             Action = DestinationAction.Overwrite,
             FileNameEncoding = FileEncoding.UTF8,
             EnableBomForFileName = true

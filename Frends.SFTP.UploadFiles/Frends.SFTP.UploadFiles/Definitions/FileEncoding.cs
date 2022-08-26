@@ -9,7 +9,6 @@ namespace Frends.SFTP.UploadFiles.Definitions;
 public enum FileEncoding
 {
     UTF8,
-    UTF16,
     ANSI,
     ASCII,
     WINDOWS1252,
