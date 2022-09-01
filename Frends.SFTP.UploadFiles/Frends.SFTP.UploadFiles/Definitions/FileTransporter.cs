@@ -98,9 +98,8 @@ internal class FileTransporter
                     client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256");
                     client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256@libssh.org");
 
-                    // Force task to use ssh-rsa algotrithm because otherwise ED25519 is used.
-                    client.ConnectionInfo.HostKeyAlgorithms.Clear();
-                    client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) => { return new KeyHostAlgorithm("ssh-rsa", new RsaKey(), data); });
+                    if (_batchContext.Connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
+                        ForceHostKeyAlgorithm(client, _batchContext.Connection.HostKeyAlgorithm);
 
                     var expectedServerFingerprint = _batchContext.Connection.ServerFingerPrint;
 
@@ -253,6 +252,35 @@ internal class FileTransporter
         connectionInfo.Encoding = GetEncoding(destination);
 
         return connectionInfo;
+    }
+
+    private void ForceHostKeyAlgorithm(SftpClient client, HostKeyAlgorithms algorithm)
+    {
+        client.ConnectionInfo.HostKeyAlgorithms.Clear();
+
+        switch (algorithm)
+        {
+            case HostKeyAlgorithms.RSA:
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) => { return new KeyHostAlgorithm("ssh-rsa", new RsaKey(), data); });
+                break;
+            case HostKeyAlgorithms.Ed25519:
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-ed25519", (data) => { return new KeyHostAlgorithm("ssh-ed25519", new ED25519Key(), data); });
+                break;
+            case HostKeyAlgorithms.DSS:
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-dss", (data) => { return new KeyHostAlgorithm("ssh-dss", new DsaKey(), data); });
+                break;
+            case HostKeyAlgorithms.nistp256:
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp256", (data) => { return new KeyHostAlgorithm("ecdsa-sha2-nistp256", new EcdsaKey(), data); });
+                break;
+            case HostKeyAlgorithms.nistp384:
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp384", (data) => { return new KeyHostAlgorithm("ecdsa-sha2-nistp384", new EcdsaKey(), data); });
+                break;
+            case HostKeyAlgorithms.nistp521:
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp521", (data) => { return new KeyHostAlgorithm("ecdsa-sha2-nistp521", new EcdsaKey(), data); });
+                break;
+        }
+
+        return;
     }
 
     private void CheckServerFingerprint(SftpClient client, string expectedServerFingerprint)

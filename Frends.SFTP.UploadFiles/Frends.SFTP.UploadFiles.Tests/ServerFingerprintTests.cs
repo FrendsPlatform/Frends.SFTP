@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using NUnit.Framework;
+using Frends.SFTP.UploadFiles.Definitions;
 
 namespace Frends.SFTP.UploadFiles.Tests;
 
@@ -18,12 +17,8 @@ public class ServerFingerprintTests : UploadFilesTestBase
     {
         var (fingerPrint, hostKey) = Helpers.GetServerFingerPrintAndHostKey();
         _MD5 = Helpers.ConvertToMD5Hex(fingerPrint);
-        var test = _MD5;
         _Sha256Hex = Helpers.ConvertToSHA256Hex(hostKey);
-        test = _Sha256Hex;
         _Sha256Hash = Helpers.ConvertToSHA256Hash(hostKey);
-        test = _Sha256Hash;
-        test = "";
     }
 
     [Test]
@@ -31,6 +26,7 @@ public class ServerFingerprintTests : UploadFilesTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.ServerFingerPrint = _Sha256Hex;
+        connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
         var result = SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);
@@ -43,7 +39,7 @@ public class ServerFingerprintTests : UploadFilesTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.ServerFingerPrint = _Sha256Hash.Replace("=", "");
-        var test = connection.ServerFingerPrint;
+        connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
         var result = SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);
@@ -56,6 +52,7 @@ public class ServerFingerprintTests : UploadFilesTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.ServerFingerPrint = _Sha256Hash;
+        connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
         var result = SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);
@@ -68,6 +65,7 @@ public class ServerFingerprintTests : UploadFilesTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.ServerFingerPrint = _MD5;
+        connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
         var result = SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);
@@ -80,6 +78,7 @@ public class ServerFingerprintTests : UploadFilesTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.ServerFingerPrint = _MD5.ToLower();
+        connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
         var result = SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);
@@ -92,6 +91,7 @@ public class ServerFingerprintTests : UploadFilesTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.ServerFingerPrint = _MD5.Replace(":", "");
+        connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
         var result = SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);

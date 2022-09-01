@@ -108,5 +108,14 @@ public class Connection
     /// <example>32</example>
     [DefaultValue(32)]
     public uint BufferSize { get; set; }
+
+    /// <summary>
+    /// Host key algorithm to use when connecting to server. 
+    /// Default value is Any which doesn't force the task to use 
+    /// specific algorithm.
+    /// </summary>
+    /// <example>HostKeyAlgorithms.RSA</example>
+    [DefaultValue(HostKeyAlgorithms.Any)]
+    public HostKeyAlgorithms HostKeyAlgorithm { get; set; }
 }
 
