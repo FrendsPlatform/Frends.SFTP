@@ -63,7 +63,7 @@ public class Connection
     public string PrivateKeyFile { get; set; }
 
     /// <summary>
-    /// Private key as a string, supported private key formats: OpenSSH.
+    /// Private key as a string, supported private key formats: OpenSSH and ssh.com.
     /// PuTTY keys can be converted with puttygen.exe application.
     /// 1. Load your key file into puttygen.exe
     /// 2. Conversion > Export OpenSSH key (not the "force new file format" option)
@@ -102,14 +102,6 @@ public class Connection
     public string ServerFingerPrint { get; set; }
 
     /// <summary>
-    /// Integer value of used buffer size as KB.
-    /// Default value is 32 KB.
-    /// </summary>
-    /// <example>32</example>
-    [DefaultValue(32)]
-    public uint BufferSize { get; set; }
-
-    /// <summary>
     /// Host key algorithm to use when connecting to server. 
     /// Default value is Any which doesn't force the task to use 
     /// specific algorithm.
@@ -117,5 +109,13 @@ public class Connection
     /// <example>HostKeyAlgorithms.RSA</example>
     [DefaultValue(HostKeyAlgorithms.Any)]
     public HostKeyAlgorithms HostKeyAlgorithm { get; set; }
+
+    /// <summary>
+    /// Integer value of used buffer size as KB.
+    /// Default value is 32 KB.
+    /// </summary>
+    /// <example>32</example>
+    [DefaultValue(32)]
+    public uint BufferSize { get; set; }
 }
 

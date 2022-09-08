@@ -194,6 +194,18 @@ internal class FileTransporter
             _logger.NotifyError(_batchContext, userResultMessage, ex);
             return FormFailedFileTransferResult(userResultMessage);
         }
+        catch (SftpPathNotFoundException ex)
+        {
+            userResultMessage = $"Error when establishing connection to the Server: {ex.Message}, {userResultMessage}";
+            _logger.NotifyError(_batchContext, userResultMessage, ex);
+            return FormFailedFileTransferResult(userResultMessage);
+        }
+        catch (Exception ex)
+        {
+            userResultMessage = $"Error when establishing connection to the Server: {ex.Message}, {userResultMessage}";
+            _logger.NotifyError(_batchContext, userResultMessage, ex);
+            return FormFailedFileTransferResult(userResultMessage);
+        }
         finally
         {
             CleanTempFiles(_batchContext);
@@ -361,17 +373,15 @@ internal class FileTransporter
             case FileEncoding.UTF8:
                 return dest.EnableBomForFileName ? new UTF8Encoding(true) : new UTF8Encoding(false);
             case FileEncoding.ASCII:
-                return Encoding.ASCII;
+                return new ASCIIEncoding();
             case FileEncoding.ANSI:
                 return Encoding.Default;
-            case FileEncoding.Unicode:
-                return Encoding.Unicode;
             case FileEncoding.WINDOWS1252:
-                return Encoding.Default;
+                return CodePagesEncodingProvider.Instance.GetEncoding("windows-1252");
             case FileEncoding.Other:
-                return Encoding.GetEncoding(dest.FileNameEncodingInString);
+                return CodePagesEncodingProvider.Instance.GetEncoding(dest.FileNameEncodingInString);
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{dest.FileContentEncoding}'.");
         }
     }
 

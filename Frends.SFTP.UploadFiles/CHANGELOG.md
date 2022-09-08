@@ -1,7 +1,15 @@
 # Changelog
 
-#[2.0.1] - 2022-08-26
+#[2.1.0] - 2022-09-08
 ### Fixed
+- [Beaking] Removed UTF-16 and Unicode FileEncoding because their implementation didn't work. These were used as a parameter so autoupdate won't work.
+- Fixed how the Encoding on windows-1252 is handled. Added NuGet System.Text.Encoding.CodePages which can handle that encoding.
+- Fixed error handling by adding catch to FileTransporter to catch SftpPathNotFoundException and general Exception.
+- Added HostKeyAlgorithm parameter which enables users to change the host key algorithm used in the task. Before task defaults to ED25519.
+- Added tests to test the file name and content encoding.
+- Updated the document to state that Ssh.Net only supports private keys in OpenSSH and ssh.com formats.
+- Added documentation on the private key formatingm from putty.ppk to OpenSSH.
+- Moved all the SourceOperation tests to their own test class. 
 - Fixed issue with server fingerprint given by user in SHA256 hex format was not accepted: Added conversion to the fingerprint given by user.
 - Fixed issue when using invalid server fingerprint in MD5 string format throws wrong error message: Added more specific error messages.
 - Changed how MD5 string is handled. MD5 can now be given without ':' or '-' characters.
@@ -9,7 +17,6 @@
 - Added selector for host key algorithm which when enabled will force the task to use specific algorithm.
 - Added more tests for using server fingerprints.
 - Fixed issue where when using SourceOperation.Move the source file cannot be restored when exception occurs. 
-- Removed FileEncoding UTF-16 which was not implemented and threw exception if selected.
 
 # [2.0.0] - 2022-08-08
 ### Fixed

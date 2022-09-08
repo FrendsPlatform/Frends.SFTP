@@ -66,5 +66,29 @@ class ErrorTesting : UploadFilesTestBase
 
         Directory.Delete(source.DirectoryToMoveAfterTransfer, true);
     }
+
+    [Test]
+    public void UploadFiles_TestSourceMoveWithFileAlreadyInMovedFolder()
+    {
+        Helpers.UploadSingleTestFile(_destination.Directory, Path.Combine(_workDir, _source.FileName));
+
+        var connection = Helpers.GetSftpConnection();
+        var source = new Source
+        {
+            Directory = _workDir,
+            FileName = "SFTPUploadTestFile1.txt",
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Move,
+            DirectoryToMoveAfterTransfer = Path.Combine(_workDir, "moved")
+        };
+        Directory.CreateDirectory(source.DirectoryToMoveAfterTransfer);
+        File.Copy(Path.Combine(source.Directory, source.FileName), Path.Combine(source.DirectoryToMoveAfterTransfer, source.FileName));
+
+        var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken()));
+        Assert.That(ex.Message.Contains($"Error: Failure in source operation: System.IO.IOException: Cannot create a file when that file already exists."));
+        Assert.IsTrue(File.Exists(Path.Combine(_source.Directory, _source.FileName)));
+
+        Directory.Delete(source.DirectoryToMoveAfterTransfer, true);
+    }
 }
 

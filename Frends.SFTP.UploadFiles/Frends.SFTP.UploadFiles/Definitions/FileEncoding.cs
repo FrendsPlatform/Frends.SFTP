@@ -12,7 +12,6 @@ public enum FileEncoding
     ANSI,
     ASCII,
     WINDOWS1252,
-    Unicode,
     /// <summary>
     /// Other enables users to add other encoding options as string.
     /// </summary>

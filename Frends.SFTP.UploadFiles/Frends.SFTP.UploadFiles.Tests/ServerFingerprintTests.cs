@@ -13,8 +13,9 @@ public class ServerFingerprintTests : UploadFilesTestBase
     internal static string _Sha256Hash;
 
     [OneTimeSetUp]
-    public void IndividualOneTimeSetup()
+    public override void OneTimeSetup()
     {
+        base.OneTimeSetup();
         var (fingerPrint, hostKey) = Helpers.GetServerFingerPrintAndHostKey();
         _MD5 = Helpers.ConvertToMD5Hex(fingerPrint);
         _Sha256Hex = Helpers.ConvertToSHA256Hex(hostKey);

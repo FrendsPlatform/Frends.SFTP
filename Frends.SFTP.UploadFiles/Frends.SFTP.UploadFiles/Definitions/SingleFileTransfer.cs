@@ -263,15 +263,13 @@ internal class SingleFileTransfer
             case FileEncoding.UTF8:
                 return dest.EnableBomForFileName ? new UTF8Encoding(true) : new UTF8Encoding(false);
             case FileEncoding.ASCII:
-                return Encoding.ASCII;
+                return new ASCIIEncoding();
             case FileEncoding.ANSI:
                 return Encoding.Default;
-            case FileEncoding.Unicode:
-                return Encoding.Unicode;
             case FileEncoding.WINDOWS1252:
-                return Encoding.Default;
+                return CodePagesEncodingProvider.Instance.GetEncoding("windows-1252");
             case FileEncoding.Other:
-                return Encoding.GetEncoding(dest.FileNameEncodingInString);
+                return CodePagesEncodingProvider.Instance.GetEncoding(dest.FileNameEncodingInString);
             default:
                 throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{dest.FileContentEncoding}'.");
         }
@@ -295,7 +293,7 @@ internal class SingleFileTransfer
             var destFileName = Path.Combine(moveToPath, SourceFile.Name);
 
             try { File.Move(filePath, destFileName); }
-            catch { throw new Exception($"Failure in source operation: File {Path.GetFileName(destFileName)} exists in move to directory."); }
+            catch (Exception ex) { throw new Exception($"Failure in source operation: {ex}: {ex.Message}"); }
 
             _logger.NotifyInformation(BatchContext, $"FILE MOVE: Source file {SourceFileDuringTransfer} moved to target {destFileName}.");
             WorkFile = new FileItem(destFileName);
@@ -469,7 +467,6 @@ internal class SingleFileTransfer
 
         if (!File.Exists(filePath)) return;
 
-        var test = SourceFile.FullPath;
         File.Move(filePath, SourceFile.FullPath);
 
         if (!File.Exists(SourceFile.FullPath)) throw new ArgumentException("Failure in restoring moved source file.");

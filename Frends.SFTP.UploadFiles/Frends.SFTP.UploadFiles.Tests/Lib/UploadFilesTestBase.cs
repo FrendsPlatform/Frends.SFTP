@@ -17,7 +17,7 @@ public class UploadFilesTestBase
     protected static string _testResultFile = "testResultFile.txt";
 
     [OneTimeSetUp]
-    public static void OneTimeSetup()
+    public virtual void OneTimeSetup()
     {
         _workDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
 
@@ -60,6 +60,7 @@ public class UploadFilesTestBase
     {
         Helpers.CreateDummyFiles(2);
     }
+
 
     [TearDown]
     public void TearDown()
