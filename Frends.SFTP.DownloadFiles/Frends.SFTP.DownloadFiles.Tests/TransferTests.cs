@@ -80,7 +80,7 @@ class TransferTests : DownloadFilesTestBase
     {
         var files = new List<string>
         {
-            Path.Combine(_workDir, "SFTPDownloadTestFile.txt"),
+            Path.Combine(_workDir, "SFTPDownloadTestFile1.txt"),
             Path.Combine(_workDir, "SFTPDownloadTestFile2.txt"),
             Path.Combine(_workDir, "SFTPDownloadTestFile3.txt")
         };
@@ -147,7 +147,7 @@ class TransferTests : DownloadFilesTestBase
         var source = new Source
         {
             Directory = _source.Directory,
-            FileName = "*File.txt",
+            FileName = "*File1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Nothing
         };
@@ -164,7 +164,7 @@ class TransferTests : DownloadFilesTestBase
 
         var files = new List<string>
         {
-            Path.Combine(_workDir, "SFTPDownloadTestFile.txt"),
+            Path.Combine(_workDir, "SFTPDownloadTestFile1.txt"),
             Path.Combine(_workDir, "SFTPDownloadTestFile2.txt"),
             Path.Combine(_workDir, "SFTPDownloadTestFile3.txt"),
         };

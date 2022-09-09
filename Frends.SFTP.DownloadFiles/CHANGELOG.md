@@ -1,5 +1,18 @@
 # Changelog
 
+#[2.1.0] - 2022-09-09
+### Fixed
+- [Beaking] Removed UTF-16 and Unicode FileEncoding because their implementation didn't work. These were used as a parameter so autoupdate won't work.
+- Fixed how the Encoding on windows-1252 is handled. Added NuGet System.Text.Encoding.CodePages which can handle that encoding.
+- Fixed error handling by adding catch to FileTransporter to catch SftpPathNotFoundException and general Exception.
+- Added tests to test the file name and content encoding.
+- Updated the document to state that Ssh.Net only supports private keys in OpenSSH and ssh.com formats.
+- Added documentation on the private key formatingm from putty.ppk to OpenSSH.
+- Fixed HostKeyAlgorithm by removing the forcing of the ssh-rsa.
+- Added HostKeyAlgorithm parameter which enables users to change the host key algorithm used in the task. Before task defaults to ED25519.
+- Added enum HostKeyAlgorithms with the supported algorithms.
+- Modified tests to create testfiles instead of using files from project directory.
+
 ## [2.0.3] - 2022-08-19
 ### Fixed
 - Fixed issue with server fingerprint given by user in SHA256 hex format was not accepted: Added conversion to the fingerprint given by user.

@@ -75,5 +75,29 @@ public class ConnectivityTests : DownloadFilesTestBase
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.SuccessfulTransferCount);
     }
+
+    [Test]
+    public void TestWithAzureBlobStorage()
+    {
+        var connection = new Connection()
+        {
+            ConnectionTimeout = 60,
+            Address = "frendstasktestsftp.blob.core.windows.net",
+            UserName = "frendstasktestsftp.tasktestuser",
+            Password = "zB2lciR4Q3+s3OoJpTB+LX2iXEDFsq39R+uHVsIzLZB67m6bdkUzv8rXvP0Xzc2qL4vqgK3Tn9jRB143vFktcA==",
+        };
+
+        var source = new Source()
+        {
+            Directory = "/download",
+            FileName = "downloadfile.txt",
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Nothing
+        };
+
+        var result = SFTP.DownloadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(1, result.SuccessfulTransferCount);
+    }
 }
 

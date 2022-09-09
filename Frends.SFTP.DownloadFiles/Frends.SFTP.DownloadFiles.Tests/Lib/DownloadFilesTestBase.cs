@@ -17,7 +17,7 @@ public class DownloadFilesTestBase
     protected static string _destWorkDir;
 
     [OneTimeSetUp]
-    public static void Setup()
+    public virtual void OneTimeSetup()
     {
         _workDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
         _destWorkDir = Path.Combine(_workDir, "destination");
@@ -27,7 +27,7 @@ public class DownloadFilesTestBase
         _source = new Source
         {
             Directory = "/upload/Upload",
-            FileName = "SFTPDownloadTestFile.txt",
+            FileName = "SFTPDownloadTestFile1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Nothing,
         };
@@ -56,6 +56,12 @@ public class DownloadFilesTestBase
         };
     }
 
+    [SetUp]
+    public virtual void Setup()
+    {
+        Helpers.CreateDummyFiles(3);
+    }
+
     [TearDown]
     public void TearDown()
     {
@@ -74,6 +80,8 @@ public class DownloadFilesTestBase
             if (Directory.Exists(_destWorkDir))
                 Directory.Delete(_destWorkDir, true);
         }
+
+        Helpers.DeleteDummyFiles();
     }
 }
 

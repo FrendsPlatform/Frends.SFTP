@@ -20,6 +20,7 @@ internal static class Helpers
     readonly static string _dockerUsername = "foo";
     readonly static string _dockerPassword = "pass";
     readonly static string _baseDir = "/upload/";
+    readonly static string _workDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
 
     internal static Connection GetSftpConnection()
     {
@@ -68,6 +69,26 @@ internal static class Helpers
 
             }
             client.Disconnect();
+        }
+    }
+    internal static void CreateDummyFiles(int count)
+    {
+        var name = "SFTPDownloadTestFile";
+        var extension = ".txt";
+        for (var i = 1; i <= count; i++)
+        {
+            File.WriteAllText(Path.Combine(_workDir, name + i + extension), "This is a test file.");
+        }
+    }
+
+    internal static void DeleteDummyFiles()
+    {
+        foreach (var file in Directory.EnumerateFileSystemEntries(_workDir))
+        {
+            if (Directory.Exists(file))
+                Directory.Delete(file, true);
+            if (!file.Contains("LargeTestFile.bin"))
+                File.Delete(file);
         }
     }
 
@@ -182,17 +203,6 @@ internal static class Helpers
         using (SHA256 mySHA256 = SHA256.Create())
         {
             fingerprint = ToHex(mySHA256.ComputeHash(hostKey));
-        }
-        return fingerprint;
-    }
-
-    internal static string ConvertToSHA1(byte[] hostKey)
-    {
-        var fingerprint = "";
-        using (var sha1 = SHA1.Create())
-        {
-            var hash = sha1.ComputeHash(hostKey);
-            fingerprint = string.Concat(hash.Select(b => b.ToString("x2")));
         }
         return fingerprint;
     }

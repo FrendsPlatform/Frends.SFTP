@@ -273,20 +273,18 @@ internal class SingleFileTransfer
 
     private static Encoding GetEncoding(Destination dest)
     {
-        switch (dest.FileContentEncoding)
+        switch (dest.FileNameEncoding)
         {
             case FileEncoding.UTF8:
-                return dest.EnableBomForContent ? new UTF8Encoding(true) : new UTF8Encoding(false);
+                return dest.EnableBomForFileName ? new UTF8Encoding(true) : new UTF8Encoding(false);
             case FileEncoding.ASCII:
-                return Encoding.ASCII;
+                return new ASCIIEncoding();
             case FileEncoding.ANSI:
                 return Encoding.Default;
-            case FileEncoding.Unicode:
-                return Encoding.Unicode;
             case FileEncoding.WINDOWS1252:
-                return Encoding.Default;
+                return CodePagesEncodingProvider.Instance.GetEncoding("windows-1252");
             case FileEncoding.Other:
-                return Encoding.GetEncoding(dest.FileContentEncodingInString);
+                return CodePagesEncodingProvider.Instance.GetEncoding(dest.FileNameEncodingInString);
             default:
                 throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{dest.FileContentEncoding}'.");
         }

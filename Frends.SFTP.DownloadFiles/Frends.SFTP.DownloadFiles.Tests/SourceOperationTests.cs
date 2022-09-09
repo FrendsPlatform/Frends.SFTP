@@ -38,7 +38,7 @@ class SourceOperationTests : DownloadFilesTestBase
         var source = new Source
         {
             Directory = "upload/Upload",
-            FileName = "SFTPDownloadTestFile.txt",
+            FileName = "SFTPDownloadTestFile1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Move,
             DirectoryToMoveAfterTransfer = to
@@ -89,7 +89,7 @@ class SourceOperationTests : DownloadFilesTestBase
         var source = new Source
         {
             Directory = "upload/Upload",
-            FileName = "SFTPDownloadTestFile.txt",
+            FileName = "SFTPDownloadTestFile1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Rename,
             FileNameAfterTransfer = "uploaded_%SourceFileName%.txt"
@@ -122,7 +122,7 @@ class SourceOperationTests : DownloadFilesTestBase
         var source = new Source
         {
             Directory = "upload/Upload",
-            FileName = "SFTPDownloadTestFile.txt",
+            FileName = "SFTPDownloadTestFile1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Move,
             DirectoryToMoveAfterTransfer = to
@@ -153,7 +153,7 @@ class SourceOperationTests : DownloadFilesTestBase
         var source = new Source
         {
             Directory = "upload/Upload",
-            FileName = "SFTPDownloadTestFile.txt",
+            FileName = "SFTPDownloadTestFile1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Rename,
             FileNameAfterTransfer = "uploaded_%SourceFileName%.txt"
@@ -186,7 +186,7 @@ class SourceOperationTests : DownloadFilesTestBase
         var source = new Source
         {
             Directory = "upload/Upload",
-            FileName = "SFTPDownloadTestFile.txt",
+            FileName = "SFTPDownloadTestFile1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Move,
             DirectoryToMoveAfterTransfer = to
@@ -217,7 +217,7 @@ class SourceOperationTests : DownloadFilesTestBase
         var source = new Source
         {
             Directory = "upload/Upload",
-            FileName = "SFTPDownloadTestFile.txt",
+            FileName = "SFTPDownloadTestFile1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Rename,
             FileNameAfterTransfer = "uploaded_%SourceFileName%.txt"
