@@ -85,7 +85,7 @@ class ErrorTesting : UploadFilesTestBase
         File.Copy(Path.Combine(source.Directory, source.FileName), Path.Combine(source.DirectoryToMoveAfterTransfer, source.FileName));
 
         var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken()));
-        Assert.That(ex.Message.Contains($"Error: Failure in source operation: System.IO.IOException: Cannot create a file when that file already exists."));
+        Assert.That(ex.Message.Contains($"Error: Failure in source operation:"));
         Assert.IsTrue(File.Exists(Path.Combine(_source.Directory, _source.FileName)));
 
         Directory.Delete(source.DirectoryToMoveAfterTransfer, true);
