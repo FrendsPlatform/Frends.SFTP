@@ -258,10 +258,10 @@ internal class SingleFileTransfer
 
     private static Encoding GetEncoding(Destination dest)
     {
-        switch (dest.FileNameEncoding)
+        switch (dest.FileContentEncoding)
         {
             case FileEncoding.UTF8:
-                return dest.EnableBomForFileName ? new UTF8Encoding(true) : new UTF8Encoding(false);
+                return dest.EnableBomForContent ? new UTF8Encoding(true) : new UTF8Encoding(false);
             case FileEncoding.ASCII:
                 return new ASCIIEncoding();
             case FileEncoding.ANSI:
@@ -269,7 +269,7 @@ internal class SingleFileTransfer
             case FileEncoding.WINDOWS1252:
                 return CodePagesEncodingProvider.Instance.GetEncoding("windows-1252");
             case FileEncoding.Other:
-                return CodePagesEncodingProvider.Instance.GetEncoding(dest.FileNameEncodingInString);
+                return CodePagesEncodingProvider.Instance.GetEncoding(dest.FileContentEncodingInString);
             default:
                 throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{dest.FileContentEncoding}'.");
         }
@@ -293,7 +293,7 @@ internal class SingleFileTransfer
             var destFileName = Path.Combine(moveToPath, SourceFile.Name);
 
             try { File.Move(filePath, destFileName); }
-            catch (Exception ex) { throw new Exception($"Failure in source operation: {ex}: {ex.Message}"); }
+            catch (Exception ex) { throw new Exception($"Failure in source operation: {ex.GetType().Name}", ex); }
 
             _logger.NotifyInformation(BatchContext, $"FILE MOVE: Source file {SourceFileDuringTransfer} moved to target {destFileName}.");
             WorkFile = new FileItem(destFileName);
