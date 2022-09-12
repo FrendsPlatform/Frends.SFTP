@@ -373,7 +373,7 @@ internal class FileTransporter
             case FileEncoding.Other:
                 return CodePagesEncodingProvider.Instance.GetEncoding(dest.FileNameEncodingInString);
             default:
-                throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{dest.FileContentEncoding}'.");
+                throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{dest.FileNameEncoding}'.");
         }
     }
 
