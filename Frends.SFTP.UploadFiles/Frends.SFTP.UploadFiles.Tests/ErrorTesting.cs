@@ -41,7 +41,7 @@ class ErrorTesting : UploadFilesTestBase
         connection.Port = 51651;
 
         var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-        Assert.AreEqual(ex.Message, "SFTP transfer failed: Unable to establish the socket: No connection could be made because the target machine actively refused it.");
+        Assert.That(ex.Message.StartsWith("SFTP transfer failed: Unable to establish the socket:"));
     }
 
     [Test]
@@ -51,7 +51,7 @@ class ErrorTesting : UploadFilesTestBase
         connection.Address = "local";
 
         var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-        Assert.AreEqual(ex.Message, "SFTP transfer failed: Unable to establish the socket: No such host is known.");
+        Assert.That(ex.Message.StartsWith("SFTP transfer failed: Unable to establish the socket:"));
     }
 
     [Test]
