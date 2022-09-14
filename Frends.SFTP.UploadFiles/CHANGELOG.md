@@ -1,5 +1,9 @@
 # Changelog
 
+#[2.1.1] - 2022-09-14
+### Updated
+- Updated depricated library Microsoft.Extensions.DependencyInjection from 5.0.1 to 6.0.0
+
 #[2.1.0] - 2022-09-08
 ### Fixed
 - [Beaking] Removed UTF-16 and Unicode FileEncoding because their implementation didn't work. These were used as a parameter so autoupdate won't work.
