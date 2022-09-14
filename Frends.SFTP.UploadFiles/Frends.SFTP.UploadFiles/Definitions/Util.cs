@@ -99,5 +99,24 @@ internal static class Util
         }
         catch { return false; }
     }
+
+    internal static Encoding GetEncoding(FileEncoding encoding, string encodingString, bool enableBom)
+    {
+        switch (encoding)
+        {
+            case FileEncoding.UTF8:
+                return enableBom ? new UTF8Encoding(true) : new UTF8Encoding(false);
+            case FileEncoding.ASCII:
+                return new ASCIIEncoding();
+            case FileEncoding.ANSI:
+                return Encoding.Default;
+            case FileEncoding.WINDOWS1252:
+                return CodePagesEncodingProvider.Instance.GetEncoding("windows-1252");
+            case FileEncoding.Other:
+                return CodePagesEncodingProvider.Instance.GetEncoding(encodingString);
+            default:
+                throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{encoding}'.");
+        }
+    }
 }
 

@@ -111,9 +111,9 @@ internal class FileTransporter
                         {
                             CheckServerFingerprint(client, expectedServerFingerprint);
                         }
-                        catch (Exception e)
+                        catch (Exception ex)
                         {
-                            _logger.NotifyError(null, $"Error when checking the server fingerprint", e);
+                            _logger.NotifyError(null, $"Error when checking the server fingerprint: {ex.Message}", ex);
                             return FormFailedFileTransferResult(userResultMessage);
                         }
 
@@ -184,7 +184,7 @@ internal class FileTransporter
         }
         catch (SocketException ex)
         {
-            userResultMessage = $"Unable to establish the socket: No such host is known. {userResultMessage}";
+            userResultMessage = $"Unable to establish the socket: {ex.Message}, {userResultMessage}";
             _logger.NotifyError(_batchContext, userResultMessage, ex);
             return FormFailedFileTransferResult(userResultMessage);
         }
@@ -261,7 +261,7 @@ internal class FileTransporter
         }
 
         connectionInfo = new ConnectionInfo(connect.Address, connect.Port, connect.UserName, methods.ToArray());
-        connectionInfo.Encoding = GetEncoding(destination);
+        connectionInfo.Encoding = Util.GetEncoding(destination.FileNameEncoding, destination.FileNameEncodingInString, destination.EnableBomForFileName);
 
         return connectionInfo;
     }
@@ -358,31 +358,6 @@ internal class FileTransporter
             if (!e.CanTrust)
                 _logger.NotifyError(_batchContext, userResultMessage, new SshConnectionException());
         };
-    }
-
-    /// <summary>
-    /// Get encoding for the file name to be transferred.
-    /// </summary>
-    /// <param name="dest"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    private static Encoding GetEncoding(Destination dest)
-    {
-        switch (dest.FileNameEncoding)
-        {
-            case FileEncoding.UTF8:
-                return dest.EnableBomForFileName ? new UTF8Encoding(true) : new UTF8Encoding(false);
-            case FileEncoding.ASCII:
-                return new ASCIIEncoding();
-            case FileEncoding.ANSI:
-                return Encoding.Default;
-            case FileEncoding.WINDOWS1252:
-                return CodePagesEncodingProvider.Instance.GetEncoding("windows-1252");
-            case FileEncoding.Other:
-                return CodePagesEncodingProvider.Instance.GetEncoding(dest.FileNameEncodingInString);
-            default:
-                throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{dest.FileNameEncoding}'.");
-        }
     }
 
     /// <summary>

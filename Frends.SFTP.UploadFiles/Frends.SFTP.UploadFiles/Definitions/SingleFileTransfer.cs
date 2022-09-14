@@ -139,7 +139,7 @@ internal class SingleFileTransfer
         Encoding encoding;
         try
         {
-            encoding = GetEncoding(BatchContext.Destination);
+            encoding = Util.GetEncoding(BatchContext.Destination.FileContentEncoding, BatchContext.Destination.FileContentEncodingInString, BatchContext.Destination.EnableBomForContent);
         }
         catch (Exception ex)
         {
@@ -256,25 +256,6 @@ internal class SingleFileTransfer
         return;
     }
 
-    private static Encoding GetEncoding(Destination dest)
-    {
-        switch (dest.FileContentEncoding)
-        {
-            case FileEncoding.UTF8:
-                return dest.EnableBomForContent ? new UTF8Encoding(true) : new UTF8Encoding(false);
-            case FileEncoding.ASCII:
-                return new ASCIIEncoding();
-            case FileEncoding.ANSI:
-                return Encoding.Default;
-            case FileEncoding.WINDOWS1252:
-                return CodePagesEncodingProvider.Instance.GetEncoding("windows-1252");
-            case FileEncoding.Other:
-                return CodePagesEncodingProvider.Instance.GetEncoding(dest.FileContentEncodingInString);
-            default:
-                throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{dest.FileContentEncoding}'.");
-        }
-    }
-
     private void ExecuteSourceOperationMoveOrRename()
     {
         var filePath = string.IsNullOrEmpty(SourceFileDuringTransfer) ? SourceFile.FullPath : SourceFileDuringTransfer;
@@ -293,7 +274,7 @@ internal class SingleFileTransfer
             var destFileName = Path.Combine(moveToPath, SourceFile.Name);
 
             try { File.Move(filePath, destFileName); }
-            catch (Exception ex) { throw new Exception($"Failure in source operation: {ex.GetType().Name}", ex); }
+            catch (Exception ex) { throw new Exception($"Failure in source operation: {ex.GetType().Name}: {ex.Message}", ex); }
 
             _logger.NotifyInformation(BatchContext, $"FILE MOVE: Source file {SourceFileDuringTransfer} moved to target {destFileName}.");
             WorkFile = new FileItem(destFileName);
