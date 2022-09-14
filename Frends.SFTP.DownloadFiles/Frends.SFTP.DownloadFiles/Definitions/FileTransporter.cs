@@ -74,9 +74,8 @@ internal class FileTransporter
                 client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256");
                 client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256@libssh.org");
 
-                // Force task to use ssh-rsa algotrithm because otherwise ED25519 is used.
-                client.ConnectionInfo.HostKeyAlgorithms.Clear();
-                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) => { return new KeyHostAlgorithm("ssh-rsa", new RsaKey(), data); });
+                if (_batchContext.Connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
+                    ForceHostKeyAlgorithm(client, _batchContext.Connection.HostKeyAlgorithm);
 
                 var expectedServerFingerprint = _batchContext.Connection.ServerFingerPrint;
 
@@ -95,6 +94,7 @@ internal class FileTransporter
                     }
 
                 }
+
                 client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
 
                 client.BufferSize = _batchContext.Connection.BufferSize * 1024;
@@ -185,7 +185,20 @@ internal class FileTransporter
             userResultMessage = $"Authentication of SSH session failed: {ex.Message}";
             _logger.NotifyError(_batchContext, userResultMessage, ex);
             return FormFailedFileTransferResult(userResultMessage);
-        } finally
+        }
+        catch (SftpPathNotFoundException ex)
+        {
+            userResultMessage = $"Error when establishing connection to the Server: {ex.Message}, {userResultMessage}";
+            _logger.NotifyError(_batchContext, userResultMessage, ex);
+            return FormFailedFileTransferResult(userResultMessage);
+        }
+        catch (Exception ex)
+        {
+            userResultMessage = $"Error when establishing connection to the Server: {ex.Message}, {userResultMessage}";
+            _logger.NotifyError(_batchContext, userResultMessage, ex);
+            return FormFailedFileTransferResult(userResultMessage);
+        }
+        finally
         {
             CleanTempFiles(_batchContext);
         }
@@ -240,9 +253,38 @@ internal class FileTransporter
         }
 
         connectionInfo = new ConnectionInfo(connect.Address, connect.Port, connect.UserName, methods.ToArray());
-        connectionInfo.Encoding = GetEncoding(destination);
+        connectionInfo.Encoding = Util.GetEncoding(destination.FileNameEncoding, destination.FileNameEncodingInString, destination.EnableBomForFileName);
 
         return connectionInfo;
+    }
+
+    private void ForceHostKeyAlgorithm(SftpClient client, HostKeyAlgorithms algorithm)
+    {
+        client.ConnectionInfo.HostKeyAlgorithms.Clear();
+
+        switch (algorithm)
+        {
+            case HostKeyAlgorithms.RSA:
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) => { return new KeyHostAlgorithm("ssh-rsa", new RsaKey(), data); });
+                break;
+            case HostKeyAlgorithms.Ed25519:
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-ed25519", (data) => { return new KeyHostAlgorithm("ssh-ed25519", new ED25519Key(), data); });
+                break;
+            case HostKeyAlgorithms.DSS:
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-dss", (data) => { return new KeyHostAlgorithm("ssh-dss", new DsaKey(), data); });
+                break;
+            case HostKeyAlgorithms.nistp256:
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp256", (data) => { return new KeyHostAlgorithm("ecdsa-sha2-nistp256", new EcdsaKey(), data); });
+                break;
+            case HostKeyAlgorithms.nistp384:
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp384", (data) => { return new KeyHostAlgorithm("ecdsa-sha2-nistp384", new EcdsaKey(), data); });
+                break;
+            case HostKeyAlgorithms.nistp521:
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp521", (data) => { return new KeyHostAlgorithm("ecdsa-sha2-nistp521", new EcdsaKey(), data); });
+                break;
+        }
+
+        return;
     }
 
     private void CheckServerFingerprint(SftpClient client, string expectedServerFingerprint)
@@ -308,33 +350,6 @@ internal class FileTransporter
             if (!e.CanTrust)
                 _logger.NotifyError(_batchContext, userResultMessage, new SshConnectionException());
         };
-    }
-
-    /// <summary>
-    /// Get encoding for the file name to be transferred.
-    /// </summary>
-    /// <param name="dest"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    private static Encoding GetEncoding(Destination dest)
-    {
-        switch (dest.FileNameEncoding)
-        {
-            case FileEncoding.UTF8:
-                return dest.EnableBomForFileName ? new UTF8Encoding(true) : new UTF8Encoding(false);
-            case FileEncoding.ASCII:
-                return Encoding.ASCII;
-            case FileEncoding.ANSI:
-                return Encoding.Default;
-            case FileEncoding.Unicode:
-                return Encoding.Unicode;
-            case FileEncoding.WINDOWS1252:
-                return Encoding.Default;
-            case FileEncoding.Other:
-                return Encoding.GetEncoding(dest.FileNameEncodingInString);
-            default:
-                throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{dest.FileNameEncoding}'.");
-        }
     }
 
     /// <summary>
@@ -525,6 +540,5 @@ internal class FileTransporter
     }
 
     #endregion
-
 }
 

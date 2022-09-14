@@ -108,8 +108,8 @@ class PreserveModifiedTests : DownloadFilesTestBase
 
         var source = new Source
         {
-            Directory = "upload/Upload",
-            FileName = "SFTPDownloadTestFile.txt",
+            Directory = "/upload/Upload",
+            FileName = "SFTPDownloadTestFile1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Delete,
         };

@@ -25,7 +25,7 @@ internal class MacroTests : DownloadFilesTestBase
         var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);
         var date = DateTime.Now;
-        Assert.IsTrue(File.Exists(Path.Combine(_destWorkDir, "SFTPDownloadTestFile" + date.ToString(@"yyyy-MM-dd") + ".txt")));
+        Assert.IsTrue(File.Exists(Path.Combine(_destWorkDir, "SFTPDownloadTestFile1" + date.ToString(@"yyyy-MM-dd") + ".txt")));
     }
 
     [Test]
