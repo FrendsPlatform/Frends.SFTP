@@ -154,7 +154,7 @@ internal class SingleFileTransfer
         Encoding encoding;
         try
         {
-            encoding = GetEncoding(BatchContext.Destination);
+            encoding = Util.GetEncoding(BatchContext.Destination.FileContentEncoding, BatchContext.Destination.FileContentEncodingInString, BatchContext.Destination.EnableBomForContent);
         }
         catch (Exception ex)
         {
@@ -269,25 +269,6 @@ internal class SingleFileTransfer
             $"Restoring the modified datetime of transferred file {Path.GetFileName(DestinationFileWithMacrosExpanded)}");
         File.SetLastWriteTime(DestinationFileWithMacrosExpanded, date);
         _logger.NotifyInformation(BatchContext, $"SET MODIFIED {date.ToString("dd.MM.yyyy hh:mm:ss")}");
-    }
-
-    private static Encoding GetEncoding(Destination dest)
-    {
-        switch (dest.FileContentEncoding)
-        {
-            case FileEncoding.UTF8:
-                return dest.EnableBomForContent ? new UTF8Encoding(true) : new UTF8Encoding(false);
-            case FileEncoding.ASCII:
-                return new ASCIIEncoding();
-            case FileEncoding.ANSI:
-                return Encoding.Default;
-            case FileEncoding.WINDOWS1252:
-                return CodePagesEncodingProvider.Instance.GetEncoding("windows-1252");
-            case FileEncoding.Other:
-                return CodePagesEncodingProvider.Instance.GetEncoding(dest.FileContentEncodingInString);
-            default:
-                throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{dest.FileContentEncoding}'.");
-        }
     }
 
     private void ExecuteSourceOperationNothingOrDelete()
