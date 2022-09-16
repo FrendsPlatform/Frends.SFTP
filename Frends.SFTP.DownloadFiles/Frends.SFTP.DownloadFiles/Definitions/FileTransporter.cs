@@ -160,9 +160,14 @@ internal class FileTransporter
                     foreach (var file in files)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
+
+                        // Check that the connection is alive and if not try to connect again
+                        if (!client.IsConnected)
+                            client.Connect();
+
                         var singleTransfer = new SingleFileTransfer(file, _batchContext, client, _renamingPolicy, _logger);
                         var result = singleTransfer.TransferSingleFile();
-                        _result.Add(result);
+                        _result.Add(result); 
                     }
                     client.Disconnect();
                 }

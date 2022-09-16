@@ -1,5 +1,9 @@
 # Changelog
 
+#[2.1.1] - 2022-09-16
+### Fixed
+- Fixed error handler by adding connection check to FileTransporter and SingleFileTransfer classes. If the client is not connected the task tries to connect again before handling errors.
+
 #[2.1.0] - 2022-09-09
 ### Fixed
 - [Beaking] Removed UTF-16 and Unicode FileEncoding because their implementation didn't work. These were used as a parameter so autoupdate won't work.
