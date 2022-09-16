@@ -1,5 +1,10 @@
 # Changelog
 
+#[2.1.2] - 2022-09-16
+### Fixed
+- Fixed error handler by adding connection check to FileTransporter and SingleFileTransfer classes. If the client is not connected the task tries to connect again before handling errors.
+- Added some tests and separated Appending tests to their own class.
+
 #[2.1.1] - 2022-09-14
 ### Updated
 - Updated depricated library Microsoft.Extensions.DependencyInjection from 5.0.1 to 6.0.0
