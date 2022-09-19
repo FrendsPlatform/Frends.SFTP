@@ -139,37 +139,6 @@ class TransferTests : UploadFilesTestBase
     }
 
     [Test]
-    public void UploadFiles_TestAppendToExistingFile()
-    {
-        var result = SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        var fullPath = _destination.Directory + "/" + _source.FileName;
-        var content1 = Helpers.GetTransferredFileContent(fullPath);
-
-        var destination = new Destination
-        {
-            Directory = "/upload/Upload",
-            FileName = "SFTPUploadTestFile1.txt",
-            Action = DestinationAction.Append,
-            FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
-        };
-
-        var source = new Source
-        {
-            Directory = _workDir,
-            FileName = "SFTPUploadTestFile2.txt",
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Nothing
-        };
-
-        result = SFTP.UploadFiles(source, destination, _connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        var content2 = Helpers.GetTransferredFileContent(fullPath);
-        Assert.AreNotEqual(content1, content2);
-    }
-
-    [Test]
     public void UploadFiles_TestSingleFileTransferWithError()
     {
         var options = new Options

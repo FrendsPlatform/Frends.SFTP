@@ -412,6 +412,10 @@ internal class SingleFileTransfer
 
     private string RestoreSourceFileAfterError()
     {
+        // Check that the connection is alive and if not try to connect again
+        if (!Client.IsConnected)
+            Client.Connect();
+
         // restore the source file so we can retry the operations
         // - but only if the source file has been renamed in the first place
         if (!string.IsNullOrEmpty(SourceFileDuringTransfer))
