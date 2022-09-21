@@ -1,15 +1,15 @@
 # Changelog
 
-#[2.1.2] - 2022-09-16
+## [2.1.2] - 2022-09-16
 ### Fixed
 - Fixed error handler by adding connection check to FileTransporter and SingleFileTransfer classes. If the client is not connected the task tries to connect again before handling errors.
 - Added some tests and separated Appending tests to their own class.
 
-#[2.1.1] - 2022-09-14
+## [2.1.1] - 2022-09-14
 ### Updated
 - Updated depricated library Microsoft.Extensions.DependencyInjection from 5.0.1 to 6.0.0
 
-#[2.1.0] - 2022-09-08
+## [2.1.0] - 2022-09-08
 ### Fixed
 - [Beaking] Removed UTF-16 and Unicode FileEncoding because their implementation didn't work. These were used as a parameter so autoupdate won't work.
 - Fixed how the Encoding on windows-1252 is handled. Added NuGet System.Text.Encoding.CodePages which can handle that encoding.
@@ -27,7 +27,7 @@
 - Added more tests for using server fingerprints.
 - Fixed issue where when using SourceOperation.Move the source file cannot be restored when exception occurs. 
 
-# [2.0.0] - 2022-08-08
+## [2.0.0] - 2022-08-08
 ### Fixed
 - [Breaking] Changed the implementation to work similar to Cobalt by moving the source file to local Temp folder before transferring to destination.
 - Fixed issue where PreserveModified caused exceptions because the method used wrong file path.
