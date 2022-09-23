@@ -45,12 +45,12 @@ internal class SFTPLogger : ISFTPLogger
         {
             if (context == null) context = new BatchContext();
 
-            var sourceEndPointName = GetEndPointName(context, EndPoint.Source ,"unknown source end point");
+            var sourceEndPointName = GetEndPointName(context, EndPoint.Source, "unknown source end point");
             var destinationEndPointName = GetEndPointName(context, EndPoint.Destination, "unknown destination end point");
             var transferName = context.Info == null ? "unknown" : context.Info.TransferName;
             var transferNameForLog = transferName ?? string.Empty;
 
-            var errorMessage = string.Format("\r\n\r\nFRENDS SFTP file transfer '{0}' from '{1}' to '{2}': \r\n{3}\r\n", transferNameForLog, sourceEndPointName, destinationEndPointName, msg);
+            var errorMessage = $"\r\n\r\nFRENDS SFTP file transfer '{transferNameForLog}' from '{sourceEndPointName}' to '{destinationEndPointName}': \r\n{msg}\r\n";
             _log.Error(errorMessage, e);
         }
         catch (Exception ex)
@@ -124,9 +124,12 @@ internal class SFTPLogger : ISFTPLogger
         dynamic endpointConfig = (endpoint == EndPoint.Source) ? context.Source : context.Destination;
         if (endpointConfig == null || context.Connection.Address == null) return defaultValue;
 
+        if (endpoint == EndPoint.Destination)
+            return $"FILE://{context.Destination.Directory}";
+
         var directory = endpointConfig.Directory;
 
-        return string.Format("{0}://{1}/{2}/{3}", "SFTP", context.Connection.Address, directory, endpointConfig.FileName);
+        return $"SFTP://{context.Connection.Address}/{directory}/{endpointConfig.FileName}";
     }
 
     public static FileTransferInfo CreateFileTransferInfo(TransferResult result, SingleFileTransfer transfer, BatchContext context, string errorMessage = null)

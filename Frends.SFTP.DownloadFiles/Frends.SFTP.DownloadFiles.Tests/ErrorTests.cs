@@ -154,4 +154,16 @@ class ErrorTests : DownloadFilesTestBase
         Assert.That(ex.Message.StartsWith($"SFTP transfer failed: 1 Errors: Failure in CheckIfDestination"));
         Assert.IsTrue(Helpers.SourceFileExists(Path.Combine(_source.Directory, _source.FileName).Replace("\\", "/")));
     }
+
+    [Test]
+    public void DownloadFiles_TestErrorMessage()
+    {
+        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
+        var connection = Helpers.GetSftpConnection();
+        connection.Password = "cuinbeu8i9ch";
+
+        var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
+        var test = ex.Message;
+        Assert.That(ex.Message.Contains($"FRENDS SFTP file transfer '' from 'SFTP://localhost//upload/Upload/{_source.FileName}' to 'FILE://{_destination.Directory}':"));
+    }
 }
