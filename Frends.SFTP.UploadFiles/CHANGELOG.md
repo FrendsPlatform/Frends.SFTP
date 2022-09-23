@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.1.3] - 2022-09-23
+### Fixed
+- Fixed issue with the error message by changing how the error message is build. Error message had 'SFTP://' in both endpoints.
+
 ## [2.1.2] - 2022-09-16
 ### Fixed
 - Fixed error handler by adding connection check to FileTransporter and SingleFileTransfer classes. If the client is not connected the task tries to connect again before handling errors.
