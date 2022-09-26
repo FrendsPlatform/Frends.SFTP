@@ -1,6 +1,6 @@
 # Changelog
 
-#[2.1.2] - 2022-09-23
+## [2.1.2] - 2022-09-23
 ### Fixed
 - Fixed issue with the error message by changing how the error message is build. Error message had 'SFTP://' in both endpoints.
 
