@@ -100,5 +100,15 @@ class ErrorTesting : UploadFilesTestBase
 
         Directory.Delete(source.DirectoryToMoveAfterTransfer, true);
     }
+
+    [Test]
+    public void UploadFiles_TestErrorMessage()
+    {
+        var connection = Helpers.GetSftpConnection();
+        connection.Password = "cuinbeu8i9ch";
+
+        var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
+        Assert.That(ex.Message.Contains(@$"FRENDS SFTP file transfer '' from 'FILE://{_source.Directory}/{_source.FileName}' to 'SFTP://{connection.Address}/{_destination.Directory}':"));
+    }
 }
 
