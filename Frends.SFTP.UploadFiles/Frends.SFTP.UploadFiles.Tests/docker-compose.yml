@@ -6,7 +6,6 @@ services:
  sftp_server:
   build:
     context: .
-  container_name: testikontti
   ports:
    - "2222:22"
   volumes:

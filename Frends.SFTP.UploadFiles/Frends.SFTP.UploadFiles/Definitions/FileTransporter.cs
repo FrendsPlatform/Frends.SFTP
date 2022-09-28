@@ -283,12 +283,8 @@ internal class FileTransporter
     private void HandleKeyEvent(object sender, AuthenticationPromptEventArgs e)
     {
         foreach (var prompt in e.Prompts)
-        {
             if (prompt.Request.IndexOf("Password:", StringComparison.InvariantCultureIgnoreCase) != -1)
-            {
                 prompt.Response = _batchContext.Connection.Password;
-            }
-        }
     }
 
     private void ForceHostKeyAlgorithm(SftpClient client, HostKeyAlgorithms algorithm)
