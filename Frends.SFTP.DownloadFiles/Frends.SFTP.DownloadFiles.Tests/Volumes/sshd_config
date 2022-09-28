@@ -10,7 +10,7 @@ UseDNS no
 UsePAM yes
 #ChallengeResponseAuthentication yes
 PasswordAuthentication yes
-AuthenticationMethods keyboard-interactive
+AuthenticationMethods password keyboard-interactive
 
 # Limited access
 PermitRootLogin no
