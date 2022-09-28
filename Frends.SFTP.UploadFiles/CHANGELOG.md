@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.2.0] - 2022-09-28
+### Fixed
+- [Breaking] Added option to enable keyboard-interactive authentication method. This change will break the automatic updates of the task.
+- Fixed issue with connecting to server which uses keyboard-interactive authentication method. Fixed by adding UseKeyboardInteractiveAuthentication parameter and handled the method inside tha task.
+
 ## [2.1.3] - 2022-09-23
 ### Fixed
 - Fixed issue with the error message by changing how the error message is build. Error message had 'SFTP://' in both endpoints.
