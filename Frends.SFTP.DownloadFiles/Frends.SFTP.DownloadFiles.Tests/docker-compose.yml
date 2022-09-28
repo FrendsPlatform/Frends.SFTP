@@ -3,9 +3,9 @@
 # Usage https://github.com/atmoz/sftp
 
 services:
- ftpd_server:
-  image: atmoz/sftp
-  container_name: testikontti
+ sftp_server:
+  build:
+    context: .
   ports:
    - "2222:22"
   volumes:

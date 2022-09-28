@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using NUnit.Framework;
-using System.Net.Sockets;
 using Frends.SFTP.DownloadFiles.Definitions;
 
 namespace Frends.SFTP.DownloadFiles.Tests;
@@ -76,26 +75,26 @@ public class ConnectivityTests : DownloadFilesTestBase
         Assert.AreEqual(1, result.SuccessfulTransferCount);
     }
 
+    /// <summary>
+    /// To enable keyboard-interactive method, you need to install pam and nano to the server:
+    /// apt-get update
+    /// apt install nano
+    /// Configure file etc/ssh/sshd_config with following and restart the server:
+    ///     UsePAM yes
+    ///     #ChallengeResponseAuthentication yes 
+    ///     PasswordAuthentication yes
+    ///     AuthenticationMethods password keyboard-interactive
+    /// </summary>
+    // [Ignore("Server needs to be configured to use keyboard-interactive authentication methods")]
     [Test]
-    public void TestWithAzureBlobStorage()
+    public void DownloadFiles_TestWithInteractiveKeyboardAuthentication()
     {
-        var connection = new Connection()
-        {
-            ConnectionTimeout = 60,
-            Address = "frendstasktestsftp.blob.core.windows.net",
-            UserName = "frendstasktestsftp.tasktestuser",
-            Password = "zB2lciR4Q3+s3OoJpTB+LX2iXEDFsq39R+uHVsIzLZB67m6bdkUzv8rXvP0Xzc2qL4vqgK3Tn9jRB143vFktcA==",
-        };
+        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
 
-        var source = new Source()
-        {
-            Directory = "/download",
-            FileName = "downloadfile.txt",
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Nothing
-        };
+        var connection = Helpers.GetSftpConnection();
+        connection.UseKeyboardInteractiveAuthentication = true;
 
-        var result = SFTP.DownloadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+        var result = SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.SuccessfulTransferCount);
     }
