@@ -117,5 +117,12 @@ public class Connection
     /// <example>32</example>
     [DefaultValue(32)]
     public uint BufferSize { get; set; }
+
+    /// <summary>
+    /// Enable if the server uses keyboard-interactive authentication method.
+    /// </summary>
+    /// <example>false</example>
+    [DefaultValue(false)]
+    public bool UseKeyboardInteractiveAuthentication { get; set; }
 }
 

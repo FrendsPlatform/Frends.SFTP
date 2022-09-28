@@ -103,5 +103,16 @@ public class ConnectivityTests : UploadFilesTestBase
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.SuccessfulTransferCount);
     }
+
+    [Test]
+    public void UploadFiles_TestKeyboardInteractiveAuthentication()
+    {
+        var connection = Helpers.GetSftpConnection();
+        connection.UseKeyboardInteractiveAuthentication = true;
+
+        var result = SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(1, result.SuccessfulTransferCount);
+    }
 }
 
