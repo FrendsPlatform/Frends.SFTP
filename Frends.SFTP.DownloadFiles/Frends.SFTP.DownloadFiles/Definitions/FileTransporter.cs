@@ -212,10 +212,19 @@ internal class FileTransporter
     }
 
     #region Helper methods
-    private static ConnectionInfo GetConnectionInfo(Destination destination, Connection connect)
+    private ConnectionInfo GetConnectionInfo(Destination destination, Connection connect)
     {
         ConnectionInfo connectionInfo;
         List<AuthenticationMethod> methods = new List<AuthenticationMethod>();
+
+        if (connect.UseKeyboardInteractiveAuthentication)
+        {
+            // Construct keyboard-interactive authentication method
+            var kauth = new KeyboardInteractiveAuthenticationMethod(connect.UserName);
+            kauth.AuthenticationPrompt += new EventHandler<AuthenticationPromptEventArgs>(HandleKeyEvent);
+            methods.Add(kauth);
+        }
+
         PrivateKeyFile privateKey = null;
         if (connect.Authentication == AuthenticationType.UsernamePrivateKeyFile || connect.Authentication == AuthenticationType.UsernamePasswordPrivateKeyFile)
         {
@@ -258,9 +267,21 @@ internal class FileTransporter
         }
 
         connectionInfo = new ConnectionInfo(connect.Address, connect.Port, connect.UserName, methods.ToArray());
+
         connectionInfo.Encoding = Util.GetEncoding(destination.FileNameEncoding, destination.FileNameEncodingInString, destination.EnableBomForFileName);
 
         return connectionInfo;
+    }
+
+    private void HandleKeyEvent(object sender, AuthenticationPromptEventArgs e)
+    {
+        foreach (var prompt in e.Prompts)
+        {
+            if (prompt.Request.IndexOf("Password:", StringComparison.InvariantCultureIgnoreCase) != -1)
+            {
+                prompt.Response = _batchContext.Connection.Password;
+            }
+        }
     }
 
     private void ForceHostKeyAlgorithm(SftpClient client, HostKeyAlgorithms algorithm)
