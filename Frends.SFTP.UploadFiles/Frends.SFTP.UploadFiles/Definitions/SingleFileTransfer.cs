@@ -284,7 +284,18 @@ internal class SingleFileTransfer
         }
         else if (BatchContext.Source.Operation == SourceOperation.Rename)
         {
-            var renameToPath = Path.Combine(Path.GetDirectoryName(SourceFile.FullPath), _renamingPolicy.CreateRemoteFileNameForRename(SourceFile.FullPath, BatchContext.Source.FileNameAfterTransfer));
+            var path = string.IsNullOrEmpty(Path.GetDirectoryName(BatchContext.Source.FileNameAfterTransfer))
+                ? Path.GetDirectoryName(SourceFile.FullPath)
+                : Path.GetDirectoryName(_renamingPolicy.CreateRemoteFileNameForRename(SourceFile.FullPath, BatchContext.Source.FileNameAfterTransfer));
+
+            if (!Directory.Exists(path))
+            {
+                var msg = $"Operation failed: Source file {SourceFile.Name} couldn't be moved to given directory {path} because the directory didn't exist.";
+                _logger.NotifyError(BatchContext, msg, new ArgumentException("Failure in moving the source file."));
+                _result.ErrorMessages.Add($"Failure in source operation: {msg}");
+            }
+
+            var renameToPath = Path.Combine(path, _renamingPolicy.CreateRemoteFileNameForRename(SourceFile.FullPath, BatchContext.Source.FileNameAfterTransfer));
             SetCurrentState(TransferState.SourceOperationRename, $"Renaming source file {Path.GetFileName(SourceFile.FullPath)} to {renameToPath}");
             
             File.Move(filePath, renameToPath);
