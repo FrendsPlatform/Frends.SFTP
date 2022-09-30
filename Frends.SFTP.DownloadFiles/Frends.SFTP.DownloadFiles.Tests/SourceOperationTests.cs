@@ -345,4 +345,26 @@ class SourceOperationTests : DownloadFilesTestBase
         Assert.IsTrue(result.Success);
         Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
     }
+
+    [Test]
+    public void DownloadFiles_TestSourceOperationRenameWithDifferentDirectory()
+    {
+        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
+        Helpers.CreateSubDirectory("upload/moved");
+
+        var source = new Source
+        {
+            Directory = "upload/Upload",
+            FileName = "SFTPDownloadTestFile1.txt",
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Rename,
+            FileNameAfterTransfer = "upload/moved/uploaded_%SourceFileName%.txt"
+        };
+
+        var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+        Assert.IsTrue(Helpers.SourceFileExists("upload/moved/uploaded_" + source.FileName));
+    }
 }
