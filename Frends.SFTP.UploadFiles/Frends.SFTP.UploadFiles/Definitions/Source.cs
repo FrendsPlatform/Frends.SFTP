@@ -40,14 +40,18 @@ public class Source
     public SourceOperation Operation { get; set; }
 
     /// <summary>
-    /// Parameter for Rename operation. Set the file name for the source file.
+    /// Parameter for Rename operation. You can use file macros and also specify a directory 
+    /// where to move the files to, e.g. C:\subdir\%Date%file.txt. If you don't define a 
+    /// directory path, the source directory is used. When using rename, this parameter 
+    /// must always contain a file name.
     /// </summary>
     /// <example>transferred.txt</example>
     [UIHint(nameof(Operation), "", SourceOperation.Rename)]
     public string FileNameAfterTransfer { get; set; }
 
     /// <summary>
-    /// Parameter for Move operation. Set the full file path for source file.
+    /// Parameter for Move operation. Set the full path to the directory without the 
+    /// file name. You can use some macros in the directory name, e.g. C:\subdir\%Year%_uploaded\.
     /// </summary>
     /// <example>C:\directory\transferred\</example>
     [UIHint(nameof(Operation), "", SourceOperation.Move)]
