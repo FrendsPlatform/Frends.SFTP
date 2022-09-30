@@ -50,7 +50,7 @@ public class Source
     public string FileNameAfterTransfer { get; set; }
 
     /// <summary>
-    /// Parameter for Move operation. Set the full path to the directory without the file name. You can use some macros in the directory name, e.g. /subdir/%Year%_uploaded.txt.
+    /// Parameter for Move operation. Set the full path to the directory without the file name. You can use some macros in the directory name, e.g. /subdir/%Year%_uploaded/.
     /// </summary>
     /// <example>/upload/transferred/</example>
     [UIHint(nameof(Operation), "", SourceOperation.Move)]
