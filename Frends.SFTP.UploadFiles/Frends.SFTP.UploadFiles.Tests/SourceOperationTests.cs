@@ -249,7 +249,7 @@ class SourceOperationTests : UploadFilesTestBase
             FileName = "SFTPUploadTestFile1.txt",
             Action = SourceAction.Error,
             Operation = SourceOperation.Rename,
-            FileNameAfterTransfer = Path.Combine(_workDir, "%Year%_uploaded\\uploaded_%SourceFileName%.txt")
+            FileNameAfterTransfer = Path.Combine(_workDir + "%Year%_uploaded", "uploaded_%SourceFileName%.txt")
         };
 
         var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
