@@ -72,44 +72,32 @@ internal class MacroTests : DownloadFilesTestBase
     }
 
     [Test]
-    public void DownloadFiles_TestSourceFileMoveWithMacros()
+    public void DownloadFiles_TestSourceFileRenameWithMacros()
     {
         Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
 
         var year = DateTime.Now.Year.ToString();
-        var to = "/upload/Upload/" + year + "_uploaded";
-        var connection = Helpers.GetSftpConnection();
-        using (var client = new SftpClient(connection.Address, connection.Port, connection.UserName, connection.Password))
-        {
-            client.Connect();
-            Helpers.CreateSourceDirectories(client, to);
-            client.Disconnect();
-        }
+        var to = "/upload/Upload/" + year + "_uploaded/" + Path.GetFileNameWithoutExtension(_source.FileName) + year + Path.GetExtension(_source.FileName);
+        Helpers.CreateSubDirectory(Path.GetDirectoryName(to).Replace("\\", "/"));
 
         var source = new Source
         {
             Directory = _source.Directory,
             FileName = _source.FileName,
             Action = SourceAction.Error,
-            Operation = SourceOperation.Move,
-            DirectoryToMoveAfterTransfer = "/upload/Upload/%Year%_uploaded"
+            Operation = SourceOperation.Rename,
+            FileNameAfterTransfer = to,
         };
 
         var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-        Assert.IsTrue(Helpers.SourceFileExists(to + "/" + _source.FileName));
-        using (var client = new SftpClient(connection.Address, connection.Port, connection.UserName, connection.Password))
-        {
-            client.Connect();
-            Helpers.DeleteDirectory(client, to);
-            client.Disconnect();
-        }
+        Assert.IsTrue(Helpers.SourceFileExists(to));
     }
 
     [Test]
-    public void DownloadFiles_TestSourceFileRenameWithMacros()
+    public void DownloadFiles_TestSourceFileRenameWithMacros2()
     {
         Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
 
@@ -127,6 +115,30 @@ internal class MacroTests : DownloadFilesTestBase
         Assert.AreEqual(1, result.SuccessfulTransferCount);
 
         Assert.IsTrue(Helpers.SourceFileExists(_source.Directory + "/uploaded_" + source.FileName));
+    }
+
+    [Test]
+    public void DownloadFiles_TestSourceFileMoveWithMacros()
+    {
+        var year = DateTime.Now.Year.ToString();
+        var to = $"/upload/Upload/{year}_uploaded";
+        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
+        Helpers.CreateSubDirectory(to);
+
+        var source = new Source
+        {
+            Directory = _source.Directory,
+            FileName = _source.FileName,
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Move,
+            DirectoryToMoveAfterTransfer = "/upload/Upload/%Year%_uploaded"
+        };
+
+        var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+        Assert.IsTrue(Helpers.SourceFileExists(Path.Combine(to, _source.FileName).Replace("\\", "/")));
     }
 }
 
