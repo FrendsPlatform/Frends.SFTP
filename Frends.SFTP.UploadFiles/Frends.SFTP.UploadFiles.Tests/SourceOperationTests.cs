@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System.IO;
 using System.Threading;
-using System.Collections.Generic;
+using System;
 using Frends.SFTP.UploadFiles.Definitions;
 
 namespace Frends.SFTP.UploadFiles.Tests;
@@ -214,6 +214,71 @@ class SourceOperationTests : UploadFilesTestBase
         Assert.IsFalse(result.Success);
 
         Assert.IsTrue(File.Exists(Path.Combine(_workDir, _source.FileName)));
+    }
+
+    [Test]
+    public void UploadFiles_TestSourceOperationWithRenameWithDifferentDirectory()
+    {
+        var to = Path.Combine(_workDir, "uploaded");
+        Directory.CreateDirectory(to);
+        var source = new Source
+        {
+            Directory = _workDir,
+            FileName = "SFTPUploadTestFile1.txt",
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Rename,
+            FileNameAfterTransfer = Path.Combine(to, "uploaded_%SourceFileName%.txt")
+        };
+
+        var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+        Assert.IsTrue(File.Exists(Path.Combine(to, "uploaded_SFTPUploadTestFile1.txt")));
+    }
+
+    [Test]
+    public void UploadFiles_TestSourceOperationWithRenameWithDifferentDirectoryWithMacrosInDirectory()
+    {
+        var year = DateTime.Now.Year.ToString();
+        var to = Path.Combine(_workDir, $"{year}_uploaded");
+        Directory.CreateDirectory(to);
+        var source = new Source
+        {
+            Directory = _workDir,
+            FileName = "SFTPUploadTestFile1.txt",
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Rename,
+            FileNameAfterTransfer = Path.Combine(_workDir + "%Year%_uploaded", "uploaded_%SourceFileName%.txt")
+        };
+
+        var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+        Assert.IsTrue(File.Exists(Path.Combine(to, "uploaded_SFTPUploadTestFile1.txt")));
+    }
+
+    [Test]
+    public void UploadFiles_TestSourceOperationWithRenameWithDifferentDirectoryWithMacrosInFileName()
+    {
+        var year = DateTime.Now.Year.ToString();
+        var to = Path.Combine(_workDir, $"{year}_uploaded");
+        Directory.CreateDirectory(to);
+        var source = new Source
+        {
+            Directory = _workDir,
+            FileName = "SFTPUploadTestFile1.txt",
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Rename,
+            FileNameAfterTransfer = Path.Combine(to, "uploaded_%SourceFileName%.txt")
+        };
+
+        var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+        Assert.IsTrue(File.Exists(Path.Combine(to, "uploaded_SFTPUploadTestFile1.txt")));
     }
 }
 

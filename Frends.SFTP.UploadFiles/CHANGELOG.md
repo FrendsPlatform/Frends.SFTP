@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.2.1] - 2022-09-30
+### Fixed
+- Added possibility to give different directory to the task when using SourceOperation.Rename.
+- Updated documentation.
+
 ## [2.2.0] - 2022-09-28
 ### Fixed
 - [Breaking] Added option to enable keyboard-interactive authentication method. This change will break the automatic updates of the task.
