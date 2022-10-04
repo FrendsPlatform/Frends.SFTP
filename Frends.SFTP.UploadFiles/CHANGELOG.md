@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.2.2] - 2022-10-03
+### Added
+- Added OperationTimeout and KeepAliveInterval attributes to SftpClient and set them to same value as the ConnectionTimeout parameter.
+
 ## [2.2.1] - 2022-09-30
 ### Fixed
 - Added possibility to give different directory to the task when using SourceOperation.Rename.
