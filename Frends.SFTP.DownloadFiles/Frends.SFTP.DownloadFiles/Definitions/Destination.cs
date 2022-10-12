@@ -55,6 +55,14 @@ public class Destination
     public DestinationAction Action { get; set; }
 
     /// <summary>
+    /// If enabled new line is added to the existing file before appending the content.
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(false)]
+    [UIHint(nameof(Action), "", DestinationAction.Append)]
+    public bool AddNewLine { get; set; }
+
+    /// <summary>
     /// Encoding for the appending content. By selecting 'Other' you can use any encoding.
     /// </summary>
     /// <example>FileEncoding.ANSI</example>

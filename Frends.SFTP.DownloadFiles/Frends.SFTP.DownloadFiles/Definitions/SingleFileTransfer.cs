@@ -164,7 +164,7 @@ internal class SingleFileTransfer
         if (BatchContext.Options.RenameDestinationFileDuringTransfer)
             RenameDestinationFile();
 
-        Append(GetSourceFileContent(filePath, encoding), encoding);
+        Append(GetSourceFileContent(filePath, BatchContext.Destination.AddNewLine, encoding), encoding);
 
         if (BatchContext.Options.RenameDestinationFileDuringTransfer)
             RenameDestinationFile();
@@ -187,7 +187,7 @@ internal class SingleFileTransfer
         }       
     }
 
-    private void Append(string[] content, Encoding encoding)
+    private void Append(string content, Encoding encoding)
     {
         SetCurrentState(
             TransferState.AppendToDestinationFile,
@@ -198,21 +198,17 @@ internal class SingleFileTransfer
             ? DestinationFileDuringTransfer
             : DestinationFile.FullPath;
 
-        File.AppendAllLines(path, content, encoding);
+        File.AppendAllText(path, content, encoding);
         _logger.NotifyInformation(BatchContext, $"FILE APPEND: Source file appended to target {DestinationFile.Name}.");
     }
 
-    private static string[] GetSourceFileContent(string filePath, Encoding encoding)
+    private static string GetSourceFileContent(string filePath, bool addNewLine, Encoding encoding)
     {
-        var result = new List<string>();
-        result.Add("\n");
-        string[] content;
-        content = File.ReadAllLines(filePath, encoding);
-            
-        foreach (var line in content)
-            result.Add(line);
-
-        return result.ToArray();
+        string content;
+        content = File.ReadAllText(filePath, encoding);
+        if (addNewLine)
+            content = Environment.NewLine + content;
+        return content;
 
     }
 
