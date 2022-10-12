@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.3.0]
+### Added
+- Added boolean parameter for adding a new line when appending to an existing file.
+- Changed the appending to use AppendAllText instead of AppendAllLines.
+
 ## [2.2.3] - 2022-10-12
 ### Fixed
 - Fixed OperationTimeout and KeepAliveInterval attributes to use directly user input.
