@@ -1,9 +1,9 @@
-# Frends.SFTP.DownloadFile
+cd repos# Frends.SFTP.DownloadFile
 
-[![Frends.SFTP.DownloadFile Main](https://github.com/FrendsPlatform/Frends.SFTP/actions/workflows/DownloadFile_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.SFTP/actions/workflows/DownloadFile_build_and_test_on_main.yml)
-![MyGet](https://img.shields.io/myget/frends-tasks/v/Frends.SFTP.DownloadFile?label=NuGet)
+[![Frends.SFTP.DownloadFile Main](https://github.com/FrendsPlatform/Frends.SFTP/actions/workflows/DownloadFiles_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.SFTP/actions/workflows/DownloadFiles_build_and_test_on_main.yml)
+![MyGet](https://img.shields.io/myget/frends-tasks/v/Frends.SFTP.DownloadFiles?label=NuGet)
 ![GitHub](https://img.shields.io/github/license/FrendsPlatform/Frends.SFTP?label=License)
-![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.SFTP/Frends.SFTP.DownloadFile|main)
+![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.SFTP/Frends.SFTP.DownloadFiles|main)
 
 Downloads files from SFTP server or through SFTP connection.
 

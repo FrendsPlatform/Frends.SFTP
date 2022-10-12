@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.2.3] - 2022-10-12
+### Fixed
+- Fixed OperationTimeout and KeepAliveInterval attributes to use directly user input.
+
 ## [2.2.2] - 2022-10-03
 ### Added
 - Added OperationTimeout and KeepAliveInterval attributes to SftpClient and set them to same value as the ConnectionTimeout parameter.
