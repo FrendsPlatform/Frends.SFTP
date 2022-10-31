@@ -161,7 +161,7 @@ internal static class Helpers
     internal static void CreateLargeDummyFile()
     {
         var fs = new FileStream(Path.Combine(_workDir, "LargeTestFile.bin"), FileMode.CreateNew);
-        fs.Seek(2048L * 1024 * 1024, SeekOrigin.Begin);
+        fs.Seek(2048L * 1024 * 100, SeekOrigin.Begin);
         fs.WriteByte(0);
         fs.Close();
     }
