@@ -158,6 +158,24 @@ internal static class Helpers
         }
     }
 
+    internal static void CreateLargeDummyFile()
+    {
+        var fs = new FileStream(Path.Combine(_workDir, "LargeTestFile.bin"), FileMode.CreateNew);
+        fs.Seek(2048L * 1024 * 1024, SeekOrigin.Begin);
+        fs.WriteByte(0);
+        fs.Close();
+    }
+
+    internal static void CopyLargeTestFile(int count)
+    {
+        var name = "LargeTestFile";
+        var extension = ".bin";
+        for (var i = 1; i <= count; i++)
+        {
+            File.Copy(Path.Combine(_workDir, name + extension), Path.Combine(_workDir, name + i + extension));
+        }
+    }
+
     internal static Tuple<byte[], byte[]> GetServerFingerPrintAndHostKey()
     {
         Tuple<byte[], byte[]> result = null;

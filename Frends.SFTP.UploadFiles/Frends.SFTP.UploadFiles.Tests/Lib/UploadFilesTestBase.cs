@@ -53,6 +53,8 @@ public class UploadFilesTestBase
         {
             WorkDir = null,
         };
+
+        Helpers.CreateLargeDummyFile();
     }
 
     [SetUp]
@@ -77,5 +79,10 @@ public class UploadFilesTestBase
 
         Helpers.DeleteDummyFiles();
     }
-}
 
+    [OneTimeTearDown]
+    public void OneTimeTearDown()
+    {
+        File.Delete(Path.Combine(_workDir, "LargeTestFile.bin"));
+    }
+}
