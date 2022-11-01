@@ -257,5 +257,35 @@ class TransferTests : UploadFilesTestBase
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.ActionSkipped);
     }
+
+    [Test]
+    public void UploadFiles_MassTransferTest()
+    {
+        Helpers.CreateDummyFiles(30);
+        Helpers.CopyLargeTestFile(10);
+
+        var source = new Source
+        {
+            Directory = _source.Directory,
+            FileName = "*",
+            Action = SourceAction.Info,
+            Operation = SourceOperation.Nothing
+        };
+
+        var connection = new Connection
+        {
+            ConnectionTimeout = _connection.ConnectionTimeout,
+            Address = _connection.Address,
+            Port = _connection.Port,
+            Authentication = _connection.Authentication,
+            UserName = _connection.UserName,
+            Password = _connection.Password,
+            BufferSize = 256
+        };
+
+        var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+        Assert.IsTrue(result.Success);
+        Assert.IsFalse(result.ActionSkipped);
+    }
 }
 

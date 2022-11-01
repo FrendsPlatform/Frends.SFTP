@@ -53,6 +53,9 @@ public class UploadFilesTestBase
         {
             WorkDir = null,
         };
+
+        Directory.CreateDirectory(_workDir);
+        Helpers.CreateLargeDummyFile();
     }
 
     [SetUp]
@@ -77,5 +80,10 @@ public class UploadFilesTestBase
 
         Helpers.DeleteDummyFiles();
     }
-}
 
+    [OneTimeTearDown]
+    public void OneTimeTearDown()
+    {
+        Directory.Delete(_workDir, true);
+    }
+}
