@@ -18,6 +18,7 @@ internal enum TransferState
     CheckIfDestinationFileExists,
     CreateDestinationDirectories,
     Connection,
-    RestoreModified
+    RestoreModified,
+    CheckSourceFiles
 }
 

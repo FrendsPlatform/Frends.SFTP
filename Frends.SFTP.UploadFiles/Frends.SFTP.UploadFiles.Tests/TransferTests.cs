@@ -283,9 +283,47 @@ class TransferTests : UploadFilesTestBase
             BufferSize = 256
         };
 
+        var result = SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+        Assert.IsTrue(result.Success);
+        Assert.IsFalse(result.ActionSkipped);
+    }
+
+    [Test]
+    public void UploadFiles_TestWithFilePaths()
+    {
+        var filePaths = Helpers.CreateDummyFiles(3);
+
+        var source = new Source
+        {
+            Action = SourceAction.Info,
+            Operation = SourceOperation.Nothing,
+            FilePaths = filePaths
+        };
+
         var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);
         Assert.IsFalse(result.ActionSkipped);
+        Assert.AreEqual(3, result.SuccessfulTransferCount);
+    }
+
+    [Test]
+    public void UploadFiles_TestWithFilePathsEvenIfSourceFileIsAssigned()
+    {
+        var filePaths = Helpers.CreateDummyFiles(3);
+
+        var source = new Source
+        {
+            Directory = _source.Directory,
+            FileName = "*.csv",
+            Action = SourceAction.Info,
+            Operation = SourceOperation.Nothing,
+            FilePaths = filePaths
+        };
+
+        var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+        Assert.IsTrue(result.Success);
+        Assert.IsFalse(result.ActionSkipped);
+        Assert.AreEqual(3, result.SuccessfulTransferCount);
     }
 }
 
