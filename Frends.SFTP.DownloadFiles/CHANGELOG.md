@@ -3,6 +3,7 @@
 ## [2.4.0] -2022-11-03
 ### Added
 - [Breaking] Added parameters for the file extension of temporary source and destination files when rename options are enabled.
+- Fixed task to enable transfers with file paths. 
 - Fixed operations log to show correct state when source files are not found with filePaths.
 - Fixed operations log to use temp work path when getting source files to temp directory.
 - Added tests for the filePaths.

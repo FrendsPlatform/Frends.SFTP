@@ -158,7 +158,6 @@ class ErrorTests : DownloadFilesTestBase
         connection.Password = "cuinbeu8i9ch";
 
         var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-        var test = ex.Message;
         Assert.That(ex.Message.Contains($"FRENDS SFTP file transfer '' from 'SFTP://localhost//upload/Upload/{_source.FileName}' to 'FILE://{_destination.Directory}':"));
     }
 }

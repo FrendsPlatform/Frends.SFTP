@@ -22,12 +22,9 @@ internal class FileItem
 
     public FileItem(string fullPath)
     {
-        if (!File.Exists(fullPath)) throw new FileNotFoundException($"File does not exist: '{fullPath}");
-
         var fi = new FileInfo(fullPath);
         Modified = fi.LastWriteTime;
         Name = Path.GetFileName(fullPath);
-        Size = fi.Length;
         FullPath = fullPath;
     }
 }

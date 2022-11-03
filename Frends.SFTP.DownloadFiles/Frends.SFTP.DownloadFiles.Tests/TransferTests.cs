@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using System.IO;
-using System.Collections.Generic;
 using System.Threading;
 using Frends.SFTP.DownloadFiles.Definitions;
 
@@ -276,18 +275,33 @@ class TransferTests : DownloadFilesTestBase
 
         var source = new Source
         {
-            Action = SourceAction.Info,
+            Action = SourceAction.Error,
             Operation = SourceOperation.Nothing,
             FilePaths = filePaths
         };
 
-
+        var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+        Assert.AreEqual(3, result.SuccessfulTransferCount);
+        Assert.IsTrue(result.Success);
     }
 
     [Test]
     public void DownloadFiles_TestWitFilePathsEvenIfSourceFileIsAssigned()
     {
+        var filePaths = Helpers.UploadTestFiles(_source.Directory, 3);
 
+        var source = new Source
+        {
+            Directory = _source.Directory,
+            FileName = _source.FileName,
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Nothing,
+            FilePaths = filePaths
+        };
+
+        var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+        Assert.AreEqual(3, result.SuccessfulTransferCount);
+        Assert.IsTrue(result.Success);
     }
 }
 

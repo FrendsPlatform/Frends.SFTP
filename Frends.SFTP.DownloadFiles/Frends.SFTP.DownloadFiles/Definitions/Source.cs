@@ -20,7 +20,7 @@ public class Source
     /// File name or file mask of the files to be fetched.
     /// </summary>
     /// <example>test.txt</example>
-    [DefaultValue("\"\"")]
+    [DefaultValue("")]
     public string FileName { get; set; }
 
     /// <summary>

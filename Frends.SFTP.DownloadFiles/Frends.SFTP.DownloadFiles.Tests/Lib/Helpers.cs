@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.IO;
 using System.Text;
 using System.Security.Cryptography;
@@ -70,8 +69,8 @@ internal static class Helpers
                 using (var fs = File.OpenRead(file))
                 {
                     client.UploadFile(fs, Path.GetFileName(file), true);
-                    filePaths.Add(Path.Combine(destination, Path.GetFileName(file).Replace("\\", "/")));
                 }
+                filePaths.Add(Path.Combine(destination, Path.GetFileName(file)).Replace("\\", "/"));
 
             }
             client.Disconnect();
@@ -108,8 +107,26 @@ internal static class Helpers
         return filePaths.ToArray();
     }
 
+    internal static void DeleteRemoteFiles(int count, string directory)
+    {
+        using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+        {
+            client.Connect();
+            var files = client.ListDirectory(directory);
+            var i = 0;
+            foreach (var file in files)
+            {
+                if (i == count)
+                    break;
+                client.DeleteFile(file.FullName);
+                i++;
+            }
+        }
+    }
+
     internal static List<string> CreateDummyFiles(int count)
     {
+        Directory.CreateDirectory(_workDir);
         var filePaths = new List<string>();
         var name = "SFTPDownloadTestFile";
         var extension = ".txt";
