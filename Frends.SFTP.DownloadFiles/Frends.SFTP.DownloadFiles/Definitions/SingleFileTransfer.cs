@@ -135,7 +135,7 @@ internal class SingleFileTransfer
             return;
         }
 
-        var uniqueFileName = Util.CreateUniqueFileName(); 
+        var uniqueFileName = Util.CreateUniqueFileName(BatchContext.Options.SourceFileExtension); 
         var directory = Path.GetDirectoryName(SourceFile.FullPath);
 
         SourceFileDuringTransfer = (SourceFile.FullPath.Contains('/')) 
@@ -145,7 +145,7 @@ internal class SingleFileTransfer
         SetCurrentState(TransferState.RenameSourceFileBeforeTransfer, $"Renaming source file {SourceFile.Name} to temporary file name {uniqueFileName} before transfer.");
 
         Client.RenameFile(SourceFile.FullPath, SourceFileDuringTransfer);
-        _logger.NotifyInformation(BatchContext, $"FILE RENAME: Source file {SourceFile.Name} renamed to target {Path.GetFileName(SourceFileDuringTransfer)}.");
+        _logger.NotifyInformation(BatchContext, $"FILE RENAME: Source file {SourceFile.Name} renamed to target {uniqueFileName}.");
     }
 
     private void AppendDestinationFile()
@@ -180,7 +180,7 @@ internal class SingleFileTransfer
         }
         else
         {
-            DestinationFileDuringTransfer = Path.Combine(Path.GetDirectoryName(DestinationFile.FullPath), Util.CreateUniqueFileName());
+            DestinationFileDuringTransfer = Path.Combine(Path.GetDirectoryName(DestinationFile.FullPath), Util.CreateUniqueFileName(BatchContext.Options.DestinationFileExtension));
             SetCurrentState(TransferState.RenameDestinationFile, $"Renaming destination file {DestinationFile.Name} to temporary file name {Path.GetFileName(DestinationFileDuringTransfer)} during transfer.");
             File.Move(DestinationFile.FullPath, DestinationFileDuringTransfer);
             _logger.NotifyInformation(BatchContext, $"FILE RENAME: Destination file {DestinationFile.Name} renamed to target {Path.GetFileName(DestinationFileDuringTransfer)}.");
@@ -221,7 +221,7 @@ internal class SingleFileTransfer
         var doRename = BatchContext.Options.RenameDestinationFileDuringTransfer;
 
         DestinationFileDuringTransfer = doRename
-            ? Path.Combine(Path.GetDirectoryName(DestinationFileWithMacrosExpanded), Util.CreateUniqueFileName())
+            ? Path.Combine(Path.GetDirectoryName(DestinationFileWithMacrosExpanded), Util.CreateUniqueFileName(BatchContext.Options.DestinationFileExtension))
             : DestinationFileWithMacrosExpanded;
 
         var helper = doRename ? "temporary " : string.Empty;

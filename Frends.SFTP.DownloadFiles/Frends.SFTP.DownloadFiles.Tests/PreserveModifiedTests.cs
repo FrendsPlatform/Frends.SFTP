@@ -38,7 +38,6 @@ class PreserveModifiedTests : DownloadFilesTestBase
         };
 
         sourcePath = Path.Combine(_workDir, _source.FileName);
-        Helpers.UploadTestFiles(new List<string> { sourcePath }, _source.Directory);
         date = File.GetLastWriteTime(sourcePath);
         Helpers.SetTestFileLastModified(_source.Directory + "/" + _source.FileName, date);
     }

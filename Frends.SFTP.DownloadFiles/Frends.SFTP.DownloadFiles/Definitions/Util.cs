@@ -9,9 +9,9 @@ namespace Frends.SFTP.DownloadFiles.Definitions;
 /// </summary>
 internal static class Util
 {
-    internal static string CreateUniqueFileName()
+    internal static string CreateUniqueFileName(string fileExtension)
     {
-        return Path.ChangeExtension("frends_" + DateTime.Now.Ticks + Path.GetRandomFileName(), "8CO");
+        return Path.ChangeExtension("frends_" + DateTime.Now.Ticks + Path.GetRandomFileName(), fileExtension);
     }
 
     /// <summary>

@@ -15,7 +15,6 @@ class AppendTests : DownloadFilesTestBase
         Directory.CreateDirectory(_destWorkDir);
         File.Copy(Path.Combine(_workDir, _source.FileName), Path.Combine(_destWorkDir, _source.FileName));
         var file1 = new FileInfo(Path.Combine(_workDir, _source.FileName));
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, "SFTPDownloadTestFile2.txt") }, _source.Directory);
 
         var destination = new Destination
         {
@@ -46,7 +45,6 @@ class AppendTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_AppendingToExistingFile()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         Directory.CreateDirectory(_destWorkDir);
 
         var options = new Options
@@ -83,7 +81,6 @@ class AppendTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_AppendingToExistingFileRenameSourceFile()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         Directory.CreateDirectory(_destWorkDir);
 
         var options = new Options
@@ -119,7 +116,6 @@ class AppendTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_AppendingToExistingFileRenameDestinationFile()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         Directory.CreateDirectory(_destWorkDir);
 
         var options = new Options
@@ -155,7 +151,6 @@ class AppendTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_AppendingToExistingFileRenameBoth()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         Directory.CreateDirectory(_destWorkDir);
 
         var options = new Options
@@ -192,7 +187,6 @@ class AppendTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_AppendingToExistingFileRenameBothWithSourceFileNameStar()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         Directory.CreateDirectory(_destWorkDir);
 
         var options = new Options
@@ -237,7 +231,6 @@ class AppendTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_AppendWithoutNewLine()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         Directory.CreateDirectory(_destWorkDir);
 
         var options = new Options

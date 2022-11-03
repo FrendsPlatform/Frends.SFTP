@@ -59,7 +59,7 @@ public class DownloadFilesTestBase
     [SetUp]
     public virtual void Setup()
     {
-        Helpers.CreateDummyFiles(3);
+        Helpers.UploadTestFiles(_source.Directory, 3);
     }
 
     [TearDown]

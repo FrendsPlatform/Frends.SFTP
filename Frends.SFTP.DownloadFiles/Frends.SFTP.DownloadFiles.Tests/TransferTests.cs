@@ -12,8 +12,6 @@ class TransferTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestSimpleTransfer()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
         var result = SFTP.DownloadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.SuccessfulTransferCount);
@@ -22,8 +20,6 @@ class TransferTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestDownloadWithFileMask()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
         var source = new Source
         {
             Directory = _source.Directory,
@@ -34,14 +30,12 @@ class TransferTests : DownloadFilesTestBase
 
         var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
+        Assert.AreEqual(3, result.SuccessfulTransferCount);
     }
 
     [Test] 
     public void DownloadFiles_TestWithOperationLogDisabled()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
         var options = new Options
         {
             ThrowErrorOnFail = true,
@@ -60,9 +54,6 @@ class TransferTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestWithMultipleSubdirectoriesInDestination()
     {
-
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
         var destination = new Destination
         {
             Directory = Path.Combine(_destWorkDir, "another\\folder"),
@@ -78,13 +69,6 @@ class TransferTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestOneErrorInTransferWithMultipleFiles()
     {
-        var files = new List<string>
-        {
-            Path.Combine(_workDir, "SFTPDownloadTestFile1.txt"),
-            Path.Combine(_workDir, "SFTPDownloadTestFile2.txt"),
-            Path.Combine(_workDir, "SFTPDownloadTestFile3.txt")
-        };
-        Helpers.UploadTestFiles(files, _source.Directory);
         Directory.CreateDirectory(_destWorkDir);
         File.Copy(Path.Combine(_workDir, _source.FileName), Path.Combine(_destWorkDir, _source.FileName));
 
@@ -132,7 +116,7 @@ class TransferTests : DownloadFilesTestBase
             PreserveLastModified = false,
             OperationLog = true
         };
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
+
         Directory.CreateDirectory(_destWorkDir);
         File.Copy(Path.Combine(_workDir, _source.FileName), Path.Combine(_destWorkDir, _source.FileName));
 
@@ -162,14 +146,6 @@ class TransferTests : DownloadFilesTestBase
             OperationLog = true
         };
 
-        var files = new List<string>
-        {
-            Path.Combine(_workDir, "SFTPDownloadTestFile1.txt"),
-            Path.Combine(_workDir, "SFTPDownloadTestFile2.txt"),
-            Path.Combine(_workDir, "SFTPDownloadTestFile3.txt"),
-        };
-        Helpers.UploadTestFiles(files, _source.Directory);
-
         var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.SuccessfulTransferCount);
@@ -184,8 +160,6 @@ class TransferTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestDownloadWithOverwrite()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
         var destination = new Destination
         {
             Directory = Path.Combine(_workDir, "destination"),
@@ -202,8 +176,6 @@ class TransferTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestTransferWithRenameSourceEnabledRenameDestinationDisabled()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
         var destination = new Destination
         {
             Directory = Path.Combine(_workDir, "destination"),
@@ -244,7 +216,7 @@ class TransferTests : DownloadFilesTestBase
         var source = new Source
         {
             Directory = _source.Directory,
-            FileName = _source.FileName,
+            FileName = "*.csv",
             Action = SourceAction.Ignore,
             Operation = SourceOperation.Delete
         };
@@ -270,7 +242,7 @@ class TransferTests : DownloadFilesTestBase
         var source = new Source
         {
             Directory = _source.Directory,
-            FileName = _source.FileName,
+            FileName = "*.csv",
             Action = SourceAction.Info,
             Operation = SourceOperation.Delete
         };
@@ -295,6 +267,27 @@ class TransferTests : DownloadFilesTestBase
         var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
         Assert.IsTrue(result.Success);
         Assert.AreEqual(0, result.OperationsLog.Count);
+    }
+
+    [Test]
+    public void DownloadFiles_TestWithFilePaths()
+    {
+        var filePaths = Helpers.UploadTestFiles(_source.Directory, 3);
+
+        var source = new Source
+        {
+            Action = SourceAction.Info,
+            Operation = SourceOperation.Nothing,
+            FilePaths = filePaths
+        };
+
+
+    }
+
+    [Test]
+    public void DownloadFiles_TestWitFilePathsEvenIfSourceFileIsAssigned()
+    {
+
     }
 }
 

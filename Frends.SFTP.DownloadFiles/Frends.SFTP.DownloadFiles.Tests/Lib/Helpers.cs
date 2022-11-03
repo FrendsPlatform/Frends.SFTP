@@ -52,33 +52,93 @@ internal static class Helpers
         if (client.Exists(dir) && !dir.Equals(_baseDir)) client.DeleteDirectory(dir);
     }
 
-    internal static void UploadTestFiles(List<string> paths, string destination, string to = null)
+    internal static Array UploadTestFiles(string destination, int count = 3, string to = null)
     {
+        var filePaths = new List<string>();
+
+        var files = CreateDummyFiles(count);
         using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
         {
             client.Connect();
+            if (client.Exists(destination))
+                DeleteDirectory(client, destination);
             CreateSourceDirectories(client, destination);
             client.ChangeDirectory(destination);
             if (!string.IsNullOrEmpty(to)) client.CreateDirectory(to);
-            foreach (var path in paths)
+            foreach (var file in files)
             {
-                using (var fs = File.OpenRead(path))
+                using (var fs = File.OpenRead(file))
                 {
-                    client.UploadFile(fs, Path.GetFileName(path));
+                    client.UploadFile(fs, Path.GetFileName(file), true);
+                    filePaths.Add(Path.Combine(destination, Path.GetFileName(file).Replace("\\", "/")));
                 }
 
             }
             client.Disconnect();
         }
+
+        return filePaths.ToArray();
     }
-    internal static void CreateDummyFiles(int count)
+
+    internal static Array UploadLargeTestFiles(string destination, int count = 3, string to = null)
     {
+        var filePaths = new List<string>();
+
+    var files = CreateLargeDummyFiles(count);
+        using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+        {
+            client.Connect();
+            if (client.Exists(destination))
+                DeleteDirectory(client, destination);
+            CreateSourceDirectories(client, destination);
+            client.ChangeDirectory(destination);
+            if (!string.IsNullOrEmpty(to)) client.CreateDirectory(to);
+            foreach (var file in files)
+            {
+                using (var fs = File.OpenRead(file))
+                {
+                    client.UploadFile(fs, Path.GetFileName(file), true);
+                    filePaths.Add(Path.Combine(destination, Path.GetFileName(file).Replace("\\", "/")));
+                }
+
+            }
+            client.Disconnect();
+        }
+
+        return filePaths.ToArray();
+    }
+
+    internal static List<string> CreateDummyFiles(int count)
+    {
+        var filePaths = new List<string>();
         var name = "SFTPDownloadTestFile";
         var extension = ".txt";
         for (var i = 1; i <= count; i++)
         {
-            File.WriteAllText(Path.Combine(_workDir, name + i + extension), "This is a test file.");
+            var path = Path.Combine(_workDir, name + i + extension);
+            File.WriteAllText(path, "This is a test file.");
+            filePaths.Add(path);
         }
+
+        return filePaths;
+    }
+
+    internal static List<string> CreateLargeDummyFiles(int count = 1)
+    {
+        var filePaths = new List<string>();
+        var name = "LargeTestFile";
+        var extension = ".bin";
+        for (var i = 1; i <= count; i++)
+        {
+            var path = Path.Combine(_workDir, name + i + extension);
+            var fs = new FileStream(path, FileMode.CreateNew);
+            fs.Seek(2048L * 1024 * 100, SeekOrigin.Begin);
+            fs.WriteByte(0);
+            fs.Close();
+            filePaths.Add(path);
+        }
+
+        return filePaths;
     }
 
     internal static void DeleteDummyFiles()
@@ -87,8 +147,7 @@ internal static class Helpers
         {
             if (Directory.Exists(file))
                 Directory.Delete(file, true);
-            if (!file.Contains("LargeTestFile.bin"))
-                File.Delete(file);
+            File.Delete(file);
         }
     }
 

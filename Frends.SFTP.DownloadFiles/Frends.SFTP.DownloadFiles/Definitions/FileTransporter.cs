@@ -156,8 +156,8 @@ internal class FileTransporter
                             return FormFailedFileTransferResult(userResultMessage);
                         }
                     }
-                    else
-                        _batchContext.DestinationFiles = GetDestinationFiles(DestinationDirectoryWithMacrosExtended);
+
+                    _batchContext.DestinationFiles = GetDestinationFiles(DestinationDirectoryWithMacrosExtended);
 
                     foreach (var file in files)
                     {
@@ -196,6 +196,12 @@ internal class FileTransporter
         catch (SftpPathNotFoundException ex)
         {
             userResultMessage = $"Error when establishing connection to the Server: {ex.Message}, {userResultMessage}";
+            _logger.NotifyError(_batchContext, userResultMessage, ex);
+            return FormFailedFileTransferResult(userResultMessage);
+        }
+        catch (FileNotFoundException ex)
+        {
+            userResultMessage = $"Error when fetching source files: {ex.Message}, {userResultMessage}";
             _logger.NotifyError(_batchContext, userResultMessage, ex);
             return FormFailedFileTransferResult(userResultMessage);
         }
@@ -384,6 +390,8 @@ internal class FileTransporter
     /// <returns></returns>
     private Tuple<List<FileItem>, bool> GetSourceFiles(SftpClient client, Source source)
     {
+        SetCurrentState(TransferState.CheckSourceFiles, "Checking source files.");
+
         var fileItems = new List<FileItem>();
 
         if (_filePaths != null)
