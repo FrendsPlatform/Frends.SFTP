@@ -138,7 +138,7 @@ internal static class Helpers
         }
     }
 
-    internal static Array CreateDummyFiles(int count)
+    internal static string[] CreateDummyFiles(int count)
     {
         var filePaths = new List<string>();
         var name = "SFTPUploadTestFile";
