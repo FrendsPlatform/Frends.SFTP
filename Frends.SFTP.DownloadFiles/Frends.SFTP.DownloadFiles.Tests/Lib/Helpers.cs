@@ -51,7 +51,7 @@ internal static class Helpers
         if (client.Exists(dir) && !dir.Equals(_baseDir)) client.DeleteDirectory(dir);
     }
 
-    internal static Array UploadTestFiles(string destination, int count = 3, string to = null)
+    internal static string[] UploadTestFiles(string destination, int count = 3, string to = null)
     {
         var filePaths = new List<string>();
 
@@ -79,7 +79,7 @@ internal static class Helpers
         return filePaths.ToArray();
     }
 
-    internal static Array UploadLargeTestFiles(string destination, int count = 3, string to = null)
+    internal static string[] UploadLargeTestFiles(string destination, int count = 3, string to = null)
     {
         var filePaths = new List<string>();
 
