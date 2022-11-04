@@ -28,7 +28,9 @@ internal class FileTransporter
         _result = new List<SingleFileTransferResult>();
         _filePaths = ConvertObjectToStringArray(context.Source.FilePaths);
 
-        SourceDirectoryWithMacrosExtended = _renamingPolicy.ExpandDirectoryForMacros(context.Source.Directory);
+        if (_filePaths == null || !_filePaths.Any())
+            SourceDirectoryWithMacrosExtended = _renamingPolicy.ExpandDirectoryForMacros(context.Source.Directory);
+
         DestinationDirectoryWithMacrosExtended = _renamingPolicy.ExpandDirectoryForMacros(context.Destination.Directory);
     }
 
@@ -156,8 +158,8 @@ internal class FileTransporter
                             return FormFailedFileTransferResult(userResultMessage);
                         }
                     }
-                    else
-                        _batchContext.DestinationFiles = GetDestinationFiles(DestinationDirectoryWithMacrosExtended);
+
+                    _batchContext.DestinationFiles = GetDestinationFiles(DestinationDirectoryWithMacrosExtended);
 
                     foreach (var file in files)
                     {
@@ -196,6 +198,12 @@ internal class FileTransporter
         catch (SftpPathNotFoundException ex)
         {
             userResultMessage = $"Error when establishing connection to the Server: {ex.Message}, {userResultMessage}";
+            _logger.NotifyError(_batchContext, userResultMessage, ex);
+            return FormFailedFileTransferResult(userResultMessage);
+        }
+        catch (FileNotFoundException ex)
+        {
+            userResultMessage = $"Error when fetching source files: {ex.Message}, {userResultMessage}";
             _logger.NotifyError(_batchContext, userResultMessage, ex);
             return FormFailedFileTransferResult(userResultMessage);
         }
@@ -384,13 +392,24 @@ internal class FileTransporter
     /// <returns></returns>
     private Tuple<List<FileItem>, bool> GetSourceFiles(SftpClient client, Source source)
     {
+        SetCurrentState(TransferState.CheckSourceFiles, "Checking source files.");
+
         var fileItems = new List<FileItem>();
 
         if (_filePaths != null)
         {
-            fileItems = _filePaths.Select(p => new FileItem(p) { Name = p }).ToList();
+            var items = _filePaths.Select(p => new FileItem(p) { Name = p }).ToList();
+            foreach (var file in items)
+            {
+                if (!client.Exists(file.FullPath))
+                    _logger.NotifyError(_batchContext, $"File does not exist: '{file.FullPath}", new FileNotFoundException());
+                else
+                    fileItems.Add(file);
+            }
+               
             if (fileItems.Any()) return new Tuple<List<FileItem>, bool>(fileItems, true);
-            return new Tuple<List<FileItem>, bool>(fileItems, false);
+
+            return new Tuple<List<FileItem>, bool>(fileItems, true);
         }
 
         // Return empty list and success.false value if source directory doesn't exists.

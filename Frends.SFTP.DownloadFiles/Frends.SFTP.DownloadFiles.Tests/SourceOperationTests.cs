@@ -12,8 +12,6 @@ class SourceOperationTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_SourceOperationNothingWithRenamingDisable()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
         var options = new Options
         {
             ThrowErrorOnFail = false,
@@ -33,7 +31,7 @@ class SourceOperationTests : DownloadFilesTestBase
     public void DownloadFiles_TestSourceOperationMove()
     {
         var to = "uploaded";
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory, to);
+        Helpers.UploadTestFiles(_source.Directory, 1, to);
         to = "upload/Upload/" + to;
         var source = new Source
         {
@@ -54,7 +52,6 @@ class SourceOperationTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestWithSourceMoveToNonExistingDirectoryShouldReturnUnsuccessfulTransfer()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         Directory.CreateDirectory(_destWorkDir);
 
         var options = new Options
@@ -84,8 +81,6 @@ class SourceOperationTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestSourceOperationRename()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
         var source = new Source
         {
             Directory = "upload/Upload",
@@ -106,7 +101,7 @@ class SourceOperationTests : DownloadFilesTestBase
     public void DownloadFiles_TestSourceOperationMoveWithRenameFilesDuringTransfer()
     {
         var to = "uploaded";
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory, to);
+        Helpers.UploadTestFiles(_source.Directory, 3, to);
         to = "upload/Upload/" + to;
 
         var options = new Options
@@ -138,8 +133,6 @@ class SourceOperationTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestSourceOperationRenameWithRenameFilesDuringTransfer()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
         var options = new Options
         {
             ThrowErrorOnFail = false,
@@ -170,7 +163,7 @@ class SourceOperationTests : DownloadFilesTestBase
     public void DownloadFiles_TestSourceOperationMoveWithRenameFilesDuringTransferWithRenameSourceAndDestinationFilesEnabled()
     {
         var to = "uploaded";
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory, to);
+        Helpers.UploadTestFiles(_source.Directory, 3, to);
         to = "upload/Upload/" + to;
 
         var options = new Options
@@ -202,8 +195,6 @@ class SourceOperationTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestSourceOperationRenameWithRenameFilesDuringTransferWithRenameSourceAndDestinationFilesEnabled()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
         var options = new Options
         {
             ThrowErrorOnFail = false,
@@ -233,7 +224,6 @@ class SourceOperationTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_SourceOperationDelete()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         Directory.CreateDirectory(_destWorkDir);
 
         var options = new Options
@@ -262,7 +252,6 @@ class SourceOperationTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_SourceOperationDeleteRenameSourceFile()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         Directory.CreateDirectory(_destWorkDir);
 
         var options = new Options
@@ -291,7 +280,6 @@ class SourceOperationTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_SourceOperationDeleteRenameDestinationFile()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         Directory.CreateDirectory(_destWorkDir);
 
         var options = new Options
@@ -320,7 +308,6 @@ class SourceOperationTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_SourceOperationDeleteRenameBoth()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         Directory.CreateDirectory(_destWorkDir);
 
         var options = new Options
@@ -349,7 +336,6 @@ class SourceOperationTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestSourceOperationRenameWithDifferentDirectory()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         Helpers.CreateSubDirectory("upload/moved");
 
         var source = new Source

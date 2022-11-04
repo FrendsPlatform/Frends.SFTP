@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Frends.SFTP.DownloadFiles.Definitions;
 
@@ -22,11 +23,29 @@ public class Options
     public bool RenameSourceFileBeforeTransfer { get; set; }
 
     /// <summary>
+    /// File extension for the temporary source file which is used during the transfer.
+    /// </summary>
+    /// <example>.8CO</example>
+    [DefaultValue(".8CO")]
+    [UIHint(nameof(RenameSourceFileBeforeTransfer), "", true)]
+    [DisplayFormat(DataFormatString = "Text")]
+    public string SourceFileExtension { get; set; }
+
+    /// <summary>
     /// Should the destination file be renamed with temporary file name during file transfer as a locking mechanism.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
     public bool RenameDestinationFileDuringTransfer { get; set; }
+
+    /// <summary>
+    /// File extension for the temporary destination file which is used during the transfer.
+    /// </summary>
+    /// <example>.8CO</example>
+    [DefaultValue(".8CO")]
+    [UIHint(nameof(RenameDestinationFileDuringTransfer), "", true)]
+    [DisplayFormat(DataFormatString = "Text")]
+    public string DestinationFileExtension { get; set; }
 
     /// <summary>
     /// Should the destination directories be created if they do not exist. May not work on all servers. 

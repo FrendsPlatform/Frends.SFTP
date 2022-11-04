@@ -13,7 +13,6 @@ class ErrorTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestTransferThatExistsThrowsError()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         Directory.CreateDirectory(_destWorkDir);
         File.Copy(Path.Combine(_workDir, _source.FileName), Path.Combine(_destWorkDir, _source.FileName));
 
@@ -68,7 +67,6 @@ class ErrorTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestThrowsWithSourceMoveToNonExistingDirectoryShouldReturnUnsuccessfulTransfer()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         Directory.CreateDirectory(_destWorkDir);
 
         var source = new Source
@@ -88,7 +86,6 @@ class ErrorTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestThrowsSourceMoveToDestinationFileExists()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         Directory.CreateDirectory(_destWorkDir);
         Helpers.CreateSubDirectory("/upload/uploaded");
         File.Copy(Path.Combine(_workDir, _source.FileName), Path.Combine(_destWorkDir, _source.FileName));
@@ -128,7 +125,6 @@ class ErrorTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestThrowsSourceMoveToDestinationFileExistsWithRenameSourceFileBeforeTransfer()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         Directory.CreateDirectory(_destWorkDir);
         Helpers.CreateSubDirectory("/upload/uploaded");
         File.Copy(Path.Combine(_workDir, _source.FileName), Path.Combine(_destWorkDir, _source.FileName));
@@ -158,12 +154,10 @@ class ErrorTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestErrorMessage()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         var connection = Helpers.GetSftpConnection();
         connection.Password = "cuinbeu8i9ch";
 
         var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-        var test = ex.Message;
         Assert.That(ex.Message.Contains($"FRENDS SFTP file transfer '' from 'SFTP://localhost//upload/Upload/{_source.FileName}' to 'FILE://{_destination.Directory}':"));
     }
 }

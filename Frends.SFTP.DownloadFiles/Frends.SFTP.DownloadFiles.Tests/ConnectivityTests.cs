@@ -13,7 +13,7 @@ public class ConnectivityTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestWithLargerBuffer()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, "LargeTestFile.bin") }, _source.Directory);
+        Helpers.UploadLargeTestFiles(_source.Directory, 1);
 
         var connection = Helpers.GetSftpConnection();
         connection.BufferSize = 256;
@@ -21,7 +21,7 @@ public class ConnectivityTests : DownloadFilesTestBase
         var source = new Source
         {
             Directory = _source.Directory,
-            FileName = "LargeTestFile.bin",
+            FileName = "LargeTestFile1.bin",
             Action = SourceAction.Error,
             Operation = SourceOperation.Nothing,
         };
@@ -46,8 +46,6 @@ public class ConnectivityTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestPrivateKeyFileRsa()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
         connection.PrivateKeyFilePassphrase = "passphrase";
@@ -62,8 +60,6 @@ public class ConnectivityTests : DownloadFilesTestBase
     public void DownloadFiles_TestPrivateKeyFileRsaFromString()
     {
         var key = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key"));
-
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
 
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
@@ -89,8 +85,6 @@ public class ConnectivityTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestWithInteractiveKeyboardAuthentication()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
         var connection = Helpers.GetSftpConnection();
         connection.UseKeyboardInteractiveAuthentication = true;
 

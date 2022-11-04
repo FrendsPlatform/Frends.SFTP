@@ -17,6 +17,7 @@ internal enum TransferState
     CleanUpFiles,
     CheckIfDestinationFileExists,
     RestoreModified,
-    Connection
+    Connection,
+    CheckSourceFiles
 }
 

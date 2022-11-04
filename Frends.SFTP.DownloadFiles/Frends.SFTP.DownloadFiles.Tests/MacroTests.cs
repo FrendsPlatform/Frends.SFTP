@@ -14,7 +14,6 @@ internal class MacroTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestUsingMacros()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         var destination = new Destination
         {
             Directory = _destination.Directory,
@@ -31,7 +30,7 @@ internal class MacroTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestSourceDirectoryWithMacros()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory + "/testfolder_2022");
+        Helpers.UploadTestFiles(_source.Directory + "/testfolder_2022", 3);
 
         var source = new Source
         {
@@ -50,7 +49,6 @@ internal class MacroTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestDestinationDirectoryWithMacros()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
         var year = DateTime.Now.Year.ToString();
         var destination = new Destination
         {
@@ -74,8 +72,6 @@ internal class MacroTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestSourceFileRenameWithMacros()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
         var year = DateTime.Now.Year.ToString();
         var to = "/upload/Upload/" + year + "_uploaded/" + Path.GetFileNameWithoutExtension(_source.FileName) + year + Path.GetExtension(_source.FileName);
         Helpers.CreateSubDirectory(Path.GetDirectoryName(to).Replace("\\", "/"));
@@ -99,8 +95,6 @@ internal class MacroTests : DownloadFilesTestBase
     [Test]
     public void DownloadFiles_TestSourceFileRenameWithMacros2()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-
         var source = new Source
         {
             Directory = _source.Directory,
@@ -122,8 +116,7 @@ internal class MacroTests : DownloadFilesTestBase
     {
         var year = DateTime.Now.Year.ToString();
         var to = $"/upload/Upload/{year}_uploaded";
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
-        Helpers.CreateSubDirectory(to);
+        Helpers.UploadTestFiles(_source.Directory, 1, to);
 
         var source = new Source
         {

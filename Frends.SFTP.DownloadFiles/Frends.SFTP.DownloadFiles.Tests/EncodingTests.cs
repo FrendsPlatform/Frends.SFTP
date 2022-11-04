@@ -12,7 +12,7 @@ class EncodingTests : DownloadFilesTestBase
     [SetUp]
     public void setup()
     {
-        Helpers.UploadTestFiles(new List<string> { Path.Combine(_workDir, _source.FileName) }, _source.Directory);
+        Helpers.UploadTestFiles(_source.Directory, 3);
     }
 
     [Test]
