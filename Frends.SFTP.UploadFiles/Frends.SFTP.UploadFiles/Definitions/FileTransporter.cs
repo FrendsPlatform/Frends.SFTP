@@ -162,8 +162,7 @@ internal class FileTransporter
                             return FormFailedFileTransferResult(userResultMessage);
                         }
                     }
-                    else
-                        // client.ChangeDirectory(DestinationDirectoryWithMacrosExtended);
+
 
                     _batchContext.DestinationFiles = client.ListDirectory(DestinationDirectoryWithMacrosExtended);
 
@@ -182,6 +181,12 @@ internal class FileTransporter
                     client.Disconnect();
                 }
             }   
+        }
+        catch (FileNotFoundException ex)
+        {
+            userResultMessage = $"Error when fetching source files: {ex.Message}, {userResultMessage}";
+            _logger.NotifyError(_batchContext, userResultMessage, ex);
+            return FormFailedFileTransferResult(userResultMessage);
         }
         catch (SshConnectionException ex)
         {
@@ -390,6 +395,8 @@ internal class FileTransporter
     /// <returns></returns>
     private Tuple<List<FileItem>, bool> GetSourceFiles(Source source)
     {
+        SetCurrentState(TransferState.CheckSourceFiles, "Checking source files.");
+
         var fileItems = new List<FileItem>();
 
         if (_filePaths != null)

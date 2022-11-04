@@ -1,6 +1,13 @@
 # Changelog
 
-## [2.3.0]
+## [2.4.0]
+### Added
+- [Breaking] Added parameters for the file extension of temporary source and destination files when rename options are enabled.
+- Fixed operations log to show correct state when source files are not found with filePaths.
+- Fixed operations log to use temp work path when getting source files to temp directory.
+- Added tests for the filePaths.
+
+## [2.3.0] - 2022-10-12
 ### Added
 - Added boolean parameter for adding a new line when appending to an existing file.
 - Changed the appending to use AppendAllText instead of AppendAllLines.

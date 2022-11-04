@@ -110,5 +110,25 @@ class ErrorTesting : UploadFilesTestBase
         var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
         Assert.That(ex.Message.Contains(@$"FRENDS SFTP file transfer '' from 'FILE://{_source.Directory}/{_source.FileName}' to 'SFTP://{connection.Address}/{_destination.Directory}':"));
     }
+
+    [Test]
+    public void UploadFiles_TestThrowsWhenFilesInFilePathsAreNotFound()
+    {
+        var filePaths = Helpers.CreateDummyFiles(3);
+        foreach (var file in filePaths)
+        {
+            File.Delete(file.ToString());
+        }
+
+        var source = new Source
+        {
+            Action = SourceAction.Info,
+            Operation = SourceOperation.Nothing,
+            FilePaths = filePaths
+        };
+
+        var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
+        Assert.That(ex.Message.Contains("Error when fetching source files: File does not exist"));
+    }
 }
 

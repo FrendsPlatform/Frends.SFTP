@@ -25,7 +25,7 @@ internal class FileItem
     public FileItem(string fullPath)
     {
         if (!File.Exists(fullPath))
-            throw new ArgumentException($"File does not exist: '{fullPath}");
+            throw new FileNotFoundException($"File does not exist: '{fullPath}");
 
         var fi = new FileInfo(fullPath);
         Modified = fi.LastWriteTime;

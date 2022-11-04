@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using Renci.SshNet;
 using Renci.SshNet.Common;
@@ -137,14 +138,20 @@ internal static class Helpers
         }
     }
 
-    internal static void CreateDummyFiles(int count)
+    internal static string[] CreateDummyFiles(int count)
     {
+        var filePaths = new List<string>();
         var name = "SFTPUploadTestFile";
         var extension = ".txt";
+
         for (var i = 1; i <= count; i++)
         {
-            File.WriteAllText(Path.Combine(_workDir, name + i + extension), "This is a test file.");
+            var path = Path.Combine(_workDir, name + i + extension);
+            File.WriteAllText(path, "This is a test file.");
+            filePaths.Add(path);
         }
+
+        return filePaths.ToArray();
     }
 
     internal static void DeleteDummyFiles()
