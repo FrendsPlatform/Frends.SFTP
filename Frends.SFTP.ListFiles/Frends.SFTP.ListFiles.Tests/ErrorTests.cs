@@ -5,6 +5,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using Frends.SFTP.ListFiles.Definitions;
+using Frends.SFTP.ListFiles.Enums;
 
 namespace Frends.SFTP.ListFiles.Tests;
 

@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using Renci.SshNet.Security;
+using Frends.SFTP.ListFiles.Enums;
 
 namespace Frends.SFTP.ListFiles.Definitions;
 
@@ -12,26 +13,6 @@ namespace Frends.SFTP.ListFiles.Definitions;
 /// </summary>
 internal static class Util
 {
-    internal static bool FileMatchesMask(string filename, string mask)
-    {
-        const string regexEscape = "<regex>";
-        string pattern;
-
-        //check is pure regex wished to be used for matching
-        if (mask.StartsWith(regexEscape))
-            //use substring instead of string.replace just in case some has regex like '<regex>//File<regex>' or something else like that
-            pattern = mask.Substring(regexEscape.Length);
-        else
-        {
-            pattern = mask.Replace(".", "\\.");
-            pattern = pattern.Replace("*", ".*");
-            pattern = pattern.Replace("?", ".+");
-            pattern = String.Concat("^", pattern, "$");
-        }
-
-        return Regex.IsMatch(filename, pattern, RegexOptions.IgnoreCase);
-    }
-
     internal static byte[] ConvertFingerprintToByteArray(string fingerprint)
     {
         return fingerprint.Split(':').Select(s => Convert.ToByte(s, 16)).ToArray();
@@ -59,32 +40,18 @@ internal static class Util
         catch { return false; }
     }
 
-    internal static byte[] ConvertHexStringToHex(string hex)
-    {
-        var arr = new byte[hex.Length / 2];
-        for (var i = 0; i < arr.Length; i++)
-        {
-            arr[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
-        }
-        return arr;
-    }
-
     internal static bool IsMD5(string input)
     {
-        if (String.IsNullOrEmpty(input))
-        {
+        if (string.IsNullOrEmpty(input))
             return false;
-        }
 
         return Regex.IsMatch(input, "^[0-9a-fA-F]{32}$");
     }
 
     internal static bool IsSha256(string input)
     {
-        if (String.IsNullOrEmpty(input))
-        {
+        if (string.IsNullOrEmpty(input))
             return false;
-        }
 
         if (Regex.IsMatch(input, "^[0-9a-fA-F]{64}$"))
             return true;
@@ -128,7 +95,7 @@ internal static class Util
 
         client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
         {
-            if (Util.IsMD5(expectedServerFingerprint.Replace(":", "").Replace("-", "")))
+            if (IsMD5(expectedServerFingerprint.Replace(":", "").Replace("-", "")))
             {
                 if (!expectedServerFingerprint.Contains(':'))
                 {
@@ -143,20 +110,20 @@ internal static class Util
                 {
                     var serverFingerprint = BitConverter.ToString(e.FingerPrint).Replace('-', ':');
 
-                    e.CanTrust = e.FingerPrint.SequenceEqual(Util.ConvertFingerprintToByteArray(expectedServerFingerprint));
+                    e.CanTrust = e.FingerPrint.SequenceEqual(ConvertFingerprintToByteArray(expectedServerFingerprint));
                     if (!e.CanTrust)
                         userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
                                 $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{serverFingerprint}'.";
                 }
 
             }
-            else if (Util.IsSha256(expectedServerFingerprint))
+            else if (IsSha256(expectedServerFingerprint))
             {
-                if (Util.TryConvertHexStringToHex(expectedServerFingerprint))
+                if (TryConvertHexStringToHex(expectedServerFingerprint))
                 {
                     using (SHA256 mySHA256 = SHA256.Create())
                     {
-                        var sha256Fingerprint = Util.ToHex(mySHA256.ComputeHash(e.HostKey));
+                        var sha256Fingerprint = ToHex(mySHA256.ComputeHash(e.HostKey));
 
                         e.CanTrust = (sha256Fingerprint == expectedServerFingerprint);
                         if (!e.CanTrust)

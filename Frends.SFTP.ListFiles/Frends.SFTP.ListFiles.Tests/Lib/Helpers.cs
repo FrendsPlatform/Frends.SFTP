@@ -5,6 +5,7 @@ using Renci.SshNet;
 using Renci.SshNet.Common;
 using Renci.SshNet.Security;
 using Frends.SFTP.ListFiles.Definitions;
+using Frends.SFTP.ListFiles.Enums;
 
 namespace Frends.SFTP.ListFiles.Tests;
 

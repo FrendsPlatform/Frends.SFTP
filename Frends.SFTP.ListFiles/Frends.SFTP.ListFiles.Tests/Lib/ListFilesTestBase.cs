@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using Frends.SFTP.ListFiles.Definitions;
+using Frends.SFTP.ListFiles.Enums;
 
 namespace Frends.SFTP.ListFiles.Tests;
 

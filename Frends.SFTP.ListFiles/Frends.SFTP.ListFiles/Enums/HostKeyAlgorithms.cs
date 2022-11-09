@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.ListFiles.Definitions;
+﻿namespace Frends.SFTP.ListFiles.Enums;
 
 /// <summary>
 /// Enumeration for host key algorithms.

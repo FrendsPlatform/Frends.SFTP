@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using System.Threading;
-using Frends.SFTP.ListFiles.Definitions;
+using Frends.SFTP.ListFiles.Enums;
 
 namespace Frends.SFTP.ListFiles.Tests;
 
@@ -20,7 +20,7 @@ public class ListFilesTest : ListFilesTestBase
 
         var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.FileCount, Is.EqualTo(3));
+        Assert.AreEqual(3, result.FileCount);
     }
 
     [Test]
@@ -31,7 +31,7 @@ public class ListFilesTest : ListFilesTestBase
             
         var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.FileCount, Is.EqualTo(6));
+        Assert.AreEqual(6, result.FileCount);
     }
 
     [Test]
@@ -39,7 +39,7 @@ public class ListFilesTest : ListFilesTestBase
     {
         var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.FileCount, Is.EqualTo(3));
+        Assert.AreEqual(3, result.FileCount);
     }
 
     [Test]
@@ -49,7 +49,7 @@ public class ListFilesTest : ListFilesTestBase
 
         var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.FileCount, Is.EqualTo(4));
+        Assert.AreEqual(4, result.FileCount);
     }
 
     [Test]
@@ -60,7 +60,7 @@ public class ListFilesTest : ListFilesTestBase
 
         var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.FileCount, Is.EqualTo(1));
+        Assert.AreEqual(1, result.FileCount);
         Assert.IsTrue(result.Files[0].IsDirectory);
     }
 

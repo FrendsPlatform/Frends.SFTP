@@ -2,6 +2,7 @@
 using Renci.SshNet;
 using System.Text.RegularExpressions;
 using Frends.SFTP.ListFiles.Definitions;
+using Frends.SFTP.ListFiles.Enums;
 
 namespace Frends.SFTP.ListFiles
 {

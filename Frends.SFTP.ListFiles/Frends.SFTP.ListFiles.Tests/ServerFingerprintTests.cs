@@ -2,7 +2,7 @@
 using System.Threading;
 using NUnit.Framework;
 using Renci.SshNet.Common;
-using Frends.SFTP.ListFiles.Definitions;
+using Frends.SFTP.ListFiles.Enums;
 
 namespace Frends.SFTP.ListFiles.Tests;
 
@@ -126,7 +126,6 @@ public class ServerFingerprintTests : ListFilesTestBase
 
         var ex = Assert.Throws<SshConnectionException>(() => SFTP.ListFiles(_input, connection, new CancellationToken()));
         Assert.IsTrue(ex.Message.StartsWith("Key exchange negotiation failed."));
-        //Assert.That(ex.Message.Contains("Expected server fingerprint was given in unsupported format."));
     }
 }
 

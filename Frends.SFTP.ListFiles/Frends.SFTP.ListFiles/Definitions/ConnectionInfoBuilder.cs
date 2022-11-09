@@ -1,6 +1,7 @@
 ﻿using Renci.SshNet;
 using Renci.SshNet.Common;
 using System.Text;
+using Frends.SFTP.ListFiles.Enums;
 
 namespace Frends.SFTP.ListFiles.Definitions;
 
