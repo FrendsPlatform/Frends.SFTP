@@ -32,9 +32,7 @@ internal static class Util
         {
             var arr = new byte[hex.Length / 2];
             for (var i = 0; i < arr.Length; i++)
-            {
                 arr[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
-            }
             return true;
         }
         catch { return false; }
