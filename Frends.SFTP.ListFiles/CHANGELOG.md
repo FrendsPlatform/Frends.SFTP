@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0] - 2022-11-09
+### Added
+- Added keyboard authentication method
+- [Breaking] Added parameter for keyboard authentication
+- Modified result Task to return object instead of list
+- Added result attribute FileCount
+- Added more tests e.g. Serverfingerprint tests
+- Added System.Text.CodePages NuGet to the project
+- Added ConnectionInfoBuilder
+- Added HostKeyAlgorithm enum
+
 ## [1.0.2] - 2022-06-28
 ### Changed
 - Reconstructed the Task to be similar to other SFTP tasks

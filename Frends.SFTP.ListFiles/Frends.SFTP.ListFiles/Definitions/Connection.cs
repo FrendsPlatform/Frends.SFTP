@@ -56,7 +56,10 @@ public class Connection
     public string Password { get; set; }
 
     /// <summary>
-    /// Full path to private key file.
+    /// Full path to private key file. Supported private key formats: OpenSSH and ssh.com.
+    /// PuTTY keys can be converted with puttygen.exe application.
+    /// 1. Load your key file into puttygen.exe
+    /// 2. Conversion > Export OpenSSH key (not the "force new file format" option)
     /// </summary>
     /// <example>C:\path\to\private\key</example>
     [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyFile)]
@@ -64,8 +67,10 @@ public class Connection
     public string PrivateKeyFile { get; set; }
 
     /// <summary>
-    /// Private key as a string, supported private key formats: PKCS#8,
-    /// PuTTY.ppk.
+    /// Private key as a string, supported private key formats: OpenSSH and ssh.com.
+    /// PuTTY keys can be converted with puttygen.exe application.
+    /// 1. Load your key file into puttygen.exe
+    /// 2. Conversion > Export OpenSSH key (not the "force new file format" option)
     /// </summary>
     /// <example>
     /// -----BEGIN RSA PRIVATE KEY-----
@@ -99,5 +104,21 @@ public class Connection
     /// </example>
     [DefaultValue("")]
     public string ServerFingerPrint { get; set; }
+
+    /// <summary>
+    /// Host key algorithm to use when connecting to server. 
+    /// Default value is Any which doesn't force the task to use 
+    /// specific algorithm.
+    /// </summary>
+    /// <example>HostKeyAlgorithms.RSA</example>
+    [DefaultValue(HostKeyAlgorithms.Any)]
+    public HostKeyAlgorithms HostKeyAlgorithm { get; set; }
+
+    /// <summary>
+    /// Enable if the server uses keyboard-interactive authentication method.
+    /// </summary>
+    /// <example>false</example>
+    [DefaultValue(false)]
+    public bool UseKeyboardInteractiveAuthentication { get; set; }
 }
 

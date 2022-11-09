@@ -54,7 +54,9 @@ public class Input
     public bool EnableBom { get; set; }
 
     /// <summary>
-    /// File encoding to be used. A partial list of possible encodings: https://en.wikipedia.org/wiki/Windows_code_page#List.
+    /// File encoding to be used.
+    /// Encoding don't support any unicode encoding. It only support the code page encodings. 
+    /// A partial list of possible encodings: https://en.wikipedia.org/wiki/Windows_code_page#List.
     /// </summary>
     /// <example>utf-8</example>
     [UIHint(nameof(FileEncoding), "", FileEncoding.Other)]
