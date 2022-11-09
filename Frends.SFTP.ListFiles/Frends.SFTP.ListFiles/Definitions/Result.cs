@@ -9,7 +9,7 @@ public class Result
 	/// Count of files found from the directory.
 	/// </summary>
 	/// <example>2</example>
-	public int Count { get; private set; }
+	public int FileCount { get; private set; }
 
     /// <summary>
     /// List of file items found from the directory.
@@ -46,7 +46,7 @@ public class Result
 
     internal Result(List<FileItem> files)
     {
-		Count = files.Count;
+		FileCount = files.Count;
         Files = files;
     }
 }

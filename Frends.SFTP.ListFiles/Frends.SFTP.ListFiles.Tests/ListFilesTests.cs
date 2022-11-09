@@ -20,7 +20,7 @@ public class ListFilesTest : ListFilesTestBase
 
         var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Count, Is.EqualTo(3));
+        Assert.That(result.FileCount, Is.EqualTo(3));
     }
 
     [Test]
@@ -31,7 +31,7 @@ public class ListFilesTest : ListFilesTestBase
             
         var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Count, Is.EqualTo(6));
+        Assert.That(result.FileCount, Is.EqualTo(6));
     }
 
     [Test]
@@ -39,7 +39,7 @@ public class ListFilesTest : ListFilesTestBase
     {
         var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Count, Is.EqualTo(3));
+        Assert.That(result.FileCount, Is.EqualTo(3));
     }
 
     [Test]
@@ -49,7 +49,7 @@ public class ListFilesTest : ListFilesTestBase
 
         var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Count, Is.EqualTo(4));
+        Assert.That(result.FileCount, Is.EqualTo(4));
     }
 
     [Test]
@@ -60,7 +60,7 @@ public class ListFilesTest : ListFilesTestBase
 
         var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Count, Is.EqualTo(1));
+        Assert.That(result.FileCount, Is.EqualTo(1));
         Assert.IsTrue(result.Files[0].IsDirectory);
     }
 
@@ -71,30 +71,30 @@ public class ListFilesTest : ListFilesTestBase
         _input.IncludeSubdirectories = true;
 
         var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
-        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual(1, result.FileCount);
 
         _input.FileEncoding = FileEncoding.ASCII;
         result = SFTP.ListFiles(_input, _connection, new CancellationToken());
-        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual(1, result.FileCount);
 
         _input.FileEncoding = FileEncoding.UTF8;
         _input.EnableBom = true;
         result = SFTP.ListFiles(_input, _connection, new CancellationToken());
-        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual(1, result.FileCount);
 
         _input.FileEncoding = FileEncoding.UTF8;
         _input.EnableBom = false;
         result = SFTP.ListFiles(_input, _connection, new CancellationToken());
-        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual(1, result.FileCount);
 
         _input.FileEncoding = FileEncoding.WINDOWS1252;
         result = SFTP.ListFiles(_input, _connection, new CancellationToken());
-        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual(1, result.FileCount);
 
         _input.FileEncoding = FileEncoding.Other;
         _input.EncodingInString = "iso-8859-1";
         result = SFTP.ListFiles(_input, _connection, new CancellationToken());
-        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual(1, result.FileCount);
     }
 }
 

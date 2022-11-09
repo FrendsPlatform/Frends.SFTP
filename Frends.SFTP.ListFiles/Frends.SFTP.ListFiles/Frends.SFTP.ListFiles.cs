@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using Renci.SshNet;
-using Renci.SshNet.Security;
 using System.Text.RegularExpressions;
 using Frends.SFTP.ListFiles.Definitions;
 
@@ -40,7 +39,7 @@ namespace Frends.SFTP.ListFiles
             client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256@libssh.org");
 
             if (connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
-                ForceHostKeyAlgorithm(client, connection.HostKeyAlgorithm);
+                Util.ForceHostKeyAlgorithm(client, connection.HostKeyAlgorithm);
 
             var expectedServerFingerprint = connection.ServerFingerPrint;
             // Check the fingerprint of the server if given.
@@ -76,37 +75,6 @@ namespace Frends.SFTP.ListFiles
             return new Result(files);
         }
 
-        #region Helper methods
-
-        private static void ForceHostKeyAlgorithm(SftpClient client, HostKeyAlgorithms algorithm)
-        {
-            client.ConnectionInfo.HostKeyAlgorithms.Clear();
-
-            switch (algorithm)
-            {
-                case HostKeyAlgorithms.RSA:
-                    client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) => { return new KeyHostAlgorithm("ssh-rsa", new RsaKey(), data); });
-                    break;
-                case HostKeyAlgorithms.Ed25519:
-                    client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-ed25519", (data) => { return new KeyHostAlgorithm("ssh-ed25519", new ED25519Key(), data); });
-                    break;
-                case HostKeyAlgorithms.DSS:
-                    client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-dss", (data) => { return new KeyHostAlgorithm("ssh-dss", new DsaKey(), data); });
-                    break;
-                case HostKeyAlgorithms.nistp256:
-                    client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp256", (data) => { return new KeyHostAlgorithm("ecdsa-sha2-nistp256", new EcdsaKey(), data); });
-                    break;
-                case HostKeyAlgorithms.nistp384:
-                    client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp384", (data) => { return new KeyHostAlgorithm("ecdsa-sha2-nistp384", new EcdsaKey(), data); });
-                    break;
-                case HostKeyAlgorithms.nistp521:
-                    client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp521", (data) => { return new KeyHostAlgorithm("ecdsa-sha2-nistp521", new EcdsaKey(), data); });
-                    break;
-            }
-
-            return;
-        }
-
         private static List<FileItem> GetFiles(SftpClient sftp, string regexStr, string directory, Input input, CancellationToken cancellationToken)
         {
             var directoryList = new List<FileItem>();
@@ -133,7 +101,5 @@ namespace Frends.SFTP.ListFiles
             }
             return directoryList;
         }
-
-        #endregion
     }
 }

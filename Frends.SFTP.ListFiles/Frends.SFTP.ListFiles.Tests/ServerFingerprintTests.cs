@@ -30,7 +30,7 @@ public class ServerFingerprintTests : ListFilesTestBase
         connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
         var result = SFTP.ListFiles(_input, connection, new CancellationToken());
-        Assert.AreEqual(3, result.Count);
+        Assert.AreEqual(3, result.FileCount);
     }
 
     [Test]
@@ -41,7 +41,7 @@ public class ServerFingerprintTests : ListFilesTestBase
         connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
         var result = SFTP.ListFiles(_input, connection, new CancellationToken());
-        Assert.AreEqual(3, result.Count);
+        Assert.AreEqual(3, result.FileCount);
     }
 
     [Test]
@@ -52,7 +52,7 @@ public class ServerFingerprintTests : ListFilesTestBase
         connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
         var result = SFTP.ListFiles(_input, connection, new CancellationToken());
-        Assert.AreEqual(3, result.Count);
+        Assert.AreEqual(3, result.FileCount);
     }
 
     [Test]
@@ -63,7 +63,7 @@ public class ServerFingerprintTests : ListFilesTestBase
         connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
         var result = SFTP.ListFiles(_input, connection, new CancellationToken());
-        Assert.AreEqual(3, result.Count);
+        Assert.AreEqual(3, result.FileCount);
     }
 
     [Test]
@@ -74,7 +74,7 @@ public class ServerFingerprintTests : ListFilesTestBase
         connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
         var result = SFTP.ListFiles(_input, connection, new CancellationToken());
-        Assert.AreEqual(3, result.Count);
+        Assert.AreEqual(3, result.FileCount);
     }
 
     [Test]
@@ -85,7 +85,7 @@ public class ServerFingerprintTests : ListFilesTestBase
         connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
         var result = SFTP.ListFiles(_input, connection, new CancellationToken());
-        Assert.AreEqual(3, result.Count);
+        Assert.AreEqual(3, result.FileCount);
     }
 
     [Test]
