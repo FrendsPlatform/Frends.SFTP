@@ -58,7 +58,7 @@ public class ConnectivityTests : ListFilesTestBase
         connection.UseKeyboardInteractiveAuthentication = true;
 
         var result = SFTP.ListFiles(_input, connection, new CancellationToken());
-        Assert.That(result.FileCount, Is.EqualTo(3));
+        Assert.AreEqual(3, result.FileCount);
     }
 }
 
