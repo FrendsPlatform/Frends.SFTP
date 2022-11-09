@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.ListFiles.Enums;
+﻿namespace Frends.SFTP.ListFiles.Definitions;
 
 /// <summary>
 /// Enumeration to specify authentication type for the transfer.

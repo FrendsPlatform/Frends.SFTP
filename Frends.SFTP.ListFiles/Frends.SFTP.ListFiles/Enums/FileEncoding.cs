@@ -1,7 +1,7 @@
 ﻿// Pragma for self-explanatory enum attributes.
 #pragma warning disable 1591
 
-namespace Frends.SFTP.ListFiles.Enums;
+namespace Frends.SFTP.ListFiles.Definitions;
 
 /// <summary>
 /// Enumeration of file encoding options.

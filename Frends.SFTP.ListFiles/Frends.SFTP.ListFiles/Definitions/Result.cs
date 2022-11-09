@@ -1,77 +1,53 @@
-﻿using Renci.SshNet.Sftp;
-
-namespace Frends.SFTP.ListFiles.Definitions;
+﻿namespace Frends.SFTP.ListFiles.Definitions;
 
 /// <summary>
 /// Return object with private setters.
 /// </summary>
 public class Result
 {
-    /// <summary>
-    /// Full path of directory or file.
-    /// </summary>
-    /// <example>/directory/test.txt</example>
-    public string FullPath { get; private set; }
+	/// <summary>
+	/// Count of files found from the directory.
+	/// </summary>
+	/// <example>2</example>
+	public int Count { get; private set; }
 
     /// <summary>
-    /// Boolean value of Result object being directory.
+    /// List of file items found from the directory.
     /// </summary>
-    /// <example>false</example>
-    public bool IsDirectory { get; private set; }
+    /// <example>
+    /// <code>
+    /// [
+	///		{
+	///			"FullPath": "/upload/down/test2.txt",
+	///			"IsDirectory": false,
+	///			"IsFile": true,
+	///			"Length": 54,
+	///			"Name": "test2.txt",
+	///			"LastWriteTimeUtc": "2022-11-07T12:17:36Z",
+	///			"LastAccessTimeUtc": "2022-11-07T12:17:37Z",
+	///			"LastWriteTime": "2022-11-07T14:17:36+02:00",
+	///			"LastAccessTime": "2022-11-07T14:17:37+02:00"
+	///		},
+	///		{
+	///			"FullPath": "/upload/down/test1.txt",
+	///			"IsDirectory": false,
+	///			"IsFile": true,
+	///			"Length": 0,
+	///			"Name": "test1.txt",
+	///			"LastWriteTimeUtc": "2022-11-07T12:17:36Z",
+	///			"LastAccessTimeUtc": "2022-11-07T12:17:37Z",
+	///			"LastWriteTime": "2022-11-07T14:17:36+02:00",
+	///			"LastAccessTime": "2022-11-07T14:17:37+02:00"
+	///		},
+	/// ]
+    /// </code>
+    /// </example>
+    public List<FileItem> Files { get; private set; }
 
-    /// <summary>
-    /// Boolean value of Result object being file.
-    /// </summary>
-    /// <example>true</example>
-    public bool IsFile { get; private set; }
-
-    /// <summary>
-    /// File size in bytes.
-    /// </summary>
-    /// <example>4</example>
-    public long Length { get; private set; }
-
-    /// <summary>
-    /// Name of the file with extension.
-    /// </summary>
-    /// <example>test.txt</example>
-    public string Name { get; private set; }
-
-    /// <summary>
-    /// Timestamps for last write in UTC timezone.
-    /// </summary>
-    /// <example>2022-06-28T11:05:58Z</example>
-    public DateTime LastWriteTimeUtc { get; private set; }
-
-    /// <summary>
-    /// Timestamps for last access in UTC timezone.
-    /// </summary>
-    /// <example>2022-06-28T11:05:58Z</example>
-    public DateTime LastAccessTimeUtc { get; private set; }
-
-    /// <summary>
-    /// Timestamps for last write in current timezone.
-    /// </summary>
-    /// <example>2022-06-28T14:05:58+03:00</example>
-    public DateTime LastWriteTime { get; private set; }
-
-    /// <summary>
-    /// Timestamps for last access in current timezone.
-    /// </summary>
-    /// <example>2022-06-28T14:05:58+03:00</example>
-    public DateTime LastAccessTime { get; private set; }
-
-    internal Result(SftpFile file)
+    internal Result(List<FileItem> files)
     {
-        FullPath = file.FullName;
-        IsDirectory = file.IsDirectory;
-        IsFile = file.IsRegularFile;
-        Length = file.Length;
-        Name = file.Name;
-        LastWriteTimeUtc = file.LastWriteTimeUtc;
-        LastAccessTimeUtc = file.LastAccessTimeUtc;
-        LastWriteTime = file.LastWriteTime;
-        LastAccessTime = file.LastAccessTime;
+		Count = files.Count;
+        Files = files;
     }
 }
 

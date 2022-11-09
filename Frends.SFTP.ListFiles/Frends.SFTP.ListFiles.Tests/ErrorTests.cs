@@ -5,20 +5,18 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using Frends.SFTP.ListFiles.Definitions;
-using Frends.SFTP.ListFiles.Enums;
 
 namespace Frends.SFTP.ListFiles.Tests;
 
 [TestFixture]
-public class ErrorTests
+public class ErrorTests : ListFilesTestBase
 {
     [Test]
     public void ListFiles_TestDirectoryNotExistsThrows()
     {
-        var connection = Helpers.GetSftpConnection();
         var input = new Input
         {
-            Directory = "/listfiles/nonexisting/directory",
+            Directory = "/upload/nonexisting/directory",
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
@@ -26,7 +24,7 @@ public class ErrorTests
         };
             
 
-        var ex = Assert.Throws<SftpPathNotFoundException>(() => SFTP.ListFiles(input, connection, new CancellationToken()));
+        var ex = Assert.Throws<SftpPathNotFoundException>(() => SFTP.ListFiles(input, _connection, new CancellationToken()));
         Assert.AreEqual($"No such file", ex.Message);
 
     }
@@ -38,7 +36,7 @@ public class ErrorTests
         connection.Port = 51644;
         var input = new Input
         {
-            Directory = "/listfiles",
+            Directory = "/upload",
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
@@ -57,7 +55,7 @@ public class ErrorTests
 
         var input = new Input
         {
-            Directory = "/listfiles",
+            Directory = "/upload",
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
@@ -78,7 +76,7 @@ public class ErrorTests
 
         var input = new Input
         {
-            Directory = "/listfiles",
+            Directory = "/upload",
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
@@ -99,7 +97,7 @@ public class ErrorTests
 
         var input = new Input
         {
-            Directory = "/listfiles",
+            Directory = "/upload",
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
@@ -122,7 +120,7 @@ public class ErrorTests
 
         var input = new Input
         {
-            Directory = "/listfiles",
+            Directory = "/upload",
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
@@ -143,7 +141,7 @@ public class ErrorTests
 
         var input = new Input
         {
-            Directory = "/listfiles",
+            Directory = "/upload",
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
@@ -163,7 +161,7 @@ public class ErrorTests
 
         var input = new Input
         {
-            Directory = "/listfiles",
+            Directory = "/upload",
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
@@ -183,7 +181,7 @@ public class ErrorTests
 
         var input = new Input
         {
-            Directory = "/listfiles",
+            Directory = "/upload",
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
