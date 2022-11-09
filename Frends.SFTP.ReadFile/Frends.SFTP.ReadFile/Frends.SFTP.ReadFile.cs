@@ -1,8 +1,5 @@
 ﻿using System.ComponentModel;
 using Renci.SshNet;
-using Renci.SshNet.Common;
-using System.Text;
-using System.Security.Cryptography;
 using Frends.SFTP.ReadFile.Definitions;
 
 namespace Frends.SFTP.ReadFile;
@@ -47,10 +44,7 @@ public class SFTP
             {
                 userResultMessage = Util.CheckServerFingerprint(client, connection.ServerFingerPrint);
             }
-            catch (Exception ex)
-            {
-                throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}");
-            }
+            catch (Exception ex) { throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}"); }
         }
 
         client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);

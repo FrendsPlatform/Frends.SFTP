@@ -1,6 +1,7 @@
 ﻿using Renci.SshNet;
 using Renci.SshNet.Common;
 using System.Text;
+using Frends.SFTP.ReadFile.Enums;
 
 namespace Frends.SFTP.ReadFile.Definitions;
 
