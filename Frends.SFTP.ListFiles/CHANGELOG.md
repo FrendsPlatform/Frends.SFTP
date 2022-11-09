@@ -3,8 +3,9 @@
 ## [2.0.0] - 2022-11-09
 ### Added
 - Added keyboard authentication method
-- Added parameter for keyboard authentication
+- [Breaking] Added parameter for keyboard authentication
 - Modified result Task to return object instead of list
+- Added result attribute FileCount
 - Added more tests e.g. Serverfingerprint tests
 - Added System.Text.CodePages NuGet to the project
 - Added ConnectionInfoBuilder
