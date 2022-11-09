@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Frends.SFTP.ReadFile.Enums;
 
 namespace Frends.SFTP.ReadFile.Definitions;
 
