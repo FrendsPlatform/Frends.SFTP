@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using Renci.SshNet;
 using Frends.SFTP.ReadFile.Definitions;
+using Frends.SFTP.ReadFile.Enums;
 
 namespace Frends.SFTP.ReadFile;
 
@@ -35,6 +36,9 @@ public class SFTP
         //Disable support for these host key exchange algorithms relating: https://github.com/FrendsPlatform/Frends.SFTP/security/dependabot/4
         client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256");
         client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256@libssh.org");
+
+        if (connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
+            Util.ForceHostKeyAlgorithm(client, connection.HostKeyAlgorithm);
 
         // Check the fingerprint of the server if given.
         if (!string.IsNullOrEmpty(connection.ServerFingerPrint))
