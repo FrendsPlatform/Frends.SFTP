@@ -8,9 +8,9 @@ namespace Frends.SFTP.ReadFile.Tests;
 [TestFixture]
 public class ServerFingerprintTests : ReadFileTestBase
 {
-    internal static string _MD5;
-    internal static string _Sha256Hex;
-    internal static string _Sha256Hash;
+    private static string _MD5;
+    private static string _Sha256Hex;
+    private static string _Sha256Hash;
 
     [OneTimeSetUp]
     public void OneTimeSetup()

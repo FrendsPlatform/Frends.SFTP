@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using Frends.SFTP.ReadFile.Definitions;
 using Frends.SFTP.ReadFile.Enums;
 
 namespace Frends.SFTP.ReadFile.Tests;

@@ -5,9 +5,9 @@ using Frends.SFTP.ReadFile.Enums;
 namespace Frends.SFTP.ReadFile.Tests;
 public class ReadFileTestBase
 {
-    protected static Connection _connection;
-    protected static Input _input;
-    protected static string _content;
+    internal static Connection _connection;
+    internal static Input _input;
+    internal static string _content;
 
     [SetUp]
     public void SetUp()
