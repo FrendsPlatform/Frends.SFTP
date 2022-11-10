@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.0.0] _ 2022-11-10
+### Changed
+- [Breaking] Added parameters for keyboard-interactive authentication and add new line when appending.
+- Fixed overwrite deleting the original file before writing the new file.
+- Added keyboard-interactive authentication method.
+- Added more tests e.g. Serverfingerprint tests
+- Added System.Text.CodePages NuGet to the project
+- Added ConnectionInfoBuilder
+- Added HostKeyAlgorithm enum
+
 ## [1.0.1] - 2022-06-14
 ### Changed
 - Changed the main method to write from stream to a file.

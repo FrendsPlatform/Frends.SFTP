@@ -1,8 +1,5 @@
 ﻿using System.ComponentModel;
 using Renci.SshNet;
-using Renci.SshNet.Common;
-using System.Security.Cryptography;
-using System.Text;
 using Frends.SFTP.WriteFile.Definitions;
 using Frends.SFTP.WriteFile.Enums;
 
@@ -63,13 +60,19 @@ public class SFTP
         if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
         var encoding = Util.GetEncoding(input.FileEncoding, input.EnableBom, input.EncodingInString);
+        
         switch (input.WriteBehaviour)
         {
             case WriteOperation.Append:
-                var content = "\n" + input.Content;
+                var content = string.Empty;
+                if (input.AddNewLine)
+                    content = "\n";
+                content += input.Content;
                 client.AppendAllText(input.Path, content, encoding);
                 break;
             case WriteOperation.Overwrite:
+                if (client.Exists(input.Path))
+                    client.DeleteFile(input.Path);
                 client.WriteAllText(input.Path, input.Content, encoding);
                 break;
             case WriteOperation.Error:

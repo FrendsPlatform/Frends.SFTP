@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using NUnit.Framework;
-using Frends.SFTP.WriteFile.Definitions;
 using Frends.SFTP.WriteFile.Enums;
 
 namespace Frends.SFTP.WriteFile.Tests;
@@ -12,80 +11,23 @@ public class ConnectivityTests : WriteFileTestBase
     [Test]
     public void WriteFile_TestWithLargerBuffer()
     {
-        var connection = Helpers.GetSftpConnection();
-        connection.BufferSize = 256;
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "test",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Error
-        };
+        _connection.BufferSize = 256;
 
-        var result = SFTP.WriteFile(input, connection);
-        Assert.AreEqual("/write/test.txt", result.Path);
-        Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
-        Assert.AreEqual("test", Helpers.GetDestinationFileContent(input.Path));
-    }
-
-    [Test]
-    public void WriteFile_TestWithMD5ServerFingerprint()
-    {
-        var connection = Helpers.GetSftpConnection();
-        connection.ServerFingerPrint = Helpers.GetServerFingerprintAsMD5String();
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "test",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Error
-        };
-
-        var result = SFTP.WriteFile(input, connection);
-        Assert.AreEqual("/write/test.txt", result.Path);
-        Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
-        Assert.AreEqual("test", Helpers.GetDestinationFileContent(input.Path));
-    }
-
-    [Test]
-    public void WriteFile_TestWithSHA256ServerFingerprint()
-    {
-        var connection = Helpers.GetSftpConnection();
-        connection.ServerFingerPrint = Helpers.GetServerFingerprintAsSHA256String();
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "test",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Error
-        };
-
-        var result = SFTP.WriteFile(input, connection);
-        Assert.AreEqual("/write/test.txt", result.Path);
-        Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
-        Assert.AreEqual("test", Helpers.GetDestinationFileContent(input.Path));
+        SFTP.WriteFile(_input, _connection);
+        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
+        Assert.AreEqual(_content, Helpers.GetDestinationFileContent(_input.Path));
     }
 
     [Test]
     public void WriteFile_TestWithPrivateKeyFileRsa()
     {
-        var connection = Helpers.GetSftpConnection();
-        connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        connection.PrivateKeyFilePassphrase = "passphrase";
-        connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
+        _connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
+        _connection.PrivateKeyFilePassphrase = "passphrase";
+        _connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "test",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Error
-        };
-
-        var result = SFTP.WriteFile(input, connection);
-        Assert.AreEqual("/write/test.txt", result.Path);
-        Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
-        Assert.AreEqual("test", Helpers.GetDestinationFileContent(input.Path));
+        SFTP.WriteFile(_input, _connection);
+        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
+        Assert.AreEqual(_content, Helpers.GetDestinationFileContent(_input.Path));
     }
 
     [Test]
@@ -93,23 +35,23 @@ public class ConnectivityTests : WriteFileTestBase
     {
         var key = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key"));
 
-        var connection = Helpers.GetSftpConnection();
-        connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
-        connection.PrivateKeyFilePassphrase = "passphrase";
-        connection.PrivateKeyString = key;
+        _connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
+        _connection.PrivateKeyFilePassphrase = "passphrase";
+        _connection.PrivateKeyString = key;
 
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "test",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Error
-        };
+        SFTP.WriteFile(_input, _connection);
+        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
+        Assert.AreEqual(_content, Helpers.GetDestinationFileContent(_input.Path));
+    }
 
-        var result = SFTP.WriteFile(input, connection);
-        Assert.AreEqual("/write/test.txt", result.Path);
-        Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
-        Assert.AreEqual("test", Helpers.GetDestinationFileContent(input.Path));
+    [Test]
+    public void WriteFile_TestWithInteractiveKeyboardAuthentication()
+    {
+        _connection.UseKeyboardInteractiveAuthentication = true;
+
+        SFTP.WriteFile(_input, _connection);
+        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
+        Assert.AreEqual(_content, Helpers.GetDestinationFileContent(_input.Path));
     }
 }
 
