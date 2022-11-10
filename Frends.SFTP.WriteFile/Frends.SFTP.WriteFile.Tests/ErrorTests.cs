@@ -25,7 +25,6 @@ public class ErrorTests : WriteFileTestBase
     {
         _connection.Port = 51644;
         var ex = Assert.Throws<SocketException>(() => SFTP.WriteFile(_input, _connection));
-        Assert.AreEqual("No connection could be made because the target machine actively refused it.", ex.Message);
     }
 
     [Test]
