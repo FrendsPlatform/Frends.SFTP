@@ -45,7 +45,7 @@ public class ErrorTests
     {
         var connection = Helpers.GetSftpConnection();
         connection.Password = "demo";
-        connection.UserName = "demo";
+        connection.Username = "demo";
 
         var input = new Input
         {

@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.0.0] - 2022-11-09
+### Added
+- Added keyboard authentication method
+- [Breaking] Added parameter for keyboard authentication
+- Added more tests e.g. Serverfingerprint tests
+- Added System.Text.CodePages NuGet to the project
+- Added ConnectionInfoBuilder
+- Added HostKeyAlgorithm enum
+
 ## [1.0.2] - 2022-06-23
 ### Changed
 - Changed the main method to read from a file.
