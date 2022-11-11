@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using Frends.SFTP.WriteFile.Definitions;
 using Frends.SFTP.WriteFile.Enums;
 
 namespace Frends.SFTP.WriteFile.Tests;
@@ -10,122 +9,99 @@ class WriteTests : WriteFileTestBase
     [Test]
     public void WriteFile_TestSimpleWrite()
     {
-        var connection = Helpers.GetSftpConnection();
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "test",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Error
-        };
-
-        var result = SFTP.WriteFile(input, connection);
-        Assert.AreEqual("/write/test.txt", result.Path);
-        Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
-        Assert.AreEqual("test", Helpers.GetDestinationFileContent(input.Path));
+        var result = SFTP.WriteFile(_input, _connection);
+        Assert.AreEqual(_input.Path, result.Path);
+        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
+        Assert.AreEqual(_content, Helpers.GetDestinationFileContent(_input.Path));
     }
 
     [Test]
     public void WriteFile_TestWriteWithAppend()
     {
-        var connection = Helpers.GetSftpConnection();
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "test",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Error
-        };
+        SFTP.WriteFile(_input, _connection);
+        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
 
-        SFTP.WriteFile(input, connection);
-        Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
+        _input.Content = "This is another line in the test file.";
+        _input.WriteBehaviour = WriteOperation.Append;
+        _input.AddNewLine = true;
 
-        input.Content = "test";
-        input.WriteBehaviour = WriteOperation.Append;
+        SFTP.WriteFile(_input, _connection);
+        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
+        Assert.AreEqual(_content + "\n" + _input.Content, Helpers.GetDestinationFileContent(_input.Path));
+    }
 
-        SFTP.WriteFile(input, connection);
-        Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
-        Assert.AreEqual("test\ntest", Helpers.GetDestinationFileContent(input.Path));
+    [Test]
+    public void WriteFile_TestWriteWithAppendWithoutNewLine()
+    {
+        SFTP.WriteFile(_input, _connection);
+        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
+
+        _input.Content = "This is another line in the test file.";
+        _input.WriteBehaviour = WriteOperation.Append;
+
+        SFTP.WriteFile(_input, _connection);
+        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
+        Assert.AreEqual(_content + _input.Content, Helpers.GetDestinationFileContent(_input.Path));
     }
 
     [Test]
     public void WriteFile_TestWriteWithOverwrite()
     {
-        var connection = Helpers.GetSftpConnection();
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "test",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Overwrite
-        };
+        _input.WriteBehaviour = WriteOperation.Overwrite;
 
-        var result = SFTP.WriteFile(input, connection);
-        Assert.AreEqual("/write/test.txt", result.Path);
-        Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
-        Assert.AreEqual("test", Helpers.GetDestinationFileContent(input.Path));
+        var result = SFTP.WriteFile(_input, _connection);
+        Assert.AreEqual(_input.Path, result.Path);
+        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
+        Assert.AreEqual(_content, Helpers.GetDestinationFileContent(_input.Path));
 
-        input.Content = "something else";
-        SFTP.WriteFile(input, connection);
-        Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
-        Assert.AreEqual("something else", Helpers.GetDestinationFileContent(input.Path));
+        _input.Content = "Something else.";
+        SFTP.WriteFile(_input, _connection);
+        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
+        Assert.AreEqual(_input.Content, Helpers.GetDestinationFileContent(_input.Path));
     }
 
     [Test]
     public void WriteFile_TestWithEmptyContent()
     {
-        var connection = Helpers.GetSftpConnection();
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Error
-        };
+        _input.Content = "";
 
-        var result = SFTP.WriteFile(input, connection);
-        Assert.AreEqual("/write/test.txt", result.Path);
-        Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
-        Assert.AreEqual("", Helpers.GetDestinationFileContent(input.Path));
+        var result = SFTP.WriteFile(_input, _connection);
+        Assert.AreEqual(_input.Path, result.Path);
+        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
+        Assert.AreEqual(string.Empty, Helpers.GetDestinationFileContent(_input.Path));
     }
 
     [Test]
     public void WriteFile_TestWithDifferentEncoding()
     {
-        var connection = Helpers.GetSftpConnection();
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "test",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Overwrite
-        };
+        _input.WriteBehaviour = WriteOperation.Overwrite;
 
-        var result = SFTP.WriteFile(input, connection);
-        Assert.AreEqual("/write/test.txt", result.Path);
-        
-        input.FileEncoding = FileEncoding.ASCII;
-        result = SFTP.WriteFile(input, connection);
-        Assert.AreEqual("/write/test.txt", result.Path);
+        var result = SFTP.WriteFile(_input, _connection);
+        Assert.IsTrue(Helpers.DestinationFileExists(result.Path));
 
-        input.FileEncoding = FileEncoding.UTF8;
-        input.EnableBom = true;
-        result = SFTP.WriteFile(input, connection);
-        Assert.AreEqual("/write/test.txt", result.Path);
 
-        input.FileEncoding = FileEncoding.UTF8;
-        input.EnableBom = false;
-        result = SFTP.WriteFile(input, connection);
-        Assert.AreEqual("/write/test.txt", result.Path);
+        _input.FileEncoding = FileEncoding.ASCII;
+        result = SFTP.WriteFile(_input, _connection);
+        Assert.IsTrue(Helpers.DestinationFileExists(result.Path));
 
-        input.FileEncoding = FileEncoding.WINDOWS1252;
-        result = SFTP.WriteFile(input, connection);
-        Assert.AreEqual("/write/test.txt", result.Path);
+        _input.FileEncoding = FileEncoding.UTF8;
+        _input.EnableBom = true;
+        result = SFTP.WriteFile(_input, _connection);
+        Assert.IsTrue(Helpers.DestinationFileExists(result.Path));
 
-        input.FileEncoding = FileEncoding.Other;
-        input.EncodingInString = "utf-8";
-        result = SFTP.WriteFile(input, connection);
-        Assert.AreEqual("/write/test.txt", result.Path);
+        _input.FileEncoding = FileEncoding.UTF8;
+        _input.EnableBom = false;
+        result = SFTP.WriteFile(_input, _connection);
+        Assert.IsTrue(Helpers.DestinationFileExists(result.Path));
+
+        _input.FileEncoding = FileEncoding.WINDOWS1252;
+        result = SFTP.WriteFile(_input, _connection);
+        Assert.IsTrue(Helpers.DestinationFileExists(result.Path));
+
+        _input.FileEncoding = FileEncoding.Other;
+        _input.EncodingInString = "iso-8859-1";
+        result = SFTP.WriteFile(_input, _connection);
+        Assert.IsTrue(Helpers.DestinationFileExists(result.Path));
     }
 }
 

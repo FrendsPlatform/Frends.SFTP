@@ -3,7 +3,6 @@ using Renci.SshNet.Common;
 using System;
 using System.IO;
 using System.Net.Sockets;
-using Frends.SFTP.WriteFile.Definitions;
 using Frends.SFTP.WriteFile.Enums;
 
 namespace Frends.SFTP.WriteFile.Tests;
@@ -14,96 +13,49 @@ public class ErrorTests : WriteFileTestBase
     [Test]
     public void WriteFile_TestFileExistsThrows()
     {
-        var connection = Helpers.GetSftpConnection();
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "test",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Error
-        };
+        var result = SFTP.WriteFile(_input, _connection);
+        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
 
-        var result = SFTP.WriteFile(input, connection);
-        Assert.IsTrue(Helpers.DestinationFileExists(input.Path));
-
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(input, connection));
-        Assert.AreEqual($"File already exists: {input.Path}", ex.Message);
-
-        Helpers.DeleteDestinationFile(input.Path);
+        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection));
+        Assert.AreEqual($"File already exists: {_input.Path}", ex.Message);
     }
 
     [Test]
     public void WriteFile_TestThrowsWithWrongPort()
     {
-        var connection = Helpers.GetSftpConnection();
-        connection.Port = 51644;
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "test",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Error
-        };
-
-        Assert.Throws<SocketException>(() => SFTP.WriteFile(input, connection));
+        _connection.Port = 51644;
+        var ex = Assert.Throws<SocketException>(() => SFTP.WriteFile(_input, _connection));
     }
 
     [Test]
     public void WriteFile_TestThrowsWithIncorrectCredentials()
     {
-        var connection = Helpers.GetSftpConnection();
-        connection.Password = "demo";
-        connection.UserName = "demo";
+        _connection.Password = "demo";
+        _connection.Username = "demo";
 
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "test",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Error
-        };
-
-        var ex = Assert.Throws<SshAuthenticationException>(() => SFTP.WriteFile(input, connection));
+        var ex = Assert.Throws<SshAuthenticationException>(() => SFTP.WriteFile(_input, _connection));
         Assert.AreEqual("Permission denied (password).", ex.Message);
     }
 
     [Test]
     public void WriteFile_TestThrowsWithIncorrectPrivateKeyPassphrase()
     {
-        var connection = Helpers.GetSftpConnection();
-        connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        connection.PrivateKeyFilePassphrase = "demo";
-        connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
+        _connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
+        _connection.PrivateKeyFilePassphrase = "demo";
+        _connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "test",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Error
-        };
-
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(input, connection));
+        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection));
         Assert.That(ex.Message.StartsWith("Error when initializing connection info:"));
     }
 
     [Test]
     public void WriteFile_TestThrowsWithEmptyPrivateKeyFile()
     {
-        var connection = Helpers.GetSftpConnection();
-        connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        connection.PrivateKeyFilePassphrase = "passphrase";
-        connection.PrivateKeyFile = "";
+        _connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
+        _connection.PrivateKeyFilePassphrase = "passphrase";
+        _connection.PrivateKeyFile = "";
 
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "test",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Error
-        };
-
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(input, connection));
+        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection));
         Assert.That(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
@@ -112,20 +64,11 @@ public class ErrorTests : WriteFileTestBase
     {
         var key = Helpers.GenerateDummySshKey();
 
-        var connection = Helpers.GetSftpConnection();
-        connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
-        connection.PrivateKeyFilePassphrase = "passphrase";
-        connection.PrivateKeyString = key.ToString();
+        _connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
+        _connection.PrivateKeyFilePassphrase = "passphrase";
+        _connection.PrivateKeyString = key.ToString();
 
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "test",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Error
-        };
-
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(input, connection));
+        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection));
         Assert.That(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
@@ -134,18 +77,9 @@ public class ErrorTests : WriteFileTestBase
     {
         var fingerprint = "f6:fc:1c:03:17:5f:67:4f:1f:0b:50:5a:9f:f9:30:e5";
 
-        var connection = Helpers.GetSftpConnection();
-        connection.ServerFingerPrint = fingerprint;
+        _connection.ServerFingerPrint = fingerprint;
 
-        var input = new Input
-        {
-            Path = "/write/test.txt",
-            Content = "test",
-            FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Error
-        };
-
-        var ex = Assert.Throws<SshConnectionException>(() => SFTP.WriteFile(input, connection));
+        var ex = Assert.Throws<SshConnectionException>(() => SFTP.WriteFile(_input, _connection));
         Assert.AreEqual("Key exchange negotiation failed.", ex.Message);
     }
 }

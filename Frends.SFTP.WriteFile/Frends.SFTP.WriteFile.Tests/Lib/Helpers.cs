@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Text;
 using System.Security.Cryptography;
 using Renci.SshNet;
 using Renci.SshNet.Common;
+using Renci.SshNet.Security;
 using Frends.SFTP.WriteFile.Definitions;
 using Frends.SFTP.WriteFile.Enums;
 
@@ -23,7 +25,7 @@ internal static class Helpers
             ConnectionTimeout = 60,
             Address = _dockerAddress,
             Port = 2222,
-            UserName = _dockerUsername,
+            Username = _dockerUsername,
             Authentication = AuthenticationType.UsernamePassword,
             Password = _dockerPassword,
             ServerFingerPrint = null,
@@ -33,34 +35,56 @@ internal static class Helpers
         return connection;
     }
 
-    internal static string GetServerFingerprintAsSHA256String()
+    internal static Tuple<byte[], byte[]> GetServerFingerPrintAndHostKey()
     {
-        var fingerprint = "";
+        Tuple<byte[], byte[]> result = null;
         using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
         {
+            client.ConnectionInfo.HostKeyAlgorithms.Clear();
+            client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) => { return new KeyHostAlgorithm("ssh-rsa", new RsaKey(), data); });
+
             client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
             {
-                // First try with SHA256 typed fingerprint
-                using (SHA256 mySHA256 = SHA256.Create())
-                {
-                    fingerprint = Convert.ToBase64String(mySHA256.ComputeHash(e.HostKey));
-                }
+                result = new Tuple<byte[], byte[]>(e.FingerPrint, e.HostKey);
+                e.CanTrust = true;
             };
+            client.Connect();
+            client.Disconnect();
+        }
+        return result;
+    }
+
+    internal static string ConvertToMD5Hex(byte[] fingerPrint)
+    {
+        return BitConverter.ToString(fingerPrint).Replace("-", ":");
+    }
+
+    internal static string ConvertToSHA256Hash(byte[] hostKey)
+    {
+        var fingerprint = "";
+        using (SHA256 mySHA256 = SHA256.Create())
+        {
+            fingerprint = Convert.ToBase64String(mySHA256.ComputeHash(hostKey));
         }
         return fingerprint;
     }
 
-    internal static string GetServerFingerprintAsMD5String()
+    internal static string ConvertToSHA256Hex(byte[] hostKey)
     {
         var fingerprint = "";
-        using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+        using (SHA256 mySHA256 = SHA256.Create())
         {
-            client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
-            {
-                fingerprint = BitConverter.ToString(e.FingerPrint).Replace("-", ":");
-            };
+            fingerprint = ToHex(mySHA256.ComputeHash(hostKey));
         }
         return fingerprint;
+    }
+
+    internal static string ToHex(byte[] bytes)
+    {
+        StringBuilder result = new StringBuilder(bytes.Length * 2);
+        for (int i = 0; i < bytes.Length; i++)
+            result.Append(bytes[i].ToString("x2"));
+        return result.ToString();
     }
 
     internal static void DeleteDirectory(SftpClient client, string dir)
@@ -95,19 +119,11 @@ internal static class Helpers
         return content;
     }
 
-    internal static void DeleteDestinationFile(string path)
-    {
-        using var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword);
-        client.Connect();
-        client.DeleteFile(path);
-        client.Disconnect();
-    }
-
     internal static void DeleteDestinationFiles()
     {
         using var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword);
         client.Connect();
-        DeleteDirectory(client, "/write");
+        DeleteDirectory(client, "/upload");
         client.Disconnect();
     }
 
