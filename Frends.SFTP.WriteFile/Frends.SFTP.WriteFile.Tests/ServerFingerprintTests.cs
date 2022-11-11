@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using NUnit.Framework;
 using Renci.SshNet.Common;
 using Frends.SFTP.WriteFile.Enums;

@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using Frends.SFTP.WriteFile.Definitions;
 using Frends.SFTP.WriteFile.Enums;
 
 namespace Frends.SFTP.WriteFile.Tests;
