@@ -51,11 +51,11 @@ internal static class Helpers
         if (client.Exists(dir) && !dir.Equals(_baseDir)) client.DeleteDirectory(dir);
     }
 
-    internal static string[] UploadTestFiles(string destination, int count = 3, string to = null)
+    internal static string[] UploadTestFiles(string destination, int count = 3, string to = null, List<string> filenames = null)
     {
         var filePaths = new List<string>();
 
-        var files = CreateDummyFiles(count);
+        var files = (filenames == null) ? CreateDummyFiles(count) : CreateDummyFiles(0, filenames);
         using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
         {
             client.Connect();
@@ -83,7 +83,7 @@ internal static class Helpers
     {
         var filePaths = new List<string>();
 
-    var files = CreateLargeDummyFiles(count);
+        var files = CreateLargeDummyFiles(count);
         using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
         {
             client.Connect();
@@ -124,17 +124,29 @@ internal static class Helpers
         }
     }
 
-    internal static List<string> CreateDummyFiles(int count)
+    internal static List<string> CreateDummyFiles(int count, List<string> filenames = null)
     {
         Directory.CreateDirectory(_workDir);
         var filePaths = new List<string>();
-        var name = "SFTPDownloadTestFile";
-        var extension = ".txt";
-        for (var i = 1; i <= count; i++)
+        if (filenames == null)
         {
-            var path = Path.Combine(_workDir, name + i + extension);
-            File.WriteAllText(path, "This is a test file.");
-            filePaths.Add(path);
+            var name = "SFTPDownloadTestFile";
+            var extension = ".txt";
+            for (var i = 1; i <= count; i++)
+            {
+                var path = Path.Combine(_workDir, name + i + extension);
+                File.WriteAllText(path, "This is a test file.");
+                filePaths.Add(path);
+            }
+        }
+        else
+        {
+            foreach (var filename in filenames)
+            {
+                var path = Path.Combine(_workDir, filename);
+                File.WriteAllText(path, "This is a test file.");
+                filePaths.Add(path);
+            }
         }
 
         return filePaths;

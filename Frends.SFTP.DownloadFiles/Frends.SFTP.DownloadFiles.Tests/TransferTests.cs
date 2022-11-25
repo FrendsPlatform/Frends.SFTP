@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System.IO;
 using System.Threading;
+using System.Collections.Generic;
 using Frends.SFTP.DownloadFiles.Definitions;
 
 namespace Frends.SFTP.DownloadFiles.Tests;
@@ -302,6 +303,50 @@ class TransferTests : DownloadFilesTestBase
         var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
         Assert.AreEqual(3, result.SuccessfulTransferCount);
         Assert.IsTrue(result.Success);
+    }
+
+    [Test]
+    public void DownloadFiles_TestTransferWithSpecialCharactersInFileNames()
+    {
+        // upload test files
+        var files = new List<string> { "this is a test file.txt", "This_is(a test file).txt", "this is  { a test} file.txt" };
+        Helpers.UploadTestFiles(_source.Directory, 0, null, files);
+
+        var source = new Source
+        {
+            Directory = _source.Directory,
+            FileName = "this is a test file.txt",
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Nothing,
+        };
+
+        var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+        source = new Source
+        {
+            Directory = _source.Directory,
+            FileName = "This_is(a test file).txt",
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Nothing,
+        };
+
+        result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+        source = new Source
+        {
+            Directory = _source.Directory,
+            FileName = "this is  { a test} file.txt",
+            Action = SourceAction.Error,
+            Operation = SourceOperation.Nothing,
+        };
+
+        result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(1, result.SuccessfulTransferCount);
     }
 }
 

@@ -429,7 +429,7 @@ internal class FileTransporter
 
             if (file.IsDirectory) continue;
 
-            if (Util.FileMatchesMask(Path.GetFileName(file.FullName), source.FileName))
+            if (file.Name.Equals(source.FileName) || Util.FileMatchesMask(Path.GetFileName(file.FullName), source.FileName))
             {
                 FileItem item = new FileItem(file);
                 _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath}.");

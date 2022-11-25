@@ -1,6 +1,10 @@
 # Changelog
 
-## [2.4.0] -2022-11-03
+## [2.4.1] - 2022-11-24
+### Fixed 
+- Fixed issue with files not found when the name consist of special characters by adding a check for the files exact name.
+
+## [2.4.0] - 2022-11-03
 ### Added
 - [Breaking] Added parameters for the file extension of temporary source and destination files when rename options are enabled.
 - Fixed task to enable transfers with file paths. 
