@@ -1,6 +1,10 @@
 # Changelog
 
-## [2.0.0] _ 2022-11-10
+## [2.0.1] - 2022-12-01
+### Updated
+- Updated dependency Microsoft.Extensions.DependencyInjection to the newest version.
+
+## [2.0.0] - 2022-11-10
 ### Changed
 - [Breaking] Added parameters for keyboard-interactive authentication and add new line when appending.
 - Fixed overwrite deleting the original file before writing the new file.
