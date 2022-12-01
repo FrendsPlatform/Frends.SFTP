@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.0.1] - 2022-12-01
+### Updated
+- Updated dependency Microsoft.Extensions.DependencyInjection to the newest version.
+
 ## [2.0.0] - 2022-11-09
 ### Added
 - Added keyboard authentication method
