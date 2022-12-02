@@ -63,7 +63,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
-            Assert.That(File.Exists(Path.Combine(destination.Directory, _source.FileName)));
+            Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -122,7 +122,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             var result = SFTP.DownloadFiles(_source, _destination, _connection, options, _info, new CancellationToken());
             Assert.IsFalse(result.Success);
-            Assert.That(result.FailedTransferCount == 1);
+            Assert.AreEqual(1, result.FailedTransferCount);
         }
 
         [Test]

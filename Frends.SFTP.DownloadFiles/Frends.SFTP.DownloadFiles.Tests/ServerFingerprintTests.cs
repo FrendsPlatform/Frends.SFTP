@@ -150,7 +150,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
             Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: Error when establishing connection to the Server: Key exchange negotiation failed.."));
-            Assert.That(ex.Message.Contains("Expected server fingerprint was given in unsupported format."));
+            Assert.IsTrue(ex.Message.Contains("Expected server fingerprint was given in unsupported format."));
         }
     }
 }
