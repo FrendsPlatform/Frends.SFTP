@@ -69,7 +69,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             var year = DateTime.Now.Year.ToString();
-            Assert.That(Helpers.CheckFileExistsInDestination("upload/Upload/test" + year));
+            Assert.IsTrue(Helpers.CheckFileExistsInDestination("upload/Upload/test" + year));
         }
 
         [Test]

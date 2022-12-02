@@ -72,9 +72,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 sftp.Connect();
                 if (sftp.Exists(_destination.Directory))
-                {
                     Helpers.DeleteDirectory(sftp, _destination.Directory);
-                }
                 sftp.Disconnect();
             }
 

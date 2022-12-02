@@ -178,9 +178,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             var name = "LargeTestFile";
             var extension = ".bin";
             for (var i = 1; i <= count; i++)
-            {
                 File.Copy(Path.Combine(_workDir, name + extension), Path.Combine(_workDir, name + i + extension));
-            }
         }
 
         internal static Tuple<byte[], byte[]> GetServerFingerPrintAndHostKey()

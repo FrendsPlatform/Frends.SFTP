@@ -21,7 +21,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             };
 
             var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.StartsWith("SFTP transfer failed:"));
+            Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed:"));
         }
 
         [Test]
@@ -31,7 +31,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
 
             var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.StartsWith($"SFTP transfer failed: 1 Errors: Failure in CheckIfDestination"));
+            Assert.IsTrue(ex.Message.StartsWith($"SFTP transfer failed: 1 Errors: Failure in CheckIfDestination"));
         }
 
         [Test]
@@ -41,7 +41,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             connection.Port = 51651;
 
             var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.StartsWith("SFTP transfer failed: Unable to establish the socket:"));
+            Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: Unable to establish the socket:"));
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             connection.Address = "local";
 
             var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.StartsWith("SFTP transfer failed: Unable to establish the socket:"));
+            Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: Unable to establish the socket:"));
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             Directory.CreateDirectory(source.DirectoryToMoveAfterTransfer);
 
             var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.StartsWith($"SFTP transfer failed: 1 Errors: Failure in CheckIfDestination"));
+            Assert.IsTrue(ex.Message.StartsWith($"SFTP transfer failed: 1 Errors: Failure in CheckIfDestination"));
             Assert.IsTrue(File.Exists(Path.Combine(_source.Directory, _source.FileName)));
 
             Directory.Delete(source.DirectoryToMoveAfterTransfer, true);
@@ -95,7 +95,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             File.Copy(Path.Combine(source.Directory, source.FileName), Path.Combine(source.DirectoryToMoveAfterTransfer, source.FileName));
 
             var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.Contains($"Error: Failure in source operation:"));
+            Assert.IsTrue(ex.Message.Contains($"Error: Failure in source operation:"));
             Assert.IsTrue(File.Exists(Path.Combine(_source.Directory, _source.FileName)));
 
             Directory.Delete(source.DirectoryToMoveAfterTransfer, true);
@@ -108,7 +108,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             connection.Password = "cuinbeu8i9ch";
 
             var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.Contains($@"FRENDS SFTP file transfer '' from 'FILE://{_source.Directory}/{_source.FileName}' to 'SFTP://{connection.Address}/{_destination.Directory}':"));
+            Assert.IsTrue(ex.Message.Contains($@"FRENDS SFTP file transfer '' from 'FILE://{_source.Directory}/{_source.FileName}' to 'SFTP://{connection.Address}/{_destination.Directory}':"));
         }
 
         [Test]
@@ -128,7 +128,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             };
 
             var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.Contains("Error when fetching source files: File does not exist"));
+            Assert.IsTrue(ex.Message.Contains("Error when fetching source files: File does not exist"));
         }
     }
 }
