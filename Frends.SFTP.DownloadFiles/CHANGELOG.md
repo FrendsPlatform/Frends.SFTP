@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.5.0] - 2022-12-16
+### Fixed
+- [Breaking] Fixed issue where keepaliveinterval and operationtimeout is set as the connectiontimeout by creating them for the keepaliveinterval its own parameter and removed operationtimeout.
+
 ## [2.4.1] - 2022-11-24
 ### Fixed 
 - Fixed issue with files not found when the name consist of special characters by adding a check for the files exact name.
