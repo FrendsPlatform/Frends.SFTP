@@ -31,7 +31,8 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 UserName = _dockerUsername,
                 Authentication = AuthenticationType.UsernamePassword,
                 Password = _dockerPassword,
-                BufferSize = 32
+                BufferSize = 32,
+                KeepAliveInterval = -1
             };
 
             return connection;

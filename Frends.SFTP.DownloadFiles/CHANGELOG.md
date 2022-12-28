@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.5.0] - 2022-12-16
+### Fixed
+- [Breaking] Fixed issue where keepaliveinterval and operationtimeout is set as the connectiontimeout by creating them for the keepaliveinterval its own parameter and removed operationtimeout.
+
 ## [2.4.2] - 2022-12-01
 ### Updated
 - Updated dependencies System.Text.Encoding.CodePages and Microsoft.Extensions.DependencyInjection to the newest version.

@@ -70,17 +70,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
 
-        /// <summary>
-        /// To enable keyboard-interactive method, you need to install pam and nano to the server:
-        /// apt-get update
-        /// apt install nano
-        /// Configure file etc/ssh/sshd_config with following and restart the server:
-        ///     UsePAM yes
-        ///     #ChallengeResponseAuthentication yes 
-        ///     PasswordAuthentication yes
-        ///     AuthenticationMethods password keyboard-interactive
-        /// </summary>
-        // [Ignore("Server needs to be configured to use keyboard-interactive authentication methods")]
         [Test]
         public void DownloadFiles_TestWithInteractiveKeyboardAuthentication()
         {
@@ -91,8 +80,49 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
-    }
 
+        [Test]
+        public void DownloadFiles_TestKeepAliveIntervalWithDefault()
+        {
+            Helpers.UploadLargeTestFiles(_source.Directory, 1);
+
+            var connection = Helpers.GetSftpConnection();
+
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "*.bin",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+            };
+
+            var result = SFTP.DownloadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+        }
+
+        [Test]
+        public void DownloadFiles_TestKeepAliveIntervalWith1ms()
+        {
+            Helpers.UploadLargeTestFiles(_source.Directory, 1);
+
+            var connection = Helpers.GetSftpConnection();
+            connection.KeepAliveInterval = 1;
+            connection.BufferSize = 256;
+
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "*.bin",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+            };
+
+            var result = SFTP.DownloadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+        }
+    }
 }
 
 
