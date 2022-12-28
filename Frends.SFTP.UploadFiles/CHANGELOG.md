@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.4.1] - 2022-12-01
+### Updated
+- Updated dependencies System.Text.Encoding.CodePages and Microsoft.Extensions.DependencyInjection to the newest version.
+- Modified test to run against net471 instead of net6.
+
 ## [2.4.0]
 ### Added
 - [Breaking] Added parameters for the file extension of temporary source and destination files when rename options are enabled.

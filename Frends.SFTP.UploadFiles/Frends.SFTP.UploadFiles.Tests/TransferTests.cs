@@ -4,326 +4,329 @@ using System.Threading;
 using Frends.SFTP.UploadFiles.Definitions;
 
 
-namespace Frends.SFTP.UploadFiles.Tests;
-
-[TestFixture]
-class TransferTests : UploadFilesTestBase
+namespace Frends.SFTP.UploadFiles.Tests
 {
-
-    [Test]
-    public void UploadFiles_TestSimpleTransfer()
+    [TestFixture]
+    class TransferTests : UploadFilesTestBase
     {
-        var result = SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
-    }
 
-    [Test]
-    public void UploadFiles_TestUploadWithFileMaskEverything()
-    {
-        var source = new Source
+        [Test]
+        public void UploadFiles_TestSimpleTransfer()
         {
-            Directory = _workDir,
-            FileName = "*",
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Nothing
-        };
+            var result = SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+        }
 
-        var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(3, result.SuccessfulTransferCount);
-    }
-
-    [Test] 
-    public void UploadFiles_TestWithOperationLogDisabled()
-    {
-        var options = new Options
+        [Test]
+        public void UploadFiles_TestUploadWithFileMaskEverything()
         {
-            ThrowErrorOnFail = true,
-            RenameSourceFileBeforeTransfer = true,
-            RenameDestinationFileDuringTransfer = true,
-            CreateDestinationDirectories = true,
-            PreserveLastModified = false,
-            OperationLog = false
-        };
+            var source = new Source
+            {
+                Directory = _workDir,
+                FileName = "*",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing
+            };
 
-        var result = SFTP.UploadFiles(_source, _destination, _connection, options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(0, result.OperationsLog.Count);
-    }
+            var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(3, result.SuccessfulTransferCount);
+        }
 
-    [Test]
-    public void UploadFiles_TestWithMultipleSubdirectoriesInDestination()
-    {
-        var destination = new Destination
+        [Test]
+        public void UploadFiles_TestWithOperationLogDisabled()
         {
-            Directory = "/upload/Upload/sub",
-            Action = DestinationAction.Error,
-            FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
-        };
+            var options = new Options
+            {
+                ThrowErrorOnFail = true,
+                RenameSourceFileBeforeTransfer = true,
+                RenameDestinationFileDuringTransfer = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = false
+            };
 
-        var result = SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
-    }
+            var result = SFTP.UploadFiles(_source, _destination, _connection, options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(0, result.OperationsLog.Count);
+        }
 
-    [Test]
-    public void UploadFiles_TestOneErrorInTransferWithMultipleFiles()
-    {
-        var result = SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-
-        var destination = new Destination
+        [Test]
+        public void UploadFiles_TestWithMultipleSubdirectoriesInDestination()
         {
-            Directory = "/upload/Upload",
-            Action = DestinationAction.Error,
-            FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
-        };
+            var destination = new Destination
+            {
+                Directory = "/upload/Upload/sub",
+                Action = DestinationAction.Error,
+                FileNameEncoding = FileEncoding.UTF8,
+                EnableBomForFileName = true
+            };
 
-        var options = new Options
+            var result = SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+        }
+
+        [Test]
+        public void UploadFiles_TestOneErrorInTransferWithMultipleFiles()
         {
-            ThrowErrorOnFail = false,
-            RenameSourceFileBeforeTransfer = true,
-            RenameDestinationFileDuringTransfer = true,
-            CreateDestinationDirectories = true,
-            PreserveLastModified = false,
-            OperationLog = true
-        };
+            var result = SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
 
-        var source = new Source
+            var destination = new Destination
+            {
+                Directory = "/upload/Upload",
+                Action = DestinationAction.Error,
+                FileNameEncoding = FileEncoding.UTF8,
+                EnableBomForFileName = true
+            };
+
+            var options = new Options
+            {
+                ThrowErrorOnFail = false,
+                RenameSourceFileBeforeTransfer = true,
+                RenameDestinationFileDuringTransfer = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true
+            };
+
+            var source = new Source
+            {
+                Directory = _workDir,
+                FileName = "*.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing
+            };
+
+            result = SFTP.UploadFiles(source, destination, _connection, options, _info, new CancellationToken());
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.AreEqual(1, result.FailedTransferCount);
+        }
+
+        [Test]
+        public void UploadFiles_TestWithFileMaskWithFileAlreadyInDestination()
         {
-            Directory = _workDir,
-            FileName = "*.txt",
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Nothing
-        };
+            var source = new Source
+            {
+                Directory = _workDir,
+                FileName = "*File1.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing
+            };
 
-        result = SFTP.UploadFiles(source, destination, _connection, options, _info, new CancellationToken());
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
-        Assert.AreEqual(1, result.FailedTransferCount);
-    }
+            var options = new Options
+            {
+                ThrowErrorOnFail = false,
+                RenameSourceFileBeforeTransfer = true,
+                RenameDestinationFileDuringTransfer = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true
+            };
 
-    [Test]
-    public void UploadFiles_TestWithFileMaskWithFileAlreadyInDestination()
-    {
-        var source = new Source
+            var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+            source.FileName = "*.txt";
+            result = SFTP.UploadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(1, result.FailedTransferCount);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+        }
+
+        [Test]
+        public void UploadFiles_TestSingleFileTransferWithError()
         {
-            Directory = _workDir,
-            FileName = "*File1.txt",
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Nothing
-        };
+            var options = new Options
+            {
+                ThrowErrorOnFail = false,
+                RenameSourceFileBeforeTransfer = true,
+                RenameDestinationFileDuringTransfer = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true
+            };
 
-        var options = new Options
+            var destination = new Destination
+            {
+                Directory = _destination.Directory,
+                FileName = "",
+                Action = DestinationAction.Error,
+            };
+
+            Helpers.UploadSingleTestFile(_destination.Directory, Path.Combine(_workDir, "SFTPUploadTestFile1.txt"));
+
+            var result = SFTP.UploadFiles(_source, destination, _connection, options, _info, new CancellationToken());
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(1, result.FailedTransferCount);
+        }
+
+        [Test]
+        public void UploadFiles_TestUploadWithOverwrite()
         {
-            ThrowErrorOnFail = false,
-            RenameSourceFileBeforeTransfer = true,
-            RenameDestinationFileDuringTransfer = true,
-            CreateDestinationDirectories = true,
-            PreserveLastModified = false,
-            OperationLog = true
-        };
+            var destination = new Destination
+            {
+                Directory = "/upload/Upload",
+                FileName = "SFTPUploadTestFile1.txt",
+                Action = DestinationAction.Overwrite,
+                FileNameEncoding = FileEncoding.UTF8,
+                EnableBomForFileName = true
+            };
 
-        var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(_workDir, _source.FileName));
 
-        source.FileName = "*.txt";
-        result = SFTP.UploadFiles(source, _destination, _connection, options, _info, new CancellationToken());
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(1, result.FailedTransferCount);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
-    }
+            var result = SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-    [Test]
-    public void UploadFiles_TestSingleFileTransferWithError()
-    {
-        var options = new Options
+            Assert.IsTrue(Helpers.CheckFileExistsInDestination(destination.Directory + "/" + _source.FileName));
+        }
+
+        [Test]
+        public void UploadFiles_TestUploadWithOnlyRenameSourceDuringTransferEnabled()
         {
-            ThrowErrorOnFail = false,
-            RenameSourceFileBeforeTransfer = true,
-            RenameDestinationFileDuringTransfer = true,
-            CreateDestinationDirectories = true,
-            PreserveLastModified = false,
-            OperationLog = true
-        };
+            var options = new Options
+            {
+                ThrowErrorOnFail = true,
+                RenameSourceFileBeforeTransfer = true,
+                RenameDestinationFileDuringTransfer = false,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true
+            };
 
-        var destination = new Destination
+            var result = SFTP.UploadFiles(_source, _destination, _connection, options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+            Assert.IsTrue(Helpers.CheckFileExistsInDestination(_destination.Directory + "/" + _source.FileName));
+        }
+
+        [Test]
+        public void UploadFiles_TestUploadWithOnlyRenameDestinationDuringTransferEnabled()
         {
-            Directory = _destination.Directory,
-            FileName = "",
-            Action = DestinationAction.Error,
-        };
+            var options = new Options
+            {
+                ThrowErrorOnFail = true,
+                RenameSourceFileBeforeTransfer = false,
+                RenameDestinationFileDuringTransfer = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true
+            };
 
-        Helpers.UploadSingleTestFile(_destination.Directory, Path.Combine(_workDir, "SFTPUploadTestFile1.txt"));
+            var result = SFTP.UploadFiles(_source, _destination, _connection, options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-        var result = SFTP.UploadFiles(_source, destination, _connection, options, _info, new CancellationToken());
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(1, result.FailedTransferCount);
-    }
+            Assert.IsTrue(Helpers.CheckFileExistsInDestination(_destination.Directory + "/" + _source.FileName));
+        }
 
-    [Test]
-    public void UploadFiles_TestUploadWithOverwrite()
-    {
-        var destination = new Destination
+        [Test]
+        public void UploadFiles_NoSourceFilesAndIgnoreShouldNotThrowException()
         {
-            Directory = "/upload/Upload",
-            FileName = "SFTPUploadTestFile1.txt",
-            Action = DestinationAction.Overwrite,
-            FileNameEncoding = FileEncoding.UTF8,
-            EnableBomForFileName = true
-        };
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "NonExistingFile.txt",
+                Action = SourceAction.Ignore,
+                Operation = SourceOperation.Delete
+            };
 
-        Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(_workDir, _source.FileName));
+            var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(result.ActionSkipped);
+        }
 
-        var result = SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
-
-        Assert.IsTrue(Helpers.CheckFileExistsInDestination(destination.Directory + "/" + _source.FileName));
-    }
-
-    [Test]
-    public void UploadFiles_TestUploadWithOnlyRenameSourceDuringTransferEnabled()
-    {
-        var options = new Options
+        [Test]
+        public void UploadFiles_NoSourceFilesAndInfoShouldNotThrowException()
         {
-            ThrowErrorOnFail = true,
-            RenameSourceFileBeforeTransfer = true,
-            RenameDestinationFileDuringTransfer = false,
-            CreateDestinationDirectories = true,
-            PreserveLastModified = false,
-            OperationLog = true
-        };
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "NonExistingFile.txt",
+                Action = SourceAction.Info,
+                Operation = SourceOperation.Delete
+            };
 
-        var result = SFTP.UploadFiles(_source, _destination, _connection, options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
+            var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(result.ActionSkipped);
+        }
 
-        Assert.IsTrue(Helpers.CheckFileExistsInDestination(_destination.Directory + "/" + _source.FileName));
-    }
-
-    [Test]
-    public void UploadFiles_TestUploadWithOnlyRenameDestinationDuringTransferEnabled()
-    {
-        var options = new Options
+        [Test]
+        public void UploadFiles_MassTransferTest()
         {
-            ThrowErrorOnFail = true,
-            RenameSourceFileBeforeTransfer = false,
-            RenameDestinationFileDuringTransfer = true,
-            CreateDestinationDirectories = true,
-            PreserveLastModified = false,
-            OperationLog = true
-        };
+            Helpers.CreateDummyFiles(30);
+            Helpers.CopyLargeTestFile(10);
 
-        var result = SFTP.UploadFiles(_source, _destination, _connection, options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "*",
+                Action = SourceAction.Info,
+                Operation = SourceOperation.Nothing
+            };
 
-        Assert.IsTrue(Helpers.CheckFileExistsInDestination(_destination.Directory + "/" + _source.FileName));
-    }
+            var connection = new Connection
+            {
+                ConnectionTimeout = _connection.ConnectionTimeout,
+                Address = _connection.Address,
+                Port = _connection.Port,
+                Authentication = _connection.Authentication,
+                UserName = _connection.UserName,
+                Password = _connection.Password,
+                BufferSize = 256
+            };
 
-    [Test]
-    public void UploadFiles_NoSourceFilesAndIgnoreShouldNotThrowException()
-    {
-        var source = new Source
+            var result = SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.IsFalse(result.ActionSkipped);
+        }
+
+        [Test]
+        public void UploadFiles_TestWithFilePaths()
         {
-            Directory = _source.Directory,
-            FileName = "NonExistingFile.txt",
-            Action = SourceAction.Ignore,
-            Operation = SourceOperation.Delete
-        };
+            var filePaths = Helpers.CreateDummyFiles(3);
 
-        var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.IsTrue(result.ActionSkipped);
-    }
+            var source = new Source
+            {
+                Action = SourceAction.Info,
+                Operation = SourceOperation.Nothing,
+                FilePaths = filePaths
+            };
 
-    [Test]
-    public void UploadFiles_NoSourceFilesAndInfoShouldNotThrowException()
-    {
-        var source = new Source
+            var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.IsFalse(result.ActionSkipped);
+            Assert.AreEqual(3, result.SuccessfulTransferCount);
+        }
+
+        [Test]
+        public void UploadFiles_TestWithFilePathsEvenIfSourceFileIsAssigned()
         {
-            Directory = _source.Directory,
-            FileName = "NonExistingFile.txt",
-            Action = SourceAction.Info,
-            Operation = SourceOperation.Delete
-        };
+            var filePaths = Helpers.CreateDummyFiles(3);
 
-        var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.IsTrue(result.ActionSkipped);
-    }
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "*.csv",
+                Action = SourceAction.Info,
+                Operation = SourceOperation.Nothing,
+                FilePaths = filePaths
+            };
 
-    [Test]
-    public void UploadFiles_MassTransferTest()
-    {
-        Helpers.CreateDummyFiles(30);
-        Helpers.CopyLargeTestFile(10);
-
-        var source = new Source
-        {
-            Directory = _source.Directory,
-            FileName = "*",
-            Action = SourceAction.Info,
-            Operation = SourceOperation.Nothing
-        };
-
-        var connection = new Connection
-        {
-            ConnectionTimeout = _connection.ConnectionTimeout,
-            Address = _connection.Address,
-            Port = _connection.Port,
-            Authentication = _connection.Authentication,
-            UserName = _connection.UserName,
-            Password = _connection.Password,
-            BufferSize = 256
-        };
-
-        var result = SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.IsFalse(result.ActionSkipped);
-    }
-
-    [Test]
-    public void UploadFiles_TestWithFilePaths()
-    {
-        var filePaths = Helpers.CreateDummyFiles(3);
-
-        var source = new Source
-        {
-            Action = SourceAction.Info,
-            Operation = SourceOperation.Nothing,
-            FilePaths = filePaths
-        };
-
-        var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.IsFalse(result.ActionSkipped);
-        Assert.AreEqual(3, result.SuccessfulTransferCount);
-    }
-
-    [Test]
-    public void UploadFiles_TestWithFilePathsEvenIfSourceFileIsAssigned()
-    {
-        var filePaths = Helpers.CreateDummyFiles(3);
-
-        var source = new Source
-        {
-            Directory = _source.Directory,
-            FileName = "*.csv",
-            Action = SourceAction.Info,
-            Operation = SourceOperation.Nothing,
-            FilePaths = filePaths
-        };
-
-        var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.IsFalse(result.ActionSkipped);
-        Assert.AreEqual(3, result.SuccessfulTransferCount);
+            var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.IsFalse(result.ActionSkipped);
+            Assert.AreEqual(3, result.SuccessfulTransferCount);
+        }
     }
 }
+
+
 

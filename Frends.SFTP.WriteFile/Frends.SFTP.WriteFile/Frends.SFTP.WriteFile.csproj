@@ -7,7 +7,7 @@
 	  <AssemblyName>Frends.SFTP.WriteFile</AssemblyName>
 	  <RootNamespace>Frends.SFTP.WriteFile</RootNamespace>
 
-	  <Version>2.0.0</Version>
+	  <Version>2.0.1</Version>
 	  <Authors>Frends</Authors>
 	  <Copyright>Frends</Copyright>
 	  <Company>Frends</Company>
@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-	<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+	<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="SSH.NET" Version="2020.0.2" />
     <PackageReference Include="SshKeyGenerator" Version="1.1.50" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />

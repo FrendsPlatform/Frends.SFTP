@@ -4,6 +4,11 @@
 ### Fixed
 - [Breaking] Fixed issue where keepaliveinterval and operationtimeout is set as the connectiontimeout by creating them for the keepaliveinterval its own parameter and removed operationtimeout.
 
+## [2.4.2] - 2022-12-01
+### Updated
+- Updated dependencies System.Text.Encoding.CodePages and Microsoft.Extensions.DependencyInjection to the newest version.
+- Modified test to run against net471 instead of net6.
+
 ## [2.4.1] - 2022-11-24
 ### Fixed 
 - Fixed issue with files not found when the name consist of special characters by adding a check for the files exact name.

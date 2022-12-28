@@ -1,356 +1,358 @@
 ﻿using NUnit.Framework;
 using System.IO;
 using System.Threading;
-using System.Collections.Generic;
 using Frends.SFTP.DownloadFiles.Definitions;
 
-namespace Frends.SFTP.DownloadFiles.Tests;
-
-[TestFixture]
-class SourceOperationTests : DownloadFilesTestBase
+namespace Frends.SFTP.DownloadFiles.Tests
 {
-    [Test]
-    public void DownloadFiles_SourceOperationNothingWithRenamingDisable()
+    [TestFixture]
+    class SourceOperationTests : DownloadFilesTestBase
     {
-        var options = new Options
+        [Test]
+        public void DownloadFiles_SourceOperationNothingWithRenamingDisable()
         {
-            ThrowErrorOnFail = false,
-            RenameSourceFileBeforeTransfer = false,
-            RenameDestinationFileDuringTransfer = false,
-            CreateDestinationDirectories = true,
-            PreserveLastModified = false,
-            OperationLog = true
-        };
-        var result = SFTP.DownloadFiles(_source, _destination, _connection, options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
+            var options = new Options
+            {
+                ThrowErrorOnFail = false,
+                RenameSourceFileBeforeTransfer = false,
+                RenameDestinationFileDuringTransfer = false,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true
+            };
+            var result = SFTP.DownloadFiles(_source, _destination, _connection, options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
 
-        Assert.IsTrue(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
-    }
+            Assert.IsTrue(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
+        }
 
-    [Test]
-    public void DownloadFiles_TestSourceOperationMove()
-    {
-        var to = "uploaded";
-        Helpers.UploadTestFiles(_source.Directory, 1, to);
-        to = "upload/Upload/" + to;
-        var source = new Source
+        [Test]
+        public void DownloadFiles_TestSourceOperationMove()
         {
-            Directory = "upload/Upload",
-            FileName = "SFTPDownloadTestFile1.txt",
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Move,
-            DirectoryToMoveAfterTransfer = to
-        };
+            var to = "uploaded";
+            Helpers.UploadTestFiles(_source.Directory, 1, to);
+            to = "upload/Upload/" + to;
+            var source = new Source
+            {
+                Directory = "upload/Upload",
+                FileName = "SFTPDownloadTestFile1.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Move,
+                DirectoryToMoveAfterTransfer = to
+            };
 
-        var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
+            var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-        Assert.IsTrue(Helpers.SourceFileExists(source.DirectoryToMoveAfterTransfer + "/" + source.FileName));
-    }
+            Assert.IsTrue(Helpers.SourceFileExists(source.DirectoryToMoveAfterTransfer + "/" + source.FileName));
+        }
 
-    [Test]
-    public void DownloadFiles_TestWithSourceMoveToNonExistingDirectoryShouldReturnUnsuccessfulTransfer()
-    {
-        Directory.CreateDirectory(_destWorkDir);
-
-        var options = new Options
+        [Test]
+        public void DownloadFiles_TestWithSourceMoveToNonExistingDirectoryShouldReturnUnsuccessfulTransfer()
         {
-            ThrowErrorOnFail = false,
-            RenameSourceFileBeforeTransfer = true,
-            RenameDestinationFileDuringTransfer = true,
-            CreateDestinationDirectories = true,
-            PreserveLastModified = true,
-            OperationLog = true
-        };
+            Directory.CreateDirectory(_destWorkDir);
 
-        var source = new Source
+            var options = new Options
+            {
+                ThrowErrorOnFail = false,
+                RenameSourceFileBeforeTransfer = true,
+                RenameDestinationFileDuringTransfer = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = true,
+                OperationLog = true
+            };
+
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = _source.FileName,
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Move,
+                DirectoryToMoveAfterTransfer = "/upload/test"
+            };
+
+            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            Assert.IsFalse(result.Success);
+            Assert.IsTrue(Helpers.SourceFileExists(Path.Combine(_source.Directory, _source.FileName).Replace("\\", "/")));
+        }
+
+        [Test]
+        public void DownloadFiles_TestSourceOperationRename()
         {
-            Directory = _source.Directory,
-            FileName = _source.FileName,
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Move,
-            DirectoryToMoveAfterTransfer = "/upload/test"
-        };
+            var source = new Source
+            {
+                Directory = "upload/Upload",
+                FileName = "SFTPDownloadTestFile1.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Rename,
+                FileNameAfterTransfer = "uploaded_%SourceFileName%.txt"
+            };
 
-        var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
-        Assert.IsFalse(result.Success);
-        Assert.IsTrue(Helpers.SourceFileExists(Path.Combine(_source.Directory, _source.FileName).Replace("\\", "/")));
-    }
+            var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-    [Test]
-    public void DownloadFiles_TestSourceOperationRename()
-    {
-        var source = new Source
+            Assert.IsTrue(Helpers.SourceFileExists(source.Directory + "/uploaded_" + source.FileName));
+        }
+
+        [Test]
+        public void DownloadFiles_TestSourceOperationMoveWithRenameFilesDuringTransfer()
         {
-            Directory = "upload/Upload",
-            FileName = "SFTPDownloadTestFile1.txt",
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Rename,
-            FileNameAfterTransfer = "uploaded_%SourceFileName%.txt"
-        };
+            var to = "uploaded";
+            Helpers.UploadTestFiles(_source.Directory, 3, to);
+            to = "upload/Upload/" + to;
 
-        var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
+            var options = new Options
+            {
+                ThrowErrorOnFail = false,
+                RenameSourceFileBeforeTransfer = false,
+                RenameDestinationFileDuringTransfer = false,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true
+            };
 
-        Assert.IsTrue(Helpers.SourceFileExists(source.Directory + "/uploaded_" + source.FileName));
-    }
+            var source = new Source
+            {
+                Directory = "upload/Upload",
+                FileName = "SFTPDownloadTestFile1.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Move,
+                DirectoryToMoveAfterTransfer = to
+            };
 
-    [Test]
-    public void DownloadFiles_TestSourceOperationMoveWithRenameFilesDuringTransfer()
-    {
-        var to = "uploaded";
-        Helpers.UploadTestFiles(_source.Directory, 3, to);
-        to = "upload/Upload/" + to;
+            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-        var options = new Options
+            Assert.IsTrue(Helpers.SourceFileExists(source.DirectoryToMoveAfterTransfer + "/" + source.FileName));
+        }
+
+        [Test]
+        public void DownloadFiles_TestSourceOperationRenameWithRenameFilesDuringTransfer()
         {
-            ThrowErrorOnFail = false,
-            RenameSourceFileBeforeTransfer = false,
-            RenameDestinationFileDuringTransfer = false,
-            CreateDestinationDirectories = true,
-            PreserveLastModified = false,
-            OperationLog = true
-        };
+            var options = new Options
+            {
+                ThrowErrorOnFail = false,
+                RenameSourceFileBeforeTransfer = false,
+                RenameDestinationFileDuringTransfer = false,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true
+            };
 
-        var source = new Source
+            var source = new Source
+            {
+                Directory = "upload/Upload",
+                FileName = "SFTPDownloadTestFile1.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Rename,
+                FileNameAfterTransfer = "uploaded_%SourceFileName%.txt"
+            };
+
+            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+            Assert.IsTrue(Helpers.SourceFileExists(source.Directory + "/uploaded_" + source.FileName));
+        }
+
+        [Test]
+        public void DownloadFiles_TestSourceOperationMoveWithRenameFilesDuringTransferWithRenameSourceAndDestinationFilesEnabled()
         {
-            Directory = "upload/Upload",
-            FileName = "SFTPDownloadTestFile1.txt",
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Move,
-            DirectoryToMoveAfterTransfer = to
-        };
+            var to = "uploaded";
+            Helpers.UploadTestFiles(_source.Directory, 3, to);
+            to = "upload/Upload/" + to;
 
-        var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
+            var options = new Options
+            {
+                ThrowErrorOnFail = false,
+                RenameSourceFileBeforeTransfer = true,
+                RenameDestinationFileDuringTransfer = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true
+            };
 
-        Assert.IsTrue(Helpers.SourceFileExists(source.DirectoryToMoveAfterTransfer + "/" + source.FileName));
-    }
+            var source = new Source
+            {
+                Directory = "upload/Upload",
+                FileName = "SFTPDownloadTestFile1.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Move,
+                DirectoryToMoveAfterTransfer = to
+            };
 
-    [Test]
-    public void DownloadFiles_TestSourceOperationRenameWithRenameFilesDuringTransfer()
-    {
-        var options = new Options
+            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+            Assert.IsTrue(Helpers.SourceFileExists(source.DirectoryToMoveAfterTransfer + "/" + source.FileName));
+        }
+
+        [Test]
+        public void DownloadFiles_TestSourceOperationRenameWithRenameFilesDuringTransferWithRenameSourceAndDestinationFilesEnabled()
         {
-            ThrowErrorOnFail = false,
-            RenameSourceFileBeforeTransfer = false,
-            RenameDestinationFileDuringTransfer = false,
-            CreateDestinationDirectories = true,
-            PreserveLastModified = false,
-            OperationLog = true
-        };
+            var options = new Options
+            {
+                ThrowErrorOnFail = false,
+                RenameSourceFileBeforeTransfer = true,
+                RenameDestinationFileDuringTransfer = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true
+            };
 
-        var source = new Source
+            var source = new Source
+            {
+                Directory = "upload/Upload",
+                FileName = "SFTPDownloadTestFile1.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Rename,
+                FileNameAfterTransfer = "uploaded_%SourceFileName%.txt"
+            };
+
+            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+            Assert.IsTrue(Helpers.SourceFileExists(source.Directory + "/uploaded_" + source.FileName));
+        }
+
+        [Test]
+        public void DownloadFiles_SourceOperationDelete()
         {
-            Directory = "upload/Upload",
-            FileName = "SFTPDownloadTestFile1.txt",
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Rename,
-            FileNameAfterTransfer = "uploaded_%SourceFileName%.txt"
-        };
+            Directory.CreateDirectory(_destWorkDir);
 
-        var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
+            var options = new Options
+            {
+                ThrowErrorOnFail = true,
+                RenameSourceFileBeforeTransfer = false,
+                RenameDestinationFileDuringTransfer = false,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = true,
+                OperationLog = true
+            };
 
-        Assert.IsTrue(Helpers.SourceFileExists(source.Directory + "/uploaded_" + source.FileName));
-    }
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = _source.FileName,
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Delete
+            };
 
-    [Test]
-    public void DownloadFiles_TestSourceOperationMoveWithRenameFilesDuringTransferWithRenameSourceAndDestinationFilesEnabled()
-    {
-        var to = "uploaded";
-        Helpers.UploadTestFiles(_source.Directory, 3, to);
-        to = "upload/Upload/" + to;
+            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
+        }
 
-        var options = new Options
+        [Test]
+        public void DownloadFiles_SourceOperationDeleteRenameSourceFile()
         {
-            ThrowErrorOnFail = false,
-            RenameSourceFileBeforeTransfer = true,
-            RenameDestinationFileDuringTransfer = true,
-            CreateDestinationDirectories = true,
-            PreserveLastModified = false,
-            OperationLog = true
-        };
+            Directory.CreateDirectory(_destWorkDir);
 
-        var source = new Source
+            var options = new Options
+            {
+                ThrowErrorOnFail = true,
+                RenameSourceFileBeforeTransfer = true,
+                RenameDestinationFileDuringTransfer = false,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = true,
+                OperationLog = true
+            };
+
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = _source.FileName,
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Delete
+            };
+
+            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
+        }
+
+        [Test]
+        public void DownloadFiles_SourceOperationDeleteRenameDestinationFile()
         {
-            Directory = "upload/Upload",
-            FileName = "SFTPDownloadTestFile1.txt",
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Move,
-            DirectoryToMoveAfterTransfer = to
-        };
+            Directory.CreateDirectory(_destWorkDir);
 
-        var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
+            var options = new Options
+            {
+                ThrowErrorOnFail = true,
+                RenameSourceFileBeforeTransfer = false,
+                RenameDestinationFileDuringTransfer = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = true,
+                OperationLog = true
+            };
 
-        Assert.IsTrue(Helpers.SourceFileExists(source.DirectoryToMoveAfterTransfer + "/" + source.FileName));
-    }
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = _source.FileName,
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Delete
+            };
 
-    [Test]
-    public void DownloadFiles_TestSourceOperationRenameWithRenameFilesDuringTransferWithRenameSourceAndDestinationFilesEnabled()
-    {
-        var options = new Options
+            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
+        }
+
+        [Test]
+        public void DownloadFiles_SourceOperationDeleteRenameBoth()
         {
-            ThrowErrorOnFail = false,
-            RenameSourceFileBeforeTransfer = true,
-            RenameDestinationFileDuringTransfer = true,
-            CreateDestinationDirectories = true,
-            PreserveLastModified = false,
-            OperationLog = true
-        };
+            Directory.CreateDirectory(_destWorkDir);
 
-        var source = new Source
+            var options = new Options
+            {
+                ThrowErrorOnFail = true,
+                RenameSourceFileBeforeTransfer = true,
+                RenameDestinationFileDuringTransfer = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = true,
+                OperationLog = true
+            };
+
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = _source.FileName,
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Delete
+            };
+
+            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
+        }
+
+        [Test]
+        public void DownloadFiles_TestSourceOperationRenameWithDifferentDirectory()
         {
-            Directory = "upload/Upload",
-            FileName = "SFTPDownloadTestFile1.txt",
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Rename,
-            FileNameAfterTransfer = "uploaded_%SourceFileName%.txt"
-        };
+            Helpers.CreateSubDirectory("upload/moved");
 
-        var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
+            var source = new Source
+            {
+                Directory = "upload/Upload",
+                FileName = "SFTPDownloadTestFile1.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Rename,
+                FileNameAfterTransfer = "upload/moved/uploaded_%SourceFileName%.txt"
+            };
 
-        Assert.IsTrue(Helpers.SourceFileExists(source.Directory + "/uploaded_" + source.FileName));
-    }
+            var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-    [Test]
-    public void DownloadFiles_SourceOperationDelete()
-    {
-        Directory.CreateDirectory(_destWorkDir);
-
-        var options = new Options
-        {
-            ThrowErrorOnFail = true,
-            RenameSourceFileBeforeTransfer = false,
-            RenameDestinationFileDuringTransfer = false,
-            CreateDestinationDirectories = true,
-            PreserveLastModified = true,
-            OperationLog = true
-        };
-
-        var source = new Source
-        {
-            Directory = _source.Directory,
-            FileName = _source.FileName,
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Delete
-        };
-
-        var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
-    }
-
-    [Test]
-    public void DownloadFiles_SourceOperationDeleteRenameSourceFile()
-    {
-        Directory.CreateDirectory(_destWorkDir);
-
-        var options = new Options
-        {
-            ThrowErrorOnFail = true,
-            RenameSourceFileBeforeTransfer = true,
-            RenameDestinationFileDuringTransfer = false,
-            CreateDestinationDirectories = true,
-            PreserveLastModified = true,
-            OperationLog = true
-        };
-
-        var source = new Source
-        {
-            Directory = _source.Directory,
-            FileName = _source.FileName,
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Delete
-        };
-
-        var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
-    }
-
-    [Test]
-    public void DownloadFiles_SourceOperationDeleteRenameDestinationFile()
-    {
-        Directory.CreateDirectory(_destWorkDir);
-
-        var options = new Options
-        {
-            ThrowErrorOnFail = true,
-            RenameSourceFileBeforeTransfer = false,
-            RenameDestinationFileDuringTransfer = true,
-            CreateDestinationDirectories = true,
-            PreserveLastModified = true,
-            OperationLog = true
-        };
-
-        var source = new Source
-        {
-            Directory = _source.Directory,
-            FileName = _source.FileName,
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Delete
-        };
-
-        var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
-    }
-
-    [Test]
-    public void DownloadFiles_SourceOperationDeleteRenameBoth()
-    {
-        Directory.CreateDirectory(_destWorkDir);
-
-        var options = new Options
-        {
-            ThrowErrorOnFail = true,
-            RenameSourceFileBeforeTransfer = true,
-            RenameDestinationFileDuringTransfer = true,
-            CreateDestinationDirectories = true,
-            PreserveLastModified = true,
-            OperationLog = true
-        };
-
-        var source = new Source
-        {
-            Directory = _source.Directory,
-            FileName = _source.FileName,
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Delete
-        };
-
-        var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
-    }
-
-    [Test]
-    public void DownloadFiles_TestSourceOperationRenameWithDifferentDirectory()
-    {
-        Helpers.CreateSubDirectory("upload/moved");
-
-        var source = new Source
-        {
-            Directory = "upload/Upload",
-            FileName = "SFTPDownloadTestFile1.txt",
-            Action = SourceAction.Error,
-            Operation = SourceOperation.Rename,
-            FileNameAfterTransfer = "upload/moved/uploaded_%SourceFileName%.txt"
-        };
-
-        var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.SuccessfulTransferCount);
-
-        Assert.IsTrue(Helpers.SourceFileExists("upload/moved/uploaded_" + source.FileName));
+            Assert.IsTrue(Helpers.SourceFileExists("upload/moved/uploaded_" + source.FileName));
+        }
     }
 }
+
+
