@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.IO;
 using System.Threading;
 using System.Collections.Generic;
@@ -15,6 +16,21 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = SFTP.DownloadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
+        }
+
+        [Test]
+        public void DownloadFiles_TestTransferWithoutSourceDirectoryShouldThrow()
+        {
+            var source = new Source
+            {
+                Directory = "",
+                FileName = _source.FileName,
+                Action = _source.Action,
+                Operation = _source.Operation,
+            };
+
+            var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
+            Assert.IsTrue(ex.Message.Contains("No source"));
         }
 
         [Test]
@@ -102,6 +118,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsFalse(result.Success);
             Assert.AreEqual(2, result.SuccessfulTransferCount);
             Assert.AreEqual(1, result.FailedTransferCount);
+            Assert.IsTrue(result.UserResultMessage.Contains("2 files transferred:"));
         }
 
         [Test]
@@ -223,6 +240,8 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.ActionSkipped);
+            Assert.IsFalse(result.UserResultMessage.Contains("1 files transferred"));
+            Assert.IsTrue(result.UserResultMessage.Contains("No files transferred"));
         }
 
         [Test]
@@ -249,6 +268,8 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.ActionSkipped);
+            Assert.IsFalse(result.UserResultMessage.Contains("1 files transferred"));
+            Assert.IsTrue(result.UserResultMessage.Contains("No files transferred"));
         }
 
         [Test]
