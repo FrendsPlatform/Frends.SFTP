@@ -114,6 +114,48 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
+
+        [Test]
+        public void DownloadFiles_TestKeepAliveIntervalWithDefault()
+        {
+            Helpers.CopyLargeTestFile(10);
+
+            var connection = Helpers.GetSftpConnection();
+
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "*.bin",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+            };
+
+            var result = SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(11, result.SuccessfulTransferCount);
+        }
+
+        [Test]
+        public void DownloadFiles_TestKeepAliveIntervalWith1ms()
+        {
+            Helpers.CopyLargeTestFile(10);
+
+            var connection = Helpers.GetSftpConnection();
+            connection.KeepAliveInterval = 1;
+            connection.BufferSize = 256;
+
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "*.bin",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+            };
+
+            var result = SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(11, result.SuccessfulTransferCount);
+        }
     }
 }
 

@@ -31,7 +31,8 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Port = 2222,
                 Authentication = AuthenticationType.UsernamePassword,
                 ServerFingerPrint = null,
-                BufferSize = 32
+                BufferSize = 32,
+                KeepAliveInterval = -1
             };
 
             return connection;
