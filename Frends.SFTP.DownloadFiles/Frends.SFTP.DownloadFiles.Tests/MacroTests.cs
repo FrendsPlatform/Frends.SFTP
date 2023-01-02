@@ -28,7 +28,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public void DownloadFiles_TestSourceDirectoryWithMacros()
         {
-            Helpers.UploadTestFiles(_source.Directory + "/testfolder_2022", 3);
+            Helpers.UploadTestFiles(_source.Directory + "/testfolder_" + DateTime.Now.Year, 3);
 
             var source = new Source
             {
