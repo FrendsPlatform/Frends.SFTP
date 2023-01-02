@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.5.1] - 2022-12-30
+### Fixed
+- Fixed issue with empty source dir throws an exception by setting empty source directory as '/'.
+- Fixed issue with when no source files userResultMessage still said no. files transferred and not no files transferred.
+
 ## [2.5.0] - 2022-12-16
 ### Fixed
 - [Breaking] Fixed issue where keepaliveinterval and operationtimeout is set as the connectiontimeout by creating them for the keepaliveinterval its own parameter and removed operationtimeout.

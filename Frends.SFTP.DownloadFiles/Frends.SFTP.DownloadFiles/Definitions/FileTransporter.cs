@@ -29,7 +29,7 @@ internal class FileTransporter
         _filePaths = ConvertObjectToStringArray(context.Source.FilePaths);
 
         if (_filePaths == null || !_filePaths.Any())
-            SourceDirectoryWithMacrosExtended = _renamingPolicy.ExpandDirectoryForMacros(context.Source.Directory);
+            SourceDirectoryWithMacrosExtended = string.IsNullOrEmpty(context.Source.Directory) ? "/" : _renamingPolicy.ExpandDirectoryForMacros(context.Source.Directory);
 
         DestinationDirectoryWithMacrosExtended = _renamingPolicy.ExpandDirectoryForMacros(context.Destination.Directory);
     }
@@ -512,7 +512,7 @@ internal class FileTransporter
             userResultMessage = MessageJoin(userResultMessage,
                 $"{errorMessages.Count} Errors: {string.Join(", \n", errorMessages)}.");
 
-        var transferredFiles = results.Where(x => x.Success).Select(x => x.TransferredFile).ToList();
+        var transferredFiles = results.Where(x => x.Success && !x.ActionSkipped).Select(x => x.TransferredFile).ToList();
         if (transferredFiles.Any())
             userResultMessage = MessageJoin(userResultMessage,
                 $"{transferredFiles.Count} files transferred: {string.Join(", \n", transferredFiles)}.");

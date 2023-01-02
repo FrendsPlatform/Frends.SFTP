@@ -16,7 +16,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             File.Copy(Path.Combine(_workDir, _source.FileName), Path.Combine(_destWorkDir, _source.FileName));
 
             var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, _destination, _connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.StartsWith($"SFTP transfer failed: 1 Errors: Failure in CheckIfDestination"));
+            Assert.IsTrue(ex.Message.StartsWith($"SFTP transfer failed: 1 Errors: Failure in CheckIfDestination"));
         }
 
         [Test]
@@ -31,7 +31,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
 
             var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.StartsWith("SFTP transfer failed: 1 Errors: No source files found from directory"));
+            Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: 1 Errors: No source files found from directory"));
         }
 
         [Test]
@@ -41,7 +41,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.Port = 51651;
 
             var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.StartsWith("SFTP transfer failed: Unable to establish the socket: No such host is known"));
+            Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: Unable to establish the socket: No such host is known"));
         }
 
         [Test]
@@ -58,7 +58,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
 
             var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.StartsWith("SFTP transfer failed: 1 Errors: No source files found from directory"));
+            Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: 1 Errors: No source files found from directory"));
 
             Helpers.DeleteSubDirectory(path);
         }
@@ -157,7 +157,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.Password = "cuinbeu8i9ch";
 
             var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.Contains($"FRENDS SFTP file transfer '' from 'SFTP://localhost//upload/Upload/{_source.FileName}' to 'FILE://{_destination.Directory}':"));
+            Assert.IsTrue(ex.Message.Contains($"FRENDS SFTP file transfer '' from 'SFTP://localhost//upload/Upload/{_source.FileName}' to 'FILE://{_destination.Directory}':"));
         }
     }
 }
