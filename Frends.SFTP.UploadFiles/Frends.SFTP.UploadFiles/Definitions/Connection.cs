@@ -18,6 +18,14 @@ public class Connection
     public int ConnectionTimeout { get; set; }
 
     /// <summary>
+    /// The keep-alive interval in milliseconds. Interval the client send keep-alive packages to the host.
+    /// You can use value -1 to disable the keep-alive.
+    /// </summary>
+    /// <example>-1</example>
+    [DefaultValue(-1)]
+    public int KeepAliveInterval { get; set; }
+
+    /// <summary>
     /// SFTP host address
     /// </summary>
     /// <example>localhost</example>
