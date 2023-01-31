@@ -2,8 +2,7 @@
 
 ## [2.5.2] - 2023-01-31
 ### Added
-- Added cancellation token to the method listing the source files. 
-- Modified method's name from GetSourceFiles to ListSourceFiles.
+- Added cancellation token to the method listing the source files so Task won't freeze in that execution. 
 
 ## [2.5.1] - 2022-12-30
 ### Fixed
