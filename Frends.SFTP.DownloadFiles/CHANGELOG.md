@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.5.2] - 2023-01-31
+### Added
+- Added cancellation token to the method listing the source files. 
+- Modified method's name from GetSourceFiles to ListSourceFiles.
+
 ## [2.5.1] - 2022-12-30
 ### Fixed
 - Fixed issue with empty source dir throws an exception by setting empty source directory as '/'.
