@@ -157,7 +157,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.Password = "cuinbeu8i9ch";
 
             var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-            Assert.IsTrue(ex.Message.Contains($"FRENDS SFTP file transfer '' from 'SFTP://localhost//upload/Upload/{_source.FileName}' to 'FILE://{_destination.Directory}':"));
+            Assert.IsTrue(ex.Message.Contains($"SFTP transfer failed: Authentication of SSH session failed: Permission denied (password)"));
         }
     }
 }
