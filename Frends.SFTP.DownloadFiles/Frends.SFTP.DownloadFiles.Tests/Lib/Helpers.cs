@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.IO;
 using System.Text;
 using System.Security.Cryptography;
@@ -18,7 +19,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         readonly static string _dockerAddress = "localhost";
         readonly static string _dockerUsername = "foo";
         readonly static string _dockerPassword = "pass";
-        readonly static string _baseDir = "/upload/";
+        readonly static string _baseDir = "./upload/";
         readonly static string _workDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
 
         internal static Connection GetSftpConnection()
@@ -63,6 +64,12 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 if (client.Exists(destination))
                     DeleteDirectory(client, destination);
                 CreateSourceDirectories(client, destination);
+
+                var p = client.WorkingDirectory;
+                var f = client.ListDirectory(".");
+                var c = string.Join(",", f.Select(i => i.Name));
+                var test = destination;
+
                 client.ChangeDirectory(destination);
                 if (!string.IsNullOrEmpty(to)) client.CreateDirectory(to);
                 foreach (var file in files)
@@ -183,6 +190,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
         internal static void CreateSourceDirectories(SftpClient client, string path)
         {
+            var origPath = client.WorkingDirectory;
             // Consistent forward slashes
             foreach (string dir in path.Replace(@"\", "/").Split('/'))
             {
@@ -195,6 +203,8 @@ namespace Frends.SFTP.DownloadFiles.Tests
                     }
                 }
             }
+
+            client.ChangeDirectory(origPath);
         }
 
         private static bool TryToChangeDir(SftpClient client, string dir)

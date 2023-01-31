@@ -26,7 +26,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             _source = new Source
             {
-                Directory = "/upload/Upload",
+                Directory = "./upload/Upload",
                 FileName = "SFTPDownloadTestFile1.txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Nothing,
@@ -71,7 +71,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 {
                     sftp.Connect();
                     if (sftp.Exists(_source.Directory))
-                        Helpers.DeleteDirectory(sftp, "/upload/");
+                        Helpers.DeleteDirectory(sftp, "./upload/");
                     sftp.Disconnect();
                 }
             }
