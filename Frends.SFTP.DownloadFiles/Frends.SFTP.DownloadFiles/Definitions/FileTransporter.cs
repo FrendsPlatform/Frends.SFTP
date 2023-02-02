@@ -114,7 +114,7 @@ internal class FileTransporter
                 _logger.NotifyInformation(_batchContext, $"Connection has been stablished to target {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using SFTP.");
 
                 // Fetch source file info and check if files were returned.
-                var (files, success) = GetSourceFiles(client, _batchContext.Source);
+                var (files, success) = ListSourceFiles(client, _batchContext.Source, cancellationToken);
 
                 // If source directory doesn't exist, modify userResultMessage accordingly.
                 if (!success)
@@ -383,13 +383,7 @@ internal class FileTransporter
         };
     }
 
-    /// <summary>
-    /// Get source files that fit the file name / mask
-    /// </summary>
-    /// <param name="client"></param>
-    /// <param name="source"></param>
-    /// <returns></returns>
-    private Tuple<List<FileItem>, bool> GetSourceFiles(SftpClient client, Source source)
+    private Tuple<List<FileItem>, bool> ListSourceFiles(SftpClient client, Source source, CancellationToken cancellationToken)
     {
         SetCurrentState(TransferState.CheckSourceFiles, "Checking source files.");
 
@@ -400,6 +394,8 @@ internal class FileTransporter
             var items = _filePaths.Select(p => new FileItem(p) { Name = p }).ToList();
             foreach (var file in items)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 if (!client.Exists(file.FullPath))
                     _logger.NotifyError(_batchContext, $"File does not exist: '{file.FullPath}", new FileNotFoundException());
                 else
@@ -423,6 +419,8 @@ internal class FileTransporter
         // create List of FileItems from found files.
         foreach (var file in files)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var name = file.Name;
             if (file.Name.Equals(".") || file.Name.Equals("..")) continue;
 
