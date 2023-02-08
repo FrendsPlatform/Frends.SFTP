@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.5.3] - 2023-02-08
+### Fixed
+- Fixed issue with file not found when downloading from server when server has automatic delete action enabled.
+
 ## [2.5.2] - 2023-01-31
 ### Added
 - Added cancellation token to the method listing the source files so Task won't freeze in that execution. 
