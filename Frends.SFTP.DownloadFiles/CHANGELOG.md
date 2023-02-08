@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.5.2] - 2023-02-08
+### Fixed 
+- Fixed issue with file not found when downloading from server when server has automatic delete action enabled.
+
 ## [2.5.1] - 2022-12-30
 ### Fixed
 - Fixed issue with empty source dir throws an exception by setting empty source directory as '/'.
