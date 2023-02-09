@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Renci.SshNet;
+using Renci.SshNet.Sftp;
 
 namespace Frends.SFTP.DownloadFiles.Definitions;
 
@@ -294,10 +295,11 @@ internal class SingleFileTransfer
     private void ExecuteSourceOperationMoveOrRename()
     {
         var filePath = string.IsNullOrEmpty(SourceFileDuringTransfer) ? SourceFile.FullPath : SourceFileDuringTransfer;
-        var file = Client.Get(filePath);
+        SftpFile file;
 
         if (BatchContext.Source.Operation == SourceOperation.Move) 
         {
+            file = Client.Get(filePath);
             var moveToPath = _renamingPolicy.ExpandDirectoryForMacros(BatchContext.Source.DirectoryToMoveAfterTransfer);
             SetCurrentState(TransferState.SourceOperationMove, $"Moving source file {SourceFile.FullPath} to {moveToPath}.");
             if (!Client.Exists(moveToPath))
@@ -322,6 +324,7 @@ internal class SingleFileTransfer
         }
         else if (BatchContext.Source.Operation == SourceOperation.Rename)
         {
+            file = Client.Get(filePath);
             var path = string.IsNullOrEmpty(Path.GetDirectoryName(BatchContext.Source.FileNameAfterTransfer)) 
                 ? Path.GetDirectoryName(SourceFile.FullPath).Replace("\\", "/")
                 : Path.GetDirectoryName(_renamingPolicy.CreateRemoteFileNameForRename(SourceFile.FullPath, BatchContext.Source.FileNameAfterTransfer)).Replace("\\", "/");
