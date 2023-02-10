@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.5.1] - 2023-02-09
+### Added
+- Added cancellationToken to method ListSourceFiles so Task's execution can be terminated via Frends.
+
 ## [2.5.0] - 2022-12-30
 ### Fixed
 - [Breaking] Fixed issue where keepaliveinterval and operationtimeout is set as the connectiontimeout by creating them for the keepaliveinterval its own parameter and removed operationtimeout.

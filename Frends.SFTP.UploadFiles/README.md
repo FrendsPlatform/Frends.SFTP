@@ -1,7 +1,6 @@
 # Frends.SFTP.UploadFiles
 
 [![Frends.SFTP.UploadFiles Main](https://github.com/FrendsPlatform/Frends.SFTP/actions/workflows/UploadFiles_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.SFTP/actions/workflows/UploadFiles_build_and_test_on_main.yml)
-![MyGet](https://img.shields.io/myget/frends-tasks/v/Frends.SFTP.UploadFiles?label=NuGet)
 ![GitHub](https://img.shields.io/github/license/FrendsPlatform/Frends.SFTP?label=License)
 ![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.SFTP/Frends.SFTP.UploadFiles|main)
 
@@ -23,9 +22,7 @@ You can install the task via FRENDS UI Task View or you can find the NuGet packa
 
 ### Run tests
 
-cd Frends.SFTP.UploadFiles.Tests
-
-Run the Docker compose from Frends.SFTP.UploadFiles.Tests directory using
+`cd Frends.SFTP.UploadFiles.Tests`
 
 `docker-compose up -d`
 

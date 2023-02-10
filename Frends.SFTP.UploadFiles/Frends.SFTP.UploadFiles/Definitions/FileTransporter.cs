@@ -57,7 +57,7 @@ internal class FileTransporter
         try
         {
             // Fetch source file info and check if files were returned.
-            var (files, success) = GetSourceFiles(_batchContext.Source);
+            var (files, success) = ListSourceFiles(_batchContext.Source, cancellationToken);
 
             // If source directory doesn't exist, modify userResultMessage accordingly.
             if (!success)
@@ -293,7 +293,7 @@ internal class FileTransporter
                 prompt.Response = _batchContext.Connection.Password;
     }
 
-    private void ForceHostKeyAlgorithm(SftpClient client, HostKeyAlgorithms algorithm)
+    private static void ForceHostKeyAlgorithm(SftpClient client, HostKeyAlgorithms algorithm)
     {
         client.ConnectionInfo.HostKeyAlgorithms.Clear();
 
@@ -387,12 +387,7 @@ internal class FileTransporter
         };
     }
 
-    /// <summary>
-    /// Get source files that fit the file name / mask
-    /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
-    private Tuple<List<FileItem>, bool> GetSourceFiles(Source source)
+    private Tuple<List<FileItem>, bool> ListSourceFiles(Source source, CancellationToken cancellationToken)
     {
         SetCurrentState(TransferState.CheckSourceFiles, "Checking source files.");
 
@@ -420,6 +415,7 @@ internal class FileTransporter
         // create List of FileItems from found files.
         foreach (var file in files)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (Path.GetFileName(file).Equals(source.FileName) || Util.FileMatchesMask(Path.GetFileName(file), source.FileName))
             {
                 FileItem item = new FileItem(Path.GetFullPath(file));
