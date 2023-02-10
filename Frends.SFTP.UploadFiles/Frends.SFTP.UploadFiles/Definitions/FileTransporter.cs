@@ -293,7 +293,7 @@ internal class FileTransporter
                 prompt.Response = _batchContext.Connection.Password;
     }
 
-    private void ForceHostKeyAlgorithm(SftpClient client, HostKeyAlgorithms algorithm)
+    private static void ForceHostKeyAlgorithm(SftpClient client, HostKeyAlgorithms algorithm)
     {
         client.ConnectionInfo.HostKeyAlgorithms.Clear();
 
