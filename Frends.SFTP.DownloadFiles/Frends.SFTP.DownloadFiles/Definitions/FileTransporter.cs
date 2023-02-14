@@ -396,7 +396,7 @@ internal class FileTransporter
                 else
                     fileItems.Add(file);
             }
-               
+
             if (fileItems.Any()) return new Tuple<List<FileItem>, bool>(fileItems, true);
 
             return new Tuple<List<FileItem>, bool>(fileItems, true);
