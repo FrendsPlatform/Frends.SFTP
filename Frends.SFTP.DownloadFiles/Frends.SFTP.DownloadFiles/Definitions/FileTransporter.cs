@@ -73,9 +73,6 @@ internal class FileTransporter
 
             using (var client = new SftpClient(connectionInfo))
             {
-                client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256");
-                client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256@libssh.org");
-
                 if (_batchContext.Connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
                     ForceHostKeyAlgorithm(client, _batchContext.Connection.HostKeyAlgorithm);
 
