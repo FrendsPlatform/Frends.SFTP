@@ -61,7 +61,8 @@ internal static class Util
                 arr[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
             }
             return true;
-        } catch { return false; }
+        }
+        catch { return false; }
     }
 
     internal static string HexStringToB64String(string input)
@@ -115,7 +116,7 @@ internal static class Util
                 input += '=';
             Convert.FromBase64String(input);
             return true;
-        } 
+        }
         catch { return false; }
     }
 

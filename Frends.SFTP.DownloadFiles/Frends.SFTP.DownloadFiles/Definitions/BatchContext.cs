@@ -29,6 +29,6 @@ internal class BatchContext
 
     public Destination Destination { get; set; }
 
-    public Connection Connection  { get; set; }
+    public Connection Connection { get; set; }
 }
 

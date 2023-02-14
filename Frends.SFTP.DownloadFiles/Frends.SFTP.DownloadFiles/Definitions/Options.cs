@@ -7,7 +7,7 @@ namespace Frends.SFTP.DownloadFiles.Definitions;
 /// Options for file transfer
 /// </summary>
 public class Options
-{   
+{
     /// <summary>
     /// Should an exception be thrown when file transfer fails.
     /// </summary>
