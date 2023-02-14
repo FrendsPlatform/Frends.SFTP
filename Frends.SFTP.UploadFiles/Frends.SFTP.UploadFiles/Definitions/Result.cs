@@ -116,14 +116,14 @@ public class Result
     }
 
     internal Result(
-        bool actionSkipped, 
-        bool success, 
-        string userResultMessage, 
-        int successfulTransferCount, 
-        int failedTransferCount, 
-        IEnumerable<string> transferredFileNames, 
-        Dictionary<string, IList<string>> transferErrors, 
-        IEnumerable<string> transferredFilePaths, 
+        bool actionSkipped,
+        bool success,
+        string userResultMessage,
+        int successfulTransferCount,
+        int failedTransferCount,
+        IEnumerable<string> transferredFileNames,
+        Dictionary<string, IList<string>> transferErrors,
+        IEnumerable<string> transferredFilePaths,
         IDictionary<string, string> operationsLog)
     {
         ActionSkipped = actionSkipped;

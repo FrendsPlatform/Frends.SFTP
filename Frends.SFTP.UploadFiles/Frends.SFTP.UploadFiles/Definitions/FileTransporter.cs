@@ -83,7 +83,7 @@ internal class FileTransporter
                 try
                 {
                     connectionInfo = GetConnectionInfo(_batchContext.Destination, _batchContext.Connection);
-                } 
+                }
                 catch (Exception e)
                 {
                     userResultMessage = $"Error when initializing connection info: {e}";
@@ -174,7 +174,7 @@ internal class FileTransporter
                     }
                     client.Disconnect();
                 }
-            }   
+            }
         }
         catch (FileNotFoundException ex)
         {
@@ -417,7 +417,6 @@ internal class FileTransporter
                 _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath}.");
                 fileItems.Add(item);
             }
-                    
         }
 
         return new Tuple<List<FileItem>, bool>(fileItems, true);
@@ -446,7 +445,8 @@ internal class FileTransporter
         {
             client.ChangeDirectory(dir);
             return true;
-        } catch { return false; }
+        }
+        catch { return false; }
     }
 
     private static string[] ConvertObjectToStringArray(object objectArray)
@@ -484,7 +484,8 @@ internal class FileTransporter
 
         var transferredFileResults = singleResults.Where(r => r.Success && !r.ActionSkipped).ToList();
 
-        return new FileTransferResult {
+        return new FileTransferResult
+        {
             ActionSkipped = actionSkipped,
             Success = success,
             UserResultMessage = userResultMessage,
@@ -493,7 +494,7 @@ internal class FileTransporter
             TransferredFileNames = transferredFileResults.Select(r => r.TransferredFile ?? "--unknown--").ToList(),
             TransferErrors = transferErrors,
             TransferredFilePaths = transferredFileResults.Select(r => r.TransferredFilePath ?? "--unknown--").ToList(),
-            OperationsLog = new Dictionary<string, string>() 
+            OperationsLog = new Dictionary<string, string>()
         };
     }
 

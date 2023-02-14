@@ -25,7 +25,7 @@ internal class TransferLogSink : ILogEventSink
             _initialLogMessages = new List<Tuple<DateTimeOffset, string>>(DefaultInitialLogMessages);
             _circularBuffer = new CircularBuffer<Tuple<DateTimeOffset, string>>(maxLogEntries.Value);
         }
-        else 
+        else
             _allMsgsBuffer = new List<Tuple<DateTimeOffset, string>>();
     }
 

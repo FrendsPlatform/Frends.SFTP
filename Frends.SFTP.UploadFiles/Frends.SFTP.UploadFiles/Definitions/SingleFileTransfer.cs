@@ -22,7 +22,7 @@ internal class SingleFileTransfer
         DestinationFileWithMacrosExpanded = Path.Combine(destinationDirectory, renamingPolicy.CreateRemoteFileName(
                 file.Name,
                 context.Destination.FileName));
-        if (destinationDirectory.Contains('/')) DestinationFileWithMacrosExpanded = DestinationFileWithMacrosExpanded.Replace("\\", "/"); 
+        if (destinationDirectory.Contains('/')) DestinationFileWithMacrosExpanded = DestinationFileWithMacrosExpanded.Replace("\\", "/");
         WorkFileInfo = new WorkFileInfo(file.Name, Path.GetFileName(DestinationFileWithMacrosExpanded), BatchContext.TempWorkDir);
 
         _result = new SingleFileTransferResult { Success = true };
@@ -169,7 +169,7 @@ internal class SingleFileTransfer
             DestinationFileDuringTransfer = (DestinationFileWithMacrosExpanded.Contains("/")) ? path.Replace("\\", "/") : path;
             SetCurrentState(TransferState.RenameDestinationFile, $"Renaming destination file {Path.GetFileName(DestinationFileWithMacrosExpanded)} to temporary file name {Path.GetFileName(DestinationFileDuringTransfer)} during transfer");
             Client.RenameFile(DestinationFileWithMacrosExpanded, DestinationFileDuringTransfer);
-        }  
+        }
     }
 
     private void Append(string content, Encoding encoding)
@@ -179,7 +179,7 @@ internal class SingleFileTransfer
             $"Appending file {SourceFile.Name} to existing file {DestinationFile.Name}");
 
         // If destination rename during transfer is enabled, use that instead 
-        var path = (!string.IsNullOrEmpty(DestinationFileDuringTransfer)) 
+        var path = (!string.IsNullOrEmpty(DestinationFileDuringTransfer))
             ? DestinationFileDuringTransfer
             : DestinationFileWithMacrosExpanded;
 
@@ -204,7 +204,7 @@ internal class SingleFileTransfer
     {
         var doRename = BatchContext.Options.RenameDestinationFileDuringTransfer;
 
-        DestinationFileDuringTransfer = doRename ? Path.Combine(Path.GetDirectoryName(DestinationFileWithMacrosExpanded), Util.CreateUniqueFileName(BatchContext.Options.DestinationFileExtension)): DestinationFileWithMacrosExpanded;
+        DestinationFileDuringTransfer = doRename ? Path.Combine(Path.GetDirectoryName(DestinationFileWithMacrosExpanded), Util.CreateUniqueFileName(BatchContext.Options.DestinationFileExtension)) : DestinationFileWithMacrosExpanded;
         if (DestinationFileWithMacrosExpanded.Contains('/')) DestinationFileDuringTransfer = DestinationFileDuringTransfer.Replace("\\", "/");
 
         var helper = doRename ? "temporary " : string.Empty;
@@ -294,7 +294,7 @@ internal class SingleFileTransfer
 
             var renameToPath = Path.Combine(path, _renamingPolicy.CreateRemoteFileNameForRename(SourceFile.FullPath, BatchContext.Source.FileNameAfterTransfer));
             SetCurrentState(TransferState.SourceOperationRename, $"Renaming source file {Path.GetFileName(SourceFile.FullPath)} to {renameToPath}");
-            
+
             File.Move(filePath, renameToPath);
             _logger.NotifyInformation(BatchContext, $"FILE RENAME: Source file {SourceFileDuringTransfer} renamed to target {renameToPath}.");
 
@@ -401,7 +401,7 @@ internal class SingleFileTransfer
             if (FileDefinedAndExists(filePath))
             {
                 if ((File.GetAttributes(filePath) & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
-                    File.SetAttributes(filePath, FileAttributes.Normal); 
+                    File.SetAttributes(filePath, FileAttributes.Normal);
 
                 File.Delete(filePath);
                 _logger.NotifyInformation(BatchContext, $"FILE DELETE: Temporary source file {filePath} removed.");
@@ -476,7 +476,8 @@ internal class SingleFileTransfer
                     client.RenameFile(DestinationFileDuringTransfer, DestinationFileWithMacrosExpanded);
                     return string.Empty;
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 var message = $"Could not restore original destination file '{Path.GetFileName(DestinationFileWithMacrosExpanded)}' from temporary file '{Path.GetFileName(DestinationFileDuringTransfer)}'. Error: {ex.Message}.";
 

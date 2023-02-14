@@ -55,7 +55,7 @@ internal class RenamingPolicy
 
         return ExpandFileMacros(directory);
     }
-       
+
     public string CreateRemoteFilePathForMove(string sourceOperationTo, string sourceFilePath)
     {
         var directoryName = sourceOperationTo;
