@@ -80,7 +80,6 @@ internal class FileTransporter
             {
                 _batchContext.SourceFiles = files;
                 ConnectionInfo connectionInfo;
-                // Establish connectionInfo with connection parameters
                 try
                 {
                     connectionInfo = GetConnectionInfo(_batchContext.Destination, _batchContext.Connection);
@@ -94,10 +93,6 @@ internal class FileTransporter
 
                 using (var client = new SftpClient(connectionInfo))
                 {
-                    //Disable support for these host key exchange algorithms relating: https://github.com/FrendsPlatform/Frends.SFTP/security/dependabot/4
-                    client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256");
-                    client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256@libssh.org");
-
                     if (_batchContext.Connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
                         ForceHostKeyAlgorithm(client, _batchContext.Connection.HostKeyAlgorithm);
 
