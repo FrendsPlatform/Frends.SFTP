@@ -55,22 +55,6 @@ internal class RenamingPolicy
 
         return ExpandFileMacros(directory);
     }
-       
-    public string CreateRemoteFilePathForMove(string sourceOperationTo, string sourceFilePath)
-    {
-        var directoryName = sourceOperationTo;
-        if (string.IsNullOrEmpty(directoryName))
-            throw new ArgumentException("When using move as a source operation, you should always define a directory", "sourceOperationTo");
-
-
-        directoryName = CanonizeAndCheckPath(directoryName);
-
-        // this should always be a directory
-        if (!directoryName.EndsWith("/"))
-            directoryName += "/";
-        var sourceFileName = Path.GetFileName(sourceFilePath);
-        return Path.Combine(directoryName, sourceFileName);
-    }
 
     private static string CanonizeAndCheckPath(string path)
     {

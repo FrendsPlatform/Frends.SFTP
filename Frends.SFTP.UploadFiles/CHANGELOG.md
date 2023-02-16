@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.5.2] - 2023-02-14
+### Added
+- Re-enabled key exchange algorithms 'curve25519-sha256' and 'curve25519-sha256@libssh.org'.
+
 ## [2.5.1] - 2023-02-09
 ### Added
 - Added cancellationToken to method ListSourceFiles so Task's execution can be terminated via Frends.

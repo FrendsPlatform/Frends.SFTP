@@ -104,9 +104,9 @@ public class SFTP
     /// IDictionary OperationsLog} 
     /// </returns>
     public static Result UploadFiles(
-        [PropertyTab] Source source, 
-        [PropertyTab] Destination destination, 
-        [PropertyTab] Connection connection, 
+        [PropertyTab] Source source,
+        [PropertyTab] Destination destination,
+        [PropertyTab] Connection connection,
         [PropertyTab] Options options,
         [PropertyTab] Info info,
         CancellationToken cancellationToken)
@@ -197,7 +197,7 @@ public class SFTP
         {
             return $"Error while creating log: \n{e}";
         }
-    }        
+    }
 
     private static SFTPLogger InitializeSFTPLogger(ILogger notificationLogger)
     {
