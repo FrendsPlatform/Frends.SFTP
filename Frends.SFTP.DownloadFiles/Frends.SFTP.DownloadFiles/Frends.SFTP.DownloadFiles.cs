@@ -93,9 +93,9 @@ public class SFTP
     /// <param name="cancellationToken">CancellationToken is given by Frends</param>
     /// <returns>Result object {bool ActionSkiped, bool Success, string UserResultMessage, int SuccessfulTransferCount, int Failedstring FileName, string SourcePath, string DestinationPath, bool Success} </returns>
     public static Result DownloadFiles(
-        [PropertyTab] Source source, 
-        [PropertyTab] Destination destination, 
-        [PropertyTab] Connection connection, 
+        [PropertyTab] Source source,
+        [PropertyTab] Destination destination,
+        [PropertyTab] Connection connection,
         [PropertyTab] Options options,
         [PropertyTab] Info info,
         CancellationToken cancellationToken)
@@ -188,7 +188,7 @@ public class SFTP
         {
             return $"Error while creating log: \n{e}";
         }
-    }        
+    }
 
     private static SFTPLogger InitializeSFTPLogger(ILogger notificationLogger)
     {

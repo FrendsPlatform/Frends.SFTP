@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.5.4] - 2023-02-14
+### Added
+- Re-enabled key exchange algorithms 'curve25519-sha256' and 'curve25519-sha256@libssh.org'.
+
 ## [2.5.3] - 2023-02-08
 ### Fixed
 - Fixed issue with file not found when downloading from server when server has automatic delete action enabled.

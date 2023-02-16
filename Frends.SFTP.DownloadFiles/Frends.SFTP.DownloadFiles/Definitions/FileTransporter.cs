@@ -63,7 +63,7 @@ internal class FileTransporter
             try
             {
                 connectionInfo = GetConnectionInfo(_batchContext.Destination, _batchContext.Connection);
-            } 
+            }
             catch (Exception e)
             {
                 userResultMessage = $"Error when initializing connection info: {e}.";
@@ -73,9 +73,6 @@ internal class FileTransporter
 
             using (var client = new SftpClient(connectionInfo))
             {
-                client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256");
-                client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256@libssh.org");
-
                 if (_batchContext.Connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
                     ForceHostKeyAlgorithm(client, _batchContext.Connection.HostKeyAlgorithm);
 
@@ -170,7 +167,7 @@ internal class FileTransporter
 
                         var singleTransfer = new SingleFileTransfer(file, _batchContext, client, _renamingPolicy, _logger);
                         var result = singleTransfer.TransferSingleFile();
-                        _result.Add(result); 
+                        _result.Add(result);
                     }
                     client.Disconnect();
                 }
@@ -329,7 +326,6 @@ internal class FileTransporter
                 if (!expectedServerFingerprint.Contains(':'))
                 {
                     var serverFingerprint = BitConverter.ToString(e.FingerPrint).Replace("-", "").Replace(":", "");
-                    
                     e.CanTrust = expectedServerFingerprint.ToLower() == serverFingerprint.ToLower();
                     if (!e.CanTrust)
                         userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
@@ -338,7 +334,6 @@ internal class FileTransporter
                 else
                 {
                     var serverFingerprint = BitConverter.ToString(e.FingerPrint).Replace('-', ':');
-                    
                     e.CanTrust = e.FingerPrint.SequenceEqual(Util.ConvertFingerprintToByteArray(expectedServerFingerprint));
                     if (!e.CanTrust)
                         userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
@@ -372,10 +367,10 @@ internal class FileTransporter
                     }
                 }
             }
-            else 
+            else
             {
                 userResultMessage = "Expected server fingerprint was given in unsupported format.";
-                e.CanTrust = false; 
+                e.CanTrust = false;
             }
 
             if (!e.CanTrust)
@@ -401,7 +396,7 @@ internal class FileTransporter
                 else
                     fileItems.Add(file);
             }
-               
+
             if (fileItems.Any()) return new Tuple<List<FileItem>, bool>(fileItems, true);
 
             return new Tuple<List<FileItem>, bool>(fileItems, true);
@@ -483,7 +478,8 @@ internal class FileTransporter
 
         var transferredFileResults = singleResults.Where(r => r.Success && !r.ActionSkipped).ToList();
 
-        return new FileTransferResult {
+        return new FileTransferResult
+        {
             ActionSkipped = actionSkipped,
             Success = success,
             UserResultMessage = userResultMessage,
@@ -492,7 +488,7 @@ internal class FileTransporter
             TransferredFileNames = transferredFileResults.Select(r => r.TransferredFile ?? "--unknown--").ToList(),
             TransferErrors = transferErrors,
             TransferredFilePaths = transferredFileResults.Select(r => r.TransferredFilePath ?? "--unknown--").ToList(),
-            OperationsLog = (singleResults.Any(x => !x.EnableOperationsLog)) ? null : new Dictionary<string, string>() 
+            OperationsLog = (singleResults.Any(x => !x.EnableOperationsLog)) ? null : new Dictionary<string, string>()
         };
     }
 

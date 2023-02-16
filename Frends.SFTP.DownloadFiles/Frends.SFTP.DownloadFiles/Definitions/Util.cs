@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace Frends.SFTP.DownloadFiles.Definitions;
@@ -61,22 +60,8 @@ internal static class Util
                 arr[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
             }
             return true;
-        } catch { return false; }
-    }
-
-    internal static string HexStringToB64String(string input)
-    {
-        return Convert.ToBase64String(ConvertHexStringToHex(input));
-    }
-
-    internal static byte[] ConvertHexStringToHex(string hex)
-    {
-        var arr = new byte[hex.Length / 2];
-        for (var i = 0; i < arr.Length; i++)
-        {
-            arr[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
         }
-        return arr;
+        catch { return false; }
     }
 
     internal static bool IsMD5(string input)
@@ -87,16 +72,6 @@ internal static class Util
         }
 
         return Regex.IsMatch(input, "^[0-9a-fA-F]{32}$");
-    }
-
-    internal static bool IsSha1(string input)
-    {
-        if (String.IsNullOrEmpty(input))
-        {
-            return false;
-        }
-
-        return Regex.IsMatch(input, "^[0-9a-fA-F]{40}$");
     }
 
     internal static bool IsSha256(string input)
@@ -115,7 +90,7 @@ internal static class Util
                 input += '=';
             Convert.FromBase64String(input);
             return true;
-        } 
+        }
         catch { return false; }
     }
 
