@@ -59,9 +59,11 @@ public class Source
 
     /// <summary>
     /// The paths to the files to transfer, mainly meant to be used with the file trigger with the syntax: #trigger.data.filePaths
+    /// Type: System.Object[]
+    /// example: string[]
     /// </summary>
     /// <example>#trigger.data.filePaths</example>
-    [DefaultValue("")] // set to empty string so 4.2 shows the field as empty by default
+    [DefaultValue("")]
     public object FilePaths { get; set; }
 }
 

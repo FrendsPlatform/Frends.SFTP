@@ -1,6 +1,8 @@
 using NUnit.Framework;
+using System;
 using System.IO;
 using System.Threading;
+using System.Collections.Generic;
 using Frends.SFTP.UploadFiles.Definitions;
 
 
@@ -324,6 +326,70 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.IsFalse(result.ActionSkipped);
             Assert.AreEqual(3, result.SuccessfulTransferCount);
+        }
+
+        [Test]
+        public void UploadFiles_TestWithFilePathsEvenIfSourceFileIsAssignedToAll()
+        {
+            var files = Helpers.CreateDummyFiles(6);
+
+            var filePaths = new string[] { files[0], files[1], files[2] };
+
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "*",
+                Action = SourceAction.Info,
+                Operation = SourceOperation.Nothing,
+                FilePaths = filePaths
+            };
+
+            var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.IsFalse(result.ActionSkipped);
+            Assert.AreEqual(3, result.SuccessfulTransferCount);
+        }
+
+        [Test]
+        public void UploadFiles_TestWithFilePathsObjectArray()
+        {
+            var files = Helpers.CreateDummyFiles(6);
+
+            var filePaths = new object[] { files[0], files[1], files[2] };
+
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "*",
+                Action = SourceAction.Info,
+                Operation = SourceOperation.Nothing,
+                FilePaths = filePaths
+            };
+
+            var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.IsFalse(result.ActionSkipped);
+            Assert.AreEqual(3, result.SuccessfulTransferCount);
+        }
+
+        [Test]
+        public void UploadFiles_ShouldThrowWithIncorrectTypedFilePaths()
+        {
+            var files = Helpers.CreateDummyFiles(6);
+
+            var filePaths = new List<object> { files[0], files[1], files[2] };
+
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "*",
+                Action = SourceAction.Info,
+                Operation = SourceOperation.Nothing,
+                FilePaths = filePaths
+            };
+
+            var ex = Assert.Throws<ArgumentException>(() => SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
+            Assert.AreEqual($"Invalid type for parameter FilePaths. Expected array but was {filePaths.GetType()}", ex.Message);
         }
     }
 }

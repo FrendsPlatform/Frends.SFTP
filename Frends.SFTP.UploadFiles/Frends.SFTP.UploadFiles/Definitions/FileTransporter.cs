@@ -26,7 +26,7 @@ internal class FileTransporter
         _renamingPolicy = new RenamingPolicy(_batchContext.Info.TransferName, _instanceId);
 
         _result = new List<SingleFileTransferResult>();
-        _filePaths = ConvertObjectToStringArray(context.Source.FilePaths);
+        _filePaths = (context.Source.FilePaths != null) ? ConvertObjectToStringArray(context.Source.FilePaths) : null;
 
         SourceDirectoryWithMacrosExtended = _renamingPolicy.ExpandDirectoryForMacros(context.Source.Directory);
         DestinationDirectoryWithMacrosExtended = _renamingPolicy.ExpandDirectoryForMacros(context.Destination.Directory);
@@ -451,8 +451,10 @@ internal class FileTransporter
 
     private static string[] ConvertObjectToStringArray(object objectArray)
     {
+        if (!objectArray.GetType().IsArray)
+            throw new ArgumentException($"Invalid type for parameter FilePaths. Expected array but was {objectArray.GetType()}");
         var res = objectArray as object[];
-        return res?.OfType<string>().ToArray();
+        return res.OfType<string>().ToArray();
     }
 
     private static FileTransferResult FormFailedFileTransferResult(string userResultMessage)
