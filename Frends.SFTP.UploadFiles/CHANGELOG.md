@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.5.3] - 2023-02-21
+### Fixed
+- Fixed bug with FilePaths when using list of objects in parameter.
+- Documentational fixes to the FilePaths parameter.
+
 ## [2.5.2] - 2023-02-14
 ### Added
 - Re-enabled key exchange algorithms 'curve25519-sha256' and 'curve25519-sha256@libssh.org'.
