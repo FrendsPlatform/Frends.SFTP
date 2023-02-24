@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.5.4] - 2023-02-24
+### Fixed
+- Fixed bug with task trying to rename the source file after exception without it being renamed in the first place.
+
 ## [2.5.3] - 2023-02-21
 ### Fixed
 - Fixed bug with FilePaths when using list of objects in parameter.
