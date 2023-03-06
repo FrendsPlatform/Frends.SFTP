@@ -134,9 +134,8 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public void UploadFiles_TestTransferThatThrowsWhenFileIsLocked()
         {
-            
-                var ex = Assert.Throws<Exception>(() => UploadFileWhileFileIsLocked());
-                Assert.IsFalse(ex.Message.Contains("Could not restore original source file"));
+            var ex = Assert.Throws<Exception>(() => UploadFileWhileFileIsLocked());
+            Assert.IsFalse(ex.Message.Contains("Could not restore original source file"));
         }
 
         private static void UploadFileWhileFileIsLocked()
