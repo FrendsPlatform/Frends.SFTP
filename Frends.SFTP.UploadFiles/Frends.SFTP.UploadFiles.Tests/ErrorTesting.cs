@@ -140,9 +140,20 @@ namespace Frends.SFTP.UploadFiles.Tests
 
         private static void UploadFileWhileFileIsLocked()
         {
-            using (var stream = File.OpenRead(Path.Combine(_workDir, "SFTPUploadTestFile1.txt")))
+            FileStream stream = null;
+            try
             {
+                stream = File.Open(Path.Combine(_workDir, "SFTPUploadTestFile1.txt"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
+            }
+            catch (Exception ex)
+            {
+                if (stream != null)
+                {
+                    stream.Close();
+                    stream.Dispose();
+                }
+                throw ex;
             }
         }
     }
