@@ -255,8 +255,6 @@ internal class SingleFileTransfer
 
     private void ExecuteSourceOperationMoveOrRename()
     {
-        var filePath = string.IsNullOrEmpty(SourceFileDuringTransfer) ? SourceFile.FullPath : SourceFileDuringTransfer;
-
         if (BatchContext.Source.Operation == SourceOperation.Move)
         {
             var moveToPath = _renamingPolicy.ExpandDirectoryForMacros(BatchContext.Source.DirectoryToMoveAfterTransfer);
@@ -270,7 +268,7 @@ internal class SingleFileTransfer
 
             var destFileName = Path.Combine(moveToPath, SourceFile.Name);
 
-            try { File.Move(filePath, destFileName); }
+            try { File.Move(SourceFileDuringTransfer, destFileName); }
             catch (Exception ex) { throw new Exception($"Failure in source operation: {ex.GetType().Name}: {ex.Message}", ex); }
 
             _logger.NotifyInformation(BatchContext, $"FILE MOVE: Source file {SourceFileDuringTransfer} moved to target {destFileName}.");
@@ -295,7 +293,7 @@ internal class SingleFileTransfer
             var renameToPath = Path.Combine(path, _renamingPolicy.CreateRemoteFileNameForRename(SourceFile.FullPath, BatchContext.Source.FileNameAfterTransfer));
             SetCurrentState(TransferState.SourceOperationRename, $"Renaming source file {Path.GetFileName(SourceFile.FullPath)} to {renameToPath}");
 
-            File.Move(filePath, renameToPath);
+            File.Move(SourceFileDuringTransfer, renameToPath);
             _logger.NotifyInformation(BatchContext, $"FILE RENAME: Source file {SourceFileDuringTransfer} renamed to target {renameToPath}.");
 
             WorkFile = new FileItem(renameToPath);
@@ -313,13 +311,12 @@ internal class SingleFileTransfer
 
     private void ExecuteSourceOperationNothingOrDelete()
     {
-        var filePath = string.IsNullOrEmpty(SourceFileDuringTransfer) ? SourceFile.FullPath : SourceFileDuringTransfer;
         switch (BatchContext.Source.Operation)
         {
             case SourceOperation.Delete:
                 SetCurrentState(TransferState.SourceOperationDelete, $"Deleting source file {Path.GetFileName(SourceFile.FullPath)} after transfer");
-                File.Delete(filePath);
-                _logger.NotifyInformation(BatchContext, $"FILE DELETE: Source file {filePath} deleted.");
+                File.Delete(SourceFileDuringTransfer);
+                _logger.NotifyInformation(BatchContext, $"FILE DELETE: Source file {SourceFileDuringTransfer} deleted.");
                 break;
 
             case SourceOperation.Nothing:
@@ -329,7 +326,7 @@ internal class SingleFileTransfer
                         TransferState.RestoreSourceFile,
                         $"Restoring source file from {Path.GetFileName(SourceFileDuringTransfer)} to the original name {Path.GetFileName(SourceFile.FullPath)}");
 
-                    File.Move(filePath, SourceFile.FullPath);
+                    File.Move(SourceFileDuringTransfer, SourceFile.FullPath);
                     _logger.NotifyInformation(BatchContext, $"FILE RENAME: Temporary file {SourceFileDuringTransfer} restored to target {SourceFile.FullPath}.");
                 }
                 break;
@@ -430,8 +427,9 @@ internal class SingleFileTransfer
         {
             try
             {
-                if (ShouldSourceFileBeRestoredOnError())
+                if (ShouldSourceFileBeRestoredOnError() && !File.Exists(SourceFile.FullPath))
                 {
+
                     if (BatchContext.Source.Operation == SourceOperation.Move && WorkFile != null)
                         RestoreSourceFileIfItWasMoved();
                     if (BatchContext.Source.Operation == SourceOperation.Rename || BatchContext.Options.RenameSourceFileBeforeTransfer)

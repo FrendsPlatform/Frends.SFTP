@@ -130,6 +130,16 @@ namespace Frends.SFTP.UploadFiles.Tests
             var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
             Assert.IsTrue(ex.Message.Contains("Error when fetching source files: File does not exist"));
         }
+
+        [Test]
+        public void UploadFiles_TestTransferThatThrowsWhenFileIsLocked()
+        {
+            using (var stream = File.Open(Path.Combine(_workDir, "SFTPUploadTestFile1.txt"), FileMode.Open, FileAccess.Read, FileShare.None))
+            {
+                var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken()));
+                Assert.IsFalse(ex.Message.Contains("Could not restore original source file"));
+            }
+        }
     }
 }
 

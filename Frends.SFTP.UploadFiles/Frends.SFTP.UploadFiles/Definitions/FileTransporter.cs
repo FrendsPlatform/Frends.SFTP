@@ -26,7 +26,7 @@ internal class FileTransporter
         _renamingPolicy = new RenamingPolicy(_batchContext.Info.TransferName, _instanceId);
 
         _result = new List<SingleFileTransferResult>();
-        _filePaths = (context.Source.FilePaths != null) ? ConvertObjectToStringArray(context.Source.FilePaths) : null;
+        _filePaths = (context.Source.FilePaths != null || !string.IsNullOrEmpty((string)context.Source.FilePaths)) ? ConvertObjectToStringArray(context.Source.FilePaths) : null;
 
         SourceDirectoryWithMacrosExtended = _renamingPolicy.ExpandDirectoryForMacros(context.Source.Directory);
         DestinationDirectoryWithMacrosExtended = _renamingPolicy.ExpandDirectoryForMacros(context.Destination.Directory);
