@@ -19,9 +19,9 @@ internal class SingleFileTransfer
         SourceFile = file;
         BatchContext = context;
 
-        DestinationFileWithMacrosExpanded = Path.Combine(destinationDirectory, renamingPolicy.CreateRemoteFileName(
+        DestinationFileWithMacrosExpanded = renamingPolicy.CanonizeAndCheckPath(Path.Combine(destinationDirectory, renamingPolicy.CreateRemoteFileName(
                 file.Name,
-                context.Destination.FileName));
+                context.Destination.FileName)));
         if (destinationDirectory.Contains('/')) DestinationFileWithMacrosExpanded = DestinationFileWithMacrosExpanded.Replace("\\", "/");
         WorkFileInfo = new WorkFileInfo(file.Name, Path.GetFileName(DestinationFileWithMacrosExpanded), BatchContext.TempWorkDir);
 
@@ -51,6 +51,8 @@ internal class SingleFileTransfer
     {
         try
         {
+            var test = DestinationFileWithMacrosExpanded;
+
             _result.TransferredFile = SourceFile.Name;
             _result.TransferredFilePath = SourceFile.FullPath;
 
@@ -471,8 +473,8 @@ internal class SingleFileTransfer
             {
                 if (BatchContext.Options.RenameDestinationFileDuringTransfer)
                 {
-                    client.RenameFile(DestinationFileDuringTransfer, DestinationFileWithMacrosExpanded);
-                    return string.Empty;
+                    if (client.Exists(DestinationFileDuringTransfer))
+                        client.RenameFile(DestinationFileDuringTransfer, DestinationFileWithMacrosExpanded);
                 }
             }
             catch (Exception ex)
@@ -483,7 +485,6 @@ internal class SingleFileTransfer
                 return $"[{message}]";
             }
         }
-
         return string.Empty;
     }
 

@@ -56,7 +56,7 @@ internal class RenamingPolicy
         return ExpandFileMacros(directory);
     }
 
-    private static string CanonizeAndCheckPath(string path)
+    public string CanonizeAndCheckPath(string path)
     {
         path = path.Replace(Path.DirectorySeparatorChar, '/'); // make all the paths use forward slashes - this should be supported on File, FTP, and SFTP
 
@@ -75,7 +75,7 @@ internal class RenamingPolicy
 
     public string CreateRemoteFileNameForRename(string originalFilePath, string sourceOperationTo)
     {
-        if (String.IsNullOrEmpty(sourceOperationTo))
+        if (string.IsNullOrEmpty(sourceOperationTo))
             throw new ArgumentException("When using rename as a source operation, you need to define the new name");
 
         string filePath = sourceOperationTo;
