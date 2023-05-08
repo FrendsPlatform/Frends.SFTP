@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.5.5] - 2023-05-05
+### Fixed
+- Fixed Permission denied error when using mounted CIFS share by canonizing the destination path. 
+
 ## [2.5.4] - 2023-02-24
 ### Fixed
 - Fixed bug with task trying to rename the source file after exception without it being renamed in the first place.

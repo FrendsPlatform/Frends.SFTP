@@ -391,6 +391,21 @@ namespace Frends.SFTP.UploadFiles.Tests
             var ex = Assert.Throws<ArgumentException>(() => SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
             Assert.AreEqual($"Invalid type for parameter FilePaths. Expected array but was {filePaths.GetType()}", ex.Message);
         }
+
+        [Ignore("Test needs CIFS share mounted to sftp directory 'pod'")]
+        [Test]
+        public void UploadFiles_ToCIFSShare()
+        {
+            var destination = new Destination
+            {
+                Directory = "pod",
+                FileName = ""
+            };
+            var result = SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+        }
     }
 }
 
