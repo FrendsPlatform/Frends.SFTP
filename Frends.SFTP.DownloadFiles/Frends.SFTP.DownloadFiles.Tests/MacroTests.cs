@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System.IO;
 using System;
+using System.Linq;
 using System.Threading;
 using Frends.SFTP.DownloadFiles.Definitions;
 
@@ -22,7 +23,9 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var date = DateTime.Now;
-            Assert.IsTrue(File.Exists(Path.Combine(_destWorkDir, "SFTPDownloadTestFile1" + date.ToString(@"yyyy-MM-dd") + ".txt")));
+            var file = Path.Combine(_destWorkDir, "SFTPDownloadTestFile1" + date.ToString(@"yyyy-MM-dd") + ".txt");
+            Assert.AreEqual(file, result.TransferredDestinationFilePaths.ToList().FirstOrDefault());
+            Assert.IsTrue(File.Exists(file));
         }
 
         [Test]

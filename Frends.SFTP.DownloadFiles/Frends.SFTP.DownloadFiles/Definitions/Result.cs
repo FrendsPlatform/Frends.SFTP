@@ -77,12 +77,23 @@ public class Result
     /// <example>
     /// <code>
     /// [
-    ///     "C:\\test\\test.txt",
-    ///     "C:\\test\\test2.txt"
+    ///     "/Upload/upload/test.txt",
+    ///     "/Upload/upload/test2.txt"
     /// ]
     /// </code>
     /// </example>
     public IEnumerable<string> TransferredFilePaths { get; private set; }
+
+    /// <summary>
+    /// List of destination file paths of the transferred files.
+    /// </summary>
+    /// <example>
+    /// [
+    ///     "C:\\test\\test.txt",
+    ///     "C:\\test\\test2.txt"
+    /// ]
+    /// </example>
+    public IEnumerable<string> TransferredDestinationFilePaths { get; private set; }
 
     /// <summary>
     /// Operations logs for the transfer.
@@ -107,6 +118,7 @@ public class Result
         TransferredFileNames = result.TransferredFileNames;
         TransferErrors = result.TransferErrors;
         TransferredFilePaths = result.TransferredFilePaths;
+        TransferredDestinationFilePaths = result.TransferredDestinationFilePaths;
         OperationsLog = result.OperationsLog;
     }
 }

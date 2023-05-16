@@ -488,6 +488,7 @@ internal class FileTransporter
             TransferredFileNames = transferredFileResults.Select(r => r.TransferredFile ?? "--unknown--").ToList(),
             TransferErrors = transferErrors,
             TransferredFilePaths = transferredFileResults.Select(r => r.TransferredFilePath ?? "--unknown--").ToList(),
+            TransferredDestinationFilePaths = transferredFileResults.Select(s => s.DestinationFilePath ?? "--unknown--").ToList(),
             OperationsLog = (singleResults.Any(x => !x.EnableOperationsLog)) ? null : new Dictionary<string, string>()
         };
     }
