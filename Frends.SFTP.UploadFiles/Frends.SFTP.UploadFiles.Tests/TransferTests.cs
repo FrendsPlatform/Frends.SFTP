@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Collections.Generic;
 using Frends.SFTP.UploadFiles.Definitions;
@@ -18,6 +19,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             var result = SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.AreEqual(Path.Combine(_destination.Directory, _source.FileName).Replace("\\", "/"), result.TransferredDestinationFilePaths.ToList().FirstOrDefault());
         }
 
         [Test]
