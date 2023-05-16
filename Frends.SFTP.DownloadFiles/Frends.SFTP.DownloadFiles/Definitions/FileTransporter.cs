@@ -461,6 +461,7 @@ internal class FileTransporter
             TransferredFileNames = new List<string>(),
             TransferErrors = new Dictionary<string, IList<string>>(),
             TransferredFilePaths = new List<string>(),
+            TransferredDestinationFilePaths = new List<string>(),
             OperationsLog = new Dictionary<string, string>()
         };
     }
