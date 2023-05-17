@@ -1,5 +1,6 @@
 ﻿using Renci.SshNet;
 using Renci.SshNet.Common;
+using Renci.SshNet.Sftp;
 using System.Net.Sockets;
 using System.Text;
 using System.Security.Cryptography;
@@ -386,15 +387,14 @@ internal class FileTransporter
 
         if (_filePaths != null)
         {
-            var items = _filePaths.Select(p => new FileItem(p) { Name = p }).ToList();
-            foreach (var file in items)
+            foreach (var file in _filePaths.ToList())
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                if (!client.Exists(file.FullPath))
-                    _logger.NotifyError(_batchContext, $"File does not exist: '{file.FullPath}", new FileNotFoundException());
+                if (!client.Exists(file))
+                    _logger.NotifyError(_batchContext, $"File does not exist: '{file}", new FileNotFoundException());
                 else
-                    fileItems.Add(file);
+                    fileItems.Add(new FileItem(client.Get(file)));
             }
 
             if (fileItems.Any()) return new Tuple<List<FileItem>, bool>(fileItems, true);
