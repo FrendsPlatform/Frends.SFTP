@@ -461,6 +461,7 @@ internal class FileTransporter
             TransferredFileNames = new List<string>(),
             TransferErrors = new Dictionary<string, IList<string>>(),
             TransferredFilePaths = new List<string>(),
+            TransferredDestinationFilePaths = new List<string>(),
             OperationsLog = new Dictionary<string, string>()
         };
     }
@@ -488,6 +489,7 @@ internal class FileTransporter
             TransferredFileNames = transferredFileResults.Select(r => r.TransferredFile ?? "--unknown--").ToList(),
             TransferErrors = transferErrors,
             TransferredFilePaths = transferredFileResults.Select(r => r.TransferredFilePath ?? "--unknown--").ToList(),
+            TransferredDestinationFilePaths = transferredFileResults.Select(s => s.DestinationFilePath ?? "--unknown--").ToList(),
             OperationsLog = (singleResults.Any(x => !x.EnableOperationsLog)) ? null : new Dictionary<string, string>()
         };
     }

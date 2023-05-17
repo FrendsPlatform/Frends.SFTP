@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Collections.Generic;
 using Frends.SFTP.DownloadFiles.Definitions;
@@ -16,6 +17,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = SFTP.DownloadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.AreEqual(Path.Combine(_destination.Directory, _source.FileName), result.TransferredDestinationFilePaths.ToList().FirstOrDefault());
         }
 
         [Test]
