@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.5.5] - 2023-05-16
+## [2.6.0] - 2023-05-16
 ### Added
 - Added new result attribute TransferredDestinationFilePaths list consisting of the destination file paths.
 
