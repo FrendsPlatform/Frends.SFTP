@@ -85,6 +85,19 @@ public class Result
     public IEnumerable<string> TransferredFilePaths { get; private set; }
 
     /// <summary>
+    /// List of destaintion file paths of the transferred files.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// [
+    ///     "upload/Upload/test.txt",
+    ///     "upload/Upload/test2.txt"
+    /// ]
+    /// </code>
+    /// </example>
+    public IEnumerable<string> TransferredDestinationFilePaths { get; private set; }
+
+    /// <summary>
     /// Operations logs for the transfer.
     /// </summary>
     /// <example>
@@ -107,6 +120,7 @@ public class Result
         TransferredFileNames = result.TransferredFileNames;
         TransferErrors = result.TransferErrors;
         TransferredFilePaths = result.TransferredFilePaths;
+        TransferredDestinationFilePaths = result.TransferredDestinationFilePaths;
         OperationsLog = result.OperationsLog;
     }
 }

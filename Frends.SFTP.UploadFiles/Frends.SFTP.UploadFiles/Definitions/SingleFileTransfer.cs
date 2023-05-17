@@ -93,6 +93,7 @@ internal class SingleFileTransfer
             if (!string.IsNullOrEmpty(destinationFileRestoreMessage))
                 HandleTransferError(ex, destinationFileRestoreMessage);
         }
+        _result.TransferredDestinationFilePath = DestinationFileWithMacrosExpanded;
         return _result;
     }
 
