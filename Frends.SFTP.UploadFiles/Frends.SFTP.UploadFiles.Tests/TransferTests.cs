@@ -308,6 +308,8 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.IsFalse(result.ActionSkipped);
             Assert.AreEqual(3, result.SuccessfulTransferCount);
+            Assert.AreNotEqual(filePaths[0], result.TransferredFileNames.ToList()[0]);
+            Assert.AreEqual(Path.GetFileName(filePaths[0]), result.TransferredFileNames.ToList()[0]);
         }
 
         [Test]

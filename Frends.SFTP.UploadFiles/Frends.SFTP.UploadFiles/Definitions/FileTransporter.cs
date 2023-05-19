@@ -390,7 +390,7 @@ internal class FileTransporter
 
         if (_filePaths != null)
         {
-            fileItems = _filePaths.Select(p => new FileItem(p) { Name = p }).ToList();
+            fileItems = _filePaths.Select(p => new FileItem(p)).ToList();
             if (fileItems.Any())
                 return new Tuple<List<FileItem>, bool>(fileItems, true);
             return new Tuple<List<FileItem>, bool>(fileItems, false);
