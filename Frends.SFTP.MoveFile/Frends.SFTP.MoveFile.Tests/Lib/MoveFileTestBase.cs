@@ -2,7 +2,6 @@
 using Renci.SshNet;
 using Frends.SFTP.MoveFile.Definitions;
 using Frends.SFTP.MoveFile.Enums;
-using System.IO;
 
 namespace Frends.SFTP.MoveFile.Tests;
 public class MoveFileTestBase
