@@ -26,5 +26,5 @@ public class Input
     /// How the file rename should work if a file with the new name already exists.
     /// If Rename is selected, will append a number to the new file name e.g. renamed(2).txt
     /// </summary>
-    public RenameBehaviour RenameBehaviour { get; set;  }
+    public RenameBehaviour RenameBehaviour { get; set; }
 }

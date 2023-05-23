@@ -101,7 +101,6 @@ internal static class Helpers
 
     internal static void DeleteSourceFiles(SftpClient client, string dir)
     {
-        
         var files = client.ListDirectory(dir).Where(f => (f.Name != ".") && (f.Name != ".."));
         foreach (var file in files)
         {
