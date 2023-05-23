@@ -21,7 +21,7 @@ public class Input
     /// Pattern to match for files. The file mask uses regular expressions, but for convenience, it has special handling for * and ? wildcards.
     /// </summary>
     /// <example>/destination</example>
-    [DefaultValue("**\\Folder\\*.xml")]
+    [DefaultValue("*.xml")]
     [DisplayFormat(DataFormatString = "Text")]
     public string Pattern { get; set; }
 

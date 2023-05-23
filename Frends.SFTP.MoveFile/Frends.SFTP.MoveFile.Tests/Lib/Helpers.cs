@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.IO;
 using System.Security.Cryptography;
 using Renci.SshNet;
 using Renci.SshNet.Common;
@@ -17,6 +18,7 @@ internal static class Helpers
     readonly static string _dockerAddress = "localhost";
     readonly static string _dockerUsername = "foo";
     readonly static string _dockerPassword = "pass";
+    readonly static string _baseDir = "/upload";
 
     internal static Connection GetSftpConnection()
     {
@@ -35,11 +37,13 @@ internal static class Helpers
         return connection;
     }
 
-    internal static void GenerateDummyFile(string path)
+    internal static void GenerateDummyFile(string fileName)
     {
         var content = "This is a test file.";
+        var path = _baseDir;
         using var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword);
         client.Connect();
+        path = Path.Combine(path, fileName).Replace("\\", "/");
         client.WriteAllText(path, content);
         client.Disconnect();
     }

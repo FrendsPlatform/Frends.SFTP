@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
+using System.ComponentModel;
 using Renci.SshNet;
 using Frends.SFTP.MoveFile.Definitions;
 using Frends.SFTP.MoveFile.Enums;
@@ -87,7 +89,7 @@ public class SFTP
                     transferredFiles.Add(Move(client, file));
                     break;
                 case FileExistsOperation.Rename:
-                    var targetFilePath = GetNonConflictingDestinationFilePath(client, file.SourcePath, file.DestinationPath);
+                    file.DestinationPath = GetNonConflictingDestinationFilePath(client, file.SourcePath, file.DestinationPath);
                     transferredFiles.Add(Move(client, file));
                     break;
                 case FileExistsOperation.Overwrite:
@@ -114,14 +116,11 @@ public class SFTP
     {
         var fileItems = new List<FileItem>();
 
-        var files = client.ListDirectory(input.Directory).ToList();
+        var files = client.ListDirectory(input.Directory).Where(f => (f.Name != ".") && (f.Name != ".."));
 
         foreach (var file in files)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (file.Name.Equals(".") || file.Name.Equals("..")) continue;
-
-            if (file.IsDirectory) continue;
 
             if (file.Name.Equals(input.Pattern) || Util.FileMatchesMask(Path.GetFileName(file.FullName), input.Pattern))
             {
