@@ -307,6 +307,8 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.AreEqual(3, result.SuccessfulTransferCount);
             Assert.IsTrue(result.Success);
+            Assert.AreNotEqual(filePaths[0], result.TransferredFileNames.ToList()[0]);
+            Assert.AreEqual(Path.GetFileName(filePaths[0]), result.TransferredFileNames.ToList()[0]);
         }
 
         [Test]
