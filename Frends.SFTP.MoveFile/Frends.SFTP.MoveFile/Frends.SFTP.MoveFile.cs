@@ -70,10 +70,10 @@ public class SFTP
         {
             if (input.CreateTargetDirectories)
                 client.CreateDirectory(input.TargetDirectory);
-            else 
+            else
                 throw new DirectoryNotFoundException($"Target directory {input.TargetDirectory} does not exist.");
         }
-        
+
         foreach (var file in files)
         {
             cancellationToken.ThrowIfCancellationRequested();
