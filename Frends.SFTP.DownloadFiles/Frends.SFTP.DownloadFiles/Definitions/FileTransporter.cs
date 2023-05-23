@@ -1,6 +1,5 @@
 ﻿using Renci.SshNet;
 using Renci.SshNet.Common;
-using Renci.SshNet.Sftp;
 using System.Net.Sockets;
 using System.Text;
 using System.Security.Cryptography;
@@ -287,7 +286,7 @@ internal class FileTransporter
                 prompt.Response = _batchContext.Connection.Password;
     }
 
-    private void ForceHostKeyAlgorithm(SftpClient client, HostKeyAlgorithms algorithm)
+    private static void ForceHostKeyAlgorithm(SftpClient client, HostKeyAlgorithms algorithm)
     {
         client.ConnectionInfo.HostKeyAlgorithms.Clear();
 
