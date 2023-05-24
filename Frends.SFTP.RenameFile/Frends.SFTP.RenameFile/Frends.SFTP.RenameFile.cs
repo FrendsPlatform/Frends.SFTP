@@ -23,7 +23,7 @@ public class SFTP
         // Establish connectionInfo with connection parameters
         try
         {
-            var builder = new ConnectionInfoBuilder(input, connection);
+            var builder = new ConnectionInfoBuilder(connection);
             connectionInfo = builder.BuildConnectionInfo();
         }
         catch (Exception e)

@@ -7,12 +7,10 @@ namespace Frends.SFTP.RenameFile.Definitions;
 
 internal class ConnectionInfoBuilder
 {
-    private static Input _input;
     private static Connection _connection;
 
-    internal ConnectionInfoBuilder(Input input, Connection connect)
+    internal ConnectionInfoBuilder(Connection connect)
     {
-        _input = input;
         _connection = connect;
     }
 
