@@ -14,6 +14,7 @@ public class Result
     /// <summary>
     /// Message consisting information on the transfer.
     /// </summary>
+    /// <example>Successfully moved 2 files to /destination/.</example>
     public string Message { get; private set; }
 
     internal Result(List<FileItem> files, string message)

@@ -66,7 +66,7 @@ public class ErrorTests
         };
 
         var ex = Assert.Throws<ArgumentException>(() => SFTP.MoveFile(input, connection, default));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info:"));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info:"));
     }
 
     [Test]
@@ -87,7 +87,7 @@ public class ErrorTests
         };
 
         var ex = Assert.Throws<ArgumentException>(() => SFTP.MoveFile(input, connection, default));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info: "));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
     [Test]
@@ -110,7 +110,7 @@ public class ErrorTests
         };
 
         var ex = Assert.Throws<ArgumentException>(() => SFTP.MoveFile(input, connection, default));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info: "));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
     [Test]
