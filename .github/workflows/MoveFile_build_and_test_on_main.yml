@@ -1,0 +1,20 @@
+name: Frends.SFTP.MoveFile Main
+
+on:
+  push:
+    branches:    
+      - main
+    paths:
+      - 'Frends.SFTP.MoveFile/**'
+  workflow_dispatch:
+  
+
+jobs:
+  build:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/linux_build_main.yml@main
+    with:
+      workdir: Frends.SFTP.MoveFile
+      prebuild_command: docker-compose -f ./Frends.SFTP.MoveFile.Tests/docker-compose.yml up -d
+    secrets:
+      badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
+      
