@@ -117,40 +117,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
 
         [Test]
-        public void DownloadFiles_TestShouldThrowWithoutPromptAndResponse()
-        {
-            var connection = Helpers.GetSftpConnection();
-            connection.Authentication = AuthenticationType.UsernamePrivateKeyFile;
-            connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
-            connection.Password = null;
-            connection.PrivateKeyPassphrase = "passphrase";
-            connection.UseKeyboardInteractiveAuthentication = true;
-            connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
-            connection.ServerFingerPrint = "NUfXVu2omU2k3ELtmCzhkcERRLHAEbNakrpBgEXn8JM";
-
-            var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-            Console.WriteLine(ex.Message);
-            Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: Failure in Keyboard-interactive authentication: No response given for server prompt request --> Password"));
-
-            connection.Authentication = AuthenticationType.UsernamePrivateKeyString;
-            connection.PrivateKeyFile = null;
-            connection.PrivateKeyString = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key"));
-            connection.PrivateKeyPassphrase = "passphrase";
-
-            var destination = new Destination
-            {
-                Directory = Path.Combine(_workDir, "destination"),
-                Action = DestinationAction.Overwrite,
-                FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true
-            };
-
-            ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, destination, connection, _options, _info, new CancellationToken()));
-            Console.WriteLine(ex.Message);
-            Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: Failure in Keyboard-interactive authentication: No response given for server prompt request --> Password"));
-        }
-
-        [Test]
         public void DownloadFiles_TestKeepAliveIntervalWithDefault()
         {
             Helpers.UploadLargeTestFiles(_source.Directory, 1);

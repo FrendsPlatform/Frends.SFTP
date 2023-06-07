@@ -240,11 +240,12 @@ internal class FileTransporter
                 var kauth = new KeyboardInteractiveAuthenticationMethod(connect.UserName);
                 kauth.AuthenticationPrompt += new EventHandler<AuthenticationPromptEventArgs>(HandleKeyEvent);
                 methods.Add(kauth);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.NotifyError(_batchContext, "Failure in Keyboard-Interactive authentication: ", ex);
             }
-            
+
         }
 
         PrivateKeyFile privateKey = null;
@@ -314,13 +315,13 @@ internal class FileTransporter
                     var errorMsg = $"Failure in Keyboard-interactive authentication: No response given for server prompt request --> {serverPrompt.Request.Replace(":", "").Trim()}";
                     throw new ArgumentException(errorMsg);
                 }
-                    
+
                 foreach (var prompt in _batchContext.Connection.PromptAndResponse)
                 {
                     _cancellationToken.ThrowIfCancellationRequested();
                     if (serverPrompt.Request.IndexOf(prompt.Prompt, StringComparison.InvariantCultureIgnoreCase) != -1)
                         serverPrompt.Response = prompt.Response;
-                }                  
+                }
             }
         }
         _logger.NotifyInformation(_batchContext, $"Keyboard-Interactive negotiation finished.");
@@ -365,7 +366,7 @@ internal class FileTransporter
         client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
         {
             MD5serverFingerprint = BitConverter.ToString(e.FingerPrint).Replace('-', ':');
-            
+
             using (SHA256 mySHA256 = SHA256.Create())
             {
                 SHAServerFingerprint = Convert.ToBase64String(mySHA256.ComputeHash(e.HostKey));
