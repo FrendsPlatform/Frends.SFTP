@@ -140,8 +140,8 @@ public class SFTP
                 Connection = connection
             };
 
-            var fileTransporter = new FileTransporter(logger, _batchContext, executionId);
-            var result = fileTransporter.Run(cancellationToken);
+            var fileTransporter = new FileTransporter(logger, _batchContext, executionId, cancellationToken);
+            var result = fileTransporter.Run();
 
             if (options.ThrowErrorOnFail && !result.Success)
                 throw new Exception($"SFTP transfer failed: {result.UserResultMessage}. " +

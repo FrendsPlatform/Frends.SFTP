@@ -59,7 +59,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
             Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: 1 Errors: No source files found from directory"));
-
             Helpers.DeleteSubDirectory(path);
         }
 

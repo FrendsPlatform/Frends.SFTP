@@ -115,23 +115,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             return filePaths.ToArray();
         }
 
-        internal static void DeleteRemoteFiles(int count, string directory)
-        {
-            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
-            {
-                client.Connect();
-                var files = client.ListDirectory(directory);
-                var i = 0;
-                foreach (var file in files)
-                {
-                    if (i == count)
-                        break;
-                    client.DeleteFile(file.FullName);
-                    i++;
-                }
-            }
-        }
-
         internal static List<string> CreateDummyFiles(int count, List<string> filenames = null)
         {
             Directory.CreateDirectory(_workDir);
@@ -184,6 +167,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             {
                 if (Directory.Exists(file))
                     Directory.Delete(file, true);
+
                 File.Delete(file);
             }
         }
