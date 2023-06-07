@@ -129,8 +129,9 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.ServerFingerPrint = "NUfXVu2omU2k3ELtmCzhkcERRLHAEbNakrpBgEXn8JM";
 
             var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
+            Console.WriteLine(ex.Message);
             Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: Failure in Keyboard-interactive authentication: No response given for server prompt request --> Password"));
-            
+
             connection.Authentication = AuthenticationType.UsernamePrivateKeyString;
             connection.PrivateKeyFile = null;
             connection.PrivateKeyString = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key"));
@@ -145,6 +146,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
 
             ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, destination, connection, _options, _info, new CancellationToken()));
+            Console.WriteLine(ex.Message);
             Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: Failure in Keyboard-interactive authentication: No response given for server prompt request --> Password"));
         }
 
