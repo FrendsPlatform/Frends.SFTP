@@ -167,7 +167,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.ServerFingerPrint = _Sha256Hash.Replace("=", "");
 
             var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-            Console.WriteLine(ex.Message);
             Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: Failure in Keyboard-interactive authentication: No response given for server prompt request --> Password"));
 
             connection.Authentication = AuthenticationType.UsernamePrivateKeyString;
@@ -184,7 +183,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
 
             ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, destination, connection, _options, _info, new CancellationToken()));
-            Console.WriteLine(ex.Message);
             Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: Failure in Keyboard-interactive authentication: No response given for server prompt request --> Password"));
         }
     }
