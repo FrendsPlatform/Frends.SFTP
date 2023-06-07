@@ -3,7 +3,7 @@
 ## [2.7.0] - 2023-06-07
 ### Fixed
 - Modified private key passphrase to be visible when all private key authentication options were enabled.
-- Added new parameter for keyboard-interactive authentication where users can add prompts and responses.
+- [Breaking] Added new parameter for keyboard-interactive authentication where users can add prompts and responses.
 - Modified operations log to list current system and sftp server information.
 - Fixed operations log to show case exceptions more precisely.
 
