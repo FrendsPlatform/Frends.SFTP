@@ -299,33 +299,35 @@ internal class FileTransporter
 
     private void HandleKeyEvent(object sender, AuthenticationPromptEventArgs e)
     {
-        _logger.NotifyInformation(_batchContext, $"Keyboard-Interactive negotiation started with the server {_batchContext.Connection.Address}.");
-        foreach (var serverPrompt in e.Prompts)
+        if (e.Prompts.Any())
         {
-            _cancellationToken.ThrowIfCancellationRequested();
-
-            _logger.NotifyInformation(_batchContext, $"Prompt: {serverPrompt.Request.Replace(":", "")}");
-
-            if (!string.IsNullOrEmpty(_batchContext.Connection.Password) && serverPrompt.Request.IndexOf("Password:", StringComparison.InvariantCultureIgnoreCase) != -1)
-                serverPrompt.Response = _batchContext.Connection.Password;
-            else
+            _logger.NotifyInformation(_batchContext, $"Keyboard-Interactive negotiation started with the server {_batchContext.Connection.Address}.");
+            foreach (var serverPrompt in e.Prompts)
             {
-                if (!_batchContext.Connection.PromptAndResponse.Any() || !_batchContext.Connection.PromptAndResponse.Select(p => p.Prompt.ToLower()).ToList().Contains(serverPrompt.Request.Replace(":", "").Trim().ToLower()))
-                {
-                    var errorMsg = $"Failure in Keyboard-interactive authentication: No response given for server prompt request --> {serverPrompt.Request.Replace(":", "").Trim()}";
-                    throw new ArgumentException(errorMsg);
-                }
+                _cancellationToken.ThrowIfCancellationRequested();
 
-                foreach (var prompt in _batchContext.Connection.PromptAndResponse)
+                _logger.NotifyInformation(_batchContext, $"Prompt: {serverPrompt.Request.Replace(":", "")}");
+
+                if (!string.IsNullOrEmpty(_batchContext.Connection.Password) && serverPrompt.Request.IndexOf("Password:", StringComparison.InvariantCultureIgnoreCase) != -1)
+                    serverPrompt.Response = _batchContext.Connection.Password;
+                else
                 {
-                    _cancellationToken.ThrowIfCancellationRequested();
-                    if (serverPrompt.Request.IndexOf(prompt.Prompt, StringComparison.InvariantCultureIgnoreCase) != -1)
-                        serverPrompt.Response = prompt.Response;
+                    if (!_batchContext.Connection.PromptAndResponse.Any() || !_batchContext.Connection.PromptAndResponse.Select(p => p.Prompt.ToLower()).ToList().Contains(serverPrompt.Request.Replace(":", "").Trim().ToLower()))
+                    {
+                        var errorMsg = $"Failure in Keyboard-interactive authentication: No response given for server prompt request --> {serverPrompt.Request.Replace(":", "").Trim()}";
+                        throw new ArgumentException(errorMsg);
+                    }
+
+                    foreach (var prompt in _batchContext.Connection.PromptAndResponse)
+                    {
+                        _cancellationToken.ThrowIfCancellationRequested();
+                        if (serverPrompt.Request.IndexOf(prompt.Prompt, StringComparison.InvariantCultureIgnoreCase) != -1)
+                            serverPrompt.Response = prompt.Response;
+                    }
                 }
             }
+            _logger.NotifyInformation(_batchContext, $"Keyboard-Interactive negotiation finished.");
         }
-        _logger.NotifyInformation(_batchContext, $"Keyboard-Interactive negotiation finished.");
-
     }
 
     private static void ForceHostKeyAlgorithm(SftpClient client, HostKeyAlgorithms algorithm)
