@@ -95,10 +95,10 @@ public class Connection
     /// Passphrase for the private key file.
     /// </summary>
     /// <example>passphrase</example>
-    [UIHint(nameof(Authentication), "", 
-        AuthenticationType.UsernamePrivateKeyFile, 
-        AuthenticationType.UsernamePasswordPrivateKeyFile, 
-        AuthenticationType.UsernamePrivateKeyString, 
+    [UIHint(nameof(Authentication), "",
+        AuthenticationType.UsernamePrivateKeyFile,
+        AuthenticationType.UsernamePasswordPrivateKeyFile,
+        AuthenticationType.UsernamePrivateKeyString,
         AuthenticationType.UsernamePasswordPrivateKeyString)]
     [PasswordPropertyText]
     [DisplayFormat(DataFormatString = "Text")]

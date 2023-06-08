@@ -438,7 +438,7 @@ internal class SingleFileTransfer
                         if (WorkFile != null)
                             File.Move(WorkFile.FullPath, SourceFile.FullPath);
                     if (BatchContext.Options.RenameSourceFileBeforeTransfer && !Client.Exists(SourceFile.FullPath))
-                            File.Move(SourceFileDuringTransfer, SourceFile.FullPath);
+                        File.Move(SourceFileDuringTransfer, SourceFile.FullPath);
                     return "[Source file restored.]";
                 }
             }

@@ -434,7 +434,7 @@ internal class FileTransporter
         };
     }
 
-private Tuple<List<FileItem>, bool> ListSourceFiles(Source source, CancellationToken cancellationToken)
+    private Tuple<List<FileItem>, bool> ListSourceFiles(Source source, CancellationToken cancellationToken)
     {
         var fileItems = new List<FileItem>();
 
