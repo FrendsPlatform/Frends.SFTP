@@ -432,14 +432,13 @@ internal class SingleFileTransfer
             {
                 if (ShouldSourceFileBeRestoredOnError() && !File.Exists(SourceFile.FullPath))
                 {
-
-                    if (BatchContext.Source.Operation == SourceOperation.Move && WorkFile != null)
+                    if (BatchContext.Source.Operation == SourceOperation.Move)
                         RestoreSourceFileIfItWasMoved();
-                    if (BatchContext.Source.Operation == SourceOperation.Rename || BatchContext.Options.RenameSourceFileBeforeTransfer)
+                    if (BatchContext.Source.Operation == SourceOperation.Rename && !Client.Exists(SourceFile.FullPath))
                         if (WorkFile != null)
                             File.Move(WorkFile.FullPath, SourceFile.FullPath);
-                        else
-                            File.Move(SourceFileDuringTransfer, SourceFile.FullPath);
+                    if (BatchContext.Options.RenameSourceFileBeforeTransfer && !Client.Exists(SourceFile.FullPath))
+                        File.Move(SourceFileDuringTransfer, SourceFile.FullPath);
                     return "[Source file restored.]";
                 }
             }

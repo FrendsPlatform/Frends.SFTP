@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using NUnit.Framework;
 using Frends.SFTP.UploadFiles.Definitions;
@@ -139,6 +140,38 @@ namespace Frends.SFTP.UploadFiles.Tests
             var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
             Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: Error when establishing connection to the Server: Key exchange negotiation failed"));
             Assert.IsTrue(ex.Message.Contains("Expected server fingerprint was given in unsupported format."));
+        }
+
+        [Test]
+        public void UploadFiles_TestShouldThrowWithoutPromptAndResponse()
+        {
+            var connection = Helpers.GetSftpConnection();
+            connection.Authentication = AuthenticationType.UsernamePrivateKeyFile;
+            connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
+            connection.Password = null;
+            connection.PrivateKeyPassphrase = "passphrase";
+            connection.UseKeyboardInteractiveAuthentication = true;
+            connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
+            connection.ServerFingerPrint = _Sha256Hash.Replace("=", "");
+
+            var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
+            Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: Failure in Keyboard-interactive authentication: No response given for server prompt request --> Password"));
+
+            connection.Authentication = AuthenticationType.UsernamePrivateKeyString;
+            connection.PrivateKeyFile = null;
+            connection.PrivateKeyString = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key"));
+            connection.PrivateKeyPassphrase = "passphrase";
+
+            var destination = new Destination
+            {
+                Directory = Path.Combine(_workDir, "destination"),
+                Action = DestinationAction.Overwrite,
+                FileNameEncoding = FileEncoding.UTF8,
+                EnableBomForFileName = true
+            };
+
+            ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, destination, connection, _options, _info, new CancellationToken()));
+            Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: Failure in Keyboard-interactive authentication: No response given for server prompt request --> Password"));
         }
     }
 }
