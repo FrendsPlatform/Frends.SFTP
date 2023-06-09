@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using Frends.SFTP.DownloadFiles.Definitions;
@@ -40,7 +39,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.Password = "demo";
 
             var result = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-            Assert.That(result.Message.StartsWith("SFTP transfer failed: Authentication of SSH session failed: Permission denied (password)"));
+            Assert.IsTrue(result.Message.StartsWith("SFTP transfer failed: Authentication of SSH session failed: Permission denied (password)"));
         }
 
         [Test]

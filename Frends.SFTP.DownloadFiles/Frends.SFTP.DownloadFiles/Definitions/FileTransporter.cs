@@ -77,7 +77,7 @@ internal class FileTransporter
                 return FormFailedFileTransferResult(userResultMessage);
             }
 
-            LogSourceSystemInfo(_batchContext, connectionInfo, _logger);
+            LogSourceSystemInfo(_batchContext, _logger);
 
             _logger.NotifyInformation(_batchContext, "Negotiation started.");
 
@@ -624,13 +624,7 @@ internal class FileTransporter
         }
     }
 
-    private void SetCurrentState(TransferState state, string msg)
-    {
-        State = state;
-        _logger.NotifyTrace($"{state}: {msg}");
-    }
-
-    private static void LogSourceSystemInfo(BatchContext context, ConnectionInfo connectionInfo, ISFTPLogger logger)
+    private static void LogSourceSystemInfo(BatchContext context, ISFTPLogger logger)
     {
         logger.NotifyInformation(context, $"Assembly: {Assembly.GetAssembly(typeof(SftpClient)).GetName().Name} {Assembly.GetAssembly(typeof(SftpClient)).GetName().Version}");
         var bit = Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit";
