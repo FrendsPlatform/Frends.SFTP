@@ -59,6 +59,7 @@ public class Connection
     /// <example>pass</example>
     [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePassword, AuthenticationType.UsernamePasswordPrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyString)]
     [PasswordPropertyText]
+    [DisplayFormat(DataFormatString = "Text")]
     public string Password { get; set; }
 
     /// <summary>
@@ -86,15 +87,17 @@ public class Connection
     /// </example>
     [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyString, AuthenticationType.UsernamePasswordPrivateKeyString)]
     [PasswordPropertyText]
+    [DisplayFormat(DataFormatString = "Text")]
     public string PrivateKeyString { get; set; }
 
     /// <summary>
     /// Passphrase for the private key file.
     /// </summary>
     /// <example>passphrase</example>
-    [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyFile)]
+    [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyString, AuthenticationType.UsernamePrivateKeyString)]
     [PasswordPropertyText]
-    public string PrivateKeyFilePassphrase { get; set; }
+    [DisplayFormat(DataFormatString = "Text")]
+    public string PrivateKeyPassphrase { get; set; }
 
     /// <summary>
     /// Fingerprint of the SFTP server. When using "Username-Password" 
@@ -132,4 +135,10 @@ public class Connection
     /// <example>false</example>
     [DefaultValue(false)]
     public bool UseKeyboardInteractiveAuthentication { get; set; }
+
+    /// <summary>
+    /// Responses for the server prompts when using Keyboard Interactive authentication method.
+    /// </summary>
+    [UIHint(nameof(UseKeyboardInteractiveAuthentication), "", true)]
+    public PromptResponse[] PromptAndResponse { get; set; } = new PromptResponse[0];
 }

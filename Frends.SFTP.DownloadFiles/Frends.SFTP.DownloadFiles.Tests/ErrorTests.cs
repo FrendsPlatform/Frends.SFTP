@@ -59,7 +59,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
             Assert.IsTrue(ex.Message.StartsWith("SFTP transfer failed: 1 Errors: No source files found from directory"));
-
             Helpers.DeleteSubDirectory(path);
         }
 
@@ -78,7 +77,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
 
             var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.Contains($"Operation failed: Source file {_source.FileName} couldn't be moved to given directory {source.DirectoryToMoveAfterTransfer} because the directory didn't exist."));
+            Assert.IsTrue(ex.Message.Contains($"Operation failed: Source file {_source.FileName} couldn't be moved to given directory {source.DirectoryToMoveAfterTransfer} because the directory didn't exist."));
             Assert.IsTrue(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
         }
 
@@ -117,7 +116,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
 
             var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(source, destination, _connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.StartsWith($"SFTP transfer failed: 1 Errors: Failure in CheckIfDestination"));
+            Assert.IsTrue(ex.Message.StartsWith($"SFTP transfer failed: 1 Errors: Failure in CheckIfDestination"));
             Assert.IsTrue(Helpers.SourceFileExists(Path.Combine(_source.Directory, _source.FileName).Replace("\\", "/")));
         }
 
@@ -146,7 +145,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
 
             var ex = Assert.Throws<Exception>(() => SFTP.DownloadFiles(source, destination, _connection, _options, _info, new CancellationToken()));
-            Assert.That(ex.Message.StartsWith($"SFTP transfer failed: 1 Errors: Failure in CheckIfDestination"));
+            Assert.IsTrue(ex.Message.StartsWith($"SFTP transfer failed: 1 Errors: Failure in CheckIfDestination"));
             Assert.IsTrue(Helpers.SourceFileExists(Path.Combine(_source.Directory, _source.FileName).Replace("\\", "/")));
         }
 

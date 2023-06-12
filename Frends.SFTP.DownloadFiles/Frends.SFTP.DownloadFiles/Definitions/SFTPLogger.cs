@@ -43,6 +43,7 @@ internal class SFTPLogger : ISFTPLogger
     {
         try
         {
+            NotifyInformation(context, e.ToString());
             if (context == null) context = new BatchContext();
 
             var sourceEndPointName = GetEndPointName(context, EndPoint.Source, "unknown source end point");

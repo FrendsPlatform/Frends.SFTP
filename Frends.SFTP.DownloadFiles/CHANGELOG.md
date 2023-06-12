@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.7.0] - 2023-06-07
+### Added
+- [Breaking] Added new parameter for keyboard-interactive authentication where users can add prompts and responses.
+- Modified operations log to list current system and sftp server information.
+### Fixed
+- Modified private key passphrase to be visible when all private key authentication options were enabled.
+- Fixed operations log to show case exceptions more precisely.
+
 ## [2.6.1] - 2023-05-17
 ### Fixed
 - Fixed issue with TransferredFileNames was incorrect when FilePaths parameter was used. 

@@ -319,7 +319,7 @@ internal class SingleFileTransfer
             if (!Client.Exists(destFileName)) throw new Exception($"Failure in source operation: Source file couldn't be moved to move to directory.");
 
             _logger.NotifyInformation(BatchContext, $"Source file {SourceFileDuringTransfer} moved to target {destFileName}.");
-            SourceFile = new FileItem(file);
+            WorkFile = new FileItem(file);
 
             if (SourceFile.FullPath == null)
                 _logger.NotifyInformation(BatchContext, "Source end point returned null as the moved file. It should return the name of the moved file.");
@@ -453,7 +453,9 @@ internal class SingleFileTransfer
                 {
                     if (BatchContext.Source.Operation == SourceOperation.Move)
                         RestoreSourceFileIfItWasMoved();
-                    if (!Path.GetFileName(WorkFile.Name).Equals(SourceFile.Name) || !SourceFileDuringTransfer.Equals(SourceFile.FullPath))
+                    if (BatchContext.Source.Operation == SourceOperation.Rename && !Client.Exists(SourceFile.FullPath))
+                        Client.RenameFile(SourceFileDuringTransfer, SourceFile.FullPath);
+                    if (BatchContext.Options.RenameSourceFileBeforeTransfer && !Client.Exists(SourceFile.FullPath))
                         Client.RenameFile(SourceFileDuringTransfer, SourceFile.FullPath);
                     return "[Source file restored.]";
                 }

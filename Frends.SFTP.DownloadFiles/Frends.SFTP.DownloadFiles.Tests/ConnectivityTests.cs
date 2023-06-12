@@ -39,7 +39,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.Password = "demo";
 
             var result = Assert.Throws<Exception>(() => SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
-            Assert.That(result.Message.StartsWith("SFTP transfer failed: Authentication of SSH session failed: Permission denied (password)"));
+            Assert.IsTrue(result.Message.StartsWith("SFTP transfer failed: Authentication of SSH session failed: Permission denied (password)"));
         }
 
         [Test]
@@ -47,7 +47,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         {
             var connection = Helpers.GetSftpConnection();
             connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-            connection.PrivateKeyFilePassphrase = "passphrase";
+            connection.PrivateKeyPassphrase = "passphrase";
             connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
             var result = SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
@@ -61,8 +61,9 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var key = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key"));
 
             var connection = Helpers.GetSftpConnection();
+            connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
             connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
-            connection.PrivateKeyFilePassphrase = "passphrase";
+            connection.PrivateKeyPassphrase = "passphrase";
             connection.PrivateKeyString = key;
 
             var result = SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
@@ -77,6 +78,39 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.UseKeyboardInteractiveAuthentication = true;
 
             var result = SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+        }
+
+        [Test]
+        public void DownloadFiles_TestWithInteractiveKeyboardAuthenticationAndPrivateKey()
+        {
+            var connection = Helpers.GetSftpConnection();
+            connection.Authentication = AuthenticationType.UsernamePrivateKeyFile;
+            connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
+            connection.Password = null;
+            connection.PrivateKeyPassphrase = "passphrase";
+            connection.UseKeyboardInteractiveAuthentication = true;
+            connection.PromptAndResponse = new PromptResponse[] { new PromptResponse { Prompt = "Password", Response = "pass" } };
+
+            var result = SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+            connection.Authentication = AuthenticationType.UsernamePrivateKeyString;
+            connection.PrivateKeyFile = null;
+            connection.PrivateKeyString = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key"));
+            connection.PrivateKeyPassphrase = "passphrase";
+
+            var destination = new Destination
+            {
+                Directory = Path.Combine(_workDir, "destination"),
+                Action = DestinationAction.Overwrite,
+                FileNameEncoding = FileEncoding.UTF8,
+                EnableBomForFileName = true
+            };
+
+            result = SFTP.DownloadFiles(_source, destination, connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
