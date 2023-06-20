@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.7.1] - 2023-06-20
+### Fixed
+- Added CancellationToken to methods to make the Task be able to terminate.
+- Added SFTPClient.OperationTimeout which should cause timeout during operations if the Task becomes stuck.
+
 ## [2.7.0] - 2023-06-08
 ### Added
 - [Breaking] Added new parameter for keyboard-interactive authentication where users can add prompts and responses.

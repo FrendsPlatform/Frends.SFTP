@@ -140,6 +140,28 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Assert.IsFalse(ex.Message.Contains("Could not restore original source file"));
             }
         }
+
+        [Test]
+        public void UploadFiles_TestDebuglogWithError()
+        {
+            var options = new Options
+            {
+                ThrowErrorOnFail = true,
+                RenameSourceFileBeforeTransfer = true,
+                RenameDestinationFileDuringTransfer = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true,
+                Debug = true,
+                DebugDirectory = "C:\\temp\\debuglog\\"
+            };
+
+            var connection = Helpers.GetSftpConnection();
+            connection.Password = "cuinbeu8i9ch";
+
+            var ex = Assert.Throws<Exception>(() => SFTP.UploadFiles(_source, _destination, connection, options, _info, new CancellationToken()));
+            Assert.IsTrue(ex.Message.Contains($@"FRENDS SFTP file transfer '' from 'FILE://{_source.Directory}/{_source.FileName}' to 'SFTP://{connection.Address}/{_destination.Directory}':"));
+        }
     }
 }
 

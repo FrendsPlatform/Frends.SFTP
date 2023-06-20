@@ -25,6 +25,7 @@ internal class SFTPLogger : ISFTPLogger
 {
     private ConcurrentBag<FileTransferInfo> _fileTransfers;
     private ILogger _log;
+    private readonly string _debuglogFileName; 
 
     private bool _disposed;
 
@@ -32,6 +33,7 @@ internal class SFTPLogger : ISFTPLogger
     {
         _fileTransfers = new ConcurrentBag<FileTransferInfo>();
         _log = log;
+        _debuglogFileName = $"{DateTime.Now:yyyy_MM_ddZhhmmss}_debuglog.txt";
     }
 
     ~SFTPLogger()
@@ -53,6 +55,14 @@ internal class SFTPLogger : ISFTPLogger
 
             var errorMessage = $"\r\n\r\nFRENDS SFTP file transfer '{transferNameForLog}' from '{sourceEndPointName}' to '{destinationEndPointName}': \r\n{msg}\r\n";
             _log.Error(errorMessage, e);
+            if (context.Options.Debug && !string.IsNullOrEmpty(context.Options.DebugDirectory))
+            {
+                Directory.CreateDirectory(context.Options.DebugDirectory);
+                var debugFilePath = Path.Combine(context.Options.DebugDirectory, _debuglogFileName);
+                if (!File.Exists(debugFilePath))
+                    _ = File.Create(debugFilePath);
+                File.AppendAllText(debugFilePath, $"{errorMessage}\n");
+            }
         }
         catch (Exception ex)
         {
@@ -65,6 +75,12 @@ internal class SFTPLogger : ISFTPLogger
         try
         {
             _log.Information(msg);
+            if (context.Options.Debug && !string.IsNullOrEmpty(context.Options.DebugDirectory))
+            {
+                Directory.CreateDirectory(context.Options.DebugDirectory);
+                var debugFilePath = Path.Combine(context.Options.DebugDirectory, _debuglogFileName);
+                File.AppendAllText(debugFilePath, $"{msg}\n");
+            }
         }
         catch (Exception ex)
         {

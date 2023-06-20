@@ -9,11 +9,13 @@ internal class RenamingPolicy
 {
     private readonly IDictionary<string, Func<string, string>> MacroHandlers;
     private readonly IDictionary<string, Func<string, string>> SourceFileNameMacroHandlers;
+    private CancellationToken CancellationToken;
 
-    public RenamingPolicy(string transferName, Guid transferId)
+    public RenamingPolicy(string transferName, Guid transferId, CancellationToken cancellationToken)
     {
         MacroHandlers = InitializeMacroHandlers(transferName, transferId);
         SourceFileNameMacroHandlers = InitializeSourceFileNameMacroHandlers();
+        CancellationToken = cancellationToken;
     }
 
     public string CreateRemoteFileName(string originalFileName, string remoteFileDefinition)
@@ -29,8 +31,8 @@ internal class RenamingPolicy
         if (string.IsNullOrEmpty(remoteFileDefinition)) return originalFileNameWithoutPath;
 
         if (!IsFileMask(remoteFileDefinition) &&
-            !IsFileMacro(remoteFileDefinition, MacroHandlers) &&
-            !IsFileMacro(remoteFileDefinition, SourceFileNameMacroHandlers))
+            !IsFileMacro(remoteFileDefinition, MacroHandlers, CancellationToken) &&
+            !IsFileMacro(remoteFileDefinition, SourceFileNameMacroHandlers, CancellationToken))
         {
             // remoteFileDefination does not have macros
             var remoteFileName = Path.GetFileName(remoteFileDefinition);
@@ -96,7 +98,7 @@ internal class RenamingPolicy
     private string ExpandFileMacros(string filePath)
     {
         string filename = filePath;
-        if (IsFileMacro(filename, MacroHandlers))
+        if (IsFileMacro(filename, MacroHandlers, CancellationToken))
             filename = ReplaceMacro(filename);
 
         return filename;
@@ -105,7 +107,7 @@ internal class RenamingPolicy
     private string ExpandSourceFileNameMacros(string filePath, string originalFile)
     {
         string filename = filePath;
-        if (IsFileMacro(filename, SourceFileNameMacroHandlers))
+        if (IsFileMacro(filename, SourceFileNameMacroHandlers, CancellationToken))
             filename = ReplaceSourceFileMacro(filename, originalFile);
 
         return filename;
@@ -130,19 +132,20 @@ internal class RenamingPolicy
         if (i >= 0)
         {
             string tmp = mask.Substring(0, i);
-            return String.Concat(tmp + filename + mask.Substring(i + 1, (mask.Length - (i + 1))));
+            return string.Concat(tmp + filename + mask.Substring(i + 1, (mask.Length - (i + 1))));
         }
 
         //Not an mask return mask.
         return mask;
     }
 
-    private static bool IsFileMacro(string s, IDictionary<string, Func<string, string>> macroDictionary)
+    private static bool IsFileMacro(string s, IDictionary<string, Func<string, string>> macroDictionary, CancellationToken cancellationToken)
     {
         if (s == null) return false;
 
         foreach (var key in macroDictionary.Keys)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (s.ToUpperInvariant().Contains(key.ToUpperInvariant())) return true;
         }
 
@@ -163,7 +166,7 @@ internal class RenamingPolicy
         return new Dictionary<string, Func<string, string>>
             {
                 {"%SourceFileName%", Path.GetFileNameWithoutExtension},
-                {"%SourceFileExtension%", (originalFile) => Path.HasExtension(originalFile) ? Path.GetExtension(originalFile) : String.Empty},
+                {"%SourceFileExtension%", (originalFile) => Path.HasExtension(originalFile) ? Path.GetExtension(originalFile) : string.Empty},
             };
     }
 
@@ -184,7 +187,7 @@ internal class RenamingPolicy
                 {"%Second%", (s) => DateTime.Now.ToString("ss")},
                 {"%Millisecond%", (s) => DateTime.Now.ToString("fff")},
                 {"%Guid%", (s) => Guid.NewGuid().ToString()},
-                {"%TransferName%", (s) => !String.IsNullOrEmpty(transferName) ? transferName : String.Empty},
+                {"%TransferName%", (s) => !string.IsNullOrEmpty(transferName) ? transferName : string.Empty},
                 {"%TransferId%", (s) => transferId.ToString().ToUpper()},
                 {"%WeekDay%", (s) => (DateTime.Now.DayOfWeek > 0 ? (int)DateTime.Now.DayOfWeek : 7).ToString()}
             };
@@ -192,18 +195,19 @@ internal class RenamingPolicy
 
     private string ReplaceSourceFileMacro(string fileDefinition, string originalFile)
     {
-        return ExpandMacrosFromDictionary(fileDefinition, SourceFileNameMacroHandlers, originalFile); ;
+        return ExpandMacrosFromDictionary(fileDefinition, SourceFileNameMacroHandlers, originalFile, CancellationToken); ;
     }
 
     private string ReplaceMacro(string fileDefinition)
     {
-        return ExpandMacrosFromDictionary(fileDefinition, MacroHandlers, "");
+        return ExpandMacrosFromDictionary(fileDefinition, MacroHandlers, "", CancellationToken);
     }
 
-    private static string ExpandMacrosFromDictionary(string fileDefinition, IDictionary<string, Func<string, string>> macroHandlers, string originalFile)
+    private static string ExpandMacrosFromDictionary(string fileDefinition, IDictionary<string, Func<string, string>> macroHandlers, string originalFile, CancellationToken cancellationToken)
     {
         foreach (var macroHandler in macroHandlers)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             fileDefinition = Regex.Replace(fileDefinition, Regex.Escape(macroHandler.Key), macroHandler.Value.Invoke(originalFile), RegexOptions.IgnoreCase);
         }
 

@@ -27,7 +27,7 @@ internal class FileTransporter
         _logger = logger;
         _batchContext = context;
         _instanceId = instanceId;
-        _renamingPolicy = new RenamingPolicy(_batchContext.Info.TransferName, _instanceId);
+        _renamingPolicy = new RenamingPolicy(_batchContext.Info.TransferName, _instanceId, cancellationToken);
         _cancellationToken = cancellationToken;
 
         _result = new List<SingleFileTransferResult>();
@@ -96,7 +96,7 @@ internal class FileTransporter
                     return FormFailedFileTransferResult(userResultMessage);
                 }
 
-                LogSourceSystemInfo(_batchContext, connectionInfo, _logger);
+                LogDestinationSystemInfo(_batchContext, _logger);
 
                 _logger.NotifyInformation(_batchContext, "Negotiation started.");
 
@@ -119,6 +119,7 @@ internal class FileTransporter
 
                     client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
                     client.KeepAliveInterval = TimeSpan.FromMilliseconds(_batchContext.Connection.KeepAliveInterval);
+                    client.OperationTimeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
 
                     client.BufferSize = _batchContext.Connection.BufferSize * 1024;
 
@@ -142,7 +143,7 @@ internal class FileTransporter
                             try
                             {
                                 SetCurrentState(TransferState.CreateDestinationDirectories, $"Creating destination directory {DestinationDirectoryWithMacrosExtended}.");
-                                CreateDestinationDirectories(client, DestinationDirectoryWithMacrosExtended);
+                                CreateDestinationDirectories(client, DestinationDirectoryWithMacrosExtended, _cancellationToken);
                                 _logger.NotifyInformation(_batchContext, $"DIRECTORY CREATE: Destination directory {DestinationDirectoryWithMacrosExtended} created.");
                             }
                             catch (Exception ex)
@@ -160,7 +161,6 @@ internal class FileTransporter
                         }
                     }
 
-
                     _batchContext.DestinationFiles = client.ListDirectory(DestinationDirectoryWithMacrosExtended);
 
                     foreach (var file in files)
@@ -172,7 +172,7 @@ internal class FileTransporter
                             client.Connect();
 
                         var singleTransfer = new SingleFileTransfer(file, DestinationDirectoryWithMacrosExtended, _batchContext, client, _renamingPolicy, _logger);
-                        var result = singleTransfer.TransferSingleFile();
+                        var result = singleTransfer.TransferSingleFile(_cancellationToken);
                         _result.Add(result);
                     }
                     client.Disconnect();
@@ -402,7 +402,7 @@ internal class FileTransporter
                     {
                         using (SHA256 mySHA256 = SHA256.Create())
                         {
-                            SHAServerFingerprint = Util.ToHex(mySHA256.ComputeHash(e.HostKey));
+                            SHAServerFingerprint = Util.ToHex(mySHA256.ComputeHash(e.HostKey), _cancellationToken);
                         }
                         e.CanTrust = (SHAServerFingerprint == expectedServerFingerprint);
                         if (!e.CanTrust)
@@ -472,11 +472,12 @@ internal class FileTransporter
         return new Tuple<List<FileItem>, bool>(fileItems, true);
     }
 
-    private static void CreateDestinationDirectories(SftpClient client, string path)
+    private static void CreateDestinationDirectories(SftpClient client, string path, CancellationToken cancellationToken)
     {
         // Consistent forward slashes
         foreach (string dir in path.Replace(@"\", "/").Split('/'))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (!string.IsNullOrWhiteSpace(dir))
             {
                 if (!TryToChangeDir(client, dir) && ("/" + dir != client.WorkingDirectory))
@@ -526,9 +527,10 @@ internal class FileTransporter
 
     private FileTransferResult FormResultFromSingleTransferResults(List<SingleFileTransferResult> singleResults)
     {
+        _cancellationToken.ThrowIfCancellationRequested();
         var success = singleResults.All(x => x.Success);
         var actionSkipped = success && singleResults.All(x => x.ActionSkipped);
-        var userResultMessage = GetUserResultMessage(singleResults.ToList());
+        var userResultMessage = GetUserResultMessage(singleResults.ToList(), _cancellationToken);
 
         _logger.LogBatchFinished(_batchContext, userResultMessage, success, actionSkipped);
 
@@ -552,14 +554,11 @@ internal class FileTransporter
         };
     }
 
-    /// <summary>
-    /// Forms the userResultMessage for FileTransferResult object
-    /// </summary>
-    /// <param name="results"></param>
-    /// <returns></returns>
-    private static string GetUserResultMessage(IList<SingleFileTransferResult> results)
+    private static string GetUserResultMessage(IList<SingleFileTransferResult> results, CancellationToken cancellationToken)
     {
         var userResultMessage = string.Empty;
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         var errorMessages = results.SelectMany(x => x.ErrorMessages).ToList();
         if (errorMessages.Any())
@@ -635,7 +634,7 @@ internal class FileTransporter
         _logger.NotifyTrace($"{state}: {msg}");
     }
 
-    private static void LogSourceSystemInfo(BatchContext context, ConnectionInfo connectionInfo, ISFTPLogger logger)
+    private void LogDestinationSystemInfo(BatchContext context, ISFTPLogger logger)
     {
         logger.NotifyInformation(context, $"Assembly: {Assembly.GetAssembly(typeof(SftpClient)).GetName().Name} {Assembly.GetAssembly(typeof(SftpClient)).GetName().Version}");
         var bit = Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit";
