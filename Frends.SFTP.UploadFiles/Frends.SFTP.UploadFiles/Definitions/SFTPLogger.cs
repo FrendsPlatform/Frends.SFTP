@@ -25,7 +25,7 @@ internal class SFTPLogger : ISFTPLogger
 {
     private ConcurrentBag<FileTransferInfo> _fileTransfers;
     private ILogger _log;
-    private readonly string _debuglogFileName; 
+    private readonly string _debuglogFileName;
 
     private bool _disposed;
 
