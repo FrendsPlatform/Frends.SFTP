@@ -80,6 +80,7 @@ public class Options
     /// </summary>
     /// <example>C:\temp\debuglog.txt</example>
     [UIHint(nameof(Debug), "", true)]
+    [DisplayFormat(DataFormatString = "Text")]
     [DefaultValue("C:\\temp\\debuglog\\")]
     public string DebugDirectory { get; set; }
 }

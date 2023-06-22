@@ -634,7 +634,7 @@ internal class FileTransporter
         _logger.NotifyTrace($"{state}: {msg}");
     }
 
-    private void LogDestinationSystemInfo(BatchContext context, ISFTPLogger logger)
+    private static void LogDestinationSystemInfo(BatchContext context, ISFTPLogger logger)
     {
         logger.NotifyInformation(context, $"Assembly: {Assembly.GetAssembly(typeof(SftpClient)).GetName().Name} {Assembly.GetAssembly(typeof(SftpClient)).GetName().Version}");
         var bit = Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit";

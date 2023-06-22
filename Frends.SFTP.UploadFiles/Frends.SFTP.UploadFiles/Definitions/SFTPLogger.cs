@@ -206,6 +206,11 @@ internal class SFTPLogger : ISFTPLogger
         return File.Exists(filepath) ? new FileInfo(filepath).Length : 0;
     }
 
+    public string GetDebugLogFilePath(BatchContext context)
+    {
+        return Path.Combine(context.Options.DebugDirectory, _debuglogFileName);
+    }
+
     public void Dispose()
     {
         Dispose(true);

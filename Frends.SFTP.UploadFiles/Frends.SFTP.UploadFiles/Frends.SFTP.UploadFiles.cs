@@ -101,7 +101,7 @@ public class SFTP
     /// IEnumerable TransferredFileNames, 
     /// Dictionary TransferErrors, 
     /// IEnumerable TransferredFilePaths, 
-    /// IDictionary OperationsLog} 
+    /// IDictionary OperationsLog } 
     /// </returns>
     public static Result UploadFiles(
         [PropertyTab] Source source,
@@ -148,7 +148,7 @@ public class SFTP
                 BatchTransferStartTime = DateTime.Now,
                 Source = source,
                 Destination = destination,
-                Connection = connection
+                Connection = connection,
             };
 
             var fileTransporter = new FileTransporter(logger, _batchContext, executionId, cancellationToken);
@@ -160,6 +160,9 @@ public class SFTP
 
             if (options.OperationLog)
                 result.OperationsLog = GetLogDictionary(transferSink.GetBufferedLogMessages());
+
+            if (options.Debug)
+                File.Delete(logger.GetDebugLogFilePath(_batchContext));
 
             return new Result(result);
         }

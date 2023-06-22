@@ -58,7 +58,7 @@ internal class RenamingPolicy
         return ExpandFileMacros(directory);
     }
 
-    public string CanonizeAndCheckPath(string path)
+    public static string CanonizeAndCheckPath(string path)
     {
         path = path.Replace(Path.DirectorySeparatorChar, '/'); // make all the paths use forward slashes - this should be supported on File, FTP, and SFTP
 
