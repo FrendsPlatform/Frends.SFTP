@@ -148,7 +148,7 @@ public class SFTP
                 BatchTransferStartTime = DateTime.Now,
                 Source = source,
                 Destination = destination,
-                Connection = connection,
+                Connection = connection
             };
 
             var fileTransporter = new FileTransporter(logger, _batchContext, executionId, cancellationToken);

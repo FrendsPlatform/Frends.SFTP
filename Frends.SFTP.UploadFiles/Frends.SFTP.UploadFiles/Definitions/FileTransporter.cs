@@ -172,7 +172,7 @@ internal class FileTransporter
                             client.Connect();
 
                         var singleTransfer = new SingleFileTransfer(file, DestinationDirectoryWithMacrosExtended, _batchContext, client, _renamingPolicy, _logger);
-                        var result = singleTransfer.TransferSingleFile(_cancellationToken);
+                        var result = singleTransfer.TransferSingleFile();
                         _result.Add(result);
                     }
                     client.Disconnect();
@@ -527,7 +527,6 @@ internal class FileTransporter
 
     private FileTransferResult FormResultFromSingleTransferResults(List<SingleFileTransferResult> singleResults)
     {
-        _cancellationToken.ThrowIfCancellationRequested();
         var success = singleResults.All(x => x.Success);
         var actionSkipped = success && singleResults.All(x => x.ActionSkipped);
         var userResultMessage = GetUserResultMessage(singleResults.ToList(), _cancellationToken);
@@ -557,8 +556,6 @@ internal class FileTransporter
     private static string GetUserResultMessage(IList<SingleFileTransferResult> results, CancellationToken cancellationToken)
     {
         var userResultMessage = string.Empty;
-
-        cancellationToken.ThrowIfCancellationRequested();
 
         var errorMessages = results.SelectMany(x => x.ErrorMessages).ToList();
         if (errorMessages.Any())

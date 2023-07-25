@@ -28,7 +28,7 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Directory = _workDir,
                 FileName = "SFTPUploadTestFile1.txt",
                 Action = SourceAction.Error,
-                Operation = SourceOperation.Nothing,
+                Operation = SourceOperation.Nothing
             };
 
             _destination = new Destination
@@ -46,7 +46,7 @@ namespace Frends.SFTP.UploadFiles.Tests
                 RenameDestinationFileDuringTransfer = true,
                 CreateDestinationDirectories = true,
                 PreserveLastModified = false,
-                OperationLog = true,
+                OperationLog = true
             };
 
             _info = new Info

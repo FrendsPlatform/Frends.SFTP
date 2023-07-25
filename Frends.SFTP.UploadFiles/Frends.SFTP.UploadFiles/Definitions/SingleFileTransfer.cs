@@ -47,18 +47,16 @@ internal class SingleFileTransfer
     /// </summary>
     internal TransferState State { get; set; }
 
-    internal SingleFileTransferResult TransferSingleFile(CancellationToken cancellationToken)
+    internal SingleFileTransferResult TransferSingleFile()
     {
         try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             _result.TransferredFile = SourceFile.Name;
             _result.TransferredFilePath = SourceFile.FullPath;
 
-            GetSourceFile(cancellationToken);
+            GetSourceFile();
 
-            ExecuteSourceOperationMoveOrRename(cancellationToken);
+            ExecuteSourceOperationMoveOrRename();
 
             if (DestinationFileExists(DestinationFileWithMacrosExpanded))
             {
@@ -69,13 +67,13 @@ internal class SingleFileTransfer
                         AppendDestinationFile();
                         break;
                     case DestinationAction.Overwrite:
-                        PutDestinationFile(cancellationToken, removeExisting: true);
+                        PutDestinationFile(removeExisting: true);
                         break;
                     case DestinationAction.Error:
                         throw new DestinationFileExistsException(Path.GetFileName(DestinationFileWithMacrosExpanded));
                 }
             }
-            else PutDestinationFile(cancellationToken);
+            else PutDestinationFile();
 
             if (BatchContext.Options.PreserveLastModified) RestoreModified();
 
@@ -97,9 +95,8 @@ internal class SingleFileTransfer
         return _result;
     }
 
-    private void GetSourceFile(CancellationToken cancellationToken)
+    private void GetSourceFile()
     {
-        cancellationToken.ThrowIfCancellationRequested();
         if (BatchContext.Options.RenameSourceFileBeforeTransfer)
             RenameSourceFile();
         else
@@ -200,11 +197,9 @@ internal class SingleFileTransfer
 
     }
 
-    private void PutDestinationFile(CancellationToken cancellationToken, bool removeExisting = false)
+    private void PutDestinationFile(bool removeExisting = false)
     {
         var doRename = BatchContext.Options.RenameDestinationFileDuringTransfer;
-
-        cancellationToken.ThrowIfCancellationRequested();
 
         DestinationFileDuringTransfer = doRename ? Path.Combine(Path.GetDirectoryName(DestinationFileWithMacrosExpanded), Util.CreateUniqueFileName(BatchContext.Options.DestinationFileExtension)) : DestinationFileWithMacrosExpanded;
         if (DestinationFileWithMacrosExpanded.Contains('/')) DestinationFileDuringTransfer = DestinationFileDuringTransfer.Replace("\\", "/");
@@ -255,9 +250,8 @@ internal class SingleFileTransfer
         return;
     }
 
-    private void ExecuteSourceOperationMoveOrRename(CancellationToken cancellationToken)
+    private void ExecuteSourceOperationMoveOrRename()
     {
-        cancellationToken.ThrowIfCancellationRequested();
         if (BatchContext.Source.Operation == SourceOperation.Move)
         {
             var moveToPath = _renamingPolicy.ExpandDirectoryForMacros(BatchContext.Source.DirectoryToMoveAfterTransfer);

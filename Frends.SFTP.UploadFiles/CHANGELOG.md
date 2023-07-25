@@ -1,7 +1,7 @@
 # Changelog
 
 ## [2.7.1] - 2023-07-25
-### Fixed
+### Added
 - Added SFTPClient.OperationTimeout which should cause timeout during operations if the Task becomes stuck.
 
 ## [2.7.0] - 2023-06-08
