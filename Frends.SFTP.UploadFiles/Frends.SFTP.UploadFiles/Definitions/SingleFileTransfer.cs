@@ -19,7 +19,7 @@ internal class SingleFileTransfer
         SourceFile = file;
         BatchContext = context;
 
-        DestinationFileWithMacrosExpanded = renamingPolicy.CanonizeAndCheckPath(Path.Combine(destinationDirectory, renamingPolicy.CreateRemoteFileName(
+        DestinationFileWithMacrosExpanded = RenamingPolicy.CanonizeAndCheckPath(Path.Combine(destinationDirectory, renamingPolicy.CreateRemoteFileName(
                 file.Name,
                 context.Destination.FileName)));
         if (destinationDirectory.Contains('/')) DestinationFileWithMacrosExpanded = DestinationFileWithMacrosExpanded.Replace("\\", "/");
@@ -51,8 +51,6 @@ internal class SingleFileTransfer
     {
         try
         {
-            var test = DestinationFileWithMacrosExpanded;
-
             _result.TransferredFile = SourceFile.Name;
             _result.TransferredFilePath = SourceFile.FullPath;
 
@@ -199,10 +197,6 @@ internal class SingleFileTransfer
 
     }
 
-    /// <summary>
-    /// Uploads source file to destination. Overwrites the destination file if enabled.
-    /// </summary>
-    /// <param name="removeExisting"></param>
     private void PutDestinationFile(bool removeExisting = false)
     {
         var doRename = BatchContext.Options.RenameDestinationFileDuringTransfer;

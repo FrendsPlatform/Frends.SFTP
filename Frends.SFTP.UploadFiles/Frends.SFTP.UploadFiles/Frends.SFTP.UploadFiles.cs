@@ -101,7 +101,7 @@ public class SFTP
     /// IEnumerable TransferredFileNames, 
     /// Dictionary TransferErrors, 
     /// IEnumerable TransferredFilePaths, 
-    /// IDictionary OperationsLog} 
+    /// IDictionary OperationsLog } 
     /// </returns>
     public static Result UploadFiles(
         [PropertyTab] Source source,
