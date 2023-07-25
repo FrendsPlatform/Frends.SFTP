@@ -47,7 +47,6 @@ namespace Frends.SFTP.UploadFiles.Tests
                 CreateDestinationDirectories = true,
                 PreserveLastModified = false,
                 OperationLog = true,
-                Debug = false
             };
 
             _info = new Info

@@ -67,22 +67,6 @@ public class Options
     /// <example>true</example>
     [DefaultValue(true)]
     public bool OperationLog { get; set; }
-
-    /// <summary>
-    /// If enabled the operations log will be written in file while executing.
-    /// </summary>
-    /// <example>true</example>
-    [DefaultValue(false)]
-    public bool Debug { get; set; }
-
-    /// <summary>
-    /// Directory for the operations log if Debug is enabled.
-    /// </summary>
-    /// <example>C:\temp\debuglog.txt</example>
-    [UIHint(nameof(Debug), "", true)]
-    [DisplayFormat(DataFormatString = "Text")]
-    [DefaultValue("C:\\temp\\debuglog\\")]
-    public string DebugDirectory { get; set; }
 }
 
 

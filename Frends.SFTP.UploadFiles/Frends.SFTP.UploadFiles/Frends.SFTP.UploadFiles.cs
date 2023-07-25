@@ -161,9 +161,6 @@ public class SFTP
             if (options.OperationLog)
                 result.OperationsLog = GetLogDictionary(transferSink.GetBufferedLogMessages());
 
-            if (options.Debug)
-                File.Delete(logger.GetDebugLogFilePath(_batchContext));
-
             return new Result(result);
         }
     }
