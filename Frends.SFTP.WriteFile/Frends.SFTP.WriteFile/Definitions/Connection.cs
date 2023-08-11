@@ -26,7 +26,7 @@ public class Connection
     public string Address { get; set; }
 
     /// <summary>
-    /// Port number to use in the connection to the server.
+    /// Port number to use in the connection to the server
     /// </summary>
     /// <example>22</example>
     [DefaultValue(22)]
