@@ -5,7 +5,7 @@ using Frends.SFTP.WriteFile.Enums;
 namespace Frends.SFTP.WriteFile.Definitions;
 
 /// <summary>
-/// Source transfer options
+/// Source transfer options.
 /// </summary>
 public class Input
 {
