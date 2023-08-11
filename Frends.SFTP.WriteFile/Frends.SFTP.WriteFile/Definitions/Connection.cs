@@ -33,7 +33,7 @@ public class Connection
     public int Port { get; set; } = 22;
 
     /// <summary>
-    /// Selection for authentication type
+    /// Selection for authentication type.
     /// </summary>
     /// <example>AuthenticationType.UsernamePassword</example>
     [DisplayFormat(DataFormatString = "Text")]
