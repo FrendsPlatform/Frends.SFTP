@@ -9,7 +9,7 @@ Writes string content to a file through SFTP connection.
 
 ## Installing
 
-You can install the task via FRENDS UI Task View or you can find the NuGet package from the following NuGet feed
+You can install the task via FRENDS UI Task View.
 
 ## Building
 
