@@ -19,7 +19,7 @@ public class Connection
     public int ConnectionTimeout { get; set; }
 
     /// <summary>
-    /// SFTP host address
+    /// SFTP host address.
     /// </summary>
     /// <example>localhost</example>
     [DisplayFormat(DataFormatString = "Text")]
