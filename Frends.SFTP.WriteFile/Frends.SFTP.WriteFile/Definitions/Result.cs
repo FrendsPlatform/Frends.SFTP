@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Frends.SFTP.WriteFile.Definitions;
 
 /// <summary>
-/// Return object with private setters
+/// Return object with private setters.
 /// </summary>
 public class Result
 {
