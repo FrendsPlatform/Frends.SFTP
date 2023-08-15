@@ -5,7 +5,7 @@ using Frends.SFTP.WriteFile.Enums;
 namespace Frends.SFTP.WriteFile.Definitions;
 
 /// <summary>
-/// Parameters class usually contains parameters that are required.
+/// Parameters class usually contains parameters that are required
 /// </summary>
 public class Connection
 {
