@@ -16,7 +16,7 @@ public class Connection
     /// </summary>
     /// <example>60</example>
     [DefaultValue(60)]
-    public int ConnectionTimeout { get; set; 
+    public int ConnectionTimeout { get; set; }
 
     /// <summary>
     /// SFTP host address.
