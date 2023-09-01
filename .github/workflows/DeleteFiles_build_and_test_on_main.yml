@@ -1,0 +1,19 @@
+name: DeleteFiles_build_main
+
+on:
+  push:
+    branches:    
+      - main
+    paths:
+      - 'Frends.SFTP.DeleteFiles/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/linux_build_main.yml@main
+    with:
+      workdir: Frends.SFTP.DeleteFiles
+      prebuild_command: docker-compose -f ./Frends.SFTP.DeleteFiles.Tests/docker-compose.yml up -d
+    secrets:
+      badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
+      
