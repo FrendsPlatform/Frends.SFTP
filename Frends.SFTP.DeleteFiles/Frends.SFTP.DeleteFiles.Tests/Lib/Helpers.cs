@@ -56,7 +56,7 @@ internal static class Helpers
             client.ConnectionInfo.HostKeyAlgorithms.Clear();
             client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) => { return new KeyHostAlgorithm("ssh-rsa", new RsaKey(), data); });
 
-            client.HostKeyReceived += delegate(object sender, HostKeyEventArgs e)
+            client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
             {
                 result = new Tuple<byte[], byte[]>(e.FingerPrint, e.HostKey);
                 e.CanTrust = true;

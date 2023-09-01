@@ -71,7 +71,7 @@ internal static class Util
     {
         var userResultMessage = string.Empty;
 
-        client.HostKeyReceived += delegate(object sender, HostKeyEventArgs e)
+        client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
         {
             if (IsMD5(expectedServerFingerprint.Replace(":", string.Empty).Replace("-", string.Empty)))
             {
