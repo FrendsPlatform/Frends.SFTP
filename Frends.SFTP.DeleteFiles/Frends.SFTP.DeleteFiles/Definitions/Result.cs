@@ -1,7 +1,5 @@
 ﻿namespace Frends.SFTP.DeleteFiles.Definitions;
 
-using Renci.SshNet.Sftp;
-using System;
 using System.Collections.Generic;
 
 /// <summary>

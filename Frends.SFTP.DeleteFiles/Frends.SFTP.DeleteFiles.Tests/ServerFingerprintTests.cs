@@ -2,7 +2,6 @@
 
 using System;
 using System.IO;
-using System.Threading;
 using Frends.SFTP.DeleteFiles.Enums;
 using NUnit.Framework;
 using Renci.SshNet.Common;

@@ -132,6 +132,7 @@ public class Connection
     /// <summary>
     /// Responses for the server prompts when using Keyboard Interactive authentication method.
     /// </summary>
+    /// <example>[PromptResponse { Prompt = Verification code, Response = 123456789 } ]</example>
     [UIHint(nameof(UseKeyboardInteractiveAuthentication), "", true)]
     public PromptResponse[] PromptAndResponse { get; set; } = new PromptResponse[0];
 }
