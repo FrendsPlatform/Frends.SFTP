@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.7.1] - 2023-09-08
+### Added
+- Added SFTPClient.OperationTimeout which should cause timeout during operations if the Task becomes stuck.
+
 ## [2.7.0] - 2023-06-07
 ### Added
 - [Breaking] Added new parameter for keyboard-interactive authentication where users can add prompts and responses.

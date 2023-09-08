@@ -95,6 +95,7 @@ internal class FileTransporter
 
                 client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
                 client.KeepAliveInterval = TimeSpan.FromMilliseconds(_batchContext.Connection.KeepAliveInterval);
+                client.OperationTimeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
 
                 client.BufferSize = _batchContext.Connection.BufferSize * 1024;
 
