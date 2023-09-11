@@ -430,8 +430,6 @@ internal class FileTransporter
 
     private Tuple<List<FileItem>, bool> ListSourceFiles(SftpClient client, Source source, CancellationToken cancellationToken)
     {
-        //SetCurrentState(TransferState.CheckSourceFiles, "Checking source files.");
-
         var fileItems = new List<FileItem>();
 
         if (_filePaths != null)
