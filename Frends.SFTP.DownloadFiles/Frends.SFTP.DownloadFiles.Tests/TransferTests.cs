@@ -373,6 +373,22 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
+
+        [Test]
+        public void DownloadFiles_TestWithEmptySourceDirectory()
+        {
+            var source = new Source
+            {
+                Directory = "",
+                FileName = _source.FileName,
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+            };
+
+            var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.AreEqual(3, result.SuccessfulTransferCount);
+            Assert.IsTrue(result.Success);
+        }
     }
 }
 
