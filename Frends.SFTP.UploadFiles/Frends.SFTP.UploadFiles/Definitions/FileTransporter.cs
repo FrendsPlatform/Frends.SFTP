@@ -167,7 +167,7 @@ internal class FileTransporter
                     {
                         _cancellationToken.ThrowIfCancellationRequested();
 
-                        // Check that the connection is alive and if not try to connect again
+                        // Check that the connection is alive and if not try to connect again.
                         if (!client.IsConnected)
                             client.Connect();
 
