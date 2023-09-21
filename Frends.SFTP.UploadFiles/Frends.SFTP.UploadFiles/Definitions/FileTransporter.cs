@@ -34,7 +34,7 @@ internal class FileTransporter
         _filePaths = (context.Source.FilePaths != null || !string.IsNullOrEmpty((string)context.Source.FilePaths)) ? ConvertObjectToStringArray(context.Source.FilePaths) : null;
 
         SourceDirectoryWithMacrosExtended = _renamingPolicy.ExpandDirectoryForMacros(context.Source.Directory);
-        DestinationDirectoryWithMacrosExtended = _renamingPolicy.ExpandDirectoryForMacros(context.Destination.Directory);
+        DestinationDirectoryWithMacrosExtended = string.IsNullOrEmpty(context.Destination.Directory) ? "/" : _renamingPolicy.ExpandDirectoryForMacros(context.Destination.Directory);
     }
 
     private List<SingleFileTransferResult> _result { get; set; }
@@ -167,7 +167,7 @@ internal class FileTransporter
                     {
                         _cancellationToken.ThrowIfCancellationRequested();
 
-                        // Check that the connection is alive and if not try to connect again
+                        // Check that the connection is alive and if not try to connect again.
                         if (!client.IsConnected)
                             client.Connect();
 

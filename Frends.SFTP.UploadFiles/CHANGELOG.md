@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.7.2] - 2023-09-20
+### Fixed
+- Fixed issue with empty destination directory by adding forward slash to the parameter if it's empty.
+
 ## [2.7.1] - 2023-07-25
 ### Added
 - Added SFTPClient.OperationTimeout which should cause timeout during operations if the Task becomes stuck.
