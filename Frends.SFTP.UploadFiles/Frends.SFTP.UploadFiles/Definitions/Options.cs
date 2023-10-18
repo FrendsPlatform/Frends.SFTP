@@ -67,6 +67,14 @@ public class Options
     /// <example>true</example>
     [DefaultValue(true)]
     public bool OperationLog { get; set; }
+
+    /// <summary>
+    /// If enabled, the Task will assume that destination file exists and overwrites the file.
+    /// This can help transfers with server when user has limited permissions to it.
+    /// </summary>
+    /// <example>false</example>
+    [DefaultValue(false)]
+    public bool AssumeFileExistence { get; set; }
 }
 
 

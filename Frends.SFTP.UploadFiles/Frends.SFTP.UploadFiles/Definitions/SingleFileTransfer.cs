@@ -58,7 +58,11 @@ internal class SingleFileTransfer
 
             ExecuteSourceOperationMoveOrRename();
 
-            if (DestinationFileExists(DestinationFileWithMacrosExpanded))
+            if (BatchContext.Options.AssumeFileExistence)
+            {
+                PutDestinationFile(removeExisting: true);
+            }
+            else if (DestinationFileExists(DestinationFileWithMacrosExpanded))
             {
                 DestinationFile = new FileItem(Client.Get(DestinationFileWithMacrosExpanded));
                 switch (BatchContext.Destination.Action)
@@ -73,7 +77,10 @@ internal class SingleFileTransfer
                         throw new DestinationFileExistsException(Path.GetFileName(DestinationFileWithMacrosExpanded));
                 }
             }
-            else PutDestinationFile();
+            else
+            {
+                PutDestinationFile();
+            }
 
             if (BatchContext.Options.PreserveLastModified) RestoreModified();
 
