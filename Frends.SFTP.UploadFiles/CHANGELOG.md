@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.8.0] - 2023-10-18
+### Added 
+- [Breaking] New feature: Added parameter AssumeFileExistence which will when enabled, skip checking if destination file esists and overwrites any existing files automatically.
+
 ## [2.7.2] - 2023-09-20
 ### Fixed
 - Fixed issue with empty destination directory by adding forward slash to the parameter if it's empty.

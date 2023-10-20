@@ -67,6 +67,15 @@ public class Options
     /// <example>true</example>
     [DefaultValue(true)]
     public bool OperationLog { get; set; }
+
+    /// <summary>
+    /// If enabled, the Task will assume that the destination file exists and skip the checking of the destination file.
+    /// This option will automatically overwrite existing destination file with the same name as the transferred one.
+    /// This can help transfers with server when user has limited permissions to the destination directory e.g. no permission to do lstat command.
+    /// </summary>
+    /// <example>false</example>
+    [DefaultValue(false)]
+    public bool AssumeFileExistence { get; set; }
 }
 
 
