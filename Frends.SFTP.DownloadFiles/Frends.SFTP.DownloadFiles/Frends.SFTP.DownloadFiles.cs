@@ -92,7 +92,7 @@ public class SFTP
     /// <param name="options">Transfer options</param>
     /// <param name="cancellationToken">CancellationToken is given by Frends</param>
     /// <returns>Result object {bool ActionSkiped, bool Success, string UserResultMessage, int SuccessfulTransferCount, int FailedTransferCount, IEnumrable TransferredFileNames [ string TransferredFileName ], Dictionary TransferErrors { string FileName: [ string TransferError ] }, IEnumerable TransferredFilePaths [ string FilePath ], IEnumerable TransferredDestinationFilePaths [ string FilePath ], IDictionary Operationslog { string TimeStamp, string Operation }} </returns>
-    public static Result DownloadFiles(
+    public static async Task<Result> DownloadFiles(
         [PropertyTab] Source source,
         [PropertyTab] Destination destination,
         [PropertyTab] Connection connection,
@@ -117,8 +117,7 @@ public class SFTP
             if (string.IsNullOrEmpty(info.ProcessUri))
                 fileTransferLog.Warning("ProcessUri is empty. This means the transfer view cannot link to the correct page.");
 
-            Guid executionId;
-            if (!Guid.TryParse(info.TaskExecutionID, out executionId))
+            if (!Guid.TryParse(info.TaskExecutionID, out Guid executionId))
             {
                 fileTransferLog.Warning("'{0}' is not a valid task execution ID, will default to random Guid.", info.TaskExecutionID);
                 executionId = Guid.NewGuid();
@@ -140,8 +139,8 @@ public class SFTP
                 Connection = connection
             };
 
-            var fileTransporter = new FileTransporter(logger, _batchContext, executionId, cancellationToken);
-            var result = fileTransporter.Run();
+            var fileTransporter = new FileTransporter(logger, _batchContext, executionId);
+            var result = await fileTransporter.Run(cancellationToken);
 
             if (options.ThrowErrorOnFail && !result.Success)
                 throw new Exception($"SFTP transfer failed: {result.UserResultMessage}. " +
@@ -182,7 +181,6 @@ public class SFTP
         try
         {
             return string.Join("\n", buffer.Select(x => x.Item1 == DateTimeOffset.MinValue ? "..." : $"{x.Item1:HH:mm:ssZ}: {x.Item2}"));
-
         }
         catch (Exception e)
         {

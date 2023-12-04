@@ -3,6 +3,7 @@ using System.IO;
 using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Frends.SFTP.DownloadFiles.Definitions;
 
 namespace Frends.SFTP.DownloadFiles.Tests
@@ -11,7 +12,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
     internal class MacroTests : DownloadFilesTestBase
     {
         [Test]
-        public void DownloadFiles_TestUsingMacros()
+        public async Task DownloadFiles_TestUsingMacros()
         {
             var destination = new Destination
             {
@@ -20,7 +21,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 Action = DestinationAction.Error,
             };
 
-            var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var date = DateTime.Now;
             var file = Path.Combine(_destWorkDir, "SFTPDownloadTestFile1" + date.ToString(@"yyyy-MM-dd") + ".txt");
@@ -29,7 +30,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
 
         [Test]
-        public void DownloadFiles_TestSourceDirectoryWithMacros()
+        public async Task DownloadFiles_TestSourceDirectoryWithMacros()
         {
             Helpers.UploadTestFiles(_source.Directory + "/testfolder_" + DateTime.Now.Year, 3);
 
@@ -41,14 +42,14 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 Operation = SourceOperation.Nothing
             };
 
-            var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
         }
 
         [Test]
-        public void DownloadFiles_TestDestinationDirectoryWithMacros()
+        public async Task DownloadFiles_TestDestinationDirectoryWithMacros()
         {
             var year = DateTime.Now.Year.ToString();
             var destination = new Destination
@@ -60,7 +61,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 Action = DestinationAction.Error,
             };
 
-            var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -71,7 +72,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
 
         [Test]
-        public void DownloadFiles_TestSourceFileRenameWithMacros()
+        public async Task DownloadFiles_TestSourceFileRenameWithMacros()
         {
             var year = DateTime.Now.Year.ToString();
             var to = "/upload/Upload/" + year + "_uploaded/" + Path.GetFileNameWithoutExtension(_source.FileName) + year + Path.GetExtension(_source.FileName);
@@ -86,7 +87,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileNameAfterTransfer = to,
             };
 
-            var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -94,7 +95,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
 
         [Test]
-        public void DownloadFiles_TestSourceFileRenameWithMacros2()
+        public async Task DownloadFiles_TestSourceFileRenameWithMacros2()
         {
             var source = new Source
             {
@@ -105,7 +106,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileNameAfterTransfer = "uploaded_%SourceFileName%%SourceFileExtension%"
             };
 
-            var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -113,7 +114,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
 
         [Test]
-        public void DownloadFiles_TestSourceFileMoveWithMacros()
+        public async Task DownloadFiles_TestSourceFileMoveWithMacros()
         {
             var year = DateTime.Now.Year.ToString();
             var to = $"/upload/Upload/{year}_uploaded";
@@ -128,7 +129,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 DirectoryToMoveAfterTransfer = "/upload/Upload/%Year%_uploaded"
             };
 
-            var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 

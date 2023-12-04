@@ -46,7 +46,7 @@ public class Result
     /// ]
     /// </code>
     /// </example>
-    public IEnumerable<string> TransferredFileNames { get; private set; }
+    public string[] TransferredFileNames { get; private set; }
 
     /// <summary>
     /// Dictionary of file names and errors messages of the failed transfers.
@@ -82,7 +82,7 @@ public class Result
     /// ]
     /// </code>
     /// </example>
-    public IEnumerable<string> TransferredFilePaths { get; private set; }
+    public string[] TransferredFilePaths { get; private set; }
 
     /// <summary>
     /// List of destination file paths of the transferred files.
@@ -93,7 +93,7 @@ public class Result
     ///     "C:\\test\\test2.txt"
     /// ]
     /// </example>
-    public IEnumerable<string> TransferredDestinationFilePaths { get; private set; }
+    public string[] TransferredDestinationFilePaths { get; private set; }
 
     /// <summary>
     /// Operations logs for the transfer.

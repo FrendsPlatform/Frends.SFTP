@@ -12,7 +12,7 @@ internal class FileItem
 
     public long Size { get; set; }
 
-    public FileItem(SftpFile file)
+    public FileItem(ISftpFile file)
     {
         Modified = file.LastWriteTime;
         Name = file.Name;
