@@ -177,7 +177,7 @@ internal class FileTransporter
                     {
                         client.Disconnect();
                         client.Dispose();
-                    }    
+                    }
                 }
             }
         }

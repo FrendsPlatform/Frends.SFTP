@@ -36,7 +36,6 @@
                 }
             }
         }
-            
 
         internal static async Task CopyAsync(string source, string remoteFile, bool overwrite, CancellationToken cancellationToken)
         {
