@@ -313,7 +313,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
 
         [Test]
-        public async Task DownloadFiles_TestWitFilePathsEvenIfSourceFileIsAssigned()
+        public async Task DownloadFiles_TestWithFilePathsEvenIfSourceFileIsAssigned()
         {
             var filePaths = Helpers.UploadTestFiles(_source.Directory, 3);
 
@@ -329,6 +329,46 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.AreEqual(3, result.SuccessfulTransferCount);
             Assert.IsTrue(result.Success);
+        }
+
+        [Test]
+        public async Task DownloadFiles_TestWithEmptyFilePathsShouldNotThrow()
+        {
+            var filePaths = Array.Empty<string>();
+
+            var source = new Source
+            {
+                Directory = "/",
+                FileName = string.Empty,
+                Action = SourceAction.Info,
+                Operation = SourceOperation.Nothing,
+                FilePaths = filePaths
+            };
+
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.AreEqual(0, result.SuccessfulTransferCount);
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(result.ActionSkipped);
+        }
+
+        [Test]
+        public async Task DownloadFiles_TestWithFileNotFoundInFilePaths()
+        {
+            var filePaths = new string[] { "/upload/fileThatdontexists.txt" };
+
+            var source = new Source
+            {
+                Directory = "/",
+                FileName = string.Empty,
+                Action = SourceAction.Info,
+                Operation = SourceOperation.Nothing,
+                FilePaths = filePaths
+            };
+
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.AreEqual(0, result.SuccessfulTransferCount);
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(result.ActionSkipped);
         }
 
         [Test]

@@ -91,10 +91,10 @@ internal class SingleFileTransfer
         }
         catch (Exception ex)
         {
-            var sourceFileRestoreMessage = await RestoreSourceFileAfterErrorIfItWasRenamed(cancellationToken);
+            var sourceFileRestoreMessage = RestoreSourceFileAfterErrorIfItWasRenamed();
             HandleTransferError(ex, sourceFileRestoreMessage);
 
-            var destinationFileRestoreMessage = await RestoreDestinationFileAfterErrorIfItWasRenamed(cancellationToken);
+            var destinationFileRestoreMessage = RestoreDestinationFileAfterErrorIfItWasRenamed();
             if (!string.IsNullOrEmpty(destinationFileRestoreMessage))
                 HandleTransferError(ex, destinationFileRestoreMessage);
         }
@@ -434,11 +434,11 @@ internal class SingleFileTransfer
         return !string.IsNullOrEmpty(path) && File.Exists(path);
     }
 
-    private async Task<string> RestoreSourceFileAfterErrorIfItWasRenamed(CancellationToken cancellationToken)
+    private string RestoreSourceFileAfterErrorIfItWasRenamed()
     {
         // Check that the connection is alive and if not try to connect again
         if (!Client.IsConnected)
-            await Client.ConnectAsync(cancellationToken);
+            Client.Connect();
 
         // restore the source file so we can retry the operations
         // - but only if the source file has been renamed in the first place
@@ -451,9 +451,9 @@ internal class SingleFileTransfer
                     if (BatchContext.Source.Operation == SourceOperation.Move)
                         RestoreSourceFileIfItWasMoved();
                     if (BatchContext.Source.Operation == SourceOperation.Rename && !Client.Exists(SourceFile.FullPath))
-                        await Client.RenameFileAsync(SourceFileDuringTransfer, SourceFile.FullPath, cancellationToken);
+                        Client.RenameFile(SourceFileDuringTransfer, SourceFile.FullPath);
                     if (BatchContext.Options.RenameSourceFileBeforeTransfer && !Client.Exists(SourceFile.FullPath))
-                        await Client.RenameFileAsync(SourceFileDuringTransfer, SourceFile.FullPath, cancellationToken);
+                        Client.RenameFile(SourceFileDuringTransfer, SourceFile.FullPath);
                     return "[Source file restored.]";
                 }
             }
@@ -490,7 +490,7 @@ internal class SingleFileTransfer
         if (!Client.Exists(path)) throw new ArgumentException("Failure in restoring moved source file.");
     }
 
-    private async Task<string> RestoreDestinationFileAfterErrorIfItWasRenamed(CancellationToken cancellationToken)
+    private string RestoreDestinationFileAfterErrorIfItWasRenamed()
     {
         if (!string.IsNullOrEmpty(DestinationFileDuringTransfer))
         {
@@ -498,8 +498,7 @@ internal class SingleFileTransfer
             {
                 if (BatchContext.Options.RenameDestinationFileDuringTransfer)
                 {
-                    await FileOperations.MoveAsync(DestinationFileDuringTransfer, DestinationFileWithMacrosExpanded, cancellationToken);
-                    // File.Move(DestinationFileDuringTransfer, DestinationFileWithMacrosExpanded);
+                    File.Move(DestinationFileDuringTransfer, DestinationFileWithMacrosExpanded);
                     return string.Empty;
                 }
             }

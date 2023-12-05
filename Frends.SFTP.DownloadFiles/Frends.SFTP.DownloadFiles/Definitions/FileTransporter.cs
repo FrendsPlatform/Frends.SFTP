@@ -94,7 +94,6 @@ internal class FileTransporter
                         return FormFailedFileTransferResult(userResultMessage);
                     }
 
-                    client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
                     client.KeepAliveInterval = TimeSpan.FromMilliseconds(_batchContext.Connection.KeepAliveInterval);
                     client.OperationTimeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
 
@@ -171,11 +170,14 @@ internal class FileTransporter
                             Result.Add(result);
                         }
                     }
-                } finally
+                }
+                finally
                 {
                     if (client != null)
+                    {
                         client.Disconnect();
                         client.Dispose();
+                    }    
                 }
             }
         }
@@ -223,7 +225,6 @@ internal class FileTransporter
         }
         finally
         {
-            
             CleanTempFiles(_batchContext);
         }
 
@@ -249,7 +250,6 @@ internal class FileTransporter
             {
                 _logger.NotifyError(_batchContext, "Failure in Keyboard-Interactive authentication: ", ex);
             }
-
         }
 
         PrivateKeyFile privateKey = null;
@@ -295,7 +295,9 @@ internal class FileTransporter
 
         connectionInfo = new ConnectionInfo(connect.Address, connect.Port, connect.UserName, methods.ToArray())
         {
-            Encoding = Util.GetEncoding(destination.FileNameEncoding, destination.FileNameEncodingInString, destination.EnableBomForFileName)
+            Encoding = Util.GetEncoding(destination.FileNameEncoding, destination.FileNameEncodingInString, destination.EnableBomForFileName),
+            ChannelCloseTimeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout),
+            Timeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout)
         };
 
         return connectionInfo;
@@ -513,7 +515,7 @@ internal class FileTransporter
             TransferredFileNames = new List<string>(),
             TransferErrors = new Dictionary<string, IList<string>>(),
             TransferredFilePaths = new List<string>(),
-            TransferredDestinationFilePaths = new List<string>(),
+            TransferredDestinationFilePaths = Array.Empty<string>(),
             OperationsLog = new Dictionary<string, string>()
         };
     }
@@ -541,7 +543,7 @@ internal class FileTransporter
             TransferredFileNames = transferredFileResults.Select(r => r.TransferredFile ?? "--unknown--").ToList(),
             TransferErrors = transferErrors,
             TransferredFilePaths = transferredFileResults.Select(r => r.TransferredFilePath ?? "--unknown--").ToList(),
-            TransferredDestinationFilePaths = transferredFileResults.Select(s => s.DestinationFilePath ?? "--unknown--").ToList(),
+            TransferredDestinationFilePaths = transferredFileResults.Select(s => s.DestinationFilePath ?? "--unknown--").ToArray(),
             OperationsLog = (singleResults.Any(x => !x.EnableOperationsLog)) ? null : new Dictionary<string, string>()
         };
     }

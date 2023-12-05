@@ -167,7 +167,7 @@ internal class RenamingPolicy
         return new Dictionary<string, Func<string, string>>
             {
                 {"%SourceFileName%", Path.GetFileNameWithoutExtension},
-                {"%SourceFileExtension%", (originalFile) => Path.HasExtension(originalFile) ? Path.GetExtension(originalFile) : String.Empty},
+                {"%SourceFileExtension%", (originalFile) => Path.HasExtension(originalFile) ? Path.GetExtension(originalFile) : string.Empty},
             };
     }
 
