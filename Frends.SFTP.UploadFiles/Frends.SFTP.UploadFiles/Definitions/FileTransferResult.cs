@@ -18,7 +18,7 @@ internal class FileTransferResult
 
     public IEnumerable<string> TransferredFilePaths { get; set; }
 
-    public IEnumerable<string> TransferredDestinationFilePaths { get; set; }
+    public string[] TransferredDestinationFilePaths { get; set; }
 
     public IDictionary<string, string> OperationsLog { get; set; }
 }

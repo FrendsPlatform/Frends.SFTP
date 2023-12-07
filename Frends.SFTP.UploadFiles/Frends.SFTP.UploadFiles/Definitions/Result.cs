@@ -95,7 +95,7 @@ public class Result
     /// ]
     /// </code>
     /// </example>
-    public IEnumerable<string> TransferredDestinationFilePaths { get; private set; }
+    public string[] TransferredDestinationFilePaths { get; private set; }
 
     /// <summary>
     /// Operations logs for the transfer.

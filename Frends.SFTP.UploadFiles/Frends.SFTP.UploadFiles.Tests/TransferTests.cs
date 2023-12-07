@@ -313,6 +313,53 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
+        public void UploadFiles_TestWithFilePathsThatDontExist()
+        {
+            var paths = Helpers.CreateDummyFiles(3).ToList();
+            paths.Add(@"C:\File\That\Dont\Exist.txt");
+            var filePaths = paths.ToArray();
+
+            var source = new Source
+            {
+                Action = SourceAction.Info,
+                Operation = SourceOperation.Nothing,
+                FilePaths = filePaths
+            };
+
+            var options = new Options
+            {
+                ThrowErrorOnFail = false,
+                RenameSourceFileBeforeTransfer = true,
+                RenameDestinationFileDuringTransfer = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true
+            };
+
+            var result = SFTP.UploadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(result.ActionSkipped);
+            Assert.AreEqual(3, result.SuccessfulTransferCount);
+        }
+
+        [Test]
+        public void UploadFiles_TestWithEmptyFilePaths()
+        {
+            var filePaths = Array.Empty<string>();
+
+            var source = new Source
+            {
+                Action = SourceAction.Info,
+                Operation = SourceOperation.Nothing,
+                FilePaths = filePaths
+            };
+
+            var result = SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(result.ActionSkipped);
+        }
+
+        [Test]
         public void UploadFiles_TestWithFilePathsEvenIfSourceFileIsAssigned()
         {
             var filePaths = Helpers.CreateDummyFiles(3);

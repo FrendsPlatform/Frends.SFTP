@@ -233,7 +233,7 @@ internal class FileTransporter
     private ConnectionInfo GetConnectionInfo(Destination destination, Connection connect)
     {
         ConnectionInfo connectionInfo;
-        List<AuthenticationMethod> methods = new List<AuthenticationMethod>();
+        var methods = new List<AuthenticationMethod>();
 
         if (connect.UseKeyboardInteractiveAuthentication)
         {
@@ -440,10 +440,32 @@ internal class FileTransporter
 
         if (_filePaths != null)
         {
-            fileItems = _filePaths.Select(p => new FileItem(p)).ToList();
-            if (fileItems.Any())
-                return new Tuple<List<FileItem>, bool>(fileItems, true);
-            return new Tuple<List<FileItem>, bool>(fileItems, false);
+            foreach (var path in _filePaths)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (File.Exists(path))
+                {
+                    var item = new FileItem(Path.GetFullPath(path));
+                    _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath}.");
+                    fileItems.Add(item);
+                }
+                else
+                {
+                    var msg = $"FILE LIST File '{path}' not found.";
+                    _logger.NotifyInformation(_batchContext, msg);
+                    _result.Add(new SingleFileTransferResult
+                    {
+                        ActionSkipped = true,
+                        ErrorMessages = new List<string>(),
+                        Success = true,
+                        TransferredFilePath = string.Empty,
+                        TransferredDestinationFilePath = string.Empty,
+                        TransferredFile = string.Empty
+                    });
+                }
+            }
+
+            return new Tuple<List<FileItem>, bool>(fileItems, true);
         }
 
         // Return empty list if source directory doesn't exists.
@@ -463,7 +485,7 @@ internal class FileTransporter
             cancellationToken.ThrowIfCancellationRequested();
             if (Path.GetFileName(file).Equals(source.FileName) || Util.FileMatchesMask(Path.GetFileName(file), source.FileName))
             {
-                FileItem item = new FileItem(Path.GetFullPath(file));
+                var item = new FileItem(Path.GetFullPath(file));
                 _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath}.");
                 fileItems.Add(item);
             }
@@ -520,7 +542,7 @@ internal class FileTransporter
             TransferredFileNames = new List<string>(),
             TransferErrors = new Dictionary<string, IList<string>>(),
             TransferredFilePaths = new List<string>(),
-            TransferredDestinationFilePaths = new List<string>(),
+            TransferredDestinationFilePaths = Array.Empty<string>(),
             OperationsLog = new Dictionary<string, string>()
         };
     }
@@ -528,7 +550,7 @@ internal class FileTransporter
     private FileTransferResult FormResultFromSingleTransferResults(List<SingleFileTransferResult> singleResults)
     {
         var success = singleResults.All(x => x.Success);
-        var actionSkipped = success && singleResults.All(x => x.ActionSkipped);
+        var actionSkipped = success && singleResults.Any(x => x.ActionSkipped);
         var userResultMessage = GetUserResultMessage(singleResults.ToList(), _cancellationToken);
 
         _logger.LogBatchFinished(_batchContext, userResultMessage, success, actionSkipped);
@@ -548,7 +570,7 @@ internal class FileTransporter
             TransferredFileNames = transferredFileResults.Select(r => r.TransferredFile ?? "--unknown--").ToList(),
             TransferErrors = transferErrors,
             TransferredFilePaths = transferredFileResults.Select(r => r.TransferredFilePath ?? "--unknown--").ToList(),
-            TransferredDestinationFilePaths = transferredFileResults.Select(r => r.TransferredDestinationFilePath ?? "--unknown--").ToList(),
+            TransferredDestinationFilePaths = transferredFileResults.Select(r => r.TransferredDestinationFilePath ?? "--unknown--").ToArray(),
             OperationsLog = new Dictionary<string, string>()
         };
     }
