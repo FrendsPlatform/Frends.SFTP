@@ -213,7 +213,6 @@ internal class SingleFileTransfer
             : DestinationFile.FullPath;
 
         await FileOperations.AppendAsync(sourcePath, path, addNewLine, cancellationToken);
-        //File.AppendAllText(path, content, encoding);
         _logger.NotifyInformation(BatchContext, $"FILE APPEND: Source file appended to target {DestinationFile.Name}.");
     }
 
@@ -256,7 +255,6 @@ internal class SingleFileTransfer
                 $"Renaming temporary destination file {Path.GetFileName(DestinationFileDuringTransfer)} to target file {Path.GetFileName(DestinationFileWithMacrosExpanded)}.");
 
             await FileOperations.MoveAsync(DestinationFileDuringTransfer, DestinationFileWithMacrosExpanded, cancellationToken);
-            // File.Move(DestinationFileDuringTransfer, DestinationFileWithMacrosExpanded);
             _logger.NotifyInformation(BatchContext, $"FILE RENAME: Temporary destination file {Path.GetFileName(DestinationFileDuringTransfer)} renamed to target {Path.GetFileName(DestinationFileWithMacrosExpanded)}.");
         }
     }

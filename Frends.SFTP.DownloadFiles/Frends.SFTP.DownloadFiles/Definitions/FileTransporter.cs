@@ -1,7 +1,5 @@
 ﻿using Renci.SshNet;
 using Renci.SshNet.Common;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Sockets;
 using System.Reflection;

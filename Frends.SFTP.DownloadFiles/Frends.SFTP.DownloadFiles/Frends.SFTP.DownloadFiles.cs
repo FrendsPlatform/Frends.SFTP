@@ -91,7 +91,7 @@ public class SFTP
     /// <param name="destination">Destination directory location</param>
     /// <param name="options">Transfer options</param>
     /// <param name="cancellationToken">CancellationToken is given by Frends</param>
-    /// <returns>Result object {bool ActionSkiped, bool Success, string UserResultMessage, int SuccessfulTransferCount, int FailedTransferCount, IEnumrable TransferredFileNames [ string TransferredFileName ], Dictionary TransferErrors { string FileName: [ string TransferError ] }, IEnumerable TransferredFilePaths [ string FilePath ], IEnumerable TransferredDestinationFilePaths [ string FilePath ], IDictionary Operationslog { string TimeStamp, string Operation }} </returns>
+    /// <returns>Result object {bool ActionSkiped, bool Success, string UserResultMessage, int SuccessfulTransferCount, int FailedTransferCount, IEnumrable TransferredFileNames [ string TransferredFileName ], Dictionary TransferErrors { string FileName: [ string TransferError ] }, IEnumerable TransferredFilePaths [ string FilePath ], string[] TransferredDestinationFilePaths [ string FilePath ], IDictionary Operationslog { string TimeStamp, string Operation }} </returns>
     public static async Task<Result> DownloadFiles(
         [PropertyTab] Source source,
         [PropertyTab] Destination destination,
