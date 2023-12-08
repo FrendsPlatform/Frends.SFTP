@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.9.0] - 2023-10-18
+### Changed 
+- [Breaking] Changed Result property TransferredDestinationFilePaths to string array.
+### Fixed
+- Fixed issue where single failure stops other file transfers when using FilePaths.
+### Updated
+- Updated Renci.SshNet library to the newest version 2023.0.0.
+
+
 ## [2.8.0] - 2023-10-18
 ### Added 
 - [Breaking] New feature: Added parameter AssumeFileExistence which will when enabled, skip checking if destination file esists and overwrites any existing files automatically.

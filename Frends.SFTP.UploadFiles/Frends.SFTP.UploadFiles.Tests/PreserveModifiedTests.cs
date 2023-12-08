@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using Frends.SFTP.UploadFiles.Definitions;
 
 namespace Frends.SFTP.UploadFiles.Tests
@@ -43,9 +44,9 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
-        public void UploadFiles_TestPreserveLastModifiedWithoutRename()
+        public async Task UploadFiles_TestPreserveLastModifiedWithoutRename()
         {
-            var result = SFTP.UploadFiles(_source, destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(_source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -54,12 +55,12 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
-        public void UploadFiles_TestPreserveLastModifiedWithRename()
+        public async Task UploadFiles_TestPreserveLastModifiedWithRename()
         {
             options.RenameSourceFileBeforeTransfer = true;
             options.RenameDestinationFileDuringTransfer = true;
 
-            var result = SFTP.UploadFiles(_source, destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(_source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -68,12 +69,12 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
-        public void UploadFiles_TestPreserveLastModifiedWithSourceRename()
+        public async Task UploadFiles_TestPreserveLastModifiedWithSourceRename()
         {
             options.RenameSourceFileBeforeTransfer = true;
             options.RenameDestinationFileDuringTransfer = false;
 
-            var result = SFTP.UploadFiles(_source, destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(_source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -82,12 +83,12 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
-        public void UploadFiles_TestPreserveLastModifiedWithDestinationRename()
+        public async Task UploadFiles_TestPreserveLastModifiedWithDestinationRename()
         {
             options.RenameSourceFileBeforeTransfer = false;
             options.RenameDestinationFileDuringTransfer = true;
 
-            var result = SFTP.UploadFiles(_source, destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(_source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -96,7 +97,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
-        public void UploadFiles_TestPreserveLastModifiedWithRenameAndDeleteSourceFile()
+        public async Task UploadFiles_TestPreserveLastModifiedWithRenameAndDeleteSourceFile()
         {
             options.RenameSourceFileBeforeTransfer = true;
             options.RenameDestinationFileDuringTransfer = true;
@@ -111,7 +112,7 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             File.Copy(Path.Combine(_workDir, _source.FileName), Path.Combine(_workDir, source.FileName), true);
 
-            var result = SFTP.UploadFiles(source, destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 

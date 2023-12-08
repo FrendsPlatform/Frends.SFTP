@@ -20,15 +20,13 @@ internal class FileTransporter
     private readonly BatchContext _batchContext;
     private readonly string[] _filePaths;
     private readonly RenamingPolicy _renamingPolicy;
-    private readonly CancellationToken _cancellationToken;
 
     internal FileTransporter(ISFTPLogger logger, BatchContext context, Guid instanceId, CancellationToken cancellationToken)
     {
         _logger = logger;
         _batchContext = context;
         _instanceId = instanceId;
-        _renamingPolicy = new RenamingPolicy(_batchContext.Info.TransferName, _instanceId, cancellationToken);
-        _cancellationToken = cancellationToken;
+        _renamingPolicy = new RenamingPolicy(_batchContext.Info.TransferName, _instanceId);
 
         _result = new List<SingleFileTransferResult>();
         _filePaths = (context.Source.FilePaths != null || !string.IsNullOrEmpty((string)context.Source.FilePaths)) ? ConvertObjectToStringArray(context.Source.FilePaths) : null;
@@ -55,13 +53,13 @@ internal class FileTransporter
     /// <exception cref="DirectoryNotFoundException"></exception>
     /// <exception cref="FileNotFoundException"></exception>
     /// <exception cref="ArgumentException"></exception>
-    public FileTransferResult Run()
+    public async Task<FileTransferResult> Run(CancellationToken cancellationToken)
     {
         var userResultMessage = "";
         try
         {
             // Fetch source file info and check if files were returned.
-            var (files, success) = ListSourceFiles(_batchContext.Source, _cancellationToken);
+            var (files, success) = ListSourceFiles(_batchContext.Source, cancellationToken);
 
             // If source directory doesn't exist, modify userResultMessage accordingly.
             if (!success)
@@ -117,7 +115,6 @@ internal class FileTransporter
                         return FormFailedFileTransferResult(userResultMessage);
                     }
 
-                    client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
                     client.KeepAliveInterval = TimeSpan.FromMilliseconds(_batchContext.Connection.KeepAliveInterval);
                     client.OperationTimeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
 
@@ -125,7 +122,7 @@ internal class FileTransporter
 
                     SetCurrentState(TransferState.Connection, $"Connecting to {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using SFTP.");
 
-                    client.Connect();
+                    await client.ConnectAsync(cancellationToken);
 
                     if (!client.IsConnected)
                     {
@@ -143,7 +140,7 @@ internal class FileTransporter
                             try
                             {
                                 SetCurrentState(TransferState.CreateDestinationDirectories, $"Creating destination directory {DestinationDirectoryWithMacrosExtended}.");
-                                CreateDestinationDirectories(client, DestinationDirectoryWithMacrosExtended, _cancellationToken);
+                                CreateDestinationDirectories(client, DestinationDirectoryWithMacrosExtended, cancellationToken);
                                 _logger.NotifyInformation(_batchContext, $"DIRECTORY CREATE: Destination directory {DestinationDirectoryWithMacrosExtended} created.");
                             }
                             catch (Exception ex)
@@ -165,14 +162,14 @@ internal class FileTransporter
 
                     foreach (var file in files)
                     {
-                        _cancellationToken.ThrowIfCancellationRequested();
+                        cancellationToken.ThrowIfCancellationRequested();
 
                         // Check that the connection is alive and if not try to connect again.
                         if (!client.IsConnected)
-                            client.Connect();
+                            await client.ConnectAsync(cancellationToken);
 
                         var singleTransfer = new SingleFileTransfer(file, DestinationDirectoryWithMacrosExtended, _batchContext, client, _renamingPolicy, _logger);
-                        var result = singleTransfer.TransferSingleFile();
+                        var result = await singleTransfer.TransferSingleFile(cancellationToken);
                         _result.Add(result);
                     }
                     client.Disconnect();
@@ -293,7 +290,9 @@ internal class FileTransporter
 
         connectionInfo = new ConnectionInfo(connect.Address, connect.Port, connect.UserName, methods.ToArray())
         {
-            Encoding = Util.GetEncoding(destination.FileNameEncoding, destination.FileNameEncodingInString, destination.EnableBomForFileName)
+            Encoding = Util.GetEncoding(destination.FileNameEncoding, destination.FileNameEncodingInString, destination.EnableBomForFileName),
+            ChannelCloseTimeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout),
+            Timeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout)
         };
 
         return connectionInfo;
@@ -307,7 +306,6 @@ internal class FileTransporter
 
             foreach (var serverPrompt in e.Prompts)
             {
-                _cancellationToken.ThrowIfCancellationRequested();
                 _logger.NotifyInformation(_batchContext, $"Prompt: {serverPrompt.Request.Replace(":", "")}");
 
                 if (!string.IsNullOrEmpty(_batchContext.Connection.Password) && serverPrompt.Request.IndexOf("Password:", StringComparison.InvariantCultureIgnoreCase) != -1)
@@ -322,7 +320,6 @@ internal class FileTransporter
 
                     foreach (var prompt in _batchContext.Connection.PromptAndResponse)
                     {
-                        _cancellationToken.ThrowIfCancellationRequested();
                         if (serverPrompt.Request.IndexOf(prompt.Prompt, StringComparison.InvariantCultureIgnoreCase) != -1)
                             serverPrompt.Response = prompt.Response;
                     }
@@ -369,12 +366,8 @@ internal class FileTransporter
 
         client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
         {
-            MD5serverFingerprint = BitConverter.ToString(e.FingerPrint).Replace('-', ':');
-
-            using (SHA256 mySHA256 = SHA256.Create())
-            {
-                SHAServerFingerprint = Convert.ToBase64String(mySHA256.ComputeHash(e.HostKey));
-            }
+            MD5serverFingerprint = e.FingerPrintMD5;
+            SHAServerFingerprint = e.FingerPrintSHA256;
 
             if (!string.IsNullOrEmpty(expectedServerFingerprint))
             {
@@ -402,7 +395,7 @@ internal class FileTransporter
                     {
                         using (SHA256 mySHA256 = SHA256.Create())
                         {
-                            SHAServerFingerprint = Util.ToHex(mySHA256.ComputeHash(e.HostKey), _cancellationToken);
+                            SHAServerFingerprint = Util.ToHex(mySHA256.ComputeHash(e.HostKey));
                         }
                         e.CanTrust = (SHAServerFingerprint == expectedServerFingerprint);
                         if (!e.CanTrust)
@@ -551,7 +544,7 @@ internal class FileTransporter
     {
         var success = singleResults.All(x => x.Success);
         var actionSkipped = success && singleResults.Any(x => x.ActionSkipped);
-        var userResultMessage = GetUserResultMessage(singleResults.ToList(), _cancellationToken);
+        var userResultMessage = GetUserResultMessage(singleResults.ToList());
 
         _logger.LogBatchFinished(_batchContext, userResultMessage, success, actionSkipped);
 
@@ -575,7 +568,7 @@ internal class FileTransporter
         };
     }
 
-    private static string GetUserResultMessage(IList<SingleFileTransferResult> results, CancellationToken cancellationToken)
+    private static string GetUserResultMessage(IList<SingleFileTransferResult> results)
     {
         var userResultMessage = string.Empty;
 

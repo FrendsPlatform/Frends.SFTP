@@ -14,7 +14,7 @@ internal class FileItem
 
     public long Size { get; set; }
 
-    public FileItem(SftpFile file)
+    public FileItem(ISftpFile file)
     {
         Modified = file.LastWriteTime;
         Name = file.Name;
@@ -36,7 +36,7 @@ internal class FileItem
     /// </summary>
     public FileItem() { }
 
-    private bool TryGetFileLength(FileInfo fi)
+    private static bool TryGetFileLength(FileInfo fi)
     {
         try
         {

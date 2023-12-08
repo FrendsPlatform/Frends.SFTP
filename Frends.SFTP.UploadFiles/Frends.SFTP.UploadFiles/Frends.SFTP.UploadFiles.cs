@@ -103,7 +103,7 @@ public class SFTP
     /// IEnumerable TransferredFilePaths, 
     /// IDictionary OperationsLog } 
     /// </returns>
-    public static Result UploadFiles(
+    public static async Task<Result> UploadFiles(
         [PropertyTab] Source source,
         [PropertyTab] Destination destination,
         [PropertyTab] Connection connection,
@@ -152,7 +152,7 @@ public class SFTP
             };
 
             var fileTransporter = new FileTransporter(logger, _batchContext, executionId, cancellationToken);
-            var result = fileTransporter.Run();
+            var result = await fileTransporter.Run(cancellationToken);
 
             if (options.ThrowErrorOnFail && !result.Success)
                 throw new Exception($"SFTP transfer failed: {result.UserResultMessage}. " +

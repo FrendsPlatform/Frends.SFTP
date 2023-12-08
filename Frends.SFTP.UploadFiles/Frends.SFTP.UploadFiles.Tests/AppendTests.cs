@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Frends.SFTP.UploadFiles.Definitions;
 
@@ -8,9 +9,9 @@ namespace Frends.SFTP.UploadFiles.Tests
     class AppendTests : UploadFilesTestBase
     {
         [Test]
-        public void UploadFiles_AppendingToExistingFile()
+        public async Task UploadFiles_AppendingToExistingFile()
         {
-            var result = SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var fullPath = _destination.Directory + "/" + _source.FileName;
             var content1 = Helpers.GetTransferredFileContent(fullPath);
@@ -32,16 +33,16 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Operation = SourceOperation.Nothing
             };
 
-            result = SFTP.UploadFiles(source, destination, _connection, _options, _info, new CancellationToken());
+            result = await SFTP.UploadFiles(source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var content2 = Helpers.GetTransferredFileContent(fullPath);
             Assert.AreNotEqual(content1, content2);
         }
 
         [Test]
-        public void UploadFiles_AppendingToExistingFileRenameSourceFile()
+        public async Task UploadFiles_AppendingToExistingFileRenameSourceFile()
         {
-            var result = SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var fullPath = _destination.Directory + "/" + _source.FileName;
             var content1 = Helpers.GetTransferredFileContent(fullPath);
@@ -73,16 +74,16 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Operation = SourceOperation.Nothing
             };
 
-            result = SFTP.UploadFiles(source, destination, _connection, options, _info, new CancellationToken());
+            result = await SFTP.UploadFiles(source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var content2 = Helpers.GetTransferredFileContent(fullPath);
             Assert.AreNotEqual(content1, content2);
         }
 
         [Test]
-        public void UploadFiles_AppendingToExistingFileRenameDestinationFile()
+        public async Task UploadFiles_AppendingToExistingFileRenameDestinationFile()
         {
-            var result = SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var fullPath = _destination.Directory + "/" + _source.FileName;
             var content1 = Helpers.GetTransferredFileContent(fullPath);
@@ -114,16 +115,16 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Operation = SourceOperation.Nothing
             };
 
-            result = SFTP.UploadFiles(source, destination, _connection, options, _info, new CancellationToken());
+            result = await SFTP.UploadFiles(source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var content2 = Helpers.GetTransferredFileContent(fullPath);
             Assert.AreNotEqual(content1, content2);
         }
 
         [Test]
-        public void UploadFiles_AppendingToExistingFileRenameBoth()
+        public async Task UploadFiles_AppendingToExistingFileRenameBoth()
         {
-            var result = SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var fullPath = _destination.Directory + "/" + _source.FileName;
             var content1 = Helpers.GetTransferredFileContent(fullPath);
@@ -155,16 +156,16 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Operation = SourceOperation.Nothing
             };
 
-            result = SFTP.UploadFiles(source, destination, _connection, options, _info, new CancellationToken());
+            result = await SFTP.UploadFiles(source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var content2 = Helpers.GetTransferredFileContent(fullPath);
             Assert.AreNotEqual(content1, content2);
         }
 
         [Test]
-        public void UploadFiles_AppendingToExistingFileRenameBothWithSourceFileNameStar()
+        public async Task UploadFiles_AppendingToExistingFileRenameBothWithSourceFileNameStar()
         {
-            var result = SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var fullPath = _destination.Directory + "/" + _source.FileName;
             var content1 = Helpers.GetTransferredFileContent(fullPath);
@@ -196,7 +197,7 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Operation = SourceOperation.Nothing
             };
 
-            result = SFTP.UploadFiles(source, destination, _connection, options, _info, new CancellationToken());
+            result = await SFTP.UploadFiles(source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var content2 = Helpers.GetTransferredFileContent(fullPath);
             Assert.AreNotEqual(content1, content2);
