@@ -176,7 +176,6 @@ internal class SingleFileTransfer
             await RenameDestinationFile(cancellationToken);
 
         await Append(filePath, BatchContext.Destination.AddNewLine, cancellationToken);
-        //Append(GetSourceFileContent(filePath, BatchContext.Destination.AddNewLine, encoding), encoding);
 
         if (BatchContext.Options.RenameDestinationFileDuringTransfer)
             await RenameDestinationFile(cancellationToken);
@@ -188,7 +187,6 @@ internal class SingleFileTransfer
         {
             SetCurrentState(TransferState.RenameDestinationFile, $"Renaming temporary destination file {Path.GetFileName(DestinationFileDuringTransfer)} to target file {DestinationFile.Name}.");
             await FileOperations.MoveAsync(DestinationFileDuringTransfer, DestinationFile.FullPath, cancellationToken);
-            // File.Move(DestinationFileDuringTransfer, DestinationFile.FullPath);
             _logger.NotifyInformation(BatchContext, $"FILE RENAME: Temporary destination file {Path.GetFileName(DestinationFileDuringTransfer)} renamed to target {DestinationFile.Name}.");
         }
         else
@@ -196,7 +194,6 @@ internal class SingleFileTransfer
             DestinationFileDuringTransfer = Path.Combine(Path.GetDirectoryName(DestinationFile.FullPath), Util.CreateUniqueFileName(BatchContext.Options.DestinationFileExtension));
             SetCurrentState(TransferState.RenameDestinationFile, $"Renaming destination file {DestinationFile.Name} to temporary file name {Path.GetFileName(DestinationFileDuringTransfer)} during transfer.");
             await FileOperations.MoveAsync(DestinationFile.FullPath, DestinationFileDuringTransfer, cancellationToken);
-            // File.Move(DestinationFile.FullPath, DestinationFileDuringTransfer);
             _logger.NotifyInformation(BatchContext, $"FILE RENAME: Destination file {DestinationFile.Name} renamed to target {Path.GetFileName(DestinationFileDuringTransfer)}.");
         }
     }
