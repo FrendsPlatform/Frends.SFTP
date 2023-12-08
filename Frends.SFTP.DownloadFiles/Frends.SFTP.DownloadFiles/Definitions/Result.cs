@@ -93,7 +93,7 @@ public class Result
     ///     "C:\\test\\test2.txt"
     /// ]
     /// </example>
-    public IEnumerable<string> TransferredDestinationFilePaths { get; private set; }
+    public string[] TransferredDestinationFilePaths { get; private set; }
 
     /// <summary>
     /// Operations logs for the transfer.

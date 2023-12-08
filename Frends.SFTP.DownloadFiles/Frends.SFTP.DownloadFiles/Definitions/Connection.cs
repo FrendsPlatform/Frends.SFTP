@@ -140,5 +140,5 @@ public class Connection
     /// Responses for the server prompts when using Keyboard Interactive authentication method.
     /// </summary>
     [UIHint(nameof(UseKeyboardInteractiveAuthentication), "", true)]
-    public PromptResponse[] PromptAndResponse { get; set; } = new PromptResponse[0];
+    public PromptResponse[] PromptAndResponse { get; set; } = Array.Empty<PromptResponse>();
 }

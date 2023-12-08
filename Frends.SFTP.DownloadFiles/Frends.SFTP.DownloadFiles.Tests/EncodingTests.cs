@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using Frends.SFTP.DownloadFiles.Definitions;
 
 namespace Frends.SFTP.DownloadFiles.Tests
@@ -9,13 +10,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
     class EncodingTests : DownloadFilesTestBase
     {
         [SetUp]
-        public void setup()
+        public void IndividualSetup()
         {
             Helpers.UploadTestFiles(_source.Directory, 3);
         }
 
         [Test]
-        public void UploadFiles_TransferWithANSIFileNameEncoding()
+        public async Task UploadFiles_TransferWithANSIFileNameEncoding()
         {
             var destination = new Destination
             {
@@ -23,13 +24,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileNameEncoding = FileEncoding.ANSI
             };
 
-            var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
 
         [Test]
-        public void UploadFiles_TransferWithASCIIFileNameEncoding()
+        public async Task UploadFiles_TransferWithASCIIFileNameEncoding()
         {
             var destination = new Destination
             {
@@ -37,13 +38,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileNameEncoding = FileEncoding.ASCII
             };
 
-            var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
 
         [Test]
-        public void UploadFiles_TransferWithUTF8WithoutBomFileNameEncoding()
+        public async Task UploadFiles_TransferWithUTF8WithoutBomFileNameEncoding()
         {
             var destination = new Destination
             {
@@ -52,13 +53,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 EnableBomForFileName = false
             };
 
-            var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
 
         [Test]
-        public void UploadFiles_TransferWithUTF8WithBomFileNameEncoding()
+        public async Task UploadFiles_TransferWithUTF8WithBomFileNameEncoding()
         {
             var destination = new Destination
             {
@@ -67,13 +68,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 EnableBomForFileName = true
             };
 
-            var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
 
         [Test]
-        public void UploadFiles_TransferWithWin1252FileNameEncoding()
+        public async Task UploadFiles_TransferWithWin1252FileNameEncoding()
         {
             var destination = new Destination
             {
@@ -81,13 +82,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileNameEncoding = FileEncoding.WINDOWS1252
             };
 
-            var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
 
         [Test]
-        public void UploadFiles_TransferWithOtherFileNameEncoding()
+        public async Task UploadFiles_TransferWithOtherFileNameEncoding()
         {
             var destination = new Destination
             {
@@ -96,13 +97,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileNameEncodingInString = "windows-1252"
             };
 
-            var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
 
         [Test]
-        public void UploadFiles_TransferWithASCIIFileContentEncoding()
+        public async Task UploadFiles_TransferWithASCIIFileContentEncoding()
         {
             var destination = new Destination
             {
@@ -114,13 +115,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Directory.CreateDirectory(destination.Directory);
             File.Move(Path.Combine(_workDir, _source.FileName), Path.Combine(_destination.Directory, _source.FileName));
 
-            var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
 
         [Test]
-        public void UploadFiles_TransferWithANSIFileContentEncoding()
+        public async Task UploadFiles_TransferWithANSIFileContentEncoding()
         {
             var destination = new Destination
             {
@@ -132,13 +133,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Directory.CreateDirectory(destination.Directory);
             File.Move(Path.Combine(_workDir, _source.FileName), Path.Combine(_destination.Directory, _source.FileName));
 
-            var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
 
         [Test]
-        public void UploadFiles_TransferWithUTF8WithBomFileContentEncoding()
+        public async Task UploadFiles_TransferWithUTF8WithBomFileContentEncoding()
         {
             var destination = new Destination
             {
@@ -151,13 +152,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Directory.CreateDirectory(destination.Directory);
             File.Move(Path.Combine(_workDir, _source.FileName), Path.Combine(_destination.Directory, _source.FileName));
 
-            var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
 
         [Test]
-        public void UploadFiles_TransferWithUTF8WithoutBomFileContentEncoding()
+        public async Task UploadFiles_TransferWithUTF8WithoutBomFileContentEncoding()
         {
             var destination = new Destination
             {
@@ -170,13 +171,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Directory.CreateDirectory(destination.Directory);
             File.Move(Path.Combine(_workDir, _source.FileName), Path.Combine(_destination.Directory, _source.FileName));
 
-            var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
 
         [Test]
-        public void UploadFiles_TransferWithWIN1252FileContentEncoding()
+        public async Task UploadFiles_TransferWithWIN1252FileContentEncoding()
         {
             var destination = new Destination
             {
@@ -188,13 +189,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Directory.CreateDirectory(destination.Directory);
             File.Move(Path.Combine(_workDir, _source.FileName), Path.Combine(_destination.Directory, _source.FileName));
 
-            var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
 
         [Test]
-        public void UploadFiles_TransferWithOtherFileContentEncoding()
+        public async Task UploadFiles_TransferWithOtherFileContentEncoding()
         {
             var destination = new Destination
             {
@@ -207,7 +208,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Directory.CreateDirectory(destination.Directory);
             File.Move(Path.Combine(_workDir, _source.FileName), Path.Combine(_destination.Directory, _source.FileName));
 
-            var result = SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }

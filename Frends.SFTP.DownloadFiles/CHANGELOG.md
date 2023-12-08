@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.8.0] - 2023-12-05
+### Changed
+- [Breaking] Changed TransferredDestinationFilePaths Result property type from List to string[].
+- Changed SftpClient operations to use async methods with CancellationToken.
+### Added
+- Added FileOperations class which handles file operations as async with CancellationToken e.g. Append, Copy, Move.
+### Fixed
+- Fixed issue where the Task gets stuck and can't be terminated.
+
 ## [2.7.1] - 2023-09-08
 ### Added
 - Added SFTPClient.OperationTimeout which should cause timeout during operations if the Task becomes stuck.

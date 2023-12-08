@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using Frends.SFTP.DownloadFiles.Definitions;
 
 namespace Frends.SFTP.DownloadFiles.Tests
@@ -9,7 +10,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
     class SourceOperationTests : DownloadFilesTestBase
     {
         [Test]
-        public void DownloadFiles_SourceOperationNothingWithRenamingDisable()
+        public async Task DownloadFiles_SourceOperationNothingWithRenamingDisable()
         {
             var options = new Options
             {
@@ -20,14 +21,14 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 PreserveLastModified = false,
                 OperationLog = true
             };
-            var result = SFTP.DownloadFiles(_source, _destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(_source, _destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
 
             Assert.IsTrue(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
         }
 
         [Test]
-        public void DownloadFiles_TestSourceOperationMove()
+        public async Task DownloadFiles_TestSourceOperationMove()
         {
             var to = "uploaded";
             Helpers.UploadTestFiles(_source.Directory, 1, to);
@@ -41,7 +42,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 DirectoryToMoveAfterTransfer = to
             };
 
-            var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -49,7 +50,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
 
         [Test]
-        public void DownloadFiles_TestWithSourceMoveToNonExistingDirectoryShouldReturnUnsuccessfulTransfer()
+        public async Task DownloadFiles_TestWithSourceMoveToNonExistingDirectoryShouldReturnUnsuccessfulTransfer()
         {
             Directory.CreateDirectory(_destWorkDir);
 
@@ -72,13 +73,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 DirectoryToMoveAfterTransfer = "/upload/test"
             };
 
-            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
             Assert.IsFalse(result.Success);
             Assert.IsTrue(Helpers.SourceFileExists(Path.Combine(_source.Directory, _source.FileName).Replace("\\", "/")));
         }
 
         [Test]
-        public void DownloadFiles_TestSourceOperationRename()
+        public async Task DownloadFiles_TestSourceOperationRename()
         {
             var source = new Source
             {
@@ -89,7 +90,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileNameAfterTransfer = "uploaded_%SourceFileName%.txt"
             };
 
-            var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -97,7 +98,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
 
         [Test]
-        public void DownloadFiles_TestSourceOperationMoveWithRenameFilesDuringTransfer()
+        public async Task DownloadFiles_TestSourceOperationMoveWithRenameFilesDuringTransfer()
         {
             var to = "uploaded";
             Helpers.UploadTestFiles(_source.Directory, 3, to);
@@ -122,7 +123,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 DirectoryToMoveAfterTransfer = to
             };
 
-            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -130,7 +131,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
 
         [Test]
-        public void DownloadFiles_TestSourceOperationRenameWithRenameFilesDuringTransfer()
+        public async Task DownloadFiles_TestSourceOperationRenameWithRenameFilesDuringTransfer()
         {
             var options = new Options
             {
@@ -151,7 +152,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileNameAfterTransfer = "uploaded_%SourceFileName%.txt"
             };
 
-            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -159,7 +160,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
 
         [Test]
-        public void DownloadFiles_TestSourceOperationMoveWithRenameFilesDuringTransferWithRenameSourceAndDestinationFilesEnabled()
+        public async Task DownloadFiles_TestSourceOperationMoveWithRenameFilesDuringTransferWithRenameSourceAndDestinationFilesEnabled()
         {
             var to = "uploaded";
             Helpers.UploadTestFiles(_source.Directory, 3, to);
@@ -184,7 +185,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 DirectoryToMoveAfterTransfer = to
             };
 
-            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -192,7 +193,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
 
         [Test]
-        public void DownloadFiles_TestSourceOperationRenameWithRenameFilesDuringTransferWithRenameSourceAndDestinationFilesEnabled()
+        public async Task DownloadFiles_TestSourceOperationRenameWithRenameFilesDuringTransferWithRenameSourceAndDestinationFilesEnabled()
         {
             var options = new Options
             {
@@ -213,7 +214,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileNameAfterTransfer = "uploaded_%SourceFileName%.txt"
             };
 
-            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -221,7 +222,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
 
         [Test]
-        public void DownloadFiles_SourceOperationDelete()
+        public async Task DownloadFiles_SourceOperationDelete()
         {
             Directory.CreateDirectory(_destWorkDir);
 
@@ -243,13 +244,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 Operation = SourceOperation.Delete
             };
 
-            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
         }
 
         [Test]
-        public void DownloadFiles_SourceOperationDeleteRenameSourceFile()
+        public async Task DownloadFiles_SourceOperationDeleteRenameSourceFile()
         {
             Directory.CreateDirectory(_destWorkDir);
 
@@ -271,13 +272,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 Operation = SourceOperation.Delete
             };
 
-            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
         }
 
         [Test]
-        public void DownloadFiles_SourceOperationDeleteRenameDestinationFile()
+        public async Task DownloadFiles_SourceOperationDeleteRenameDestinationFile()
         {
             Directory.CreateDirectory(_destWorkDir);
 
@@ -299,13 +300,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 Operation = SourceOperation.Delete
             };
 
-            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
         }
 
         [Test]
-        public void DownloadFiles_SourceOperationDeleteRenameBoth()
+        public async Task DownloadFiles_SourceOperationDeleteRenameBoth()
         {
             Directory.CreateDirectory(_destWorkDir);
 
@@ -327,13 +328,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 Operation = SourceOperation.Delete
             };
 
-            var result = SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
         }
 
         [Test]
-        public void DownloadFiles_TestSourceOperationRenameWithDifferentDirectory()
+        public async Task DownloadFiles_TestSourceOperationRenameWithDifferentDirectory()
         {
             Helpers.CreateSubDirectory("upload/moved");
 
@@ -346,7 +347,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileNameAfterTransfer = "upload/moved/uploaded_%SourceFileName%.txt"
             };
 
-            var result = SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
