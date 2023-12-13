@@ -530,7 +530,7 @@ internal class SingleFileTransfer
     {
         State = state;
         _logger.NotifyTrace($"{state}: {msg}");
-    } 
+    }
 
     /// <summary>
     /// Exception class for more specific Exception name.
