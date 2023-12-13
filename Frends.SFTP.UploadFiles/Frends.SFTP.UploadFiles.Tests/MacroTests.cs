@@ -115,7 +115,8 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(File.Exists(Path.Combine(_workDir, "uploaded_" + source.FileName)));        }
+            Assert.IsTrue(File.Exists(Path.Combine(_workDir, "uploaded_" + source.FileName)));
+        }
     }
 }
 
