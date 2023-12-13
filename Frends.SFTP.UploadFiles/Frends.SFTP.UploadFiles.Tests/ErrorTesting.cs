@@ -161,6 +161,50 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Assert.IsFalse(ex.Message.Contains("Could not restore original source file"));
             }
         }
+
+        [Test]
+        public void UploadFiles_TestCancellationToken()
+        {
+            var connection = Helpers.GetSftpConnection();
+            var source = new Source
+            {
+                Directory = _workDir,
+                FileName = "*",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+            };
+
+            var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationTokenSource(5000).Token));
+            Assert.IsTrue(ex.Message.Contains("No files transferred."));
+        }
+
+        [Test]
+        public void UploadFiles_TestTimeout()
+        {
+            var connection = Helpers.GetSftpConnection();
+            var options = new Options
+            {
+                Timeout = 2,
+                ThrowErrorOnFail = true,
+                RenameSourceFileBeforeTransfer = true,
+                RenameDestinationFileDuringTransfer = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = false
+            };
+
+            var source = new Source
+            {
+                Directory = _workDir,
+                FileName = "LargeTestFile.bin",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+            };
+
+            var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(source, _destination, connection, options, _info, default));
+            Assert.IsTrue(ex.Message.Contains("Operation was cancelled from UI."));
+            Assert.IsTrue(ex.Message.Contains("No files transferred."));
+        }
     }
 }
 

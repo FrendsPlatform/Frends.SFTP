@@ -90,7 +90,7 @@ public class SFTP
     /// <param name="source">Source file location</param>
     /// <param name="destination">Destination directory location</param>
     /// <param name="options">Transfer options</param>
-    /// <param name="cancellationToken">CancellationToken is given by Frends</param>
+    /// <param name="cancellationToken">cancellationToken is given by Frends</param>
     /// <returns>
     /// Result object {
     /// bool ActionSkiped, 
@@ -111,13 +111,26 @@ public class SFTP
         [PropertyTab] Info info,
         CancellationToken cancellationToken)
     {
+        if (options.Timeout > 0)
+        {
+            // Create a new cancellationTokenWithTimeOutSource with a timeout
+            var timeoutCts = new CancellationTokenSource();
+            timeoutCts.CancelAfter(TimeSpan.FromSeconds(options.Timeout));
+
+            // Create a linked token source that combines the external and timeout tokens
+            var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
+
+            // Get the linked token
+            cancellationToken = linkedCts.Token;
+        }
+
         var maxLogEntries = options.OperationLog ? (int?)null : 100;
         var transferSink = new TransferLogSink(maxLogEntries);
         var operationsLogger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .WriteTo.Sink(transferSink)
             .CreateLogger();
-        Log.Logger = Log.Logger ?? new LoggerConfiguration()
+        Log.Logger ??= new LoggerConfiguration()
             .MinimumLevel
             .Debug()
             .CreateLogger();
@@ -128,8 +141,7 @@ public class SFTP
             if (string.IsNullOrEmpty(info.ProcessUri))
                 fileTransferLog.Warning("ProcessUri is empty. This means the transfer view cannot link to the correct page");
 
-            Guid executionId;
-            if (!Guid.TryParse(info.TaskExecutionID, out executionId))
+            if (!Guid.TryParse(info.TaskExecutionID, out Guid executionId))
             {
                 fileTransferLog.Warning("'{0}' is not a valid task execution ID, will default to random Guid", info.TaskExecutionID);
                 executionId = Guid.NewGuid();
@@ -151,11 +163,11 @@ public class SFTP
                 Connection = connection
             };
 
-            var fileTransporter = new FileTransporter(logger, _batchContext, executionId, cancellationToken);
+            var fileTransporter = new FileTransporter(logger, _batchContext, executionId);
             var result = await fileTransporter.Run(cancellationToken);
 
             if (options.ThrowErrorOnFail && !result.Success)
-                throw new Exception($"SFTP transfer failed: {result.UserResultMessage}. " +
+                throw new Exception($"SFTP transfer failed: {result.UserResultMessage}" +
                                     $"Latest operations: \n{GetLogLines(transferSink.GetBufferedLogMessages())}");
 
             if (options.OperationLog)

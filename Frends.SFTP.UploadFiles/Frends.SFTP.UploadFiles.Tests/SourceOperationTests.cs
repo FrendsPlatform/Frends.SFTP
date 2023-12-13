@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System;
+using System.Linq;
 using Frends.SFTP.UploadFiles.Definitions;
 
 namespace Frends.SFTP.UploadFiles.Tests
@@ -280,6 +281,54 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
             Assert.IsTrue(File.Exists(Path.Combine(to, "uploaded_SFTPUploadTestFile1.txt")));
+        }
+
+        [Test]
+        public async Task UploadFiles_TestSourceOperationMoveThat8COFilesAreNotLeft()
+        {
+            var to = Path.Combine(_workDir, "uploaded");
+            Directory.CreateDirectory(to);
+            var source = new Source
+            {
+                Directory = _workDir,
+                FileName = "SFTPUploadTestFile1.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Move,
+                DirectoryToMoveAfterTransfer = to
+            };
+
+            var result = await SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+            var files = Directory.GetFiles(to, "*.8CO").ToList();
+            Assert.AreEqual(0, files.Count());
+            files = Directory.GetFiles(to, "*").ToList();
+            Assert.IsTrue(files.Contains(Path.Combine(to, _source.FileName)));
+        }
+
+        [Test]
+        public void UploadFiles_TestSourceOperationMoveFailedAnd8COFilesAreNotLeft()
+        {
+            var to = Path.Combine(_workDir, "uploaded");
+            Directory.CreateDirectory(to);
+            var source = new Source
+            {
+                Directory = _workDir,
+                FileName = "SFTPUploadTestFile1.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Move,
+                DirectoryToMoveAfterTransfer = to
+            };
+
+            File.Copy(Path.Combine(_workDir, source.FileName), Path.Combine(to, source.FileName));
+
+            Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
+
+            var files = Directory.GetFiles(_workDir, "frends_*").ToList();
+            Assert.AreEqual(0, files.Count());
+            files = Directory.GetFiles(_workDir, "*").ToList();
+            Assert.IsTrue(files.Contains(Path.Combine(_workDir, _source.FileName)));
         }
     }
 }

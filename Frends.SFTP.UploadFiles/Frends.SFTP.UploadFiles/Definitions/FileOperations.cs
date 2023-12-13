@@ -42,17 +42,16 @@
             FileMode fileMode = overwrite ? FileMode.Create : FileMode.CreateNew;
 
             using (Stream sourceStream = new FileStream(source, FileMode.Open, FileAccess.Read))
+            using (Stream destinationStream = new FileStream(remoteFile, fileMode, FileAccess.Write))
             {
-                using (Stream destinationStream = new FileStream(remoteFile, fileMode, FileAccess.Write))
-                {
-                    await sourceStream.CopyToAsync(destinationStream, bufferSize: 81920, cancellationToken);
-                }
+                await sourceStream.CopyToAsync(destinationStream, bufferSize: 81920, cancellationToken);
             }
         }
 
         internal static async Task MoveAsync(string source, string remoteFile, bool overwrite, CancellationToken cancellationToken)
         {
             await CopyAsync(source, remoteFile, overwrite, cancellationToken);
+            File.Delete(source);
         }
     }
 }

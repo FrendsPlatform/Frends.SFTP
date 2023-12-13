@@ -9,6 +9,16 @@ namespace Frends.SFTP.UploadFiles.Definitions;
 public class Options
 {
     /// <summary>
+    /// Timeout in seconds when the Task is cancelled after.
+    /// Cancellation with the Timeout will stop the operation even if the transfer is occuring.
+    /// Task will try to restore the source file. Destination file will be deleted if the cancellation happens during the transfer.
+    /// Number zero (0) or negative number will disable the timeout. 
+    /// </summary>
+    /// <example>30</example>
+    [DefaultValue(0)]
+    public int Timeout { get; set; }
+
+    /// <summary>
     /// Should an exception be thrown when file transfer fails.
     /// </summary>
     /// <example>true</example>

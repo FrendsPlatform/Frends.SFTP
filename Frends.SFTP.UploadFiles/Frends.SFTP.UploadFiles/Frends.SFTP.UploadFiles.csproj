@@ -8,7 +8,7 @@
 	  <AssemblyName>Frends.SFTP.UploadFiles</AssemblyName>
 	  <RootNamespace>Frends.SFTP.UploadFiles</RootNamespace>
 
-	  <Version>2.8.1</Version>
+	  <Version>2.9.0</Version>
 	  <Authors>Frends</Authors>
 	  <Copyright>Frends</Copyright>
 	  <Company>Frends</Company>
@@ -22,6 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
     <None Include="FrendsTaskMetadata.json" Pack="true" PackagePath="/">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

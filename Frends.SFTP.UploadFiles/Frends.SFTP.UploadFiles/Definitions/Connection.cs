@@ -11,6 +11,7 @@ public class Connection
     /// <summary>
     /// The lenght of time, in seconds, until the connection times out.
     /// You can use value -1 to indicate that the connection does not time out.
+    /// Connection will only time out if the client is idle.
     /// Default value is 60 seconds.
     /// </summary>
     /// <example>60</example>

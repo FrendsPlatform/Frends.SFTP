@@ -24,6 +24,16 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
+        public async Task UploadFiles_TestThat8COFilesAreNotLeft()
+        {
+            await SFTP.UploadFiles(_source, _destination, _connection, _options, _info, new CancellationToken());
+            var files = Directory.GetFiles(_workDir, "*.8CO").ToList();
+            Assert.AreEqual(0, files.Count());
+            files = Directory.GetFiles(_workDir, "*").ToList();
+            Assert.IsTrue(files.Contains(Path.Combine(_workDir, _source.FileName)));
+        }
+
+        [Test]
         public async Task UploadFiles_TestUploadWithFileMaskEverything()
         {
             var source = new Source
