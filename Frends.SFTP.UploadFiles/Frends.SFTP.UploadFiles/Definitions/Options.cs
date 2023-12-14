@@ -12,7 +12,8 @@ public class Options
     /// Timeout in seconds when the Task is cancelled after.
     /// Cancellation with the Timeout will stop the operation even if the transfer is occuring.
     /// Task will try to restore the source file. Destination file will be deleted if the cancellation happens during the transfer.
-    /// Number zero (0) or negative number will disable the timeout. 
+    /// Versus to the Connection.ConnectionTimeout which will only timeout the connection to the SFTP server if client is idle.
+    /// Number zero (0) or negative number will disable the timeout.
     /// </summary>
     /// <example>30</example>
     [DefaultValue(0)]
