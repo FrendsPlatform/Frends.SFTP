@@ -169,12 +169,12 @@ namespace Frends.SFTP.UploadFiles.Tests
             var source = new Source
             {
                 Directory = _workDir,
-                FileName = "*",
+                FileName = "LargeTestFile.bin",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Nothing,
             };
 
-            var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationTokenSource(5000).Token));
+            var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationTokenSource(1000).Token));
             Assert.IsTrue(ex.Message.Contains("No files transferred."));
         }
 
