@@ -100,7 +100,18 @@ public class SFTP
         [PropertyTab] Info info,
         CancellationToken cancellationToken)
     {
+        if (options.Timeout > 0)
+        {
+            // Create a new cancellationTokenWithTimeOutSource with a timeout
+            var timeoutCts = new CancellationTokenSource();
+            timeoutCts.CancelAfter(TimeSpan.FromSeconds(options.Timeout));
 
+            // Create a linked token source that combines the external and timeout tokens
+            var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
+
+            // Get the linked token
+            cancellationToken = linkedCts.Token;
+        }
 
         var maxLogEntries = options.OperationLog ? (int?)null : 100;
         var transferSink = new TransferLogSink(maxLogEntries);

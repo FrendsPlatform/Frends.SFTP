@@ -414,6 +414,22 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
+
+        [Test]
+        public async Task DownloadFile_TestTimeoutWithValue0()
+        {
+            Helpers.UploadLargeTestFiles(_source.Directory, 10);
+
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "*",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing
+            };
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, default);
+            Assert.IsTrue(result.Success);
+        }
     }
 }
 

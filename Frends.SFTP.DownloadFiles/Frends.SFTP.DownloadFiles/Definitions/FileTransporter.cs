@@ -157,7 +157,8 @@ internal class FileTransporter
 
                         foreach (var file in files)
                         {
-                            cancellationToken.ThrowIfCancellationRequested();
+                            if (cancellationToken.IsCancellationRequested)
+                                return FormResultFromSingleTransferResults(Result);
 
                             // Check that the connection is alive and if not try to connect again
                             if (!client.IsConnected)

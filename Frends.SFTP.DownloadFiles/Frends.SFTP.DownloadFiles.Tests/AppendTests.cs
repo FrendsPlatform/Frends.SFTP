@@ -41,6 +41,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(result.Success);
             var file2 = new FileInfo(Path.Combine(_destWorkDir, _source.FileName));
             Assert.AreNotEqual(file1.Length, file2.Length);
+            Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, destination.FileName)));
         }
 
         [Test]
@@ -78,6 +79,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var content2 = File.ReadAllText(Path.Combine(destination.Directory, _source.FileName));
             Assert.IsTrue(content2.Length > content1.Length);
             Assert.AreEqual(content1 + Environment.NewLine + content1, content2);
+            Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -113,6 +115,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(result.Success);
             var content2 = File.ReadAllText(Path.Combine(destination.Directory, _source.FileName));
             Assert.IsTrue(content2.Length > content1.Length);
+            Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -143,11 +146,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(_source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var content1 = File.ReadAllText(Path.Combine(destination.Directory, _source.FileName));
+            Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, _source.FileName)));
 
             result = await SFTP.DownloadFiles(_source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var content2 = File.ReadAllText(Path.Combine(destination.Directory, _source.FileName));
             Assert.IsTrue(content2.Length > content1.Length);
+            Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -179,11 +184,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(_source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var content1 = File.ReadAllText(Path.Combine(destination.Directory, _source.FileName));
+            Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, _source.FileName)));
 
             result = await SFTP.DownloadFiles(_source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var content2 = File.ReadAllText(Path.Combine(destination.Directory, _source.FileName));
             Assert.IsTrue(content2.Length > content1.Length);
+            Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -223,11 +230,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var content1 = File.ReadAllText(Path.Combine(destination.Directory, _source.FileName));
+            Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, _source.FileName)));
 
             result = await SFTP.DownloadFiles(source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var content2 = File.ReadAllText(Path.Combine(destination.Directory, _source.FileName));
             Assert.IsTrue(content2.Length > content1.Length);
+            Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -267,11 +276,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var content1 = File.ReadAllText(Path.Combine(destination.Directory, _source.FileName));
+            Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, _source.FileName)));
 
             result = await SFTP.DownloadFiles(source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var content2 = File.ReadAllText(Path.Combine(destination.Directory, _source.FileName));
             Assert.IsTrue(content2.Length > content1.Length);
+            Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, _source.FileName)));
         }
     }
 }
