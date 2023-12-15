@@ -90,7 +90,7 @@ public class SFTP
     /// <param name="source">Source file location</param>
     /// <param name="destination">Destination directory location</param>
     /// <param name="options">Transfer options</param>
-    /// <param name="cancellationToken">cancellationToken is given by Frends</param>
+    /// <param name="cancellationToken">CancellationToken is given by Frends</param>
     /// <returns>
     /// Result object {
     /// bool ActionSkiped, 
@@ -100,7 +100,8 @@ public class SFTP
     /// int FailedTransferCount, 
     /// IEnumerable TransferredFileNames, 
     /// Dictionary TransferErrors, 
-    /// IEnumerable TransferredFilePaths, 
+    /// IEnumerable TransferredFilePaths,
+    /// string[] TransferredDestinationFilePaths
     /// IDictionary OperationsLog } 
     /// </returns>
     public static async Task<Result> UploadFiles(
