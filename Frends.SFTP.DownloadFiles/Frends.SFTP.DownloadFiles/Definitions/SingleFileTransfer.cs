@@ -120,7 +120,14 @@ internal class SingleFileTransfer
 
             while (!sftpAsynch.IsCompleted)
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    sftpAsynch.IsDownloadCanceled = true;
+                    // This will remove partially downloaded file from the local File System.
+                    File.Delete(SourceFileDuringTransfer);
+                    _logger.NotifyError(BatchContext, "Operation was cancelled from UI.", new OperationCanceledException());
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
             }
 
             Client.EndDownloadFile(asynch);

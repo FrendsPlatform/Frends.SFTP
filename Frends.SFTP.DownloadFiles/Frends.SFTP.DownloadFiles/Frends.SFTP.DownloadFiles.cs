@@ -100,6 +100,8 @@ public class SFTP
         [PropertyTab] Info info,
         CancellationToken cancellationToken)
     {
+
+
         var maxLogEntries = options.OperationLog ? (int?)null : 100;
         var transferSink = new TransferLogSink(maxLogEntries);
         var operationsLogger = new LoggerConfiguration()

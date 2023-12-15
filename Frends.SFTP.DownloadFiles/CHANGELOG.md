@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.9.0] - 2023-12-15
+### Added
+- [Breaking] Added new parameter Options.Timeout which will cause the Task to terminate at assigned period of time if enabled.
+### Fixed
+- Fixed FileOperations.MoveAsync to remove the moved file.
+
 ## [2.8.0] - 2023-12-05
 ### Changed
 - [Breaking] Changed TransferredDestinationFilePaths Result property type from List to string[].

@@ -158,6 +158,24 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
             Assert.IsTrue(ex.Message.Contains($"SFTP transfer failed: Authentication of SSH session failed: Permission denied (password)"));
         }
+
+        [Test]
+        public void DownloadFiles_TestCancellationToken()
+        {
+            Helpers.UploadLargeTestFiles(_source.Directory, 1);
+            var connection = Helpers.GetSftpConnection();
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "LargeTestFile1.bin",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+            };
+
+            var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.DownloadFiles(source, _destination, connection, _options, _info, new CancellationTokenSource(1000).Token));
+            Console.WriteLine(ex.Message);
+            Assert.IsTrue(ex.Message.Contains("No files transferred."));
+        }
     }
 }
 
