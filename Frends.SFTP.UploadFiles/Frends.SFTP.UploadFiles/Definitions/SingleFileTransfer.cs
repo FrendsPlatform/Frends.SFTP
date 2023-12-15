@@ -85,7 +85,6 @@ internal class SingleFileTransfer
             await ExecuteSourceOperationNothingDelete(cancellationToken);
 
             _logger.LogTransferSuccess(this, BatchContext);
-            CleanUpFiles();
         }
         catch (Exception ex)
         {
@@ -96,6 +95,11 @@ internal class SingleFileTransfer
             if (!string.IsNullOrEmpty(destinationFileRestoreMessage))
                 HandleTransferError(ex, destinationFileRestoreMessage);
         }
+        finally
+        {
+            CleanUpFiles();
+        }
+
         _result.TransferredDestinationFilePath = DestinationFileWithMacrosExpanded;
         return _result;
     }

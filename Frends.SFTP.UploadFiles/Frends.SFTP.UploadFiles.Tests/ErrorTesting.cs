@@ -205,6 +205,42 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(ex.Message.Contains("Operation was cancelled from UI."));
             Assert.IsTrue(ex.Message.Contains("No files transferred."));
         }
+
+        [Test]
+        public void UploadFiles_TestTimeoutCheckTempFiles()
+        {
+            var connection = Helpers.GetSftpConnection();
+            var options = new Options
+            {
+                Timeout = 2,
+                ThrowErrorOnFail = true,
+                RenameSourceFileBeforeTransfer = true,
+                RenameDestinationFileDuringTransfer = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = false
+            };
+
+            var source = new Source
+            {
+                Directory = _workDir,
+                FileName = "LargeTestFile.bin",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+            };
+
+            var temp = Path.Combine(_workDir, "temp");
+            Directory.CreateDirectory(temp);
+            var info = new Info
+            {
+                WorkDir = temp
+            };
+
+            var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(source, _destination, connection, options, info, default));
+            Assert.IsTrue(ex.Message.Contains("Operation was cancelled from UI."));
+            Assert.IsTrue(ex.Message.Contains("No files transferred."));
+            Assert.IsTrue(Directory.GetFiles(temp).Length == 0);
+        }
     }
 }
 
