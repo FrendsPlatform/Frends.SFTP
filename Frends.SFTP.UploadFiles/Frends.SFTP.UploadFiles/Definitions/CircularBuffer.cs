@@ -9,7 +9,7 @@ namespace Frends.SFTP.UploadFiles.Definitions;
 internal class CircularBuffer<T>
 {
     private readonly ConcurrentQueue<T> _data;
-    private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+    private readonly ReaderWriterLockSlim _lock = new();
     private readonly int _size;
 
     public CircularBuffer(int size)
@@ -31,8 +31,7 @@ internal class CircularBuffer<T>
         {
             if (_data.Count == _size)
             {
-                T value;
-                _data.TryDequeue(out value);
+                _data.TryDequeue(out T value);
             }
 
             _data.Enqueue(t);

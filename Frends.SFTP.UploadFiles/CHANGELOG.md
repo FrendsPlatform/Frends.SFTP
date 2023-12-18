@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.9.0] - 2023-12-13
+### Changed 
+- [Breaking] Changed Result property TransferredDestinationFilePaths to string array.
+- Changed SftpClient operations to use async methods with CancellationToken.
+### Fixed
+- Fixed issue where single failure stops other file transfers when using FilePaths.
+- Fixed issue where Task can't be cancelled from UI. Change enables users to terminate the transfer even if file upload is ongoing.
+### Updated
+- Updated Renci.SshNet library to the newest version 2023.0.0.
+### Added
+- Added FileOperations class which handles file operations as async with CancellationToken e.g. Append, Copy, Move.
+- Added Timeout Option which will stop the Task when the operation takes enough time.
+
 ## [2.8.0] - 2023-10-18
 ### Added 
 - [Breaking] New feature: Added parameter AssumeFileExistence which will when enabled, skip checking if destination file esists and overwrites any existing files automatically.

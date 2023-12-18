@@ -8,13 +8,11 @@ internal class FileItem
 
     public string Name { get; set; }
 
-    public string NameWithMacrosExtended { get; set; }
-
     public string FullPath { get; set; }
 
     public long Size { get; set; }
 
-    public FileItem(SftpFile file)
+    public FileItem(ISftpFile file)
     {
         Modified = file.LastWriteTime;
         Name = file.Name;
@@ -24,13 +22,10 @@ internal class FileItem
 
     public FileItem(string fullPath)
     {
-        if (!File.Exists(fullPath))
-            throw new FileNotFoundException($"File does not exist: '{fullPath}");
-
         var fi = new FileInfo(fullPath);
         Modified = fi.LastWriteTime;
         Name = Path.GetFileName(fullPath);
-        Size = fi.Length;
+        Size = TryGetFileLength(fi) ? fi.Length : 0;
         FullPath = fullPath;
     }
 
@@ -38,5 +33,18 @@ internal class FileItem
     /// Default constructor, use only for testing.
     /// </summary>
     public FileItem() { }
+
+    private static bool TryGetFileLength(FileInfo fi)
+    {
+        try
+        {
+            var length = fi.Length;
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }
 

@@ -20,15 +20,13 @@ internal class FileTransporter
     private readonly BatchContext _batchContext;
     private readonly string[] _filePaths;
     private readonly RenamingPolicy _renamingPolicy;
-    private readonly CancellationToken _cancellationToken;
 
-    internal FileTransporter(ISFTPLogger logger, BatchContext context, Guid instanceId, CancellationToken cancellationToken)
+    internal FileTransporter(ISFTPLogger logger, BatchContext context, Guid instanceId)
     {
         _logger = logger;
         _batchContext = context;
         _instanceId = instanceId;
-        _renamingPolicy = new RenamingPolicy(_batchContext.Info.TransferName, _instanceId, cancellationToken);
-        _cancellationToken = cancellationToken;
+        _renamingPolicy = new RenamingPolicy(_batchContext.Info.TransferName, _instanceId);
 
         _result = new List<SingleFileTransferResult>();
         _filePaths = (context.Source.FilePaths != null || !string.IsNullOrEmpty((string)context.Source.FilePaths)) ? ConvertObjectToStringArray(context.Source.FilePaths) : null;
@@ -55,13 +53,13 @@ internal class FileTransporter
     /// <exception cref="DirectoryNotFoundException"></exception>
     /// <exception cref="FileNotFoundException"></exception>
     /// <exception cref="ArgumentException"></exception>
-    public FileTransferResult Run()
+    public async Task<FileTransferResult> Run(CancellationToken cancellationToken)
     {
         var userResultMessage = "";
         try
         {
             // Fetch source file info and check if files were returned.
-            var (files, success) = ListSourceFiles(_batchContext.Source, _cancellationToken);
+            var (files, success) = ListSourceFiles(_batchContext.Source, cancellationToken);
 
             // If source directory doesn't exist, modify userResultMessage accordingly.
             if (!success)
@@ -96,86 +94,90 @@ internal class FileTransporter
                     return FormFailedFileTransferResult(userResultMessage);
                 }
 
-                LogDestinationSystemInfo(_batchContext, _logger);
+                LogSourceSystemInfo(_batchContext, _logger);
 
                 _logger.NotifyInformation(_batchContext, "Negotiation started.");
 
                 using (var client = new SftpClient(connectionInfo))
                 {
-                    if (_batchContext.Connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
-                        ForceHostKeyAlgorithm(client, _batchContext.Connection.HostKeyAlgorithm);
-
-                    var expectedServerFingerprint = _batchContext.Connection.ServerFingerPrint;
-
                     try
                     {
-                        CheckServerFingerprint(client, expectedServerFingerprint);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.NotifyError(null, $"Error when checking the server fingerprint: {ex.Message}", ex);
-                        return FormFailedFileTransferResult(userResultMessage);
-                    }
+                        if (_batchContext.Connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
+                            ForceHostKeyAlgorithm(client, _batchContext.Connection.HostKeyAlgorithm);
 
-                    client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
-                    client.KeepAliveInterval = TimeSpan.FromMilliseconds(_batchContext.Connection.KeepAliveInterval);
-                    client.OperationTimeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
+                        var expectedServerFingerprint = _batchContext.Connection.ServerFingerPrint;
 
-                    client.BufferSize = _batchContext.Connection.BufferSize * 1024;
-
-                    SetCurrentState(TransferState.Connection, $"Connecting to {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using SFTP.");
-
-                    client.Connect();
-
-                    if (!client.IsConnected)
-                    {
-                        _logger.NotifyError(null, "Error while connecting to destination: ", new SshConnectionException(userResultMessage));
-                        return FormFailedFileTransferResult(userResultMessage);
-                    }
-
-                    _logger.NotifyInformation(_batchContext, "Negotiation finished.");
-
-                    // Check does the destination directory exists.
-                    if (!client.Exists(DestinationDirectoryWithMacrosExtended))
-                    {
-                        if (_batchContext.Options.CreateDestinationDirectories)
+                        try
                         {
-                            try
+                            CheckServerFingerprint(client, expectedServerFingerprint);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.NotifyError(null, $"Error when checking the server fingerprint: {ex.Message}", ex);
+                            return FormFailedFileTransferResult(userResultMessage);
+                        }
+
+                        client.KeepAliveInterval = TimeSpan.FromMilliseconds(_batchContext.Connection.KeepAliveInterval);
+                        client.OperationTimeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
+
+                        client.BufferSize = _batchContext.Connection.BufferSize * 1024;
+
+                        SetCurrentState(TransferState.Connection, $"Connecting to {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using SFTP.");
+
+                        await client.ConnectAsync(cancellationToken);
+
+                        if (!client.IsConnected)
+                        {
+                            _logger.NotifyError(null, "Error while connecting to destination: ", new SshConnectionException(userResultMessage));
+                            return FormFailedFileTransferResult(userResultMessage);
+                        }
+
+                        _logger.NotifyInformation(_batchContext, "Negotiation finished.");
+
+                        // Check does the destination directory exists.
+                        if (!client.Exists(DestinationDirectoryWithMacrosExtended))
+                        {
+                            if (_batchContext.Options.CreateDestinationDirectories)
                             {
-                                SetCurrentState(TransferState.CreateDestinationDirectories, $"Creating destination directory {DestinationDirectoryWithMacrosExtended}.");
-                                CreateDestinationDirectories(client, DestinationDirectoryWithMacrosExtended, _cancellationToken);
-                                _logger.NotifyInformation(_batchContext, $"DIRECTORY CREATE: Destination directory {DestinationDirectoryWithMacrosExtended} created.");
+                                try
+                                {
+                                    SetCurrentState(TransferState.CreateDestinationDirectories, $"Creating destination directory {DestinationDirectoryWithMacrosExtended}.");
+                                    CreateDestinationDirectories(client, DestinationDirectoryWithMacrosExtended, cancellationToken);
+                                    _logger.NotifyInformation(_batchContext, $"DIRECTORY CREATE: Destination directory {DestinationDirectoryWithMacrosExtended} created.");
+                                }
+                                catch (Exception ex)
+                                {
+                                    userResultMessage = $"Error while creating destination directory '{DestinationDirectoryWithMacrosExtended}': {ex.Message}";
+                                    _logger.NotifyError(_batchContext, userResultMessage, ex);
+                                    return FormFailedFileTransferResult(userResultMessage);
+                                }
                             }
-                            catch (Exception ex)
+                            else
                             {
-                                userResultMessage = $"Error while creating destination directory '{DestinationDirectoryWithMacrosExtended}': {ex.Message}";
-                                _logger.NotifyError(_batchContext, userResultMessage, ex);
+                                userResultMessage = $"Destination directory '{DestinationDirectoryWithMacrosExtended}' was not found.";
+                                _logger.NotifyError(_batchContext, userResultMessage, new ArgumentException("No such directory."));
                                 return FormFailedFileTransferResult(userResultMessage);
                             }
                         }
-                        else
+
+                        foreach (var file in files)
                         {
-                            userResultMessage = $"Destination directory '{DestinationDirectoryWithMacrosExtended}' was not found.";
-                            _logger.NotifyError(_batchContext, userResultMessage, new ArgumentException("No such directory."));
-                            return FormFailedFileTransferResult(userResultMessage);
+                            if (cancellationToken.IsCancellationRequested)
+                                return FormResultFromSingleTransferResults(_result);
+
+                            // Check that the connection is alive and if not try to connect again.
+                            if (!client.IsConnected)
+                                await client.ConnectAsync(cancellationToken);
+
+                            var singleTransfer = new SingleFileTransfer(file, DestinationDirectoryWithMacrosExtended, _batchContext, client, _renamingPolicy, _logger);
+                            var result = await singleTransfer.TransferSingleFile(cancellationToken);
+                            _result.Add(result);
                         }
                     }
-
-                    _batchContext.DestinationFiles = client.ListDirectory(DestinationDirectoryWithMacrosExtended);
-
-                    foreach (var file in files)
+                    finally
                     {
-                        _cancellationToken.ThrowIfCancellationRequested();
-
-                        // Check that the connection is alive and if not try to connect again.
-                        if (!client.IsConnected)
-                            client.Connect();
-
-                        var singleTransfer = new SingleFileTransfer(file, DestinationDirectoryWithMacrosExtended, _batchContext, client, _renamingPolicy, _logger);
-                        var result = singleTransfer.TransferSingleFile();
-                        _result.Add(result);
+                        client.Disconnect();
                     }
-                    client.Disconnect();
                 }
             }
         }
@@ -233,7 +235,7 @@ internal class FileTransporter
     private ConnectionInfo GetConnectionInfo(Destination destination, Connection connect)
     {
         ConnectionInfo connectionInfo;
-        List<AuthenticationMethod> methods = new List<AuthenticationMethod>();
+        var methods = new List<AuthenticationMethod>();
 
         if (connect.UseKeyboardInteractiveAuthentication)
         {
@@ -293,7 +295,9 @@ internal class FileTransporter
 
         connectionInfo = new ConnectionInfo(connect.Address, connect.Port, connect.UserName, methods.ToArray())
         {
-            Encoding = Util.GetEncoding(destination.FileNameEncoding, destination.FileNameEncodingInString, destination.EnableBomForFileName)
+            Encoding = Util.GetEncoding(destination.FileNameEncoding, destination.FileNameEncodingInString, destination.EnableBomForFileName),
+            ChannelCloseTimeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout),
+            Timeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout)
         };
 
         return connectionInfo;
@@ -307,7 +311,6 @@ internal class FileTransporter
 
             foreach (var serverPrompt in e.Prompts)
             {
-                _cancellationToken.ThrowIfCancellationRequested();
                 _logger.NotifyInformation(_batchContext, $"Prompt: {serverPrompt.Request.Replace(":", "")}");
 
                 if (!string.IsNullOrEmpty(_batchContext.Connection.Password) && serverPrompt.Request.IndexOf("Password:", StringComparison.InvariantCultureIgnoreCase) != -1)
@@ -322,7 +325,6 @@ internal class FileTransporter
 
                     foreach (var prompt in _batchContext.Connection.PromptAndResponse)
                     {
-                        _cancellationToken.ThrowIfCancellationRequested();
                         if (serverPrompt.Request.IndexOf(prompt.Prompt, StringComparison.InvariantCultureIgnoreCase) != -1)
                             serverPrompt.Response = prompt.Response;
                     }
@@ -369,12 +371,8 @@ internal class FileTransporter
 
         client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
         {
-            MD5serverFingerprint = BitConverter.ToString(e.FingerPrint).Replace('-', ':');
-
-            using (SHA256 mySHA256 = SHA256.Create())
-            {
-                SHAServerFingerprint = Convert.ToBase64String(mySHA256.ComputeHash(e.HostKey));
-            }
+            MD5serverFingerprint = e.FingerPrintMD5;
+            SHAServerFingerprint = e.FingerPrintSHA256;
 
             if (!string.IsNullOrEmpty(expectedServerFingerprint))
             {
@@ -402,7 +400,7 @@ internal class FileTransporter
                     {
                         using (SHA256 mySHA256 = SHA256.Create())
                         {
-                            SHAServerFingerprint = Util.ToHex(mySHA256.ComputeHash(e.HostKey), _cancellationToken);
+                            SHAServerFingerprint = Util.ToHex(mySHA256.ComputeHash(e.HostKey));
                         }
                         e.CanTrust = (SHAServerFingerprint == expectedServerFingerprint);
                         if (!e.CanTrust)
@@ -440,10 +438,32 @@ internal class FileTransporter
 
         if (_filePaths != null)
         {
-            fileItems = _filePaths.Select(p => new FileItem(p)).ToList();
-            if (fileItems.Any())
-                return new Tuple<List<FileItem>, bool>(fileItems, true);
-            return new Tuple<List<FileItem>, bool>(fileItems, false);
+            foreach (var path in _filePaths)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (File.Exists(path))
+                {
+                    var item = new FileItem(Path.GetFullPath(path));
+                    _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath}.");
+                    fileItems.Add(item);
+                }
+                else
+                {
+                    var msg = $"FILE LIST File '{path}' not found.";
+                    _logger.NotifyInformation(_batchContext, msg);
+                    _result.Add(new SingleFileTransferResult
+                    {
+                        ActionSkipped = true,
+                        ErrorMessages = new List<string>(),
+                        Success = true,
+                        TransferredFilePath = string.Empty,
+                        TransferredDestinationFilePath = string.Empty,
+                        TransferredFile = string.Empty
+                    });
+                }
+            }
+
+            return new Tuple<List<FileItem>, bool>(fileItems, true);
         }
 
         // Return empty list if source directory doesn't exists.
@@ -463,7 +483,7 @@ internal class FileTransporter
             cancellationToken.ThrowIfCancellationRequested();
             if (Path.GetFileName(file).Equals(source.FileName) || Util.FileMatchesMask(Path.GetFileName(file), source.FileName))
             {
-                FileItem item = new FileItem(Path.GetFullPath(file));
+                var item = new FileItem(Path.GetFullPath(file));
                 _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath}.");
                 fileItems.Add(item);
             }
@@ -510,6 +530,7 @@ internal class FileTransporter
 
     private static FileTransferResult FormFailedFileTransferResult(string userResultMessage)
     {
+        userResultMessage += "No files transferred.";
         return new FileTransferResult
         {
             ActionSkipped = true,
@@ -520,7 +541,7 @@ internal class FileTransporter
             TransferredFileNames = new List<string>(),
             TransferErrors = new Dictionary<string, IList<string>>(),
             TransferredFilePaths = new List<string>(),
-            TransferredDestinationFilePaths = new List<string>(),
+            TransferredDestinationFilePaths = Array.Empty<string>(),
             OperationsLog = new Dictionary<string, string>()
         };
     }
@@ -528,8 +549,8 @@ internal class FileTransporter
     private FileTransferResult FormResultFromSingleTransferResults(List<SingleFileTransferResult> singleResults)
     {
         var success = singleResults.All(x => x.Success);
-        var actionSkipped = success && singleResults.All(x => x.ActionSkipped);
-        var userResultMessage = GetUserResultMessage(singleResults.ToList(), _cancellationToken);
+        var actionSkipped = success && singleResults.Any(x => x.ActionSkipped);
+        var userResultMessage = GetUserResultMessage(singleResults.ToList());
 
         _logger.LogBatchFinished(_batchContext, userResultMessage, success, actionSkipped);
 
@@ -548,12 +569,12 @@ internal class FileTransporter
             TransferredFileNames = transferredFileResults.Select(r => r.TransferredFile ?? "--unknown--").ToList(),
             TransferErrors = transferErrors,
             TransferredFilePaths = transferredFileResults.Select(r => r.TransferredFilePath ?? "--unknown--").ToList(),
-            TransferredDestinationFilePaths = transferredFileResults.Select(r => r.TransferredDestinationFilePath ?? "--unknown--").ToList(),
+            TransferredDestinationFilePaths = transferredFileResults.Select(r => r.TransferredDestinationFilePath ?? "--unknown--").ToArray(),
             OperationsLog = new Dictionary<string, string>()
         };
     }
 
-    private static string GetUserResultMessage(IList<SingleFileTransferResult> results, CancellationToken cancellationToken)
+    private static string GetUserResultMessage(IList<SingleFileTransferResult> results)
     {
         var userResultMessage = string.Empty;
 
@@ -565,9 +586,9 @@ internal class FileTransporter
         var transferredFiles = results.Where(x => x.Success && !x.ActionSkipped).Select(x => x.TransferredFile).ToList();
         if (transferredFiles.Any())
             userResultMessage = MessageJoin(userResultMessage,
-                $"{transferredFiles.Count} files transferred: {string.Join(",\n", transferredFiles)}.");
+                $"{transferredFiles.Count} files transferred:\n{string.Join(",\n", transferredFiles)}\n");
         else
-            userResultMessage = MessageJoin(userResultMessage, "No files transferred.");
+            userResultMessage = MessageJoin(userResultMessage, "No files transferred.\n");
 
         return userResultMessage;
     }
@@ -631,7 +652,7 @@ internal class FileTransporter
         _logger.NotifyTrace($"{state}: {msg}");
     }
 
-    private static void LogDestinationSystemInfo(BatchContext context, ISFTPLogger logger)
+    private static void LogSourceSystemInfo(BatchContext context, ISFTPLogger logger)
     {
         logger.NotifyInformation(context, $"Assembly: {Assembly.GetAssembly(typeof(SftpClient)).GetName().Name} {Assembly.GetAssembly(typeof(SftpClient)).GetName().Version}");
         var bit = Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit";

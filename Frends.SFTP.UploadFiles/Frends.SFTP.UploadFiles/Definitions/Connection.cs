@@ -11,6 +11,7 @@ public class Connection
     /// <summary>
     /// The lenght of time, in seconds, until the connection times out.
     /// You can use value -1 to indicate that the connection does not time out.
+    /// Connection will only time out if the client is idle for assigned period of time.
     /// Default value is 60 seconds.
     /// </summary>
     /// <example>60</example>
@@ -144,6 +145,6 @@ public class Connection
     /// Responses for the server prompts when using Keyboard Interactive authentication method.
     /// </summary>
     [UIHint(nameof(UseKeyboardInteractiveAuthentication), "", true)]
-    public PromptResponse[] PromptAndResponse { get; set; } = new PromptResponse[0];
+    public PromptResponse[] PromptAndResponse { get; set; } = Array.Empty<PromptResponse>();
 }
 

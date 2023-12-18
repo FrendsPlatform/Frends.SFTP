@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Renci.SshNet;
+using Renci.SshNet.Sftp;
 
 namespace Frends.SFTP.UploadFiles.Definitions;
 
@@ -29,11 +30,8 @@ internal class SingleFileTransfer
     }
 
     public DateTime FileTransferStartTime { get; set; }
-
     public WorkFileInfo WorkFileInfo { get; set; }
-
     public FileItem WorkFile { get; set; }
-
     public SftpClient Client { get; set; }
     public FileItem SourceFile { get; set; }
     public FileItem DestinationFile { get; set; }
@@ -47,20 +45,20 @@ internal class SingleFileTransfer
     /// </summary>
     internal TransferState State { get; set; }
 
-    internal SingleFileTransferResult TransferSingleFile()
+    internal async Task<SingleFileTransferResult> TransferSingleFile(CancellationToken cancellationToken)
     {
         try
         {
             _result.TransferredFile = SourceFile.Name;
             _result.TransferredFilePath = SourceFile.FullPath;
 
-            GetSourceFile();
+            await GetSourceFile(cancellationToken);
 
-            ExecuteSourceOperationMoveOrRename();
+            await ExecuteSourceOperationRenameMove(cancellationToken);
 
             if (BatchContext.Options.AssumeFileExistence)
             {
-                PutDestinationFile(removeExisting: true);
+                await PutDestinationFile(Client, removeExisting: true, cancellationToken);
             }
             else if (DestinationFileExists(DestinationFileWithMacrosExpanded))
             {
@@ -68,10 +66,10 @@ internal class SingleFileTransfer
                 switch (BatchContext.Destination.Action)
                 {
                     case DestinationAction.Append:
-                        AppendDestinationFile();
+                        await AppendDestinationFile(cancellationToken);
                         break;
                     case DestinationAction.Overwrite:
-                        PutDestinationFile(removeExisting: true);
+                        await PutDestinationFile(Client, removeExisting: true, cancellationToken);
                         break;
                     case DestinationAction.Error:
                         throw new DestinationFileExistsException(Path.GetFileName(DestinationFileWithMacrosExpanded));
@@ -79,15 +77,14 @@ internal class SingleFileTransfer
             }
             else
             {
-                PutDestinationFile();
+                await PutDestinationFile(Client, removeExisting: false, cancellationToken);
             }
 
             if (BatchContext.Options.PreserveLastModified) RestoreModified();
 
-            ExecuteSourceOperationNothingOrDelete();
+            await ExecuteSourceOperationNothingDelete(cancellationToken);
 
             _logger.LogTransferSuccess(this, BatchContext);
-            CleanUpFiles();
         }
         catch (Exception ex)
         {
@@ -98,19 +95,24 @@ internal class SingleFileTransfer
             if (!string.IsNullOrEmpty(destinationFileRestoreMessage))
                 HandleTransferError(ex, destinationFileRestoreMessage);
         }
+        finally
+        {
+            CleanUpFiles();
+        }
+
         _result.TransferredDestinationFilePath = DestinationFileWithMacrosExpanded;
         return _result;
     }
 
-    private void GetSourceFile()
+    private async Task GetSourceFile(CancellationToken cancellationToken)
     {
         if (BatchContext.Options.RenameSourceFileBeforeTransfer)
-            RenameSourceFile();
+            await RenameSourceFile(cancellationToken);
         else
             SourceFileDuringTransfer = SourceFile.FullPath;
 
         SetCurrentState(TransferState.GetFile, $"Downloading source file {Path.GetFileName(SourceFileDuringTransfer)} to local temp file {WorkFileInfo.WorkFileDir}");
-        File.Copy(SourceFileDuringTransfer, Path.Combine(WorkFileInfo.WorkFileDir, Path.GetFileName(SourceFileDuringTransfer)));
+        await FileOperations.CopyAsync(SourceFileDuringTransfer, Path.Combine(WorkFileInfo.WorkFileDir, Path.GetFileName(SourceFileDuringTransfer)), false, cancellationToken);
         _logger.NotifyInformation(BatchContext, $"FILE COPY: {SourceFileDuringTransfer} to {WorkFileInfo.WorkFileDir}");
     }
 
@@ -124,11 +126,11 @@ internal class SingleFileTransfer
         return exists;
     }
 
-    private void RenameSourceFile()
+    private async Task RenameSourceFile(CancellationToken cancellationToken)
     {
         if (!string.IsNullOrEmpty(SourceFileDuringTransfer))
         {
-            File.Move(SourceFileDuringTransfer, SourceFile.FullPath);
+            await FileOperations.MoveAsync(SourceFileDuringTransfer, SourceFile.FullPath, true, cancellationToken);
             return;
         }
 
@@ -137,11 +139,11 @@ internal class SingleFileTransfer
         SourceFileDuringTransfer = Path.Combine(directory, uniqueFileName);
 
         SetCurrentState(TransferState.RenameSourceFileBeforeTransfer, $"Renaming source file {SourceFile.Name} to temporary file name {uniqueFileName} before transfer");
-        File.Move(SourceFile.FullPath, SourceFileDuringTransfer);
+        await FileOperations.MoveAsync(SourceFile.FullPath, SourceFileDuringTransfer, true, cancellationToken);
         _logger.NotifyInformation(BatchContext, $"FILE RENAME: Source file {SourceFile.Name} renamed to target {uniqueFileName}.");
     }
 
-    private void AppendDestinationFile()
+    private async Task AppendDestinationFile(CancellationToken cancellationToken)
     {
         var filePath = Path.Combine(WorkFileInfo.WorkFileDir, Path.GetFileName(SourceFileDuringTransfer));
         Encoding encoding;
@@ -155,28 +157,28 @@ internal class SingleFileTransfer
         }
 
         if (BatchContext.Options.RenameDestinationFileDuringTransfer)
-            RenameDestinationFile();
+            await RenameDestinationFile(cancellationToken);
 
         Append(GetSourceFileContent(filePath, BatchContext.Destination.AddNewLine, encoding), encoding);
 
         if (BatchContext.Options.RenameDestinationFileDuringTransfer)
-            RenameDestinationFile();
+            await RenameDestinationFile(cancellationToken);
     }
 
-    private void RenameDestinationFile()
+    private async Task RenameDestinationFile(CancellationToken cancellationToken)
     {
         if (!string.IsNullOrEmpty(DestinationFileDuringTransfer))
         {
             SetCurrentState(TransferState.RenameDestinationFile, $"Renaming temporary destination file {Path.GetFileName(DestinationFileDuringTransfer)} to target file {DestinationFile.Name}.");
-            Client.RenameFile(DestinationFileDuringTransfer, DestinationFileWithMacrosExpanded);
+            await Client.RenameFileAsync(DestinationFileDuringTransfer, DestinationFileWithMacrosExpanded, cancellationToken);
             _logger.NotifyInformation(BatchContext, $"FILE RENAME: Temporary destination file {Path.GetFileName(DestinationFileDuringTransfer)} renamed to target {DestinationFile.Name}.");
         }
         else
         {
             var path = Path.Combine(Path.GetDirectoryName(DestinationFileWithMacrosExpanded), Util.CreateUniqueFileName(BatchContext.Options.DestinationFileExtension));
-            DestinationFileDuringTransfer = (DestinationFileWithMacrosExpanded.Contains("/")) ? path.Replace("\\", "/") : path;
+            DestinationFileDuringTransfer = (DestinationFileWithMacrosExpanded.Contains('/')) ? path.Replace("\\", "/") : path;
             SetCurrentState(TransferState.RenameDestinationFile, $"Renaming destination file {Path.GetFileName(DestinationFileWithMacrosExpanded)} to temporary file name {Path.GetFileName(DestinationFileDuringTransfer)} during transfer");
-            Client.RenameFile(DestinationFileWithMacrosExpanded, DestinationFileDuringTransfer);
+            await Client.RenameFileAsync(DestinationFileWithMacrosExpanded, DestinationFileDuringTransfer, cancellationToken);
         }
     }
 
@@ -201,10 +203,9 @@ internal class SingleFileTransfer
         if (addNewLine)
             content = Environment.NewLine + content;
         return content;
-
     }
 
-    private void PutDestinationFile(bool removeExisting = false)
+    private async Task PutDestinationFile(SftpClient client, bool removeExisting, CancellationToken cancellationToken)
     {
         var doRename = BatchContext.Options.RenameDestinationFileDuringTransfer;
 
@@ -216,11 +217,30 @@ internal class SingleFileTransfer
             TransferState.PutFile,
             $"Uploading {helper}destination file { Path.GetFileName(DestinationFileDuringTransfer)} to destination {DestinationFileWithMacrosExpanded}.");
 
-        using (var fs = new FileStream(Path.Combine(WorkFileInfo.WorkFileDir, Path.GetFileName(SourceFileDuringTransfer)), FileMode.Open))
+
+        using (var fs = File.OpenRead(Path.Combine(WorkFileInfo.WorkFileDir, Path.GetFileName(SourceFileDuringTransfer))))
         {
-            Client.UploadFile(fs, DestinationFileDuringTransfer, removeExisting);
-            _logger.NotifyInformation(BatchContext, $"FILE PUT: Source file {SourceFile.FullPath} uploaded to target {DestinationFileWithMacrosExpanded}.");
+            var asynch = Client.BeginUploadFile(fs, DestinationFileDuringTransfer, removeExisting, null, null, null);
+
+            var sftpAsynch = asynch as SftpUploadAsyncResult;
+
+            while (!sftpAsynch.IsCompleted)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    sftpAsynch.IsUploadCanceled = true;
+                    // This will remove partially uploaded file from the SFTP server.
+                    Client.DeleteFile(DestinationFileDuringTransfer);
+                    _logger.NotifyError(BatchContext, "Operation was cancelled from UI.", new OperationCanceledException());
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+            }
+
+            Client.EndUploadFile(asynch);
         }
+
+        _logger.NotifyInformation(BatchContext, $"FILE PUT: Source file {SourceFile.FullPath} uploaded to target {DestinationFileWithMacrosExpanded}.");
+
 
         if (!doRename) return;
 
@@ -230,7 +250,7 @@ internal class SingleFileTransfer
                 TransferState.DeleteDestinationFile,
                 $"Deleting destination file {Path.GetFileName(DestinationFileWithMacrosExpanded)} that is to be overwritten");
 
-            Client.DeleteFile(DestinationFileWithMacrosExpanded);
+            await client.DeleteFileAsync(DestinationFileWithMacrosExpanded, cancellationToken);
             _logger.NotifyInformation(BatchContext, $"FILE DELETE: Destination file {Path.GetFileName(DestinationFileWithMacrosExpanded)} deleted.");
         }
 
@@ -238,7 +258,7 @@ internal class SingleFileTransfer
             TransferState.RenameDestinationFile,
             $"Renaming temporary destination file {Path.GetFileName(DestinationFileDuringTransfer)} to target file {Path.GetFileName(DestinationFileWithMacrosExpanded)}");
 
-        Client.RenameFile(DestinationFileDuringTransfer, DestinationFileWithMacrosExpanded);
+        await client.RenameFileAsync(DestinationFileDuringTransfer, DestinationFileWithMacrosExpanded, cancellationToken);
         _logger.NotifyInformation(BatchContext, $"FILE RENAME: Temporary destination file {Path.GetFileName(DestinationFileDuringTransfer)} renamed to target {Path.GetFileName(DestinationFileWithMacrosExpanded)}.");
     }
 
@@ -254,66 +274,72 @@ internal class SingleFileTransfer
         var fileAttributes = Client.GetAttributes(DestinationFileWithMacrosExpanded);
         fileAttributes.LastWriteTime = date;
         Client.SetAttributes(DestinationFileWithMacrosExpanded, fileAttributes);
-        return;
     }
 
-    private void ExecuteSourceOperationMoveOrRename()
+    private async Task ExecuteSourceOperationRenameMove(CancellationToken cancellationToken)
     {
-        if (BatchContext.Source.Operation == SourceOperation.Move)
+        switch (BatchContext.Source.Operation)
         {
-            var moveToPath = _renamingPolicy.ExpandDirectoryForMacros(BatchContext.Source.DirectoryToMoveAfterTransfer);
-            SetCurrentState(TransferState.SourceOperationMove, $"Moving source file {SourceFile.FullPath} to {moveToPath}");
-            if (!Directory.Exists(moveToPath))
-            {
-                var msg = $"Operation failed: Source file {SourceFile.Name} couldn't be moved to given directory {moveToPath} because the directory didn't exist.";
-                _logger.NotifyError(BatchContext, msg, new ArgumentException("Failure in moving the source file."));
-                _result.ErrorMessages.Add($"Failure in source operation: {msg}");
-            }
+            case SourceOperation.Move:
+                var moveToPath = _renamingPolicy.ExpandDirectoryForMacros(BatchContext.Source.DirectoryToMoveAfterTransfer);
+                SetCurrentState(TransferState.SourceOperationMove, $"Moving source file {SourceFile.FullPath} to {moveToPath}");
+                if (!Directory.Exists(moveToPath))
+                {
+                    var msg = $"Operation failed: Source file {SourceFile.Name} couldn't be moved to given directory {moveToPath} because the directory didn't exist.";
+                    _logger.NotifyError(BatchContext, msg, new ArgumentException("Failure in moving the source file."));
+                    _result.ErrorMessages.Add($"Failure in source operation: {msg}");
+                }
 
-            var destFileName = Path.Combine(moveToPath, SourceFile.Name);
+                var destFileName = Path.Combine(moveToPath, SourceFile.Name);
 
-            try { File.Move(SourceFileDuringTransfer, destFileName); }
-            catch (Exception ex) { throw new Exception($"Failure in source operation: {ex.GetType().Name}: {ex.Message}", ex); }
+                try
+                {
+                    await FileOperations.MoveAsync(SourceFileDuringTransfer, destFileName, false, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Failure in source operation: {ex.GetType().Name}: {ex.Message}", ex);
+                }
 
-            _logger.NotifyInformation(BatchContext, $"FILE MOVE: Source file {SourceFileDuringTransfer} moved to target {destFileName}.");
-            WorkFile = new FileItem(destFileName);
+                _logger.NotifyInformation(BatchContext, $"FILE MOVE: Source file {SourceFileDuringTransfer} moved to target {destFileName}.");
+                WorkFile = new FileItem(destFileName);
 
-            if (WorkFile.FullPath == null)
-                _logger.NotifyInformation(BatchContext, "Source end point returned null as the moved file. It should return the name of the moved file.");
-        }
-        else if (BatchContext.Source.Operation == SourceOperation.Rename)
-        {
-            var path = string.IsNullOrEmpty(Path.GetDirectoryName(BatchContext.Source.FileNameAfterTransfer))
-                ? Path.GetDirectoryName(SourceFile.FullPath)
-                : Path.GetDirectoryName(_renamingPolicy.CreateRemoteFileNameForRename(SourceFile.FullPath, BatchContext.Source.FileNameAfterTransfer));
+                if (WorkFile.FullPath == null)
+                    _logger.NotifyInformation(BatchContext, "Source end point returned null as the moved file. It should return the name of the moved file.");
+                break;
+            case SourceOperation.Rename:
+                var path = string.IsNullOrEmpty(Path.GetDirectoryName(BatchContext.Source.FileNameAfterTransfer))
+                    ? Path.GetDirectoryName(SourceFile.FullPath)
+                    : Path.GetDirectoryName(_renamingPolicy.CreateRemoteFileNameForRename(SourceFile.FullPath, BatchContext.Source.FileNameAfterTransfer));
 
-            if (!Directory.Exists(path))
-            {
-                var msg = $"Operation failed: Source file {SourceFile.Name} couldn't be moved to given directory {path} because the directory didn't exist.";
-                _logger.NotifyError(BatchContext, msg, new ArgumentException("Failure in moving the source file."));
-                _result.ErrorMessages.Add($"Failure in source operation: {msg}");
-            }
+                if (!Directory.Exists(path))
+                {
+                    var msg = $"Operation failed: Source file {SourceFile.Name} couldn't be moved to given directory {path} because the directory didn't exist.";
+                    _logger.NotifyError(BatchContext, msg, new ArgumentException("Failure in moving the source file."));
+                    _result.ErrorMessages.Add($"Failure in source operation: {msg}");
+                }
 
-            var renameToPath = Path.Combine(path, _renamingPolicy.CreateRemoteFileNameForRename(SourceFile.FullPath, BatchContext.Source.FileNameAfterTransfer));
-            SetCurrentState(TransferState.SourceOperationRename, $"Renaming source file {Path.GetFileName(SourceFile.FullPath)} to {renameToPath}");
+                var renameToPath = Path.Combine(path, _renamingPolicy.CreateRemoteFileNameForRename(SourceFile.FullPath, BatchContext.Source.FileNameAfterTransfer));
+                SetCurrentState(TransferState.SourceOperationRename, $"Renaming source file {Path.GetFileName(SourceFile.FullPath)} to {renameToPath}");
 
-            File.Move(SourceFileDuringTransfer, renameToPath);
-            _logger.NotifyInformation(BatchContext, $"FILE RENAME: Source file {SourceFileDuringTransfer} renamed to target {renameToPath}.");
+                File.Move(SourceFileDuringTransfer, renameToPath);
+                _logger.NotifyInformation(BatchContext, $"FILE RENAME: Source file {SourceFileDuringTransfer} renamed to target {renameToPath}.");
 
-            WorkFile = new FileItem(renameToPath);
-            if (!File.Exists(renameToPath))
-            {
-                var msg = $"Operation failed: Source file {SourceFile.Name} couldn't be renamed to given name {Path.GetFileName(renameToPath)}";
-                _logger.NotifyError(BatchContext, msg, new ArgumentException("Failure in renaming source file."));
-                _result.ErrorMessages.Add($"Failure in source operation: {msg}");
-            }
+                WorkFile = new FileItem(renameToPath);
+                if (!File.Exists(renameToPath))
+                {
+                    var msg = $"Operation failed: Source file {SourceFile.Name} couldn't be renamed to given name {Path.GetFileName(renameToPath)}";
+                    _logger.NotifyError(BatchContext, msg, new ArgumentException("Failure in renaming source file."));
+                    _result.ErrorMessages.Add($"Failure in source operation: {msg}");
+                }
 
-            if (WorkFile.FullPath == null)
-                _logger.NotifyInformation(BatchContext, "Source end point returned null as the renamed file. It should return the name of the renamed file.");
+                if (WorkFile.FullPath == null)
+                    _logger.NotifyInformation(BatchContext, "Source end point returned null as the renamed file. It should return the name of the renamed file.");
+                break;
         }
     }
 
-    private void ExecuteSourceOperationNothingOrDelete()
+    private async Task ExecuteSourceOperationNothingDelete(CancellationToken cancellationToken)
     {
         switch (BatchContext.Source.Operation)
         {
@@ -330,7 +356,7 @@ internal class SingleFileTransfer
                         TransferState.RestoreSourceFile,
                         $"Restoring source file from {Path.GetFileName(SourceFileDuringTransfer)} to the original name {Path.GetFileName(SourceFile.FullPath)}");
 
-                    File.Move(SourceFileDuringTransfer, SourceFile.FullPath);
+                    await FileOperations.MoveAsync(SourceFileDuringTransfer, SourceFile.FullPath, true, cancellationToken);
                     _logger.NotifyInformation(BatchContext, $"FILE RENAME: Temporary file {SourceFileDuringTransfer} restored to target {SourceFile.FullPath}.");
                 }
                 break;
@@ -433,13 +459,13 @@ internal class SingleFileTransfer
             {
                 if (ShouldSourceFileBeRestoredOnError() && !File.Exists(SourceFile.FullPath))
                 {
-                    if (BatchContext.Source.Operation == SourceOperation.Move)
+                    if (BatchContext.Options.RenameSourceFileBeforeTransfer && File.Exists(SourceFileDuringTransfer))
+                        File.Move(SourceFileDuringTransfer, SourceFile.FullPath);
+                    if (BatchContext.Source.Operation == SourceOperation.Move && !File.Exists(SourceFile.FullPath))
                         RestoreSourceFileIfItWasMoved();
-                    if (BatchContext.Source.Operation == SourceOperation.Rename && !Client.Exists(SourceFile.FullPath))
+                    if (BatchContext.Source.Operation == SourceOperation.Rename && !File.Exists(SourceFile.FullPath))
                         if (WorkFile != null)
                             File.Move(WorkFile.FullPath, SourceFile.FullPath);
-                    if (BatchContext.Options.RenameSourceFileBeforeTransfer && !Client.Exists(SourceFile.FullPath))
-                        File.Move(SourceFileDuringTransfer, SourceFile.FullPath);
                     return "[Source file restored.]";
                 }
             }
@@ -470,6 +496,10 @@ internal class SingleFileTransfer
     {
         if (!string.IsNullOrEmpty(DestinationFileDuringTransfer))
         {
+            // Check that the connection is alive and if not try to connect again
+            if (!Client.IsConnected)
+                Client.Connect();
+
             try
             {
                 if (BatchContext.Options.RenameDestinationFileDuringTransfer)

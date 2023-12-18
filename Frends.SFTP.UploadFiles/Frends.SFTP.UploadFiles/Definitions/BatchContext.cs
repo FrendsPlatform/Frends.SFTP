@@ -19,7 +19,7 @@ internal class BatchContext
 
     public IEnumerable<FileItem> SourceFiles { get; set; }
 
-    public IEnumerable<SftpFile> DestinationFiles { get; set; }
+    public IEnumerable<ISftpFile> DestinationFiles { get; set; }
 
     public string RoutineUri { get; set; }
 
