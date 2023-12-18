@@ -87,7 +87,6 @@ internal class SingleFileTransfer
             await ExecuteSourceOperation(cancellationToken);
 
             _logger.LogTransferSuccess(this, BatchContext);
-            CleanUpFiles();
         }
         catch (Exception ex)
         {
@@ -97,6 +96,10 @@ internal class SingleFileTransfer
             var destinationFileRestoreMessage = RestoreDestinationFileAfterErrorIfItWasRenamed();
             if (!string.IsNullOrEmpty(destinationFileRestoreMessage))
                 HandleTransferError(ex, destinationFileRestoreMessage);
+        }
+        finally
+        {
+            CleanUpFiles();
         }
 
         _result.DestinationFilePath = DestinationFileWithMacrosExpanded;
@@ -120,7 +123,12 @@ internal class SingleFileTransfer
 
             while (!sftpAsynch.IsCompleted)
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    sftpAsynch.IsDownloadCanceled = true;
+                    _logger.NotifyError(BatchContext, "Operation was cancelled from UI.", new OperationCanceledException());
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
             }
 
             Client.EndDownloadFile(asynch);
@@ -154,7 +162,6 @@ internal class SingleFileTransfer
             : Path.Combine(directory, uniqueFileName);
 
         SetCurrentState(TransferState.RenameSourceFileBeforeTransfer, $"Renaming source file {SourceFile.Name} to temporary file name {uniqueFileName} before transfer.");
-
         await Client.RenameFileAsync(SourceFile.FullPath, SourceFileDuringTransfer, cancellationToken);
         _logger.NotifyInformation(BatchContext, $"FILE RENAME: Source file {SourceFile.Name} renamed to target {uniqueFileName}.");
     }

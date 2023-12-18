@@ -18,10 +18,10 @@ namespace Frends.SFTP.DownloadFiles.Tests
         public override void OneTimeSetup()
         {
             base.OneTimeSetup();
-            var (fingerPrint, hostKey) = Helpers.GetServerFingerPrintAndHostKey();
-            _MD5 = Helpers.ConvertToMD5Hex(fingerPrint);
+            var (MD5, SHA, hostKey) = Helpers.GetServerFingerPrintsAndHostKey();
+            _MD5 = MD5;
             _Sha256Hex = Helpers.ConvertToSHA256Hex(hostKey);
-            _Sha256Hash = Helpers.ConvertToSHA256Hash(hostKey);
+            _Sha256Hash = SHA;
         }
 
         [SetUp]

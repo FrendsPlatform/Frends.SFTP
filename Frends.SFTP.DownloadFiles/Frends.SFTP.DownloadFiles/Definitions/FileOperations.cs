@@ -53,6 +53,7 @@
         internal static async Task MoveAsync(string source, string remoteFile, CancellationToken cancellationToken)
         {
             await CopyAsync(source, remoteFile, true, cancellationToken);
+            File.Delete(source);
         }
     }
 }

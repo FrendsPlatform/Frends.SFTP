@@ -158,6 +158,58 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
             Assert.IsTrue(ex.Message.Contains($"SFTP transfer failed: Authentication of SSH session failed: Permission denied (password)"));
         }
+
+        [Test]
+        public void DownloadFiles_TestCancellationToken()
+        {
+            Helpers.UploadLargeTestFiles(_source.Directory, 1);
+            var connection = Helpers.GetSftpConnection();
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "LargeTestFile1.bin",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+            };
+
+            var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.DownloadFiles(source, _destination, connection, _options, _info, new CancellationTokenSource(2000).Token));
+            Assert.IsTrue(ex.Message.Contains("No files transferred."));
+            Assert.IsTrue(ex.Message.Contains("Error: The operation was canceled.."));
+            Assert.IsTrue(Helpers.SourceFileExists($"{source.Directory}/{source.FileName}"));
+        }
+
+        [Test]
+        public void DownloadFiles_TestTimeout()
+        {
+            Helpers.UploadLargeTestFiles(_source.Directory, 1);
+            var connection = Helpers.GetSftpConnection();
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "*",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+            };
+
+            var options = new Options
+            {
+                Timeout = 2,
+                ThrowErrorOnFail = true,
+                RenameSourceFileBeforeTransfer = false,
+                RenameDestinationFileDuringTransfer = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true
+            };
+
+            var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.DownloadFiles(source, _destination, connection, options, _info, default));
+            Console.WriteLine(ex.Message);
+            Assert.IsTrue(ex.Message.Contains("The operation was canceled."));
+            Assert.IsTrue(ex.Message.Contains("No files transferred."));
+            Assert.IsTrue(Helpers.SourceFileExists($"{source.Directory}/LargeTestFile1.bin"));
+        }
+
+
     }
 }
 

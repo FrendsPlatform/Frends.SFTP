@@ -27,6 +27,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -41,6 +42,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -56,6 +58,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -71,6 +74,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -85,6 +89,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -100,6 +105,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -118,6 +124,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -136,6 +143,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -155,6 +163,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -174,6 +183,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -192,6 +202,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
         }
 
         [Test]
@@ -211,6 +222,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
         }
     }
 }
