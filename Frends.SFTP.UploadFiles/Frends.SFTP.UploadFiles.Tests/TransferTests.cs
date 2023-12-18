@@ -468,7 +468,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.IsFalse(result.ActionSkipped);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
-            Assert.IsTrue(Directory.GetFiles(temp).Length == 0);
+            Assert.AreEqual(0, Directory.GetFiles(temp).Length);
         }
 
         [Ignore("Test needs CIFS share mounted to sftp directory 'pod'")]

@@ -93,8 +93,8 @@ public class SFTP
     /// <param name="cancellationToken">CancellationToken is given by Frends</param>
     /// <returns>
     /// Result object {
-    /// bool ActionSkiped, 
-    /// bool Success, 
+    /// bool ActionSkipped,
+    /// bool Success,
     /// string UserResultMessage, 
     /// int SuccessfulTransferCount, 
     /// int FailedTransferCount, 

@@ -239,7 +239,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(source, _destination, connection, options, info, default));
             Assert.IsTrue(ex.Message.Contains("Operation was cancelled from UI."));
             Assert.IsTrue(ex.Message.Contains("No files transferred."));
-            Assert.IsTrue(Directory.GetFiles(temp).Length == 0);
+            Assert.AreEqual(0, Directory.GetFiles(temp).Length);
         }
     }
 }
