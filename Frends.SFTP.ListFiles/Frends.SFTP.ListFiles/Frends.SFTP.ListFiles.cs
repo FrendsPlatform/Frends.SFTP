@@ -68,7 +68,7 @@ namespace Frends.SFTP.ListFiles
 
             client.Disconnect();
             client.Dispose();
-            
+
             return new Result(files);
         }
 
