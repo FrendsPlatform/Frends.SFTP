@@ -29,7 +29,7 @@ public class ListFilesTest : ListFilesTestBase
     {
         _input.FileMask = "*.txt";
         _input.IncludeSubdirectories = true;
-            
+
         var result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.That(result, Is.Not.Null);
         Assert.AreEqual(6, result.FileCount);

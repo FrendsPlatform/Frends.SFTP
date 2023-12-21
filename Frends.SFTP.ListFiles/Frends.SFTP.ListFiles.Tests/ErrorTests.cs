@@ -23,7 +23,6 @@ public class ErrorTests : ListFilesTestBase
             IncludeSubdirectories = true,
             FileEncoding = FileEncoding.ANSI
         };
-            
 
         var ex = Assert.ThrowsAsync<SftpPathNotFoundException>(async () => await SFTP.ListFiles(input, _connection, new CancellationToken()));
         Assert.AreEqual($"No such file", ex.Message);
