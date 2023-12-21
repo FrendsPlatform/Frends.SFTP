@@ -89,9 +89,9 @@ public class Connection
     /// Passphrase for the private key file.
     /// </summary>
     /// <example>passphrase</example>
-    [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyFile)]
+    [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyString, AuthenticationType.UsernamePrivateKeyString)]
     [PasswordPropertyText]
-    public string PrivateKeyFilePassphrase { get; set; }
+    public string PrivateKeyPassphrase { get; set; }
 
     /// <summary>
     /// Fingerprint of the SFTP server. When using "Username-Password" 
