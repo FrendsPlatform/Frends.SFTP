@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Renci.SshNet.Common;
 using Frends.SFTP.MoveFile.Enums;
@@ -22,62 +23,62 @@ public class ServerFingerprintTests : MoveFileTestBase
     }
 
     [Test]
-    public void MoveFile_TestTransferWithExpectedServerFingerprintAsHexSha256()
+    public async Task MoveFile_TestTransferWithExpectedServerFingerprintAsHexSha256()
     {
         _connection.ServerFingerPrint = _Sha256Hex;
         _connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
-        var result = SFTP.MoveFile(_input, _connection, default);
+        var result = await SFTP.MoveFile(_input, _connection, default);
         Assert.IsNotNull(result.Files);
     }
 
     [Test]
-    public void MoveFile_TestTransferWithExpectedServerFingerprintAsHexSha256WithAltercations()
+    public async Task MoveFile_TestTransferWithExpectedServerFingerprintAsHexSha256WithAltercations()
     {
         _connection.ServerFingerPrint = _Sha256Hash.Replace("=", "");
         _connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
-        var result = SFTP.MoveFile(_input, _connection, default);
+        var result = await SFTP.MoveFile(_input, _connection, default);
         Assert.IsNotNull(result.Files);
     }
 
     [Test]
-    public void MoveFile_TestTransferWithExpectedServerFingerprintAsSha256()
+    public async Task MoveFile_TestTransferWithExpectedServerFingerprintAsSha256()
     {
         _connection.ServerFingerPrint = _Sha256Hash;
         _connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
-        var result = SFTP.MoveFile(_input, _connection, default);
+        var result = await SFTP.MoveFile(_input, _connection, default);
         Assert.IsNotNull(result.Files);
     }
 
     [Test]
-    public void MoveFile_TestTransferWithExpectedServerFingerprintAsMD5()
+    public async Task MoveFile_TestTransferWithExpectedServerFingerprintAsMD5()
     {
         _connection.ServerFingerPrint = _MD5;
         _connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
-        var result = SFTP.MoveFile(_input, _connection, default);
+        var result = await SFTP.MoveFile(_input, _connection, default);
         Assert.IsNotNull(result.Files);
     }
 
     [Test]
-    public void MoveFile_TestTransferWithExpectedServerFingerprintAsMD5ToLower()
+    public async Task MoveFile_TestTransferWithExpectedServerFingerprintAsMD5ToLower()
     {
         _connection.ServerFingerPrint = _MD5.ToLower();
         _connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
-        var result = SFTP.MoveFile(_input, _connection, default);
+        var result = await SFTP.MoveFile(_input, _connection, default);
         Assert.IsNotNull(result.Files);
     }
 
     [Test]
-    public void MoveFile_TestTransferWithExpectedServerFingerprintAsMD5Hash()
+    public async Task MoveFile_TestTransferWithExpectedServerFingerprintAsMD5Hash()
     {
         _connection.ServerFingerPrint = _MD5.Replace(":", "");
         _connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
-        var result = SFTP.MoveFile(_input, _connection, default);
+        var result = await SFTP.MoveFile(_input, _connection, default);
         Assert.IsNotNull(result.Files);
     }
 
@@ -86,7 +87,7 @@ public class ServerFingerprintTests : MoveFileTestBase
     {
         _connection.ServerFingerPrint = "73:58:DF:2D:CD:12:35:AB:7D:00:41:F0:1E:62:15:E0";
 
-        var ex = Assert.Throws<SshConnectionException>(() => SFTP.MoveFile(_input, _connection, default));
+        var ex = Assert.ThrowsAsync<SshConnectionException>(async () => await SFTP.MoveFile(_input, _connection, default));
         Assert.IsTrue(ex.Message.StartsWith("Key exchange negotiation failed."));
     }
 
@@ -95,7 +96,7 @@ public class ServerFingerprintTests : MoveFileTestBase
     {
         _connection.ServerFingerPrint = "c4b56fba6167c11f62e26b192c839d394e5c8d278b614b81345d037d178442f2";
 
-        var ex = Assert.Throws<SshConnectionException>(() => SFTP.MoveFile(_input, _connection, default));
+        var ex = Assert.ThrowsAsync<SshConnectionException>(async () => await SFTP.MoveFile(_input, _connection, default));
         Assert.IsTrue(ex.Message.StartsWith("Key exchange negotiation failed."));
     }
 
@@ -104,7 +105,7 @@ public class ServerFingerprintTests : MoveFileTestBase
     {
         _connection.ServerFingerPrint = "nuDEsWN4tfEQ684+x+7RySiCwj+GXmX2CfBaBHeSqO8=";
 
-        var ex = Assert.Throws<SshConnectionException>(() => SFTP.MoveFile(_input, _connection, default));
+        var ex = Assert.ThrowsAsync<SshConnectionException>(async () => await SFTP.MoveFile(_input, _connection, default));
         Assert.IsTrue(ex.Message.StartsWith("Key exchange negotiation failed."));
     }
 
@@ -113,7 +114,7 @@ public class ServerFingerprintTests : MoveFileTestBase
     {
         _connection.ServerFingerPrint = "nuDEsWN4tfEQ684x7RySiCwjGXmX2CfBaBHeSqO8vfiurenvire56";
 
-        var ex = Assert.Throws<SshConnectionException>(() => SFTP.MoveFile(_input, _connection, default));
+        var ex = Assert.ThrowsAsync<SshConnectionException>(async () => await SFTP.MoveFile(_input, _connection, default));
         Assert.IsTrue(ex.Message.StartsWith("Key exchange negotiation failed."));
     }
 }

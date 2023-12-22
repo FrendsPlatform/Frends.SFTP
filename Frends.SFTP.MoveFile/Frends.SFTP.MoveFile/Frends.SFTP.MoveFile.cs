@@ -11,20 +11,20 @@ namespace Frends.SFTP.MoveFile;
 public class SFTP
 {
     /// <summary>
-    /// Moves a file in SFTP server.
+    /// Moves files in SFTP server.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.SFTP.MoveFile)
     /// </summary>
     /// <param name="connection">Transfer connection parameters</param>
     /// <param name="input">Read options with full path and encoding</param>
     /// <param name="cancellationToken">CancellationToken given by Frends.</param>
-    /// <returns>Result object { List [object { string SourcePath, string TargetPath }, string message] }</returns>
-    public static Result MoveFile([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
+    /// <returns>Object { List&lt;FileItem&gt; [ { string SourcePath, string TargetPath } ], string message }</returns>
+    public static async Task<Result> MoveFile([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
     {
         ConnectionInfo connectionInfo;
         // Establish connectionInfo with connection parameters
         try
         {
-            var builder = new ConnectionInfoBuilder(connection);
+            var builder = new ConnectionInfoBuilder(connection, input);
             connectionInfo = builder.BuildConnectionInfo();
         }
         catch (Exception e)
@@ -49,7 +49,7 @@ public class SFTP
 
         client.BufferSize = connection.BufferSize * 1024;
 
-        client.Connect();
+        await client.ConnectAsync(cancellationToken);
 
         if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
@@ -122,7 +122,7 @@ public class SFTP
 
             if (file.Name.Equals(input.Pattern) || Util.FileMatchesMask(Path.GetFileName(file.FullName), input.Pattern))
             {
-                FileItem item = new FileItem(file.FullName, Path.Combine(input.TargetDirectory, Path.GetFileName(file.FullName)).Replace("\\", "/"));
+                var item = new FileItem(file.FullName, Path.Combine(input.TargetDirectory, Path.GetFileName(file.FullName)).Replace("\\", "/"));
                 fileItems.Add(item);
             }
         }
