@@ -31,7 +31,7 @@ public class Result
     /// <example>2022-06-14T12:45:28.6058477+03:00</example>
     public DateTime LastWriteTime { get; private set; }
 
-    internal Result(SftpFile file, string content)
+    internal Result(ISftpFile file, string content)
     {
         Content = content;
         Path = file.FullName;

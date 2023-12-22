@@ -16,8 +16,9 @@ public class SFTP
     /// </summary>
     /// <param name="connection">Transfer connection parameters</param>
     /// <param name="input">Read options with full path and encoding</param>
+    /// <param name="cancellationToken">Token given by Frends to enable Task termination.</param>
     /// <returns>Result object { string Content, string Path, double SizeInMegaBytes, DateTime LastWriteTime }</returns>
-    public static Result ReadFile([PropertyTab] Input input, [PropertyTab] Connection connection)
+    public static async Task<Result> ReadFile([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
     {
         ConnectionInfo connectionInfo;
         // Establish connectionInfo with connection parameters
@@ -32,10 +33,6 @@ public class SFTP
         }
 
         using var client = new SftpClient(connectionInfo);
-
-        //Disable support for these host key exchange algorithms relating: https://github.com/FrendsPlatform/Frends.SFTP/security/dependabot/4
-        client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256");
-        client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256@libssh.org");
 
         if (connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
             Util.ForceHostKeyAlgorithm(client, connection.HostKeyAlgorithm);
@@ -55,7 +52,7 @@ public class SFTP
 
         client.BufferSize = connection.BufferSize * 1024;
 
-        client.Connect();
+        await client.ConnectAsync(cancellationToken);
 
         if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
         var encoding = Util.GetEncoding(input.FileEncoding, input.EnableBom, input.EncodingInString);
