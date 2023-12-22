@@ -96,7 +96,7 @@ public class ServerFingerprintTests : ReadFileTestBase
     {
         _connection.ServerFingerPrint = "c4b56fba6167c11f62e26b192c839d394e5c8d278b614b81345d037d178442f2";
 
-        var ex = Assert.ThrowsAsync<SshConnectionException>(async() => await SFTP.ReadFile(_input, _connection, default));
+        var ex = Assert.ThrowsAsync<SshConnectionException>(async () => await SFTP.ReadFile(_input, _connection, default));
         Assert.IsTrue(ex.Message.StartsWith("Key exchange negotiation failed."));
     }
 
