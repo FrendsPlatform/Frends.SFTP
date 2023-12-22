@@ -8,9 +8,6 @@
 - Changed connection info builder to create the connection info as it's done in DownloadFiles.
 - [Breaking] Changed PrivateKeyFilePassphrase parameter to PrivateKeyPassphrase and enabled it when PrivateKeyString was used.
 
-### Added
-- Added FileEncoding for file names.
-
 ## [2.0.1] - 2022-12-01
 ### Updated
 - Updated dependency Microsoft.Extensions.DependencyInjection to the newest version.
