@@ -34,7 +34,7 @@ class ReadTests : ReadFileTestBase
 
         var result = await SFTP.ReadFile(_input, _connection, default);
         Assert.AreEqual(_content, result.Content);
-        
+
         _input.FileEncoding = FileEncoding.ASCII;
         result = await SFTP.ReadFile(_input, _connection, default);
         Assert.AreEqual(_content, result.Content);
