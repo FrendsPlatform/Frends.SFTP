@@ -3,6 +3,7 @@
 using System;
 using System.IO;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using Frends.SFTP.DeleteFiles.Definitions;
 using Frends.SFTP.DeleteFiles.Enums;
 using NUnit.Framework;
@@ -19,24 +20,24 @@ public class ConnectionTests : UnitTestBase
         connection.Username = "demo";
         connection.Password = "demo";
 
-        var ex = Assert.Throws<SshAuthenticationException>(() => SFTP.DeleteFiles(_input, connection, default));
+        var ex = Assert.ThrowsAsync<SshAuthenticationException>(async () => await SFTP.DeleteFiles(_input, connection, default));
         Assert.AreEqual("Permission denied (password).", ex.Message);
     }
 
     [Test]
-    public void DeleteFiles_TestPrivateKeyFileRsa()
+    public async Task DeleteFiles_TestPrivateKeyFileRsa()
     {
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
         connection.PrivateKeyPassphrase = "passphrase";
         connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
-        var result = SFTP.DeleteFiles(_input, connection, default);
+        var result = await SFTP.DeleteFiles(_input, connection, default);
         Assert.AreEqual(3, result.Files.Count);
     }
 
     [Test]
-    public void DeleteFiles_TestPrivateKeyFileRsaFromString()
+    public async Task DeleteFiles_TestPrivateKeyFileRsaFromString()
     {
         var key = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key"));
 
@@ -46,22 +47,22 @@ public class ConnectionTests : UnitTestBase
         connection.PrivateKeyPassphrase = "passphrase";
         connection.PrivateKeyString = key;
 
-        var result = SFTP.DeleteFiles(_input, connection, default);
+        var result = await SFTP.DeleteFiles(_input, connection, default);
         Assert.AreEqual(3, result.Files.Count);
     }
 
     [Test]
-    public void DeleteFiles_TestWithInteractiveKeyboardAuthentication()
+    public async Task DeleteFiles_TestWithInteractiveKeyboardAuthentication()
     {
         var connection = Helpers.GetSftpConnection();
         connection.UseKeyboardInteractiveAuthentication = true;
 
-        var result = SFTP.DeleteFiles(_input, connection, default);
+        var result = await SFTP.DeleteFiles(_input, connection, default);
         Assert.AreEqual(3, result.Files.Count);
     }
 
     [Test]
-    public void DeleteFiles_TestWithInteractiveKeyboardAuthenticationAndPrivateKey()
+    public async Task DeleteFiles_TestWithInteractiveKeyboardAuthenticationAndPrivateKey()
     {
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePrivateKeyFile;
@@ -71,7 +72,7 @@ public class ConnectionTests : UnitTestBase
         connection.UseKeyboardInteractiveAuthentication = true;
         connection.PromptAndResponse = new PromptResponse[] { new PromptResponse { Prompt = "Password", Response = "pass" } };
 
-        var result = SFTP.DeleteFiles(_input, connection, default);
+        var result = await SFTP.DeleteFiles(_input, connection, default);
         Assert.AreEqual(3, result.Files.Count);
 
         connection.Authentication = AuthenticationType.UsernamePrivateKeyString;
@@ -80,7 +81,7 @@ public class ConnectionTests : UnitTestBase
         connection.PrivateKeyPassphrase = "passphrase";
 
         _input.Directory = "/delete/subDir";
-        result = SFTP.DeleteFiles(_input, connection, default);
+        result = await SFTP.DeleteFiles(_input, connection, default);
         Assert.AreEqual(3, result.Files.Count);
     }
 
@@ -95,7 +96,7 @@ public class ConnectionTests : UnitTestBase
             FileMask = "filenotexisting.txt",
         };
 
-        Assert.Throws<SocketException>(() => SFTP.DeleteFiles(input, connection, default));
+        Assert.ThrowsAsync<SocketException>(async () => await SFTP.DeleteFiles(input, connection, default));
     }
 
     [Test]
@@ -111,7 +112,7 @@ public class ConnectionTests : UnitTestBase
             FileMask = "filenotexisting.txt",
         };
 
-        var ex = Assert.Throws<SshAuthenticationException>(() => SFTP.DeleteFiles(input, connection, default));
+        var ex = Assert.ThrowsAsync<SshAuthenticationException>(async () => await SFTP.DeleteFiles(input, connection, default));
         Assert.AreEqual("Permission denied (password).", ex.Message);
     }
 
@@ -129,7 +130,7 @@ public class ConnectionTests : UnitTestBase
             FileMask = "filenotexisting.txt",
         };
 
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.DeleteFiles(input, connection, default));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.DeleteFiles(input, connection, default));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info:"));
     }
 
@@ -139,7 +140,7 @@ public class ConnectionTests : UnitTestBase
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
         connection.PrivateKeyPassphrase = "passphrase";
-        connection.PrivateKeyFile = "";
+        connection.PrivateKeyFile = string.Empty;
 
         var input = new Input
         {
@@ -147,7 +148,7 @@ public class ConnectionTests : UnitTestBase
             FileMask = "filenotexisting.txt",
         };
 
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.DeleteFiles(input, connection, default));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.DeleteFiles(input, connection, default));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
@@ -167,7 +168,7 @@ public class ConnectionTests : UnitTestBase
             FileMask = "filenotexisting.txt",
         };
 
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.DeleteFiles(input, connection, default));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.DeleteFiles(input, connection, default));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
@@ -185,7 +186,7 @@ public class ConnectionTests : UnitTestBase
             FileMask = "filenotexisting.txt",
         };
 
-        var ex = Assert.Throws<SshConnectionException>(() => SFTP.DeleteFiles(input, connection, default));
+        var ex = Assert.ThrowsAsync<SshConnectionException>(async () => await SFTP.DeleteFiles(input, connection, default));
         Assert.AreEqual("Key exchange negotiation failed.", ex.Message);
     }
 }

@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using Frends.SFTP.DeleteFiles.Definitions;
 using Frends.SFTP.DeleteFiles.Enums;
 using Renci.SshNet.Common;
@@ -24,7 +25,7 @@ public static class SFTP
     /// <param name="connection">Connection parameters.</param>
     /// <param name="cancellationToken">Cancellation token given by Frends.</param>
     /// <returns>Object { List [ Object { string Name, string Path, Double SizeInMegaBytes } ] }.</returns>
-    public static Result DeleteFiles([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
+    public static async Task<Result> DeleteFiles([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
     {
         var deletedFiles = new List<FileItem>();
 
@@ -60,16 +61,15 @@ public static class SFTP
             }
         }
 
-        client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
         client.OperationTimeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
         client.KeepAliveInterval = TimeSpan.FromSeconds(connection.ConnectionTimeout);
         client.BufferSize = connection.BufferSize * 1024;
 
-        client.Connect();
+        await client.ConnectAsync(cancellationToken);
 
         if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
-        var files = GetFiles(client, input, cancellationToken);
+        var files = await GetFiles(client, input, cancellationToken);
 
         foreach (var file in files)
         {
@@ -83,7 +83,7 @@ public static class SFTP
         return new Result(deletedFiles);
     }
 
-    private static List<FileItem> GetFiles(SftpClient sftp, Input input, CancellationToken cancellationToken)
+    private static async Task<List<FileItem>> GetFiles(SftpClient sftp, Input input, CancellationToken cancellationToken)
     {
         var directoryList = new List<FileItem>();
         var filePaths = ConvertObjectToStringArray(input.FilePaths);
@@ -104,9 +104,9 @@ public static class SFTP
 
         try
         {
-            var files = sftp.ListDirectory(input.Directory);
+            var files = sftp.ListDirectoryAsync(input.Directory, cancellationToken).ConfigureAwait(false);
 
-            foreach (var file in files)
+            await foreach (var file in files.WithCancellation(cancellationToken).ConfigureAwait(false))
             {
                 cancellationToken.ThrowIfCancellationRequested();
 

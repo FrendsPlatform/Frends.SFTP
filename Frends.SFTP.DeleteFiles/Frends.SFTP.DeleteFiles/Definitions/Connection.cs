@@ -1,5 +1,6 @@
 ﻿namespace Frends.SFTP.DeleteFiles.Definitions;
 
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Frends.SFTP.DeleteFiles.Enums;
@@ -134,5 +135,5 @@ public class Connection
     /// </summary>
     /// <example>[PromptResponse { Prompt = Verification code, Response = 123456789 } ]</example>
     [UIHint(nameof(UseKeyboardInteractiveAuthentication), "", true)]
-    public PromptResponse[] PromptAndResponse { get; set; } = new PromptResponse[0];
+    public PromptResponse[] PromptAndResponse { get; set; } = Array.Empty<PromptResponse>();
 }
