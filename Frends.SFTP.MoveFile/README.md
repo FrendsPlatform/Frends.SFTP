@@ -4,7 +4,7 @@
 ![GitHub](https://img.shields.io/github/license/FrendsPlatform/Frends.SFTP?label=License)
 ![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.SFTP/Frends.SFTP.MoveFile|main)
 
-Moves a file in SFTP server
+Moves files in SFTP server
 
 ## Installing
 

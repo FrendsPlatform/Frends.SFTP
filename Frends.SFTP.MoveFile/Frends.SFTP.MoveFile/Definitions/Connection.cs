@@ -97,9 +97,9 @@ public class Connection
     /// Passphrase for the private key file.
     /// </summary>
     /// <example>passphrase</example>
-    [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyFile)]
+    [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyFile, AuthenticationType.UsernamePrivateKeyString, AuthenticationType.UsernamePasswordPrivateKeyString)]
     [PasswordPropertyText]
-    public string PrivateKeyFilePassphrase { get; set; }
+    public string PrivateKeyPassphrase { get; set; }
 
     /// <summary>
     /// Fingerprint of the SFTP server. When using "Username-Password" 
@@ -128,6 +128,12 @@ public class Connection
     /// <example>false</example>
     [DefaultValue(false)]
     public bool UseKeyboardInteractiveAuthentication { get; set; }
+
+    /// <summary>
+    /// Responses for the server prompts when using Keyboard Interactive authentication method.
+    /// </summary>
+    [UIHint(nameof(UseKeyboardInteractiveAuthentication), "", true)]
+    public PromptResponse[] PromptAndResponse { get; set; } = Array.Empty<PromptResponse>();
 
     /// <summary>
     /// Integer value of used buffer size as KB.
