@@ -72,7 +72,7 @@ public class ErrorTests
         };
 
         var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ReadFile(input, connection, default));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info:"));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info:"));
     }
 
     [Test]
@@ -90,7 +90,7 @@ public class ErrorTests
         };
 
         var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ReadFile(input, connection, default));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info: "));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
     [Test]
@@ -110,7 +110,7 @@ public class ErrorTests
         };
 
         var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ReadFile(input, connection, default));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info: "));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
     [Test]
