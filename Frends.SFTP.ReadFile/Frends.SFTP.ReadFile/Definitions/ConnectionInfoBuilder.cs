@@ -19,14 +19,21 @@ internal class ConnectionInfoBuilder
     internal ConnectionInfo BuildConnectionInfo()
     {
         ConnectionInfo connectionInfo;
-        List<AuthenticationMethod> methods = new List<AuthenticationMethod>();
+        var methods = new List<AuthenticationMethod>();
 
         if (_connection.UseKeyboardInteractiveAuthentication)
         {
-            // Construct keyboard-interactive authentication method
-            var kauth = new KeyboardInteractiveAuthenticationMethod(_connection.Username);
-            kauth.AuthenticationPrompt += new EventHandler<AuthenticationPromptEventArgs>(HandleKeyEvent);
-            methods.Add(kauth);
+            try
+            {
+                // Construct keyboard-interactive authentication method
+                var kauth = new KeyboardInteractiveAuthenticationMethod(_connection.Username);
+                kauth.AuthenticationPrompt += new EventHandler<AuthenticationPromptEventArgs>(HandleKeyEvent);
+                methods.Add(kauth);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Failure in Keyboard-Interactive authentication: {ex.Message}");
+            }
         }
 
         PrivateKeyFile privateKey = null;
@@ -34,8 +41,8 @@ internal class ConnectionInfoBuilder
         {
             if (string.IsNullOrEmpty(_connection.PrivateKeyFile))
                 throw new ArgumentException("Private key file path was not given.");
-            privateKey = (_connection.PrivateKeyFilePassphrase != null)
-                ? new PrivateKeyFile(_connection.PrivateKeyFile, _connection.PrivateKeyFilePassphrase)
+            privateKey = (_connection.PrivateKeyPassphrase != null)
+                ? new PrivateKeyFile(_connection.PrivateKeyFile, _connection.PrivateKeyPassphrase)
                 : new PrivateKeyFile(_connection.PrivateKeyFile);
         }
         if (_connection.Authentication == AuthenticationType.UsernamePrivateKeyString || _connection.Authentication == AuthenticationType.UsernamePasswordPrivateKeyString)
@@ -43,9 +50,9 @@ internal class ConnectionInfoBuilder
             if (string.IsNullOrEmpty(_connection.PrivateKeyString))
                 throw new ArgumentException("Private key string was not given.");
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(_connection.PrivateKeyString));
-            privateKey = (_connection.PrivateKeyFilePassphrase != null)
-                ? new PrivateKeyFile(stream, _connection.PrivateKeyFilePassphrase)
-                : new PrivateKeyFile(stream, "");
+            privateKey = (_connection.PrivateKeyPassphrase != null)
+                ? new PrivateKeyFile(stream, _connection.PrivateKeyPassphrase)
+                : new PrivateKeyFile(stream);
         }
         switch (_connection.Authentication)
         {
@@ -70,16 +77,39 @@ internal class ConnectionInfoBuilder
                 throw new ArgumentException($"Unknown Authentication type: '{_connection.Authentication}'.");
         }
 
-        connectionInfo = new ConnectionInfo(_connection.Address, _connection.Port, _connection.Username, methods.ToArray());
-        connectionInfo.Encoding = Util.GetEncoding(_input.FileEncoding, _input.EnableBom, _input.EncodingInString);
+        connectionInfo = new ConnectionInfo(_connection.Address, _connection.Port, _connection.Username, methods.ToArray())
+        {
+            Encoding = Util.GetEncoding(_input.FileEncoding, _input.EnableBom, _input.EncodingInString),
+            ChannelCloseTimeout = TimeSpan.FromSeconds(_connection.ConnectionTimeout),
+            Timeout = TimeSpan.FromSeconds(_connection.ConnectionTimeout)
+        };
 
         return connectionInfo;
     }
 
     private void HandleKeyEvent(object sender, AuthenticationPromptEventArgs e)
     {
-        foreach (var prompt in e.Prompts)
-            if (prompt.Request.IndexOf("Password:", StringComparison.InvariantCultureIgnoreCase) != -1)
-                prompt.Response = _connection.Password;
+        if (e.Prompts.Any())
+        {
+            foreach (var serverPrompt in e.Prompts)
+            {
+                if (!string.IsNullOrEmpty(_connection.Password) && serverPrompt.Request.IndexOf("Password:", StringComparison.InvariantCultureIgnoreCase) != -1)
+                    serverPrompt.Response = _connection.Password;
+                else
+                {
+                    if (!_connection.PromptAndResponse.Any() || !_connection.PromptAndResponse.Select(p => p.Prompt.ToLower()).ToList().Contains(serverPrompt.Request.Replace(":", "").Trim().ToLower()))
+                    {
+                        var errorMsg = $"Failure in Keyboard-interactive authentication: No response given for server prompt request --> {serverPrompt.Request.Replace(":", "").Trim()}";
+                        throw new ArgumentException(errorMsg);
+                    }
+
+                    foreach (var prompt in _connection.PromptAndResponse)
+                    {
+                        if (serverPrompt.Request.IndexOf(prompt.Prompt, StringComparison.InvariantCultureIgnoreCase) != -1)
+                            serverPrompt.Response = prompt.Response;
+                    }
+                }
+            }
+        }
     }
 }

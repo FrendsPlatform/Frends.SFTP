@@ -17,11 +17,11 @@ public class ErrorTests
         var connection = Helpers.GetSftpConnection();
         var input = new Input
         {
-            Path = "/read/test.txt",
+            Path = "/upload/test.txt",
             FileEncoding = FileEncoding.ANSI,
         };
 
-        var ex = Assert.Throws<SftpPathNotFoundException>(() => SFTP.ReadFile(input, connection));
+        var ex = Assert.ThrowsAsync<SftpPathNotFoundException>(async () => await SFTP.ReadFile(input, connection, default));
         Assert.AreEqual($"No such file", ex.Message);
 
     }
@@ -33,11 +33,11 @@ public class ErrorTests
         connection.Port = 51644;
         var input = new Input
         {
-            Path = "/read/test.txt",
+            Path = "/upload/test.txt",
             FileEncoding = FileEncoding.ANSI,
         };
 
-        Assert.Throws<SocketException>(() => SFTP.ReadFile(input, connection));
+        Assert.ThrowsAsync<SocketException>(async () => await SFTP.ReadFile(input, connection, default));
     }
 
     [Test]
@@ -49,11 +49,11 @@ public class ErrorTests
 
         var input = new Input
         {
-            Path = "/read/test.txt",
+            Path = "/upload/test.txt",
             FileEncoding = FileEncoding.ANSI,
         };
 
-        var ex = Assert.Throws<SshAuthenticationException>(() => SFTP.ReadFile(input, connection));
+        var ex = Assert.ThrowsAsync<SshAuthenticationException>(async () => await SFTP.ReadFile(input, connection, default));
         Assert.AreEqual("Permission denied (password).", ex.Message);
     }
 
@@ -62,17 +62,17 @@ public class ErrorTests
     {
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        connection.PrivateKeyFilePassphrase = "demo";
+        connection.PrivateKeyPassphrase = "demo";
         connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
         var input = new Input
         {
-            Path = "/read/test.txt",
+            Path = "/upload/test.txt",
             FileEncoding = FileEncoding.ANSI,
         };
 
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.ReadFile(input, connection));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info:"));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ReadFile(input, connection, default));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info:"));
     }
 
     [Test]
@@ -80,17 +80,17 @@ public class ErrorTests
     {
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        connection.PrivateKeyFilePassphrase = "passphrase";
+        connection.PrivateKeyPassphrase = "passphrase";
         connection.PrivateKeyFile = "";
 
         var input = new Input
         {
-            Path = "/read/test.txt",
+            Path = "/upload/test.txt",
             FileEncoding = FileEncoding.ANSI,
         };
 
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.ReadFile(input, connection));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info: "));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ReadFile(input, connection, default));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
     [Test]
@@ -100,17 +100,17 @@ public class ErrorTests
 
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
-        connection.PrivateKeyFilePassphrase = "passphrase";
+        connection.PrivateKeyPassphrase = "passphrase";
         connection.PrivateKeyString = key.ToString();
 
         var input = new Input
         {
-            Path = "/read/test.txt",
+            Path = "/upload/test.txt",
             FileEncoding = FileEncoding.ANSI,
         };
 
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.ReadFile(input, connection));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info: "));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ReadFile(input, connection, default));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
     [Test]
@@ -123,11 +123,11 @@ public class ErrorTests
 
         var input = new Input
         {
-            Path = "/read/test.txt",
+            Path = "/upload/test.txt",
             FileEncoding = FileEncoding.ANSI,
         };
 
-        var ex = Assert.Throws<SshConnectionException>(() => SFTP.ReadFile(input, connection));
+        var ex = Assert.ThrowsAsync<SshConnectionException>(async () => await SFTP.ReadFile(input, connection, default));
         Assert.AreEqual("Key exchange negotiation failed.", ex.Message);
     }
 }
