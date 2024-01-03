@@ -20,7 +20,7 @@ public class ListFilesTest : ListFilesTestBase
         _input.FileMask = "*.txt";
 
         var result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
-        Assert.That(result, Is.Not.Null);
+        Assert.IsNotNull(result);
         Assert.AreEqual(3, result.FileCount);
     }
 
@@ -31,7 +31,7 @@ public class ListFilesTest : ListFilesTestBase
         _input.IncludeSubdirectories = true;
 
         var result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
-        Assert.That(result, Is.Not.Null);
+        Assert.IsNotNull(result);
         Assert.AreEqual(6, result.FileCount);
     }
 
@@ -39,7 +39,7 @@ public class ListFilesTest : ListFilesTestBase
     public async Task ListFilesWithoutFileMask()
     {
         var result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
-        Assert.That(result, Is.Not.Null);
+        Assert.IsNotNull(result);
         Assert.AreEqual(3, result.FileCount);
     }
 
@@ -49,7 +49,7 @@ public class ListFilesTest : ListFilesTestBase
         _input.IncludeType = IncludeType.Both;
 
         var result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
-        Assert.That(result, Is.Not.Null);
+        Assert.IsNotNull(result);
         Assert.AreEqual(4, result.FileCount);
     }
 
@@ -60,7 +60,7 @@ public class ListFilesTest : ListFilesTestBase
         _input.IncludeSubdirectories = true;
 
         var result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
-        Assert.That(result, Is.Not.Null);
+        Assert.IsNotNull(result);
         Assert.AreEqual(1, result.FileCount);
         Assert.IsTrue(result.Files[0].IsDirectory);
     }

@@ -17,10 +17,10 @@ public class ServerFingerprintTests : ListFilesTestBase
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        var (fingerPrint, hostKey) = Helpers.GetServerFingerPrintAndHostKey();
-        _MD5 = Helpers.ConvertToMD5Hex(fingerPrint);
+        var (MD5, SHA256, hostKey) = Helpers.GetServerFingerPrintsAndHostKey();
+        _MD5 = MD5;
         _Sha256Hex = Helpers.ConvertToSHA256Hex(hostKey);
-        _Sha256Hash = Helpers.ConvertToSHA256Hash(hostKey);
+        _Sha256Hash = SHA256;
     }
 
     [Test]

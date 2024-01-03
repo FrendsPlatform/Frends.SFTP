@@ -84,7 +84,7 @@ public class ErrorTests : ListFilesTestBase
         };
 
         var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, new CancellationToken()));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info:"));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info:"));
     }
 
     [Test]
@@ -105,7 +105,7 @@ public class ErrorTests : ListFilesTestBase
         };
 
         var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, new CancellationToken()));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info: "));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
     [Test]
@@ -128,7 +128,7 @@ public class ErrorTests : ListFilesTestBase
         };
 
         var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, new CancellationToken()));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info: "));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
     [Test]
@@ -169,7 +169,7 @@ public class ErrorTests : ListFilesTestBase
         };
 
         var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, new CancellationToken()));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info: "));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
     [Test]
@@ -189,7 +189,7 @@ public class ErrorTests : ListFilesTestBase
         };
 
         var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, new CancellationToken()));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info: "));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 }
 

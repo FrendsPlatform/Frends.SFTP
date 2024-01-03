@@ -18,7 +18,7 @@ namespace Frends.SFTP.ListFiles
         /// <param name="connection">Transfer connection parameters</param>
         /// <param name="input">Source file location</param>
         /// <param name="cancellationToken">CancellationToken is given by the Frends UI</param>
-        /// <returns>Object { int Count, List&lt;FileItem&gt; Files }</returns>
+        /// <returns>Object { int FileCount, List&lt;FileItem&gt; Files }</returns>
         public static async Task<Result> ListFiles([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
         {
             ConnectionInfo connectionInfo;
