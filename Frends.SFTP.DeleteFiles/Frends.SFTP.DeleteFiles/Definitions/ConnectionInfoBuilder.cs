@@ -26,14 +26,21 @@ internal class ConnectionInfoBuilder
     internal ConnectionInfo BuildConnectionInfo()
     {
         ConnectionInfo connectionInfo;
-        List<AuthenticationMethod> methods = new List<AuthenticationMethod>();
+        var methods = new List<AuthenticationMethod>();
 
         if (_connection.UseKeyboardInteractiveAuthentication)
         {
-            // Construct keyboard-interactive authentication method
-            var kauth = new KeyboardInteractiveAuthenticationMethod(_connection.Username);
-            kauth.AuthenticationPrompt += new EventHandler<AuthenticationPromptEventArgs>(HandleKeyEvent);
-            methods.Add(kauth);
+            try
+            {
+                // Construct keyboard-interactive authentication method
+                var kauth = new KeyboardInteractiveAuthenticationMethod(_connection.Username);
+                kauth.AuthenticationPrompt += new EventHandler<AuthenticationPromptEventArgs>(HandleKeyEvent);
+                methods.Add(kauth);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Failure in Keyboard-Interactive authentication: {ex.Message}");
+            }
         }
 
         PrivateKeyFile privateKey = null;
@@ -75,8 +82,12 @@ internal class ConnectionInfoBuilder
                 throw new ArgumentException($"Unknown Authentication type: '{_connection.Authentication}'.");
         }
 
-        connectionInfo = new ConnectionInfo(_connection.Address, _connection.Port, _connection.Username, methods.ToArray());
-        connectionInfo.Encoding = Util.GetEncoding(_input.FileEncoding, _input.EnableBom, _input.EncodingInString);
+        connectionInfo = new ConnectionInfo(_connection.Address, _connection.Port, _connection.Username, methods.ToArray())
+        {
+            Encoding = Util.GetEncoding(_input.FileEncoding, _input.EnableBom, _input.EncodingInString),
+            ChannelCloseTimeout = TimeSpan.FromSeconds(_connection.ConnectionTimeout),
+            Timeout = TimeSpan.FromSeconds(_connection.ConnectionTimeout),
+        };
 
         return connectionInfo;
     }

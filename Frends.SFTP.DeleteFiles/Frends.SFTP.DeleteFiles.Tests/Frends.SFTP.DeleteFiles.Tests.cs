@@ -1,5 +1,6 @@
 namespace Frends.SFTP.DeleteFiles.Tests;
 
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Renci.SshNet.Common;
 
@@ -10,26 +11,26 @@ using Renci.SshNet.Common;
 internal class UnitTests : UnitTestBase
 {
     [Test]
-    public void DeleteFiles_SimpleDelete()
+    public async Task DeleteFiles_SimpleDelete()
     {
-        var result = SFTP.DeleteFiles(_input, _connection, default);
+        var result = await SFTP.DeleteFiles(_input, _connection, default);
         Assert.AreEqual(3, result.Files.Count);
     }
 
     [Test]
-    public void DeleteFiles_TaskShouldNotThrowIfNoFiles()
+    public async Task DeleteFiles_TaskShouldNotThrowIfNoFiles()
     {
         _input.FileMask = "FileThatDontExist";
-        var result = SFTP.DeleteFiles(_input, _connection, default);
+        var result = await SFTP.DeleteFiles(_input, _connection, default);
         Assert.AreEqual(0, result.Files.Count);
     }
 
     [Test]
-    public void DeleteFiles_TestWithFilePaths()
+    public async Task DeleteFiles_TestWithFilePaths()
     {
-        var filePaths = new string[] { "/delete/subDir/test2.txt", "/delete/subDir/test1.txt" };
+        var filePaths = new string[] { "/upload/subDir/test2.txt", "/upload/subDir/test1.txt" };
         _input.FilePaths = filePaths;
-        var result = SFTP.DeleteFiles(_input, _connection, default);
+        var result = await SFTP.DeleteFiles(_input, _connection, default);
         Assert.AreEqual(2, result.Files.Count);
     }
 
@@ -37,7 +38,7 @@ internal class UnitTests : UnitTestBase
     public void DeleteFiles_TestWithDirectoryNotExisting()
     {
         _input.Directory = "/does/not/exist";
-        var ex = Assert.Throws<SftpPathNotFoundException>(() => SFTP.DeleteFiles(_input, _connection, default));
+        var ex = Assert.ThrowsAsync<SftpPathNotFoundException>(async () => await SFTP.DeleteFiles(_input, _connection, default));
         Assert.AreEqual($"No such Directory '{_input.Directory}'.", ex.Message);
     }
 }

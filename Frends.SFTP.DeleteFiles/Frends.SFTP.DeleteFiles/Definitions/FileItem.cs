@@ -11,7 +11,7 @@ public class FileItem
     /// Initializes a new instance of the <see cref="FileItem"/> class.
     /// </summary>
     /// <param name="file">SftpFile object of deleted file.</param>
-    public FileItem(SftpFile file)
+    public FileItem(ISftpFile file)
     {
         Name = file.Name;
         Path = file.FullName;

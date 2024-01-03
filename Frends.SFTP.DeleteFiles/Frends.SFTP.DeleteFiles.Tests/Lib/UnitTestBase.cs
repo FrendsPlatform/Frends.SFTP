@@ -14,7 +14,7 @@ public class UnitTestBase
         _connection = Helpers.GetSftpConnection();
         _input = new Input
         {
-            Directory = "/delete",
+            Directory = "/upload",
             FileMask = string.Empty,
         };
 
