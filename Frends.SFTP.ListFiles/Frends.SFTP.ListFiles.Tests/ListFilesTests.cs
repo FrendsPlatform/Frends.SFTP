@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using System.Threading;
+using System.Threading.Tasks;
 using Frends.SFTP.ListFiles.Enums;
 
 namespace Frends.SFTP.ListFiles.Tests;
@@ -14,86 +15,86 @@ namespace Frends.SFTP.ListFiles.Tests;
 public class ListFilesTest : ListFilesTestBase
 {
     [Test]
-    public void ListFilesWithIncludeSubdirectoriesDisabled()
+    public async Task ListFilesWithIncludeSubdirectoriesDisabled()
     {
         _input.FileMask = "*.txt";
 
-        var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
-        Assert.That(result, Is.Not.Null);
+        var result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
+        Assert.IsNotNull(result);
         Assert.AreEqual(3, result.FileCount);
     }
 
     [Test]
-    public void ListFilesWithIncludeSubdirectoriesEnabled()
+    public async Task ListFilesWithIncludeSubdirectoriesEnabled()
     {
         _input.FileMask = "*.txt";
         _input.IncludeSubdirectories = true;
-            
-        var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
-        Assert.That(result, Is.Not.Null);
+
+        var result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
+        Assert.IsNotNull(result);
         Assert.AreEqual(6, result.FileCount);
     }
 
     [Test]
-    public void ListFilesWithoutFileMask()
+    public async Task ListFilesWithoutFileMask()
     {
-        var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
-        Assert.That(result, Is.Not.Null);
+        var result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
+        Assert.IsNotNull(result);
         Assert.AreEqual(3, result.FileCount);
     }
 
     [Test]
-    public void ListFilesWithIncludeTypeBoth()
+    public async Task ListFilesWithIncludeTypeBoth()
     {
         _input.IncludeType = IncludeType.Both;
 
-        var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
-        Assert.That(result, Is.Not.Null);
+        var result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
+        Assert.IsNotNull(result);
         Assert.AreEqual(4, result.FileCount);
     }
 
     [Test]
-    public void ListFilesWithIncludeTypeDirectory()
+    public async Task ListFilesWithIncludeTypeDirectory()
     {
         _input.IncludeType = IncludeType.Directory;
         _input.IncludeSubdirectories = true;
 
-        var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
-        Assert.That(result, Is.Not.Null);
+        var result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
+        Assert.IsNotNull(result);
         Assert.AreEqual(1, result.FileCount);
         Assert.IsTrue(result.Files[0].IsDirectory);
     }
 
     [Test]
-    public void ListFiles_TestWithDifferentEncoding()
+    public async Task ListFiles_TestWithDifferentEncoding()
     {
         _input.IncludeType = IncludeType.Directory;
         _input.IncludeSubdirectories = true;
 
-        var result = SFTP.ListFiles(_input, _connection, new CancellationToken());
+        var result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.AreEqual(1, result.FileCount);
 
         _input.FileEncoding = FileEncoding.ASCII;
-        result = SFTP.ListFiles(_input, _connection, new CancellationToken());
+        result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.AreEqual(1, result.FileCount);
 
         _input.FileEncoding = FileEncoding.UTF8;
         _input.EnableBom = true;
-        result = SFTP.ListFiles(_input, _connection, new CancellationToken());
+        result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.AreEqual(1, result.FileCount);
 
         _input.FileEncoding = FileEncoding.UTF8;
         _input.EnableBom = false;
-        result = SFTP.ListFiles(_input, _connection, new CancellationToken());
+        result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.AreEqual(1, result.FileCount);
 
         _input.FileEncoding = FileEncoding.WINDOWS1252;
-        result = SFTP.ListFiles(_input, _connection, new CancellationToken());
+        result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.AreEqual(1, result.FileCount);
 
         _input.FileEncoding = FileEncoding.Other;
         _input.EncodingInString = "iso-8859-1";
-        result = SFTP.ListFiles(_input, _connection, new CancellationToken());
+        result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
         Assert.AreEqual(1, result.FileCount);
     }
 }

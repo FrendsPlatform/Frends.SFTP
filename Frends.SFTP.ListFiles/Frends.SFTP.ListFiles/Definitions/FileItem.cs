@@ -61,7 +61,7 @@ public class FileItem
     /// <example>2022-06-28T14:05:58+03:00</example>
     public DateTime LastAccessTime { get; private set; }
 
-    internal FileItem(SftpFile file)
+    internal FileItem(ISftpFile file)
     {
         FullPath = file.FullName;
         IsDirectory = file.IsDirectory;

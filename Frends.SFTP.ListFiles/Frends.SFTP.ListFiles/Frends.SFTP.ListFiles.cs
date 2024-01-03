@@ -18,8 +18,8 @@ namespace Frends.SFTP.ListFiles
         /// <param name="connection">Transfer connection parameters</param>
         /// <param name="input">Source file location</param>
         /// <param name="cancellationToken">CancellationToken is given by the Frends UI</param>
-        /// <returns>Object { int Count, List Files }</returns>
-        public static Result ListFiles([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
+        /// <returns>Object { int FileCount, List&lt;FileItem&gt; Files }</returns>
+        public static async Task<Result> ListFiles([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
         {
             ConnectionInfo connectionInfo;
             // Establish connectionInfo with connection parameters
@@ -34,10 +34,6 @@ namespace Frends.SFTP.ListFiles
             }
 
             using var client = new SftpClient(connectionInfo);
-
-            //Disable support for these host key exchange algorithms relating: https://github.com/FrendsPlatform/Frends.SFTP/security/dependabot/4
-            client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256");
-            client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256@libssh.org");
 
             if (connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
                 Util.ForceHostKeyAlgorithm(client, connection.HostKeyAlgorithm);
@@ -62,7 +58,7 @@ namespace Frends.SFTP.ListFiles
             client.OperationTimeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
             client.KeepAliveInterval = TimeSpan.FromSeconds(connection.ConnectionTimeout);
 
-            client.Connect();
+            await client.ConnectAsync(cancellationToken);
 
             if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
@@ -72,7 +68,7 @@ namespace Frends.SFTP.ListFiles
 
             client.Disconnect();
             client.Dispose();
-            
+
             return new Result(files);
         }
 
@@ -92,7 +88,7 @@ namespace Frends.SFTP.ListFiles
                         || (file.IsDirectory && input.IncludeType == IncludeType.Directory)
                         || (file.IsRegularFile && input.IncludeType == IncludeType.File))
                     {
-                        if (Regex.IsMatch(file.Name, regexStr, RegexOptions.IgnoreCase))
+                        if (Regex.IsMatch(file.Name, regexStr, RegexOptions.IgnoreCase) || FileMatchesMask(file.Name, input.FileMask))
                             directoryList.Add(new FileItem(file));
                     }
 
@@ -101,6 +97,26 @@ namespace Frends.SFTP.ListFiles
                 }
             }
             return directoryList;
+        }
+
+        private static bool FileMatchesMask(string filename, string mask)
+        {
+            const string regexEscape = "<regex>";
+            string pattern;
+
+            //check is pure regex wished to be used for matching
+            if (mask != null && mask.StartsWith(regexEscape))
+                //use substring instead of string.replace just in case some has regex like '<regex>//File<regex>' or something else like that
+                pattern = mask.Substring(regexEscape.Length);
+            else
+            {
+                pattern = mask.Replace(".", "\\.");
+                pattern = pattern.Replace("*", ".*");
+                pattern = pattern.Replace("?", ".+");
+                pattern = string.Concat("^", pattern, "$");
+            }
+
+            return Regex.IsMatch(filename, pattern, RegexOptions.IgnoreCase);
         }
     }
 }
