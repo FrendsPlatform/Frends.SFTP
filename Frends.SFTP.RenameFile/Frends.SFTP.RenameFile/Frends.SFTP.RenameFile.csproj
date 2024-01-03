@@ -7,7 +7,7 @@
 	  <AssemblyName>Frends.SFTP.RenameFile</AssemblyName>
 	  <RootNamespace>Frends.SFTP.RenameFile</RootNamespace>
 
-	  <Version>1.0.0</Version>
+	  <Version>2.0.0</Version>
 	  <Authors>Frends</Authors>
 	  <Copyright>Frends</Copyright>
 	  <Company>Frends</Company>
@@ -29,7 +29,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 	<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="SSH.NET" Version="2020.0.2" />
+    <PackageReference Include="SSH.NET" Version="2023.0.0" />
     <PackageReference Include="SshKeyGenerator" Version="1.1.50" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
   </ItemGroup>

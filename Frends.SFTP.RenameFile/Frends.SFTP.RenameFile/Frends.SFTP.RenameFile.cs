@@ -14,16 +14,17 @@ public class SFTP
     /// Renames a file in SFTP server.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.SFTP.RenameFile)
     /// </summary>
-    /// <param name="connection">Transfer connection parameters</param>
-    /// <param name="input">Rename options with full path, new file name and renaming behaviour</param>
+    /// <param name="connection">Transfer connection parameters.</param>
+    /// <param name="input">Rename options with full path, new file name and renaming behaviour.</param>
+    /// <param name="cancellationToken">Token given by Frends to terminate the Task.</param>
     /// <returns>Result object { string Path }</returns>
-    public static Result RenameFile([PropertyTab] Input input, [PropertyTab] Connection connection)
+    public static async Task<Result> RenameFile([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
     {
         ConnectionInfo connectionInfo;
         // Establish connectionInfo with connection parameters
         try
         {
-            var builder = new ConnectionInfoBuilder(connection);
+            var builder = new ConnectionInfoBuilder(connection, cancellationToken);
             connectionInfo = builder.BuildConnectionInfo();
         }
         catch (Exception e)
@@ -51,7 +52,7 @@ public class SFTP
 
         client.BufferSize = connection.BufferSize * 1024;
 
-        client.Connect();
+        await client.ConnectAsync(cancellationToken);
 
         if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
