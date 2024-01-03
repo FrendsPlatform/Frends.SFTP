@@ -17,7 +17,7 @@ public class SFTP
     /// <param name="connection">Transfer connection parameters</param>
     /// <param name="input">Read options with full path and encoding</param>
     /// <param name="cancellationToken">CancellationToken given by Frends.</param>
-    /// <returns>Object { List&lt;FileItem&gt; [ { string SourcePath, string TargetPath } ], string message }</returns>
+    /// <returns>Object { List&lt;FileItem&gt; Files [ { string SourcePath, string DestinationPath } ], string Message }</returns>
     public static async Task<Result> MoveFile([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
     {
         ConnectionInfo connectionInfo;

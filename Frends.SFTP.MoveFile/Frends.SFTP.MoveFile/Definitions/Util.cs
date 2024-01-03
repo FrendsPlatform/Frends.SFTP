@@ -72,12 +72,8 @@ internal static class Util
 
         client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
         {
-            MD5serverFingerprint = BitConverter.ToString(e.FingerPrint).Replace('-', ':');
-
-            using (SHA256 mySHA256 = SHA256.Create())
-            {
-                SHAServerFingerprint = Convert.ToBase64String(mySHA256.ComputeHash(e.HostKey));
-            }
+            MD5serverFingerprint = e.FingerPrintMD5;
+            SHAServerFingerprint = e.FingerPrintSHA256;
 
             if (!string.IsNullOrEmpty(expectedServerFingerprint))
             {
@@ -103,7 +99,7 @@ internal static class Util
                 {
                     if (TryConvertHexStringToHex(expectedServerFingerprint))
                     {
-                        using (SHA256 mySHA256 = SHA256.Create())
+                        using (var mySHA256 = SHA256.Create())
                         {
                             SHAServerFingerprint = ToHex(mySHA256.ComputeHash(e.HostKey));
                         }

@@ -1,8 +1,8 @@
 # Changelog
 
-## [1.1.0] - 2022-12-22
+## [1.1.0] - 2023-12-22
 ### Updated
-- [Breaking ]Updated dependency SSH.NET to the newest version 2023.0.0.
+- [Breaking] Updated dependency SSH.NET to the newest version 2023.0.0.
 
 ### Changed
 - Changed connection info builder to create the connection info as it's done in DownloadFiles.
