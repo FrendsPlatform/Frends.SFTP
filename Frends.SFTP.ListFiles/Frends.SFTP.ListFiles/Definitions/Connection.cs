@@ -120,5 +120,11 @@ public class Connection
     /// <example>false</example>
     [DefaultValue(false)]
     public bool UseKeyboardInteractiveAuthentication { get; set; }
+
+    /// <summary>
+    /// Responses for the server prompts when using Keyboard Interactive authentication method.
+    /// </summary>
+    [UIHint(nameof(UseKeyboardInteractiveAuthentication), "", true)]
+    public PromptResponse[] PromptAndResponse { get; set; } = Array.Empty<PromptResponse>();
 }
 
