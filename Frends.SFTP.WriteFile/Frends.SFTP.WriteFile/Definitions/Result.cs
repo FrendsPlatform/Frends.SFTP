@@ -13,7 +13,7 @@ public class Result
     /// </summary>
     /// <example>/destination/newfile.txt</example>
     [DisplayFormat(DataFormatString = "Text")]
-	public string Path { get; private set; }
+    public string Path { get; private set; }
 
     /// <summary>
     /// Size of the new file in destination.

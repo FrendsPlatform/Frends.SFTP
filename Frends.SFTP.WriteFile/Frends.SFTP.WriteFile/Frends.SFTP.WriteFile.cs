@@ -60,7 +60,7 @@ public class SFTP
         if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
         var encoding = Util.GetEncoding(input.FileEncoding, input.EnableBom, input.EncodingInString);
-        
+
         switch (input.WriteBehaviour)
         {
             case WriteOperation.Append:
