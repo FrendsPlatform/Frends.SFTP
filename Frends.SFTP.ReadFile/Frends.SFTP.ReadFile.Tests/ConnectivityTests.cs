@@ -44,5 +44,16 @@ public class ConnectivityTests : ReadFileTestBase
         Assert.AreEqual(_input.Path, result.Path);
         Assert.AreEqual(_content, result.Content);
     }
+
+    [Test]
+    public async Task ReadFile_TestWithKeyboardinteractive()
+    {
+        _connection.Authentication = AuthenticationType.UsernamePassword;
+        _connection.UseKeyboardInteractiveAuthentication = true;
+
+        var result = await SFTP.ReadFile(_input, _connection, default);
+        Assert.AreEqual(_input.Path, result.Path);
+        Assert.AreEqual(_content, result.Content);
+    }
 }
 
