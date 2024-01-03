@@ -154,7 +154,7 @@ public class ServerFingerprintTests : UnitTestBase
         connection.PrivateKeyString = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key"));
         connection.PrivateKeyPassphrase = "passphrase";
 
-        _input.Directory = "delete/subDir";
+        _input.Directory = "upload/subDir";
 
         ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.DeleteFiles(_input, connection, default));
         Assert.AreEqual("Failure in Keyboard-interactive authentication: No response given for server prompt request --> Password", ex.Message);

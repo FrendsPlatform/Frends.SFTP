@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.0] - 2023-01-02
+## [2.0.0] - 2024-01-02
 ### Updated
 - [Breaking] Updated dependency SSH.NET to the newest version 2023.0.0.
 

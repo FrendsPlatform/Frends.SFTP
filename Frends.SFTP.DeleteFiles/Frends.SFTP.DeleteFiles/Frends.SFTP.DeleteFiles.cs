@@ -24,7 +24,7 @@ public static class SFTP
     /// <param name="input">Input parameters</param>
     /// <param name="connection">Connection parameters.</param>
     /// <param name="cancellationToken">Cancellation token given by Frends.</param>
-    /// <returns>Object { List [ Object { string Name, string Path, Double SizeInMegaBytes } ] }.</returns>
+    /// <returns>Object { List&lt;FileItem&gt; Files[ Object { string Name, string Path, Double SizeInMegaBytes } ] }.</returns>
     public static async Task<Result> DeleteFiles([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
     {
         var deletedFiles = new List<FileItem>();

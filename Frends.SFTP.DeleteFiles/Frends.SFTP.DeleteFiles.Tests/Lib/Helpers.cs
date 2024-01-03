@@ -39,10 +39,10 @@ internal static class Helpers
         using var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword);
         client.Connect();
         for (var i = 1; i <= 3; i++)
-            client.Create("/delete/test" + i + ".txt");
-        client.CreateDirectory("/delete/subDir");
+            client.Create("/upload/test" + i + ".txt");
+        client.CreateDirectory("/upload/subDir");
         for (var i = 1; i <= 3; i++)
-            client.Create("/delete/subDir/test" + i + ".txt");
+            client.Create("/upload/subDir/test" + i + ".txt");
         client.Disconnect();
     }
 
@@ -64,22 +64,6 @@ internal static class Helpers
         }
 
         return result;
-    }
-
-    internal static string ConvertToMD5Hex(byte[] fingerPrint)
-    {
-        return BitConverter.ToString(fingerPrint).Replace("-", ":");
-    }
-
-    internal static string ConvertToSHA256Hash(byte[] hostKey)
-    {
-        var fingerprint = string.Empty;
-        using (SHA256 mySHA256 = SHA256.Create())
-        {
-            fingerprint = Convert.ToBase64String(mySHA256.ComputeHash(hostKey));
-        }
-
-        return fingerprint;
     }
 
     internal static string ConvertToSHA256Hex(byte[] hostKey)
@@ -105,7 +89,7 @@ internal static class Helpers
     {
         using var sftp = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword);
         sftp.Connect();
-        sftp.ChangeDirectory("/delete");
+        sftp.ChangeDirectory("/upload");
         var files = sftp.ListDirectory(".");
         foreach (var file in files)
         {
@@ -122,7 +106,7 @@ internal static class Helpers
                         }
                     }
 
-                    sftp.ChangeDirectory("/delete");
+                    sftp.ChangeDirectory("/upload");
                     sftp.DeleteDirectory(file.FullName);
                 }
                 else

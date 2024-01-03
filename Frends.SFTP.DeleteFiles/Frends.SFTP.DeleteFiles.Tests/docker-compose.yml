@@ -12,4 +12,4 @@ services:
    - ./Volumes/ssh_host_rsa_key.pub:/home/foo/.ssh/keys/ssh_host_rsa_key.pub:ro
    - ./Volumes/share:/home/foo/share
   command: 
-   - "foo:pass:::delete"
+   - "foo:pass:::upload"

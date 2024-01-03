@@ -28,7 +28,7 @@ internal class UnitTests : UnitTestBase
     [Test]
     public async Task DeleteFiles_TestWithFilePaths()
     {
-        var filePaths = new string[] { "/delete/subDir/test2.txt", "/delete/subDir/test1.txt" };
+        var filePaths = new string[] { "/upload/subDir/test2.txt", "/upload/subDir/test1.txt" };
         _input.FilePaths = filePaths;
         var result = await SFTP.DeleteFiles(_input, _connection, default);
         Assert.AreEqual(2, result.Files.Count);
