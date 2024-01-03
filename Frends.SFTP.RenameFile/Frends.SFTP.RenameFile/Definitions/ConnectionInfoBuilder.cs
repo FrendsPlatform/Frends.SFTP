@@ -73,7 +73,6 @@ internal class ConnectionInfoBuilder
             ChannelCloseTimeout = TimeSpan.FromSeconds(_connection.ConnectionTimeout),
             Timeout = TimeSpan.FromSeconds(_connection.ConnectionTimeout)
         };
-            
 
         return connectionInfo;
     }

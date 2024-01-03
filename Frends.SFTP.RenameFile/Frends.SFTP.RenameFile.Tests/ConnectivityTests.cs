@@ -32,5 +32,15 @@ public class ConnectivityTests : RenameFileTestBase
         var result = await SFTP.RenameFile(_input, _connection, default);
         Assert.IsTrue(Helpers.DestinationFileExists(result.Path));
     }
+
+    [Test]
+    public async Task RenameFile_TestWithKeyboardInteractiveAuthentication()
+    {
+        _connection.Authentication = AuthenticationType.UsernamePassword;
+        _connection.UseKeyboardInteractiveAuthentication = true;
+
+        var result = await SFTP.RenameFile(_input, _connection, default);
+        Assert.IsTrue(Helpers.DestinationFileExists(result.Path));
+    }
 }
 
