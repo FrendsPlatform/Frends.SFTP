@@ -35,9 +35,9 @@ internal static class Helpers
         return connection;
     }
 
-    internal static Tuple<byte[], byte[]> GetServerFingerPrintAndHostKey()
+    internal static Tuple<string, string, byte[]> GetServerFingerPrintsAndHostKey()
     {
-        Tuple<byte[], byte[]> result = null;
+        Tuple<string, string, byte[]> result = null;
         using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
         {
             client.ConnectionInfo.HostKeyAlgorithms.Clear();
@@ -45,7 +45,7 @@ internal static class Helpers
 
             client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
             {
-                result = new Tuple<byte[], byte[]>(e.FingerPrint, e.HostKey);
+                result = new Tuple<string, string, byte[]>(e.FingerPrintMD5, e.FingerPrintSHA256, e.HostKey);
                 e.CanTrust = true;
             };
             client.Connect();
@@ -54,25 +54,10 @@ internal static class Helpers
         return result;
     }
 
-    internal static string ConvertToMD5Hex(byte[] fingerPrint)
-    {
-        return BitConverter.ToString(fingerPrint).Replace("-", ":");
-    }
-
-    internal static string ConvertToSHA256Hash(byte[] hostKey)
-    {
-        var fingerprint = "";
-        using (SHA256 mySHA256 = SHA256.Create())
-        {
-            fingerprint = Convert.ToBase64String(mySHA256.ComputeHash(hostKey));
-        }
-        return fingerprint;
-    }
-
     internal static string ConvertToSHA256Hex(byte[] hostKey)
     {
         var fingerprint = "";
-        using (SHA256 mySHA256 = SHA256.Create())
+        using (var mySHA256 = SHA256.Create())
         {
             fingerprint = ToHex(mySHA256.ComputeHash(hostKey));
         }
@@ -81,7 +66,7 @@ internal static class Helpers
 
     internal static string ToHex(byte[] bytes)
     {
-        StringBuilder result = new StringBuilder(bytes.Length * 2);
+        var result = new StringBuilder(bytes.Length * 2);
         for (int i = 0; i < bytes.Length; i++)
             result.Append(bytes[i].ToString("x2"));
         return result.ToString();
@@ -130,7 +115,6 @@ internal static class Helpers
     internal static SshKeyGenerator.SshKeyGenerator GenerateDummySshKey()
     {
         var keyBits = 2048;
-
         return new SshKeyGenerator.SshKeyGenerator(keyBits);
     }
 }

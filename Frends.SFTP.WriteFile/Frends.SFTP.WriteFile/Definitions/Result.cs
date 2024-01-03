@@ -21,7 +21,7 @@ public class Result
     /// <example>3.2</example>
     public double SizeInMegaBytes { get; private set; }
 
-    internal Result(SftpFile file)
+    internal Result(ISftpFile file)
     {
         Path = file.FullName;
         SizeInMegaBytes = Math.Round((file.Length / 1024d / 1024d), 3);

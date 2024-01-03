@@ -41,22 +41,22 @@ public class ErrorTests : WriteFileTestBase
     public void WriteFile_TestThrowsWithIncorrectPrivateKeyPassphrase()
     {
         _connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        _connection.PrivateKeyFilePassphrase = "demo";
+        _connection.PrivateKeyPassphrase = "demo";
         _connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
         var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info:"));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info:"));
     }
 
     [Test]
     public void WriteFile_TestThrowsWithEmptyPrivateKeyFile()
     {
         _connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        _connection.PrivateKeyFilePassphrase = "passphrase";
+        _connection.PrivateKeyPassphrase = "passphrase";
         _connection.PrivateKeyFile = "";
 
         var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info: "));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
     [Test]
@@ -65,11 +65,11 @@ public class ErrorTests : WriteFileTestBase
         var key = Helpers.GenerateDummySshKey();
 
         _connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
-        _connection.PrivateKeyFilePassphrase = "passphrase";
+        _connection.PrivateKeyPassphrase = "passphrase";
         _connection.PrivateKeyString = key.ToString();
 
         var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection));
-        Assert.That(ex.Message.StartsWith("Error when initializing connection info: "));
+        Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
     [Test]
