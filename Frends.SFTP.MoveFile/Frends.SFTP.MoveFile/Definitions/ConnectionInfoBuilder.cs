@@ -89,8 +89,27 @@ internal class ConnectionInfoBuilder
 
     private void HandleKeyEvent(object sender, AuthenticationPromptEventArgs e)
     {
-        foreach (var prompt in e.Prompts)
-            if (prompt.Request.IndexOf("Password:", StringComparison.InvariantCultureIgnoreCase) != -1)
-                prompt.Response = _connection.Password;
+        if (e.Prompts.Any())
+        {
+            foreach (var serverPrompt in e.Prompts)
+            {
+                if (!string.IsNullOrEmpty(_connection.Password) && serverPrompt.Request.IndexOf("Password:", StringComparison.InvariantCultureIgnoreCase) != -1)
+                    serverPrompt.Response = _connection.Password;
+                else
+                {
+                    if (!_connection.PromptAndResponse.Any() || !_connection.PromptAndResponse.Select(p => p.Prompt.ToLower()).ToList().Contains(serverPrompt.Request.Replace(":", "").Trim().ToLower()))
+                    {
+                        var errorMsg = $"Failure in Keyboard-interactive authentication: No response given for server prompt request --> {serverPrompt.Request.Replace(":", "").Trim()}";
+                        throw new ArgumentException(errorMsg);
+                    }
+
+                    foreach (var prompt in _connection.PromptAndResponse)
+                    {
+                        if (serverPrompt.Request.IndexOf(prompt.Prompt, StringComparison.InvariantCultureIgnoreCase) != -1)
+                            serverPrompt.Response = prompt.Response;
+                    }
+                }
+            }
+        }
     }
 }
