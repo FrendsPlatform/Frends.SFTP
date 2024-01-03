@@ -17,7 +17,7 @@ public class ErrorTests
         var connection = Helpers.GetSftpConnection();
         var input = new Input
         {
-            Path = "/read/test.txt",
+            Path = "/upload/test.txt",
             FileEncoding = FileEncoding.ANSI,
         };
 
@@ -33,7 +33,7 @@ public class ErrorTests
         connection.Port = 51644;
         var input = new Input
         {
-            Path = "/read/test.txt",
+            Path = "/upload/test.txt",
             FileEncoding = FileEncoding.ANSI,
         };
 
@@ -49,7 +49,7 @@ public class ErrorTests
 
         var input = new Input
         {
-            Path = "/read/test.txt",
+            Path = "/upload/test.txt",
             FileEncoding = FileEncoding.ANSI,
         };
 
@@ -67,7 +67,7 @@ public class ErrorTests
 
         var input = new Input
         {
-            Path = "/read/test.txt",
+            Path = "/upload/test.txt",
             FileEncoding = FileEncoding.ANSI,
         };
 
@@ -85,7 +85,7 @@ public class ErrorTests
 
         var input = new Input
         {
-            Path = "/read/test.txt",
+            Path = "/upload/test.txt",
             FileEncoding = FileEncoding.ANSI,
         };
 
@@ -105,7 +105,7 @@ public class ErrorTests
 
         var input = new Input
         {
-            Path = "/read/test.txt",
+            Path = "/upload/test.txt",
             FileEncoding = FileEncoding.ANSI,
         };
 
@@ -123,7 +123,7 @@ public class ErrorTests
 
         var input = new Input
         {
-            Path = "/read/test.txt",
+            Path = "/upload/test.txt",
             FileEncoding = FileEncoding.ANSI,
         };
 

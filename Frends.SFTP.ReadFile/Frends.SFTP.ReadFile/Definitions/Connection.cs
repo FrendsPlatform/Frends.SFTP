@@ -122,6 +122,12 @@ public class Connection
     public bool UseKeyboardInteractiveAuthentication { get; set; }
 
     /// <summary>
+    /// Responses for the server prompts when using Keyboard Interactive authentication method.
+    /// </summary>
+    [UIHint(nameof(UseKeyboardInteractiveAuthentication), "", true)]
+    public PromptResponse[] PromptAndResponse { get; set; } = Array.Empty<PromptResponse>();
+
+    /// <summary>
     /// Integer value of used buffer size as KB.
     /// Default value is 32 KB.
     /// </summary>
