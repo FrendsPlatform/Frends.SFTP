@@ -22,7 +22,7 @@ public class ConnectivityTests : WriteFileTestBase
     public void WriteFile_TestWithPrivateKeyFileRsa()
     {
         _connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        _connection.PrivateKeyFilePassphrase = "passphrase";
+        _connection.PrivateKeyPassphrase = "passphrase";
         _connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
         SFTP.WriteFile(_input, _connection);
@@ -36,7 +36,7 @@ public class ConnectivityTests : WriteFileTestBase
         var key = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key"));
 
         _connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
-        _connection.PrivateKeyFilePassphrase = "passphrase";
+        _connection.PrivateKeyPassphrase = "passphrase";
         _connection.PrivateKeyString = key;
 
         SFTP.WriteFile(_input, _connection);

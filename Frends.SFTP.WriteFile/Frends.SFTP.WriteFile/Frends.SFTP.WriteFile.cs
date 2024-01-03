@@ -16,7 +16,7 @@ public class SFTP
     /// </summary>
     /// <param name="connection">Transfer connection parameters</param>
     /// <param name="input">Write options with full path and string content</param>
-    /// <returns>Result object {string Path, double SizeInMegaBytes} </returns>
+    /// <returns>Object {string Path, double SizeInMegaBytes} </returns>
     public static Result WriteFile([PropertyTab] Input input, [PropertyTab] Connection connection)
     {
         ConnectionInfo connectionInfo;
@@ -60,7 +60,7 @@ public class SFTP
         if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
         var encoding = Util.GetEncoding(input.FileEncoding, input.EnableBom, input.EncodingInString);
-        
+
         switch (input.WriteBehaviour)
         {
             case WriteOperation.Append:
