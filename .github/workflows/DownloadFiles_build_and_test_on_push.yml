@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    uses: FrendsPlatform/FrendsTasks/.github/workflows/linux_build_test.yml@main
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/linux_build_test.yml@issue-62
     with:
       workdir: Frends.SFTP.DownloadFiles
       prebuild_command: docker-compose -f ./Frends.SFTP.DownloadFiles.Tests/docker-compose.yml up -d
