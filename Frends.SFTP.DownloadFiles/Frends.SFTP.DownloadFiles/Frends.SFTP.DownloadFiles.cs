@@ -6,7 +6,7 @@ using Serilog;
 namespace Frends.SFTP.DownloadFiles;
 
 /// <summary>
-/// Main class for the Task.   
+/// Main class for the Task.    
 /// </summary>
 public class SFTP
 {
