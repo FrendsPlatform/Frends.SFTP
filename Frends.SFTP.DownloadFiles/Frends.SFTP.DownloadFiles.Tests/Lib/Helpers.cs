@@ -17,8 +17,9 @@ namespace Frends.SFTP.DownloadFiles.Tests
         /// Test credentials for docker server.
         /// </summary>
         readonly static string _dockerAddress = "localhost";
-        readonly static string _dockerUsername = "foo";
-        readonly static string _dockerPassword = "pass";
+        readonly static string _dockerUser = "foo";
+        readonly static string _dockerPwd = "pass";
+        readonly static string _dockerPass = "passphrase";
         readonly static string _baseDir = "./upload/";
         readonly static string _workDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
 
@@ -29,11 +30,12 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 ConnectionTimeout = 60,
                 Address = _dockerAddress,
                 Port = 2222,
-                UserName = _dockerUsername,
+                UserName = _dockerUser,
                 Authentication = AuthenticationType.UsernamePassword,
-                Password = _dockerPassword,
+                Password = _dockerPwd,
                 BufferSize = 32,
-                KeepAliveInterval = -1
+                KeepAliveInterval = -1,
+                PrivateKeyPassphrase = _dockerPass,
             };
 
             return connection;
@@ -58,7 +60,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var filePaths = new List<string>();
 
             var files = (filenames == null) ? CreateDummyFiles(count) : CreateDummyFiles(0, filenames);
-            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUser, _dockerPwd))
             {
                 client.Connect();
                 if (client.Exists(destination))
@@ -92,7 +94,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var filePaths = new List<string>();
 
             var files = CreateLargeDummyFiles(count);
-            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUser, _dockerPwd))
             {
                 client.Connect();
                 if (client.Exists(destination))
@@ -204,7 +206,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         internal static bool SourceFileExists(string path)
         {
             bool exists;
-            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUser, _dockerPwd))
             {
                 client.Connect();
                 exists = client.Exists(path);
@@ -215,7 +217,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
         internal static void CreateSubDirectory(string path)
         {
-            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUser, _dockerPwd))
             {
                 client.Connect();
                 if (!client.Exists(path))
@@ -226,7 +228,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
         internal static void DeleteSubDirectory(string path)
         {
-            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUser, _dockerPwd))
             {
                 client.Connect();
                 client.DeleteDirectory(path);
@@ -236,7 +238,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
         internal static void SetTestFileLastModified(string path, DateTime date)
         {
-            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUser, _dockerPwd))
             {
                 client.Connect();
                 var attributes = client.GetAttributes(path);
@@ -249,7 +251,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         internal static Tuple<string, string, byte[]> GetServerFingerPrintsAndHostKey()
         {
             Tuple<string, string, byte[]> result = null;
-            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUser, _dockerPwd))
             {
                 client.ConnectionInfo.HostKeyAlgorithms.Clear();
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) => { return new KeyHostAlgorithm("ssh-rsa", new RsaKey(), data); });

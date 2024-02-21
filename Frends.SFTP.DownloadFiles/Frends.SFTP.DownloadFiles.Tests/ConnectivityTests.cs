@@ -10,6 +10,8 @@ namespace Frends.SFTP.DownloadFiles.Tests
     [TestFixture]
     public class ConnectivityTests : DownloadFilesTestBase
     {
+        private readonly string invalidPwd = "demo";
+
         [Test]
         public async Task DownloadFiles_TestWithLargerBuffer()
         {
@@ -37,8 +39,8 @@ namespace Frends.SFTP.DownloadFiles.Tests
         {
             var connection = Helpers.GetSftpConnection();
             connection.ConnectionTimeout = 10;
-            connection.UserName = "demo";
-            connection.Password = "demo";
+            connection.UserName = invalidPwd;
+            connection.Password = invalidPwd;
 
             var result = Assert.ThrowsAsync<Exception>(async () => await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
             Assert.IsTrue(result.Message.StartsWith("SFTP transfer failed: Authentication of SSH session failed: Permission denied (password)"));
@@ -49,7 +51,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
         {
             var connection = Helpers.GetSftpConnection();
             connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-            connection.PrivateKeyPassphrase = "passphrase";
             connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
             var result = await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
@@ -66,7 +67,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var connection = Helpers.GetSftpConnection();
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
             connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
-            connection.PrivateKeyPassphrase = "passphrase";
             connection.PrivateKeyString = key;
 
             var result = await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
@@ -94,7 +94,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.Authentication = AuthenticationType.UsernamePrivateKeyFile;
             connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
             connection.Password = null;
-            connection.PrivateKeyPassphrase = "passphrase";
             connection.UseKeyboardInteractiveAuthentication = true;
             connection.PromptAndResponse = new PromptResponse[] { new PromptResponse { Prompt = "Password", Response = "pass" } };
 
@@ -105,7 +104,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.Authentication = AuthenticationType.UsernamePrivateKeyString;
             connection.PrivateKeyFile = null;
             connection.PrivateKeyString = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key"));
-            connection.PrivateKeyPassphrase = "passphrase";
 
             var destination = new Destination
             {
