@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿namespace Frends.SFTP.DownloadFiles.Definitions;
 
-namespace Frends.SFTP.DownloadFiles.Definitions;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 /// <summary>
 /// Destination transfer options.
@@ -25,8 +25,8 @@ public class Destination
     public string FileName { get; set; }
 
     /// <summary>
-    /// If set, this ecoding will be used to encode and decode command 
-    /// parameters and server responses, such as file names. 
+    /// If set, this ecoding will be used to encode and decode command
+    /// parameters and server responses, such as file names.
     /// By selecting 'Other' you can use any encoding.
     /// </summary>
     /// <example>FileEncoding.ANSI</example>

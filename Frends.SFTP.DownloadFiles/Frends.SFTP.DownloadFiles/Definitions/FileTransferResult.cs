@@ -22,4 +22,3 @@ internal class FileTransferResult
 
     public IDictionary<string, string> OperationsLog { get; set; }
 }
-

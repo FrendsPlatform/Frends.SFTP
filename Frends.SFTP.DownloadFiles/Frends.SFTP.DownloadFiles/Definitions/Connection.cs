@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿namespace Frends.SFTP.DownloadFiles.Definitions;
 
-namespace Frends.SFTP.DownloadFiles.Definitions;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 /// <summary>
 /// Parameters class usually contains parameters that are required.
@@ -100,10 +100,10 @@ public class Connection
     public string PrivateKeyPassphrase { get; set; }
 
     /// <summary>
-    /// Fingerprint of the SFTP server. When using "Username-Password" 
-    /// authentication it is recommended to use server fingerprint in 
-    /// order to be sure of the server you are connecting. Supported 
-    /// formats for server fingerprints: MD5 and SHA256. 
+    /// Fingerprint of the SFTP server. When using "Username-Password"
+    /// authentication it is recommended to use server fingerprint in
+    /// order to be sure of the server you are connecting. Supported
+    /// formats for server fingerprints: MD5 and SHA256.
     /// </summary>
     /// <example>
     /// MD5: '41:76:EA:65:62:6E:D3:68:DC:41:9A:F2:F2:20:69:9D'
@@ -113,8 +113,8 @@ public class Connection
     public string ServerFingerPrint { get; set; }
 
     /// <summary>
-    /// Host key algorithm to use when connecting to server. 
-    /// Default value is Any which doesn't force the task to use 
+    /// Host key algorithm to use when connecting to server.
+    /// Default value is Any which doesn't force the task to use
     /// specific algorithm.
     /// </summary>
     /// <example>HostKeyAlgorithm.RSA</example>

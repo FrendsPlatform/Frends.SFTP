@@ -1,17 +1,9 @@
-﻿using Renci.SshNet.Sftp;
+﻿namespace Frends.SFTP.DownloadFiles.Definitions;
 
-namespace Frends.SFTP.DownloadFiles.Definitions;
+using Renci.SshNet.Sftp;
 
 internal class FileItem
 {
-    public DateTime Modified { get; set; }
-
-    public string Name { get; set; }
-
-    public string FullPath { get; set; }
-
-    public long Size { get; set; }
-
     public FileItem(ISftpFile file)
     {
         Modified = file.LastWriteTime;
@@ -27,5 +19,12 @@ internal class FileItem
         Name = Path.GetFileName(fullPath);
         FullPath = fullPath;
     }
-}
 
+    public DateTime Modified { get; set; }
+
+    public string Name { get; set; }
+
+    public string FullPath { get; set; }
+
+    public long Size { get; set; }
+}

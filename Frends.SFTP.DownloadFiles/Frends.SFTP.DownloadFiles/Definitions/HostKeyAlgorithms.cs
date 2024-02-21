@@ -9,29 +9,34 @@ public enum HostKeyAlgorithms
     /// The algorithm is negotiated with the server.
     /// </summary>
     Any,
+
     /// <summary>
     /// Force the ssh-rsa host key algorithm.
     /// </summary>
     RSA,
+
     /// <summary>
     /// Force the ssh-ed25519 host key algorithm.
     /// </summary>
     Ed25519,
+
     /// <summary>
     /// Force the ssh-dss host key algorithm.
     /// </summary>
     DSS,
+
     /// <summary>
     /// Force the ecdsa-sha2-nistp256 host key algorithm.
     /// </summary>
-    nistp256,
+    Nistp256,
+
     /// <summary>
     /// Force the ecdsa-sha2-nistp384 host key algorithm.
     /// </summary>
-    nistp384,
+    Nistp384,
+
     /// <summary>
     /// Force the ecdsa-sha2-nistp521 host key algorithm.
     /// </summary>
-    nistp521
+    Nistp521,
 }
-

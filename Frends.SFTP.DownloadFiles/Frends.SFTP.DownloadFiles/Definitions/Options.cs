@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿namespace Frends.SFTP.DownloadFiles.Definitions;
 
-namespace Frends.SFTP.DownloadFiles.Definitions;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 /// <summary>
 /// Options for file transfer
@@ -59,7 +59,7 @@ public class Options
     public string DestinationFileExtension { get; set; }
 
     /// <summary>
-    /// Should the destination directories be created if they do not exist. May not work on all servers. 
+    /// Should the destination directories be created if they do not exist. May not work on all servers.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(false)]
@@ -79,4 +79,3 @@ public class Options
     [DefaultValue(true)]
     public bool OperationLog { get; set; }
 }
-

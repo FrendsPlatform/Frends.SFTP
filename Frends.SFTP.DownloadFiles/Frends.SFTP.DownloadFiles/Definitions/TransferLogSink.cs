@@ -1,8 +1,8 @@
-﻿using System.Collections.Concurrent;
+﻿namespace Frends.SFTP.DownloadFiles.Definitions;
+
+using System.Collections.Concurrent;
 using Serilog.Core;
 using Serilog.Events;
-
-namespace Frends.SFTP.DownloadFiles.Definitions;
 
 /// <summary>
 /// Sink that is used to store messages and events from seriolog Logger
@@ -27,41 +27,43 @@ internal class TransferLogSink : ILogEventSink
             _circularBuffer = new CircularBuffer<Tuple<DateTimeOffset, string>>(maxLogEntries.Value);
         }
         else
-            _allMsgsBuffer = new List<Tuple<DateTimeOffset, string>>();
-    }
-
-    /// <summary>
-    /// Emits new messages to the sink
-    /// </summary>
-    /// <param name="logEvent"></param>
-    public void Emit(LogEvent logEvent)
-    {
-        if (_allMsgsBuffer != null)
-            _allMsgsBuffer.Add(new Tuple<DateTimeOffset, string>(logEvent.Timestamp, logEvent.RenderMessage()));
-        else
         {
-            if (_initialLogMessages.Count < DefaultInitialLogMessages)
-                _initialLogMessages.Add(
-                    new Tuple<DateTimeOffset, string>(logEvent.Timestamp, logEvent.RenderMessage()));
-            else
-                _circularBuffer.Add(
-                    new Tuple<DateTimeOffset, string>(logEvent.Timestamp, logEvent.RenderMessage()));
+            _allMsgsBuffer = new List<Tuple<DateTimeOffset, string>>();
         }
     }
 
-    /// <summary>
-    /// Gets the log messages from sink
-    /// </summary>
-    /// <returns></returns>
+    public void Emit(LogEvent logEvent)
+    {
+        if (_allMsgsBuffer != null)
+        {
+            _allMsgsBuffer.Add(new Tuple<DateTimeOffset, string>(logEvent.Timestamp, logEvent.RenderMessage()));
+        }
+        else
+        {
+            if (_initialLogMessages.Count < DefaultInitialLogMessages)
+            {
+                _initialLogMessages.Add(
+                    new Tuple<DateTimeOffset, string>(logEvent.Timestamp, logEvent.RenderMessage()));
+            }
+            else
+            {
+                _circularBuffer.Add(
+                    new Tuple<DateTimeOffset, string>(logEvent.Timestamp, logEvent.RenderMessage()));
+            }
+        }
+    }
+
     public IList<Tuple<DateTimeOffset, string>> GetBufferedLogMessages()
     {
         if (_allMsgsBuffer != null) return _allMsgsBuffer;
 
         var bufferedMessages = _circularBuffer.Latest();
         if (bufferedMessages.Any())
+        {
             return _initialLogMessages
                 .Concat(new[] { Tuple.Create(DateTimeOffset.MinValue, "...") })
                 .Concat(bufferedMessages).ToList();
+        }
 
         return _initialLogMessages;
     }
@@ -69,11 +71,11 @@ internal class TransferLogSink : ILogEventSink
     /// <summary>
     ///     Circular buffer impl, original from https://codereview.stackexchange.com/a/134147
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">T</typeparam>
     public class CircularBuffer<T>
     {
         private readonly ConcurrentQueue<T> _data;
-        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+        private readonly ReaderWriterLockSlim _lock = new();
         private readonly int _size;
 
         public CircularBuffer(int size)
@@ -95,8 +97,7 @@ internal class TransferLogSink : ILogEventSink
             {
                 if (_data.Count == _size)
                 {
-                    T value;
-                    _data.TryDequeue(out value);
+                    _data.TryDequeue(out _);
                 }
 
                 _data.Enqueue(t);
@@ -108,4 +109,3 @@ internal class TransferLogSink : ILogEventSink
         }
     }
 }
-

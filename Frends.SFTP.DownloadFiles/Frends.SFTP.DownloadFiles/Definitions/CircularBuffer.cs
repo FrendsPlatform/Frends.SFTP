@@ -1,15 +1,15 @@
-﻿using System.Collections.Concurrent;
+﻿namespace Frends.SFTP.DownloadFiles.Definitions;
 
-namespace Frends.SFTP.DownloadFiles.Definitions;
+using System.Collections.Concurrent;
 
 /// <summary>
 ///     Circular buffer impl, original from https://codereview.stackexchange.com/a/134147
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">T</typeparam>
 internal class CircularBuffer<T>
 {
     private readonly ConcurrentQueue<T> _data;
-    private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+    private readonly ReaderWriterLockSlim _lock = new();
     private readonly int _size;
 
     public CircularBuffer(int size)
@@ -31,8 +31,7 @@ internal class CircularBuffer<T>
         {
             if (_data.Count == _size)
             {
-                T value;
-                _data.TryDequeue(out value);
+                _data.TryDequeue(out _);
             }
 
             _data.Enqueue(t);

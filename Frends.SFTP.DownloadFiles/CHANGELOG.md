@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.9.1] - 2024-02-21
+### Changed
+- Added StyleCop.Analyzers to analyze the Task code.
+- Made code changes suggested by the StyleCop.Analyzers.
+- Fixed Readme.
+
 ## [2.9.0] - 2023-12-15
 ### Added
 - [Breaking] Added new parameter Options.Timeout which will cause the Task to terminate at assigned period of time if enabled.
