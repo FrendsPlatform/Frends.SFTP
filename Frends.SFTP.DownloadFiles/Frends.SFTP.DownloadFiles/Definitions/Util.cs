@@ -93,7 +93,7 @@ internal static class Util
             Convert.FromBase64String(input);
             return true;
         }
-        catch
+        catch (FormatException)
         {
             return false;
         }

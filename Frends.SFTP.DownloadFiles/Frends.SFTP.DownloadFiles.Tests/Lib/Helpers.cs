@@ -212,7 +212,10 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 client.ChangeDirectory(dir);
                 return true;
             }
-            catch { return false; }
+            catch (SftpPathNotFoundException)
+            {
+                return false;
+            }
         }
 
         internal static bool SourceFileExists(string path)
