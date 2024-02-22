@@ -69,109 +69,98 @@ internal class FileTransporter
             _logger.NotifyInformation(_batchContext, "Negotiation started.");
 
             using var client = new SftpClient(connectionInfo);
+            if (_batchContext.Connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
+                ForceHostKeyAlgorithm(client, _batchContext.Connection.HostKeyAlgorithm);
+
+            var expectedServerFingerprint = _batchContext.Connection.ServerFingerPrint;
+
             try
             {
-                if (_batchContext.Connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
-                    ForceHostKeyAlgorithm(client, _batchContext.Connection.HostKeyAlgorithm);
+                CheckServerFingerprint(client, expectedServerFingerprint);
+            }
+            catch (Exception e)
+            {
+                _logger.NotifyError(null, $"Error when checking the server fingerprint", e);
+                return FormFailedFileTransferResult(userResultMessage);
+            }
 
-                var expectedServerFingerprint = _batchContext.Connection.ServerFingerPrint;
+            client.KeepAliveInterval = TimeSpan.FromMilliseconds(_batchContext.Connection.KeepAliveInterval);
+            client.OperationTimeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
 
-                try
+            _batchContext.Connection.BufferSize = _batchContext.Connection.BufferSize * 1024;
+            client.BufferSize = _batchContext.Connection.BufferSize;
+
+            await client.ConnectAsync(cancellationToken);
+
+            if (!client.IsConnected)
+            {
+                _logger.NotifyError(null, "Error while connecting to destination: ", new SshConnectionException(userResultMessage));
+                return FormFailedFileTransferResult(userResultMessage);
+            }
+
+            _logger.NotifyInformation(_batchContext, "Negotiation finished.");
+
+            // Fetch source file info and check if files were returned.
+            var (files, success) = ListSourceFiles(client, _batchContext.Source, cancellationToken);
+
+            // If source directory doesn't exist, modify userResultMessage accordingly.
+            if (!success)
+            {
+                userResultMessage = $"Directory '{SourceDirectoryWithMacrosExtended}' doesn't exists.";
+                _logger.NotifyInformation(_batchContext, userResultMessage);
+                return FormFailedFileTransferResult(userResultMessage);
+            }
+
+            if (files == null || files.Count == 0)
+            {
+                if (files == null)
                 {
-                    CheckServerFingerprint(client, expectedServerFingerprint);
+                    _logger.NotifyInformation(
+                        _batchContext,
+                        "Source end point returned null list for file list. If there are no files to transfer, the result should be an empty list.");
                 }
-                catch (Exception e)
+
+                var noSourceResult = NoSourceOperation(_batchContext, _batchContext.Source);
+                Result.Add(noSourceResult);
+            }
+            else
+            {
+                // Check does the destination directory exists.
+                if (!Directory.Exists(DestinationDirectoryWithMacrosExtended))
                 {
-                    _logger.NotifyError(null, $"Error when checking the server fingerprint", e);
-                    return FormFailedFileTransferResult(userResultMessage);
-                }
-
-                client.KeepAliveInterval = TimeSpan.FromMilliseconds(_batchContext.Connection.KeepAliveInterval);
-                client.OperationTimeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
-
-                _batchContext.Connection.BufferSize = _batchContext.Connection.BufferSize * 1024;
-                client.BufferSize = _batchContext.Connection.BufferSize;
-
-                await client.ConnectAsync(cancellationToken);
-
-                if (!client.IsConnected)
-                {
-                    _logger.NotifyError(null, "Error while connecting to destination: ", new SshConnectionException(userResultMessage));
-                    return FormFailedFileTransferResult(userResultMessage);
-                }
-
-                _logger.NotifyInformation(_batchContext, "Negotiation finished.");
-
-                // Fetch source file info and check if files were returned.
-                var (files, success) = ListSourceFiles(client, _batchContext.Source, cancellationToken);
-
-                // If source directory doesn't exist, modify userResultMessage accordingly.
-                if (!success)
-                {
-                    userResultMessage = $"Directory '{SourceDirectoryWithMacrosExtended}' doesn't exists.";
-                    _logger.NotifyInformation(_batchContext, userResultMessage);
-                    return FormFailedFileTransferResult(userResultMessage);
-                }
-
-                if (files.Count == 0)
-                {
-                    if (files == null)
+                    if (_batchContext.Options.CreateDestinationDirectories)
                     {
-                        _logger.NotifyInformation(
-                            _batchContext,
-                            "Source end point returned null list for file list. If there are no files to transfer, the result should be an empty list.");
-                    }
-
-                    var noSourceResult = NoSourceOperation(_batchContext, _batchContext.Source);
-                    Result.Add(noSourceResult);
-                }
-                else
-                {
-                    // Check does the destination directory exists.
-                    if (!Directory.Exists(DestinationDirectoryWithMacrosExtended))
-                    {
-                        if (_batchContext.Options.CreateDestinationDirectories)
+                        try
                         {
-                            try
-                            {
-                                Directory.CreateDirectory(DestinationDirectoryWithMacrosExtended);
-                            }
-                            catch (Exception ex)
-                            {
-                                userResultMessage = $"Error while creating destination directory '{DestinationDirectoryWithMacrosExtended}': {ex.Message}";
-                                return FormFailedFileTransferResult(userResultMessage);
-                            }
+                            Directory.CreateDirectory(DestinationDirectoryWithMacrosExtended);
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            userResultMessage = $"Destination directory '{DestinationDirectoryWithMacrosExtended}' was not found.";
+                            userResultMessage = $"Error while creating destination directory '{DestinationDirectoryWithMacrosExtended}': {ex.Message}";
                             return FormFailedFileTransferResult(userResultMessage);
                         }
                     }
-
-                    _batchContext.DestinationFiles = GetDestinationFiles(DestinationDirectoryWithMacrosExtended, cancellationToken);
-
-                    foreach (var file in files)
+                    else
                     {
-                        if (cancellationToken.IsCancellationRequested)
-                            return FormResultFromSingleTransferResults(Result);
-
-                        // Check that the connection is alive and if not try to connect again
-                        if (!client.IsConnected)
-                            await client.ConnectAsync(cancellationToken);
-
-                        var singleTransfer = new SingleFileTransfer(file, _batchContext, client, _renamingPolicy, _logger);
-                        var result = await singleTransfer.TransferSingleFile(cancellationToken);
-                        Result.Add(result);
+                        userResultMessage = $"Destination directory '{DestinationDirectoryWithMacrosExtended}' was not found.";
+                        return FormFailedFileTransferResult(userResultMessage);
                     }
                 }
-            }
-            finally
-            {
-                if (client != null)
+
+                _batchContext.DestinationFiles = GetDestinationFiles(DestinationDirectoryWithMacrosExtended, cancellationToken);
+
+                foreach (var file in files)
                 {
-                    client.Disconnect();
-                    client.Dispose();
+                    if (cancellationToken.IsCancellationRequested)
+                        return FormResultFromSingleTransferResults(Result);
+
+                    // Check that the connection is alive and if not try to connect again
+                    if (!client.IsConnected)
+                        await client.ConnectAsync(cancellationToken);
+
+                    var singleTransfer = new SingleFileTransfer(file, _batchContext, client, _renamingPolicy, _logger);
+                    var result = await singleTransfer.TransferSingleFile(cancellationToken);
+                    Result.Add(result);
                 }
             }
         }
@@ -305,16 +294,12 @@ internal class FileTransporter
         }
 
         var transferredFiles = results.Where(x => x.Success && !x.ActionSkipped).Select(x => x.TransferredFile).ToList();
-        if (transferredFiles.Any())
-        {
-            userResultMessage = MessageJoin(
-                userResultMessage,
-                $"{transferredFiles.Count} files transferred: {string.Join(", \n", transferredFiles)}.");
-        }
-        else
-        {
-            userResultMessage = MessageJoin(userResultMessage, "No files transferred.");
-        }
+
+        userResultMessage = transferredFiles.Any()
+            ? MessageJoin(
+            userResultMessage,
+            $"{transferredFiles.Count} files transferred: {string.Join(", \n", transferredFiles)}.")
+            : MessageJoin(userResultMessage, "No files transferred.");
 
         return userResultMessage;
     }
@@ -338,10 +323,9 @@ internal class FileTransporter
 
         var transferName = context.Info.TransferName ?? string.Empty;
 
-        if (context.Source.FilePaths == null)
-            msg = $"No source files found from directory '{SourceDirectoryWithMacrosExtended}' with file mask '{source.FileName}' for transfer '{transferName}'.";
-        else
-            msg = $"No source files found from FilePaths '{string.Join(", ", context.Source.FilePaths)}' for transfer '{transferName}'.";
+        msg = context.Source.FilePaths == null
+            ? $"No source files found from directory '{SourceDirectoryWithMacrosExtended}' with file mask '{source.FileName}' for transfer '{transferName}'."
+            : $"No source files found from FilePaths '{string.Join(", ", context.Source.FilePaths)}' for transfer '{transferName}'.";
 
         switch (_batchContext.Source.Action)
         {
@@ -453,11 +437,9 @@ internal class FileTransporter
                         throw new ArgumentException(errorMsg);
                     }
 
-                    foreach (var prompt in _batchContext.Connection.PromptAndResponse)
-                    {
-                        if (serverPrompt.Request.IndexOf(prompt.Prompt, StringComparison.InvariantCultureIgnoreCase) != -1)
-                            serverPrompt.Response = prompt.Response;
-                    }
+                    foreach (var prompt in _batchContext.Connection.PromptAndResponse
+                        .Where(e => serverPrompt.Request.IndexOf(e.Prompt, StringComparison.InvariantCultureIgnoreCase) != -1))
+                        serverPrompt.Response = prompt.Response;
                 }
             }
 

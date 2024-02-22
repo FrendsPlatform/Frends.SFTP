@@ -52,7 +52,8 @@ internal class SFTPLogger : ISFTPLogger
         {
             sourceFile = transfer.SourceFile.Name;
             destinationFile = transfer.DestinationFileWithMacrosExpanded;
-            localFileName = context.Info.WorkDir;
+            if (context != null)
+                localFileName = context.Info.WorkDir;
             singleFileTransferId = Guid.NewGuid();
         }
 

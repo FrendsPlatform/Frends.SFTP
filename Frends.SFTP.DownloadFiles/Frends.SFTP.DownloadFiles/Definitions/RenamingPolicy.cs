@@ -98,8 +98,8 @@ internal class RenamingPolicy
     private static string NameByMask(string filename, string mask)
     {
         // Remove extension if it is wanted to be changed, new extension is added later on to new filename
-        if (mask.Contains("*."))
-            if (Path.HasExtension(filename)) filename = Path.GetFileNameWithoutExtension(filename);
+        if (mask.Contains("*.") && Path.HasExtension(filename))
+            Path.GetFileNameWithoutExtension(filename);
 
         int i = mask.IndexOf("*");
         if (i >= 0)
@@ -116,8 +116,8 @@ internal class RenamingPolicy
     {
         if (s == null) return false;
 
-        foreach (var key in macroDictionary.Keys)
-            if (s.ToUpperInvariant().Contains(key.ToUpperInvariant())) return true;
+        foreach (var key in macroDictionary.Keys.Where(e => s.ToUpperInvariant().Contains(e.ToUpperInvariant())))
+            return true;
 
         return false;
     }

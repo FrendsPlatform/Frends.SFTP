@@ -44,13 +44,12 @@ namespace Frends.SFTP.DownloadFiles.Tests
         internal static void DeleteDirectory(SftpClient client, string dir)
         {
 
-            foreach (var file in client.ListDirectory(dir))
+            foreach (var file in client.ListDirectory(dir).Where(e => e.Name != "." && e.Name != ".."))
             {
-                if ((file.Name != ".") && (file.Name != ".."))
-                {
-                    if (file.IsDirectory) DeleteDirectory(client, file.FullName);
-                    else client.DeleteFile(file.FullName);
-                }
+                if (file.IsDirectory)
+                    DeleteDirectory(client, file.FullName);
+                else
+                    client.DeleteFile(file.FullName);
             }
             if (client.Exists(dir) && !dir.Equals(_baseDir)) client.DeleteDirectory(dir);
         }
@@ -129,9 +128,8 @@ namespace Frends.SFTP.DownloadFiles.Tests
             }
             else
             {
-                foreach (var filename in filenames)
+                foreach (var path in filenames.Select(e => Path.Combine(_workDir, e)))
                 {
-                    var path = Path.Combine(_workDir, filename);
                     File.WriteAllText(path, "This is a test file.");
                     filePaths.Add(path);
                 }
@@ -173,16 +171,10 @@ namespace Frends.SFTP.DownloadFiles.Tests
         {
             var origPath = client.WorkingDirectory;
             // Consistent forward slashes
-            foreach (string dir in path.Replace(@"\", "/").Split('/'))
+            foreach (string dir in path.Replace(@"\", "/").Split('/').Where(e => !string.IsNullOrWhiteSpace(e) && !TryToChangeDir(client, e) && ("/" + e != client.WorkingDirectory)))
             {
-                if (!string.IsNullOrWhiteSpace(dir))
-                {
-                    if (!TryToChangeDir(client, dir) && ("/" + dir != client.WorkingDirectory))
-                    {
-                        client.CreateDirectory(dir);
-                        client.ChangeDirectory(dir);
-                    }
-                }
+                client.CreateDirectory(dir);
+                client.ChangeDirectory(dir);
             }
 
             client.ChangeDirectory(origPath);
