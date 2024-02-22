@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net471;net6</TargetFrameworks>
+    <TargetFramework>net471</TargetFramework>
 	<LangVersion>latest</LangVersion>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
