@@ -29,13 +29,8 @@ namespace Frends.SFTP.DownloadFiles.Tests
             if (!File.Exists(path))
                 return;
 
-            foreach (var line in File.ReadAllLines(path))
+            foreach (var parts in File.ReadAllLines(path).Where(e => e.Split('=').Length == 2).Select(e => e.Split('=')))
             {
-                var parts = line.Split('=');
-
-                if (parts.Length != 2)
-                    continue;
-
                 switch (parts[0])
                 {
                     case "USER":
