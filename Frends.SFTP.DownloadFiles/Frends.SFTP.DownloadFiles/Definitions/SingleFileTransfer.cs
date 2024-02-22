@@ -175,15 +175,6 @@ internal class SingleFileTransfer
     private async Task AppendDestinationFile(CancellationToken cancellationToken)
     {
         var filePath = Path.Combine(WorkFileInfo.WorkFileDir, Path.GetFileName(SourceFileDuringTransfer));
-        Encoding encoding;
-        try
-        {
-            encoding = Util.GetEncoding(BatchContext.Destination.FileContentEncoding, BatchContext.Destination.FileContentEncodingInString, BatchContext.Destination.EnableBomForContent);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Error in initializing file content encoding: ", ex);
-        }
 
         if (BatchContext.Options.RenameDestinationFileDuringTransfer)
             await RenameDestinationFile(cancellationToken);

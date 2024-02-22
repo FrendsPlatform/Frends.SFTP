@@ -67,11 +67,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
                     DeleteDirectory(client, destination);
                 CreateSourceDirectories(client, destination);
 
-                var p = client.WorkingDirectory;
-                var f = client.ListDirectory(".");
-                var c = string.Join(",", f.Select(i => i.Name));
-                var test = destination;
-
                 client.ChangeDirectory(destination);
                 if (!string.IsNullOrEmpty(to)) client.CreateDirectory(to);
                 foreach (var file in files)
@@ -261,6 +256,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                     result = new Tuple<string, string, byte[]>(e.FingerPrintMD5, e.FingerPrintSHA256, e.HostKey);
                     e.CanTrust = true;
                 };
+
                 client.Connect();
                 client.Disconnect();
             }
@@ -269,7 +265,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
         internal static string ConvertToSHA256Hex(byte[] hostKey)
         {
-            var fingerprint = "";
+            var fingerprint = string.Empty;
             using (SHA256 mySHA256 = SHA256.Create())
             {
                 fingerprint = ToHex(mySHA256.ComputeHash(hostKey));
@@ -279,7 +275,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
         internal static string ToHex(byte[] bytes)
         {
-            StringBuilder result = new StringBuilder(bytes.Length * 2);
+            StringBuilder result = new(bytes.Length * 2);
             for (int i = 0; i < bytes.Length; i++)
                 result.Append(bytes[i].ToString("x2"));
             return result.ToString();

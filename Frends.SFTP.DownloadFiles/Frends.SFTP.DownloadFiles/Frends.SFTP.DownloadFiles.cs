@@ -100,10 +100,11 @@ public class SFTP
         [PropertyTab] Info info,
         CancellationToken cancellationToken)
     {
+        // Create a new cancellationTokenWithTimeOutSource with a timeout
+        using var timeoutCts = new CancellationTokenSource();
+
         if (options.Timeout > 0)
         {
-            // Create a new cancellationTokenWithTimeOutSource with a timeout
-            var timeoutCts = new CancellationTokenSource();
             timeoutCts.CancelAfter(TimeSpan.FromSeconds(options.Timeout));
 
             // Create a linked token source that combines the external and timeout tokens
