@@ -128,7 +128,7 @@ internal class SingleFileTransfer
 
         var sftpAsynch = asynch as SftpDownloadAsyncResult;
 
-        while (!sftpAsynch.IsCompleted && sftpAsynch != null)
+        while (sftpAsynch != null && !sftpAsynch.IsCompleted)
         {
             if (cancellationToken.IsCancellationRequested)
             {

@@ -16,15 +16,25 @@ namespace Frends.SFTP.DownloadFiles.Tests
         /// <summary>
         /// Test credentials for docker server.
         /// </summary>
-        internal readonly static string _dockerAddress = "localhost";
-        internal readonly static string _dockerUser = "foo";
-        internal readonly static string _dockerPwd = "pass";
-        internal readonly static string _dockerPass = "passphrase";
+        internal static string _dockerAddress;
+        internal static string _dockerUser;
+        internal static string _dockerPwd;
+        internal static string _dockerPass;
         internal readonly static string _baseDir = "./upload/";
         internal readonly static string _workDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
 
         internal static Connection GetSftpConnection()
         {
+            var dockerAddress = "localhost";
+            var dockerUser = "foo";
+            var dockerPwd = "pass";
+            var dockerPass = "passphrase";
+
+            _dockerAddress = dockerAddress;
+            _dockerUser = dockerUser;
+            _dockerPwd = dockerPwd;
+            _dockerPass = dockerPass;
+
             var connection = new Connection
             {
                 ConnectionTimeout = 60,
