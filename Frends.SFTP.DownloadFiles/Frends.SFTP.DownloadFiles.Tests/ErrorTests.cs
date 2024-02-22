@@ -194,7 +194,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
 
             var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.DownloadFiles(source, _destination, connection, options, _info, default));
-            Console.WriteLine(ex.Message);
             Assert.IsTrue(ex.Message.Contains("The operation was canceled."));
             Assert.IsTrue(ex.Message.Contains("No files transferred."));
             Assert.IsTrue(Helpers.SourceFileExists($"{source.Directory}/LargeTestFile1.bin"));

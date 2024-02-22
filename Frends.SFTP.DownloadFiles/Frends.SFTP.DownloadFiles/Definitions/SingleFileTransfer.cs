@@ -1,6 +1,5 @@
 ﻿namespace Frends.SFTP.DownloadFiles.Definitions;
 
-using System.Text;
 using Renci.SshNet;
 using Renci.SshNet.Sftp;
 
