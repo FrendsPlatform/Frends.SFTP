@@ -10,7 +10,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
     [TestFixture]
     public class ConnectivityTests : DownloadFilesTestBase
     {
-        // Set invalid password so CodeQL doesn't throw.
         private readonly string invalidPwd = "demo";
 
         [Test]

@@ -14,5 +14,5 @@ services:
    - ./Volumes/ssh_host_rsa_key.pub:/home/foo/.ssh/keys/ssh_host_rsa_key.pub:ro
    - ./Volumes/share:/home/foo/share
   command: 
-   - "${USER}:${PASS}:::upload"
+   - "foo:pass:::upload"
 
