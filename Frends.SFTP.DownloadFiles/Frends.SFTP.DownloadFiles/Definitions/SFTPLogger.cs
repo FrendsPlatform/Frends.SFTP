@@ -34,11 +34,6 @@ internal class SFTPLogger : ISFTPLogger
         _log = log;
     }
 
-    ~SFTPLogger()
-    {
-        Dispose(false);
-    }
-
     public static FileTransferInfo CreateFileTransferInfo(TransferResult result, SingleFileTransfer transfer, BatchContext context, string errorMessage = null)
     {
         // Create 2 dummy endpoints and initialize some local variables which are needed in case if cobalt config is not
