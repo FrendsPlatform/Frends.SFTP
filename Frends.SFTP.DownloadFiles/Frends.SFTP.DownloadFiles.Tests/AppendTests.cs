@@ -49,9 +49,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
         {
             Directory.CreateDirectory(_destWorkDir);
 
-            Console.WriteLine(_connection.UserName);
-            Console.WriteLine(_connection.Password);
-
             var options = new Options
             {
                 ThrowErrorOnFail = true,

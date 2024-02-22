@@ -59,6 +59,8 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [SetUp]
         public virtual void Setup()
         {
+            Console.WriteLine(_connection.UserName);
+            Console.WriteLine(_connection.Password);
             Helpers.UploadTestFiles(_source.Directory, 3);
         }
 
