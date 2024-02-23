@@ -1,7 +1,7 @@
-﻿using System.Collections.Concurrent;
-using Serilog;
+﻿namespace Frends.SFTP.DownloadFiles.Definitions;
 
-namespace Frends.SFTP.DownloadFiles.Definitions;
+using System.Collections.Concurrent;
+using Serilog;
 
 /// <summary>
 /// SFTP internal logger interface
@@ -34,9 +34,57 @@ internal class SFTPLogger : ISFTPLogger
         _log = log;
     }
 
-    ~SFTPLogger()
+    public static FileTransferInfo CreateFileTransferInfo(TransferResult result, SingleFileTransfer transfer, BatchContext context, string errorMessage = null)
     {
-        Dispose(false);
+        // Create 2 dummy endpoints and initialize some local variables which are needed in case if cobalt config is not
+        // succesfully initialized, i.e. when there has been a failure creating the config (invalid xml etc..) and config elements are left null
+        var sourceFile = string.Empty;
+        var destinationFile = string.Empty;
+        var localFileName = string.Empty;
+        var singleFileTransferId = Guid.NewGuid();
+
+        if (transfer != null)
+        {
+            sourceFile = transfer.SourceFile.Name;
+            destinationFile = transfer.DestinationFileWithMacrosExpanded;
+            if (context != null)
+                localFileName = context.Info.WorkDir;
+            singleFileTransferId = Guid.NewGuid();
+        }
+
+        var transferStarted = DateTime.UtcNow;
+        var batchId = Guid.Empty;
+        var serviceId = string.Empty;
+
+        var routineUri = string.Empty;
+
+        var transferName = string.Empty;
+
+        if (context != null)
+        {
+            transferStarted = context.BatchTransferStartTime;
+            batchId = context.InstanceId;
+            serviceId = context.ServiceId;
+
+            routineUri = context.RoutineUri;
+            transferName = context.Info != null ? context.Info.TransferName : string.Empty;
+        }
+
+        return new FileTransferInfo
+        {
+            Result = result,
+            SourceFile = sourceFile ?? string.Empty,
+            DestinationFile = destinationFile ?? string.Empty,
+            FileSize = GetFileSize(localFileName),
+            TransferStarted = transferStarted,
+            TransferEnded = DateTime.UtcNow,
+            BatchId = batchId,
+            TransferName = transferName ?? string.Empty,
+            ServiceId = serviceId ?? string.Empty,
+            RoutineUri = routineUri ?? string.Empty,
+            ErrorInfo = errorMessage ?? string.Empty,
+            SingleFileTransferId = singleFileTransferId,
+        };
     }
 
     public void NotifyError(BatchContext context, string msg, Exception e)
@@ -105,8 +153,6 @@ internal class SFTPLogger : ISFTPLogger
     {
         try
         {
-
-
         }
         catch (Exception ex)
         {
@@ -118,76 +164,6 @@ internal class SFTPLogger : ISFTPLogger
     {
         // only log to debug trace
         _log.Debug(message);
-    }
-
-    private static string GetEndPointName(BatchContext context, EndPoint endpoint, string defaultValue)
-    {
-        dynamic endpointConfig = (endpoint == EndPoint.Source) ? context.Source : context.Destination;
-        if (endpointConfig == null || context.Connection.Address == null) return defaultValue;
-
-        if (endpoint == EndPoint.Destination)
-            return $"FILE://{context.Destination.Directory}";
-
-        var directory = endpointConfig.Directory;
-
-        return $"SFTP://{context.Connection.Address}/{directory}/{endpointConfig.FileName}";
-    }
-
-    public static FileTransferInfo CreateFileTransferInfo(TransferResult result, SingleFileTransfer transfer, BatchContext context, string errorMessage = null)
-    {
-        // Create 2 dummy endpoints and initialize some local variables which are needed in case if cobalt config is not
-        // succesfully initialized, i.e. when there has been a failure creating the config (invalid xml etc..) and config elements are left null
-        var sourceFile = string.Empty;
-        var destinationFile = string.Empty;
-        var localFileName = string.Empty;
-        var singleFileTransferId = Guid.NewGuid();
-
-        if (transfer != null)
-        {
-            sourceFile = transfer.SourceFile.Name;
-            destinationFile = transfer.DestinationFileWithMacrosExpanded;
-            localFileName = context.Info.WorkDir;
-            singleFileTransferId = Guid.NewGuid();
-        }
-
-        var transferStarted = DateTime.UtcNow;
-        var batchId = Guid.Empty;
-        var serviceId = string.Empty;
-
-        var routineUri = string.Empty;
-
-        var transferName = string.Empty;
-
-        if (context != null)
-        {
-            transferStarted = context.BatchTransferStartTime;
-            batchId = context.InstanceId;
-            serviceId = context.ServiceId;
-
-            routineUri = context.RoutineUri;
-            transferName = context.Info != null ? context.Info.TransferName : string.Empty;
-        }
-
-        return new FileTransferInfo
-        {
-            Result = result,
-            SourceFile = sourceFile ?? string.Empty,
-            DestinationFile = destinationFile ?? string.Empty,
-            FileSize = GetFileSize(localFileName),
-            TransferStarted = transferStarted,
-            TransferEnded = DateTime.UtcNow,
-            BatchId = batchId,
-            TransferName = transferName ?? string.Empty,
-            ServiceId = serviceId ?? string.Empty,
-            RoutineUri = routineUri ?? string.Empty,
-            ErrorInfo = errorMessage ?? string.Empty,
-            SingleFileTransferId = singleFileTransferId
-        };
-    }
-
-    private static long GetFileSize(string filepath)
-    {
-        return File.Exists(filepath) ? new FileInfo(filepath).Length : 0;
     }
 
     public void Dispose()
@@ -205,5 +181,22 @@ internal class SFTPLogger : ISFTPLogger
 
         _disposed = true;
     }
-}
 
+    private static string GetEndPointName(BatchContext context, EndPoint endpoint, string defaultValue)
+    {
+        dynamic endpointConfig = (endpoint == EndPoint.Source) ? context.Source : context.Destination;
+        if (endpointConfig == null || context.Connection.Address == null) return defaultValue;
+
+        if (endpoint == EndPoint.Destination)
+            return $"FILE://{context.Destination.Directory}";
+
+        var directory = endpointConfig.Directory;
+
+        return $"SFTP://{context.Connection.Address}/{directory}/{endpointConfig.FileName}";
+    }
+
+    private static long GetFileSize(string filepath)
+    {
+        return File.Exists(filepath) ? new FileInfo(filepath).Length : 0;
+    }
+}

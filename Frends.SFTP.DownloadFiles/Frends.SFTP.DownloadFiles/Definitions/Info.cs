@@ -1,6 +1,6 @@
-﻿using System.ComponentModel;
+﻿namespace Frends.SFTP.DownloadFiles.Definitions;
 
-namespace Frends.SFTP.DownloadFiles.Definitions;
+using System.ComponentModel;
 
 /// <summary>
 /// Info class including optional info of the file transfer.
@@ -8,8 +8,8 @@ namespace Frends.SFTP.DownloadFiles.Definitions;
 public class Info
 {
     /// <summary>
-    /// Optional descriptive name for the transfer. 
-    /// Will be included in the file transfer log 
+    /// Optional descriptive name for the transfer.
+    /// Will be included in the file transfer log
     /// entries and also in all error messages in the event log.
     /// </summary>
     /// <example>SFTPDownload</example>
@@ -36,6 +36,4 @@ public class Info
     /// <example>#process.executionid</example>
     [DefaultValue("#process.executionid")]
     public string TaskExecutionID { get; set; }
-
 }
-

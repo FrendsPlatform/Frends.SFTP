@@ -8,13 +8,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
 {
     public class DownloadFilesTestBase
     {
-        protected static Connection _connection;
-        protected static Source _source;
-        protected static Destination _destination;
-        protected static Options _options;
-        protected static Info _info;
-        protected static string _workDir;
-        protected static string _destWorkDir;
+        protected Connection _connection;
+        protected Source _source;
+        protected Destination _destination;
+        protected Options _options;
+        protected Info _info;
+        protected string _workDir;
+        protected string _destWorkDir;
 
         [OneTimeSetUp]
         public virtual void OneTimeSetup()

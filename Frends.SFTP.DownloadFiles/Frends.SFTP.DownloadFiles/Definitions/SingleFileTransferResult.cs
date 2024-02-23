@@ -5,6 +5,11 @@
 /// </summary>
 internal class SingleFileTransferResult
 {
+    internal SingleFileTransferResult()
+    {
+        ErrorMessages = new List<string>();
+    }
+
     internal bool Success { get; set; }
 
     internal bool ActionSkipped { get; set; }
@@ -18,10 +23,4 @@ internal class SingleFileTransferResult
     internal string DestinationFilePath { get; set; }
 
     internal bool EnableOperationsLog { get; set; } = true;
-
-    internal SingleFileTransferResult()
-    {
-        ErrorMessages = new List<string>();
-    }
 }
-

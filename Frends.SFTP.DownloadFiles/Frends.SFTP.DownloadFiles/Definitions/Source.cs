@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿namespace Frends.SFTP.DownloadFiles.Definitions;
 
-namespace Frends.SFTP.DownloadFiles.Definitions;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 /// <summary>
 /// Source transfer options
@@ -40,9 +40,9 @@ public class Source
     public SourceOperation Operation { get; set; }
 
     /// <summary>
-    /// Parameter for Rename operation. You can use file macros and also specify a directory 
-    /// where to move the files to, e.g. /subdir/%Date%file.txt. If you don't define a 
-    /// directory path, the source directory is used. When using rename, this parameter 
+    /// Parameter for Rename operation. You can use file macros and also specify a directory
+    /// where to move the files to, e.g. /subdir/%Date%file.txt. If you don't define a
+    /// directory path, the source directory is used. When using rename, this parameter
     /// must always contain a file name.
     /// </summary>
     /// <example>transferred.txt</example>
@@ -63,4 +63,3 @@ public class Source
     [DefaultValue("")] // set to empty string so 4.2 shows the field as empty by default
     public object FilePaths { get; set; }
 }
-

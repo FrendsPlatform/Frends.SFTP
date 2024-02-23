@@ -5,6 +5,20 @@
 /// </summary>
 public class Result
 {
+    internal Result(FileTransferResult result)
+    {
+        ActionSkipped = result.ActionSkipped;
+        Success = result.Success;
+        UserResultMessage = result.UserResultMessage;
+        SuccessfulTransferCount = result.SuccessfulTransferCount;
+        FailedTransferCount = result.FailedTransferCount;
+        TransferredFileNames = result.TransferredFileNames;
+        TransferErrors = result.TransferErrors;
+        TransferredFilePaths = result.TransferredFilePaths;
+        TransferredDestinationFilePaths = result.TransferredDestinationFilePaths;
+        OperationsLog = result.OperationsLog;
+    }
+
     /// <summary>
     /// Boolean value of the skipped Action.
     /// </summary>
@@ -38,7 +52,7 @@ public class Result
     /// <summary>
     /// List of transferred file names.
     /// </summary>
-    /// <example>        
+    /// <example>
     /// <code>
     /// [
     ///     "test.txt",
@@ -54,16 +68,16 @@ public class Result
     /// <example>
     /// <code>
     /// {
-    ///     test.txt : 
+    ///     test.txt :
     ///     [
-    ///         Failure in CheckIfDestinationFileExists: File 'test.txt' could not be 
-    ///         transferred to '/upload/Upload'. Error: Unable to transfer file. Destination 
+    ///         Failure in CheckIfDestinationFileExists: File 'test.txt' could not be
+    ///         transferred to '/upload/Upload'. Error: Unable to transfer file. Destination
     ///         file already exists: test.txt [Source file restored.],
     ///     ]
     ///     text2.txt :
     ///     [
-    ///         Failure in CheckIfDestinationFileExists: File 'test2.txt' could not be 
-    ///         transferred to '/upload/Upload'. Error: Unable to transfer file. Destination 
+    ///         Failure in CheckIfDestinationFileExists: File 'test2.txt' could not be
+    ///         transferred to '/upload/Upload'. Error: Unable to transfer file. Destination
     ///         file already exists: test2.txt [Source file restored.],
     ///     ]
     /// }
@@ -107,19 +121,4 @@ public class Result
     /// </code>
     /// </example>
     public IDictionary<string, string> OperationsLog { get; set; }
-
-    internal Result(FileTransferResult result)
-    {
-        ActionSkipped = result.ActionSkipped;
-        Success = result.Success;
-        UserResultMessage = result.UserResultMessage;
-        SuccessfulTransferCount = result.SuccessfulTransferCount;
-        FailedTransferCount = result.FailedTransferCount;
-        TransferredFileNames = result.TransferredFileNames;
-        TransferErrors = result.TransferErrors;
-        TransferredFilePaths = result.TransferredFilePaths;
-        TransferredDestinationFilePaths = result.TransferredDestinationFilePaths;
-        OperationsLog = result.OperationsLog;
-    }
 }
-

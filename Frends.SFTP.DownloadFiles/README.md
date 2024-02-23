@@ -1,4 +1,4 @@
-cd repos# Frends.SFTP.DownloadFile
+# Frends.SFTP.DownloadFile
 
 [![Frends.SFTP.DownloadFile Main](https://github.com/FrendsPlatform/Frends.SFTP/actions/workflows/DownloadFiles_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.SFTP/actions/workflows/DownloadFiles_build_and_test_on_main.yml)
 ![MyGet](https://img.shields.io/myget/frends-tasks/v/Frends.SFTP.DownloadFiles?label=NuGet)

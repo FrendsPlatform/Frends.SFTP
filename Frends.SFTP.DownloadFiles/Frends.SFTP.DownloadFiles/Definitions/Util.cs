@@ -1,7 +1,7 @@
-﻿using System.Text.RegularExpressions;
-using System.Text;
+﻿namespace Frends.SFTP.DownloadFiles.Definitions;
 
-namespace Frends.SFTP.DownloadFiles.Definitions;
+using System.Text.RegularExpressions;
+using System.Text;
 
 /// <summary>
 /// Helper methods for file modifications
@@ -13,25 +13,23 @@ internal static class Util
         return Path.ChangeExtension("frends_" + DateTime.Now.Ticks + Path.GetRandomFileName(), fileExtension);
     }
 
-    /// <summary>
-    /// Checks if the file name matches the given file mask. 
-    /// The file mask is checked with a kludgey regular expression.
-    /// </summary>
     internal static bool FileMatchesMask(string filename, string mask)
     {
         const string regexEscape = "<regex>";
         string pattern;
 
-        //check is pure regex wished to be used for matching
+        // check is pure regex wished to be used for matching
         if (mask.StartsWith(regexEscape))
-            //use substring instead of string.replace just in case some has regex like '<regex>//File<regex>' or something else like that
+        {
+            // use substring instead of string.replace just in case some has regex like '<regex>//File<regex>' or something else like that
             pattern = mask.Substring(regexEscape.Length);
+        }
         else
         {
             pattern = mask.Replace(".", "\\.");
             pattern = pattern.Replace("*", ".*");
             pattern = pattern.Replace("?", ".+");
-            pattern = String.Concat("^", pattern, "$");
+            pattern = string.Concat("^", pattern, "$");
         }
 
         return Regex.IsMatch(filename, pattern, RegexOptions.IgnoreCase);
@@ -44,7 +42,7 @@ internal static class Util
 
     internal static string ToHex(byte[] bytes)
     {
-        StringBuilder result = new StringBuilder(bytes.Length * 2);
+        var result = new StringBuilder(bytes.Length * 2);
         for (int i = 0; i < bytes.Length; i++)
             result.Append(bytes[i].ToString("x2"));
         return result.ToString();
@@ -59,14 +57,18 @@ internal static class Util
             {
                 arr[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
             }
+
             return true;
         }
-        catch { return false; }
+        catch
+        {
+            return false;
+        }
     }
 
     internal static bool IsMD5(string input)
     {
-        if (String.IsNullOrEmpty(input))
+        if (string.IsNullOrEmpty(input))
         {
             return false;
         }
@@ -76,7 +78,7 @@ internal static class Util
 
     internal static bool IsSha256(string input)
     {
-        if (String.IsNullOrEmpty(input))
+        if (string.IsNullOrEmpty(input))
         {
             return false;
         }
@@ -91,34 +93,22 @@ internal static class Util
             Convert.FromBase64String(input);
             return true;
         }
-        catch { return false; }
-    }
-
-    /// <summary>
-    /// Get encoding for the file name to be transferred.
-    /// </summary>
-    /// <param name="encoding"></param>
-    /// <param name="encodingString"></param>
-    /// <param name="enableBom"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    internal static Encoding GetEncoding(FileEncoding encoding, string encodingString, bool enableBom)
-    {
-        switch (encoding)
+        catch (FormatException)
         {
-            case FileEncoding.UTF8:
-                return enableBom ? new UTF8Encoding(true) : new UTF8Encoding(false);
-            case FileEncoding.ASCII:
-                return new ASCIIEncoding();
-            case FileEncoding.ANSI:
-                return Encoding.Default;
-            case FileEncoding.WINDOWS1252:
-                return CodePagesEncodingProvider.Instance.GetEncoding("windows-1252");
-            case FileEncoding.Other:
-                return CodePagesEncodingProvider.Instance.GetEncoding(encodingString);
-            default:
-                throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{encoding}'.");
+            return false;
         }
     }
-}
 
+    internal static Encoding GetEncoding(FileEncoding encoding, string encodingString, bool enableBom)
+    {
+        return encoding switch
+        {
+            FileEncoding.UTF8 => enableBom ? new UTF8Encoding(true) : new UTF8Encoding(false),
+            FileEncoding.ASCII => new ASCIIEncoding(),
+            FileEncoding.ANSI => Encoding.Default,
+            FileEncoding.WINDOWS1252 => CodePagesEncodingProvider.Instance.GetEncoding("windows-1252"),
+            FileEncoding.Other => CodePagesEncodingProvider.Instance.GetEncoding(encodingString),
+            _ => throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{encoding}'."),
+        };
+    }
+}

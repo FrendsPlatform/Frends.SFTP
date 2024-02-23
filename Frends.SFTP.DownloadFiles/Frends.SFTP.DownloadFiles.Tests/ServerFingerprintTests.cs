@@ -10,9 +10,9 @@ namespace Frends.SFTP.DownloadFiles.Tests
     [TestFixture]
     public class ServerFingerprintTests : DownloadFilesTestBase
     {
-        internal static string _MD5;
-        internal static string _Sha256Hex;
-        internal static string _Sha256Hash;
+        internal string _MD5;
+        internal string _Sha256Hex;
+        internal string _Sha256Hash;
 
         [OneTimeSetUp]
         public override void OneTimeSetup()

@@ -88,16 +88,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Helpers.CreateSubDirectory("/upload/uploaded");
             File.Copy(Path.Combine(_workDir, _source.FileName), Path.Combine(_destWorkDir, _source.FileName));
 
-            var options = new Options
-            {
-                ThrowErrorOnFail = false,
-                RenameSourceFileBeforeTransfer = false,
-                RenameDestinationFileDuringTransfer = true,
-                CreateDestinationDirectories = true,
-                PreserveLastModified = false,
-                OperationLog = true
-            };
-
             var source = new Source
             {
                 Directory = _source.Directory,
@@ -172,7 +162,8 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 Operation = SourceOperation.Nothing,
             };
 
-            var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.DownloadFiles(source, _destination, connection, _options, _info, new CancellationTokenSource(2000).Token));
+            using var cancellationTokenSource = new CancellationTokenSource(2000);
+            var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.DownloadFiles(source, _destination, connection, _options, _info, cancellationTokenSource.Token));
             Assert.IsTrue(ex.Message.Contains("No files transferred."));
             Assert.IsTrue(ex.Message.Contains("Error: The operation was canceled.."));
             Assert.IsTrue(Helpers.SourceFileExists($"{source.Directory}/{source.FileName}"));
@@ -203,7 +194,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
 
             var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.DownloadFiles(source, _destination, connection, options, _info, default));
-            Console.WriteLine(ex.Message);
             Assert.IsTrue(ex.Message.Contains("The operation was canceled."));
             Assert.IsTrue(ex.Message.Contains("No files transferred."));
             Assert.IsTrue(Helpers.SourceFileExists($"{source.Directory}/LargeTestFile1.bin"));

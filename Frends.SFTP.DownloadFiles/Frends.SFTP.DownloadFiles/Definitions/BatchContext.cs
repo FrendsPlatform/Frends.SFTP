@@ -1,6 +1,6 @@
-﻿using Renci.SshNet.Sftp;
+﻿namespace Frends.SFTP.DownloadFiles.Definitions;
 
-namespace Frends.SFTP.DownloadFiles.Definitions;
+using Renci.SshNet.Sftp;
 
 /// <summary>
 /// BatchContext class for creating collection of Task parameters
@@ -31,4 +31,3 @@ internal class BatchContext
 
     public Connection Connection { get; set; }
 }
-
