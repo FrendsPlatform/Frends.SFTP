@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.10.0] - 2024-03-06
+### Added
+- [Breaking] Added new parameter Source.IncludeSubdirectories which enables source file search from subdirectories.
+
 ## [2.9.1] - 2024-02-22
 ### Changed
 - Added StyleCop.Analyzers to analyze the Task code.

@@ -24,6 +24,14 @@ public class Source
     public string FileName { get; set; }
 
     /// <summary>
+    /// Determines if subdirectories should be included when searching source files.
+    /// Depending on how many subdirectories there are, this operation can be extremely expensive.
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(false)]
+    public bool IncludeSubdirectories { get; set; }
+
+    /// <summary>
     /// What to do if source file is not found. Error = alarm and fail,
     /// Info = alarm info and quit with success status, Ignore = quit
     /// with success status.

@@ -30,6 +30,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileName = "SFTPDownloadTestFile1.txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Nothing,
+                IncludeSubdirectories = false,
             };
 
             _destination = new Destination

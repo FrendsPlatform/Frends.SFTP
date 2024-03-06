@@ -222,7 +222,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public async Task DownloadFiles_NoSourceFilesAndIgnoreShouldNotThrowException()
         {
-            Helpers.CreateSubDirectory("/upload/Upload");
             var options = new Options
             {
                 ThrowErrorOnFail = true,
@@ -250,7 +249,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public async Task DownloadFiles_NoSourceFilesAndInfoShouldNotThrowException()
         {
-            Helpers.CreateSubDirectory("/upload/Upload");
             var options = new Options
             {
                 ThrowErrorOnFail = true,
@@ -429,6 +427,28 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
             var result = await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, default);
             Assert.IsTrue(result.Success);
+        }
+
+        [Test]
+        public async Task DownloadFiles_TestWithIncludeSubdirectories()
+        {
+            Helpers.UploadTestFiles("/upload/other", 1, null, ["test1.txt"]);
+            Helpers.UploadTestFiles("/upload/test", 1, null, ["test2.txt"]);
+            Helpers.UploadTestFiles("/upload/Upload", 1, null, ["test3.txt"]);
+            Helpers.UploadTestFiles("/upload/Upload/another", 1, null, ["test4.txt"]);
+
+            var source = new Source
+            {
+                Directory = "/upload",
+                FileName = "*",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+                IncludeSubdirectories = true
+            };
+
+            var result = await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(4, result.SuccessfulTransferCount);
         }
     }
 }
