@@ -432,10 +432,10 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public async Task DownloadFiles_TestWithIncludeSubdirectories()
         {
-            Helpers.UploadTestFiles("/upload/other", 1, null, ["test1.txt"]);
-            Helpers.UploadTestFiles("/upload/test", 1, null, ["test2.txt"]);
-            Helpers.UploadTestFiles("/upload/Upload", 1, null, ["test3.txt"]);
-            Helpers.UploadTestFiles("/upload/Upload/another", 1, null, ["test4.txt"]);
+            Helpers.UploadTestFiles("/upload/other", 1, null, new List<string> { "test1.txt" });
+            Helpers.UploadTestFiles("/upload/test", 1, null, new List<string> { "test2.txt" });
+            Helpers.UploadTestFiles("/upload/Upload", 1, null, new List<string> { "test3.txt" });
+            Helpers.UploadTestFiles("/upload/Upload/another", 1, null, new List<string> { "test4.txt" });
 
             var source = new Source
             {
