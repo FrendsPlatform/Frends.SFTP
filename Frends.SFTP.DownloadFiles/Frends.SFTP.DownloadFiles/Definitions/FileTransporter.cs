@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Security.Cryptography;
 using Renci.SshNet.Security;
+using System.Threading;
 
 /// <summary>
 /// Main class for SFTP file transfers
@@ -552,11 +553,20 @@ internal class FileTransporter
         // Return empty list and success.false value if source directory doesn't exists.
         if (!client.Exists(SourceDirectoryWithMacrosExtended)) return new Tuple<List<FileItem>, bool>(fileItems, false);
 
-        // fetch all file names in given directory
-        var files = client.ListDirectory(SourceDirectoryWithMacrosExtended).ToList();
+        fileItems = ListFiles(client, source, SourceDirectoryWithMacrosExtended, cancellationToken);
 
         // return Tuple with empty list and success.true if files are not found.
-        if (files.Count == 0) return new Tuple<List<FileItem>, bool>(fileItems, true);
+        if (fileItems.Count == 0) return new Tuple<List<FileItem>, bool>(fileItems, true);
+
+        return new Tuple<List<FileItem>, bool>(fileItems, true);
+    }
+
+    private List<FileItem> ListFiles(SftpClient sftp, Source source, string directory, CancellationToken cancellationToken)
+    {
+        var fileItems = new List<FileItem>();
+
+        // fetch all file names in given directory
+        var files = sftp.ListDirectory(directory).ToList();
 
         // create List of FileItems from found files.
         foreach (var file in files)
@@ -565,17 +575,18 @@ internal class FileTransporter
 
             if (file.Name.Equals(".") || file.Name.Equals("..")) continue;
 
-            if (file.IsDirectory) continue;
-
-            if (file.Name.Equals(source.FileName) || Util.FileMatchesMask(Path.GetFileName(file.FullName), source.FileName))
+            if (file.IsRegularFile && (file.Name.Equals(source.FileName) || Util.FileMatchesMask(Path.GetFileName(file.FullName), source.FileName)))
             {
                 var item = new FileItem(file);
                 _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath}");
                 fileItems.Add(item);
             }
+
+            if (file.IsDirectory && source.IncludeSubdirectories)
+                fileItems.AddRange(ListFiles(sftp, source, file.FullName, cancellationToken));
         }
 
-        return new Tuple<List<FileItem>, bool>(fileItems, true);
+        return fileItems;
     }
 
     private FileTransferResult FormResultFromSingleTransferResults(List<SingleFileTransferResult> singleResults)
