@@ -1,6 +1,7 @@
 ﻿namespace Frends.SFTP.DeleteDirectory.Definitions;
 
 using Frends.SFTP.DeleteDirectory.Enums;
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -126,5 +127,5 @@ public class Connection
     /// </summary>
     /// <example>[PromptResponse { Prompt = Verification code, Response = 123456789 } ]</example>
     [UIHint(nameof(UseKeyboardInteractiveAuthentication), "", true)]
-    public PromptResponse[] PromptAndResponse { get; set; } =[];
+    public PromptResponse[] PromptAndResponse { get; set; } = Array.Empty<PromptResponse>();
 }

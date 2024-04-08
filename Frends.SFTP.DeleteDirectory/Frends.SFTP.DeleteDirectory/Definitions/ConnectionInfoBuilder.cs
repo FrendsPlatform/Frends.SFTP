@@ -82,7 +82,7 @@ internal class ConnectionInfoBuilder
                 throw new ArgumentException($"Unknown Authentication type: '{_connection.Authentication}'.");
         }
 
-        connectionInfo = new ConnectionInfo(_connection.Address, _connection.Port, _connection.Username, [.. methods])
+        connectionInfo = new ConnectionInfo(_connection.Address, _connection.Port, _connection.Username, methods.ToArray())
         {
             Encoding = Util.GetEncoding(_input.FileEncoding, _input.EnableBom, _input.EncodingInString),
             ChannelCloseTimeout = TimeSpan.FromSeconds(_connection.ConnectionTimeout),
