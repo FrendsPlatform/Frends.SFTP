@@ -1,6 +1,7 @@
 ﻿namespace Frends.SFTP.DeleteDirectory.Tests;
 
 using System;
+using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Text;
 using Frends.SFTP.DeleteDirectory.Definitions;
@@ -117,12 +118,5 @@ internal static class Helpers
         }
 
         sftp.Disconnect();
-    }
-
-    internal static SshKeyGenerator.SshKeyGenerator GenerateDummySshKey()
-    {
-        var keyBits = 2048;
-
-        return new SshKeyGenerator.SshKeyGenerator(keyBits);
     }
 }

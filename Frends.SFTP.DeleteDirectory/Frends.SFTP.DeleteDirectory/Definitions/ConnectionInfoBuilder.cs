@@ -12,9 +12,9 @@ using System.Threading;
 
 internal class ConnectionInfoBuilder
 {
-    private static Input _input;
-    private static Connection _connection;
-    private static CancellationToken _cancellationToken;
+    private readonly Input _input;
+    private readonly Connection _connection;
+    private readonly CancellationToken _cancellationToken;
 
     internal ConnectionInfoBuilder(Input input, Connection connect, CancellationToken cancellationToken)
     {

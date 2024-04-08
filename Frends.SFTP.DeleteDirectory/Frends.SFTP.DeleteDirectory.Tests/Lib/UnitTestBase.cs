@@ -6,9 +6,9 @@ using NUnit.Framework;
 
 public class UnitTestBase
 {
-    protected static Connection _connection;
-    protected static Input _input;
-    protected static Options _options;
+    protected Connection _connection;
+    protected Input _input;
+    protected Options _options;
 
     [SetUp]
     public void Setup()

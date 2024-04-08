@@ -11,9 +11,9 @@ using Renci.SshNet.Common;
 [TestFixture]
 public class ServerFingerprintTests : UnitTestBase
 {
-    internal static string _MD5;
-    internal static string _Sha256Hex;
-    internal static string _Sha256Hash;
+    internal string _MD5;
+    internal string _Sha256Hex;
+    internal string _Sha256Hash;
 
     [OneTimeSetUp]
     public void OneTimeSetup()

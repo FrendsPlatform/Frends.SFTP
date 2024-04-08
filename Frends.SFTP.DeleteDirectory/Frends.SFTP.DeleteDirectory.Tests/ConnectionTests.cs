@@ -17,8 +17,8 @@ public class ConnectionTests : UnitTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.ConnectionTimeout = 10;
-        connection.Username = "demo";
-        connection.Password = "demo";
+        connection.Username = Guid.NewGuid().ToString();
+        connection.Password = Guid.NewGuid().ToString();
 
         var ex = Assert.ThrowsAsync<SshAuthenticationException>(async () => await SFTP.DeleteDirectory(_input, connection, _options, default));
         Assert.AreEqual("Permission denied (password).", ex.Message);
@@ -29,8 +29,8 @@ public class ConnectionTests : UnitTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.ConnectionTimeout = 10;
-        connection.Username = "demo";
-        connection.Password = "demo";
+        connection.Username = Guid.NewGuid().ToString();
+        connection.Password = Guid.NewGuid().ToString();
 
         var options = new Options
         {
@@ -114,8 +114,8 @@ public class ConnectionTests : UnitTestBase
     public void DeleteDirectory_TestThrowsWithIncorrectCredentials()
     {
         var connection = Helpers.GetSftpConnection();
-        connection.Password = "demo";
-        connection.Username = "demo";
+        connection.Password = Guid.NewGuid().ToString();
+        connection.Username = Guid.NewGuid().ToString();
 
         var input = new Input
         {
@@ -130,8 +130,8 @@ public class ConnectionTests : UnitTestBase
     public async Task DeleteDirectory_TestReturnWithIncorrectCredentials()
     {
         var connection = Helpers.GetSftpConnection();
-        connection.Password = "demo";
-        connection.Username = "demo";
+        connection.Password = Guid.NewGuid().ToString();
+        connection.Username = Guid.NewGuid().ToString();
 
         var input = new Input
         {
@@ -152,7 +152,7 @@ public class ConnectionTests : UnitTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        connection.PrivateKeyPassphrase = "demo";
+        connection.PrivateKeyPassphrase = Guid.NewGuid().ToString();
         connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
         var input = new Input
@@ -169,7 +169,7 @@ public class ConnectionTests : UnitTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        connection.PrivateKeyPassphrase = "demo";
+        connection.PrivateKeyPassphrase = Guid.NewGuid().ToString();
         connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
         var input = new Input
@@ -228,12 +228,10 @@ public class ConnectionTests : UnitTestBase
     [Test]
     public void DeleteDirectory_TestThrowsWithIncorrectPrivateKeyString()
     {
-        var key = Helpers.GenerateDummySshKey();
-
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
         connection.PrivateKeyPassphrase = "passphrase";
-        connection.PrivateKeyString = key.ToString();
+        connection.PrivateKeyString = Guid.NewGuid().ToString();
 
         var input = new Input
         {
@@ -247,12 +245,10 @@ public class ConnectionTests : UnitTestBase
     [Test]
     public async Task DeleteDirectory_TestReturnsErrorWithIncorrectPrivateKeyString()
     {
-        var key = Helpers.GenerateDummySshKey();
-
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
         connection.PrivateKeyPassphrase = "passphrase";
-        connection.PrivateKeyString = key.ToString();
+        connection.PrivateKeyString = Guid.NewGuid().ToString();
 
         var input = new Input
         {
