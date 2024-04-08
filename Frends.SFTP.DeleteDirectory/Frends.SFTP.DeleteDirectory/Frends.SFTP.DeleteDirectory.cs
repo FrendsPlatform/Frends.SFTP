@@ -6,6 +6,7 @@ using Renci.SshNet;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -53,34 +54,30 @@ public static class SFTP
 
             client.ChangeDirectory(input.Directory);
             var files = client.ListDirectory(input.Directory);
-            foreach (var file in files)
-            {
-                if (file.Name != "." && file.Name != "..")
-                {
-                    if (file.IsDirectory)
-                    {
-                        client.ChangeDirectory(file.FullName);
-                        foreach (var f in client.ListDirectory("."))
-                        {
-                            if (f.Name != "." && f.Name != "..")
-                            {
-                                client.DeleteFile(f.Name);
-                            }
-                        }
+            var validFiles = files.Where(file => file.Name != "." && file.Name != "..");
 
-                        client.ChangeDirectory(input.Directory);
-                        client.DeleteDirectory(file.FullName);
-                    }
-                    else
+            foreach (var file in validFiles)
+            {
+                if (file.IsDirectory)
+                {
+                    client.ChangeDirectory(file.FullName);
+                    var directoryFiles = client.ListDirectory(".").Where(f => f.Name != "." && f.Name != "..");
+
+                    foreach (var f in directoryFiles)
                     {
-                        client.DeleteFile(file.FullName);
+                        client.DeleteFile(f.Name);
                     }
+
+                    client.ChangeDirectory(input.Directory);
+                    client.DeleteDirectory(file.FullName);
+                }
+                else
+                {
+                    client.DeleteFile(file.FullName);
                 }
 
                 deleted.Add(file.FullName);
             }
-
-            client.DeleteDirectory(input.Directory);
         }
         catch (Exception ex)
         {

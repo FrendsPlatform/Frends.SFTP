@@ -152,7 +152,7 @@ public class ConnectionTests : UnitTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        connection.PrivateKeyPassphrase = Guid.NewGuid().ToString();
+        connection.PrivateKeyPassphrase = new Random().Next(int.MinValue, int.MaxValue).ToString("X");
         connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
         var input = new Input
@@ -161,7 +161,7 @@ public class ConnectionTests : UnitTestBase
         };
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () => await SFTP.DeleteDirectory(input, connection, _options, default));
-        Assert.IsTrue(ex.Message.Contains("Invalid data type"));
+        Assert.IsTrue(ex.Message.Contains("Invalid data type"), ex.Message);
     }
 
     [Test]
@@ -169,7 +169,7 @@ public class ConnectionTests : UnitTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        connection.PrivateKeyPassphrase = Guid.NewGuid().ToString();
+        connection.PrivateKeyPassphrase = new Random().Next(int.MinValue, int.MaxValue).ToString("X");
         connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
         var input = new Input
@@ -183,7 +183,7 @@ public class ConnectionTests : UnitTestBase
         };
 
         var ex = await SFTP.DeleteDirectory(input, connection, options, default);
-        Assert.IsTrue(ex.ErrorMessage.Message.Contains("Invalid data type"));
+        Assert.IsTrue(ex.ErrorMessage.Message.Contains("Invalid data type"), ex.ErrorMessage.Message);
     }
 
     [Test]
