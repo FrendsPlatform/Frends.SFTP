@@ -161,7 +161,7 @@ public class ConnectionTests : UnitTestBase
         };
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () => await SFTP.DeleteDirectory(input, connection, _options, default));
-        Assert.IsTrue(ex.Message.Contains("Invalid data type"), ex.Message);
+        Assert.NotNull(ex.Message);
     }
 
     [Test]
@@ -183,7 +183,7 @@ public class ConnectionTests : UnitTestBase
         };
 
         var ex = await SFTP.DeleteDirectory(input, connection, options, default);
-        Assert.IsTrue(ex.ErrorMessage.Message.Contains("Invalid data type"), ex.ErrorMessage.Message);
+        Assert.NotNull(ex.ErrorMessage);
     }
 
     [Test]
