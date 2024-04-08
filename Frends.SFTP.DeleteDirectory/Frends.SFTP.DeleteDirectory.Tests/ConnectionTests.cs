@@ -46,7 +46,7 @@ public class ConnectionTests : UnitTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        connection.PrivateKeyPassphrase = "passphrase";
+        connection.PrivateKeyPassphrase = Guid.NewGuid().ToString();
         connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
         var result = await SFTP.DeleteDirectory(_input, connection, _options, default);
@@ -61,7 +61,7 @@ public class ConnectionTests : UnitTestBase
         var connection = Helpers.GetSftpConnection();
         connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
-        connection.PrivateKeyPassphrase = "passphrase";
+        connection.PrivateKeyPassphrase = Guid.NewGuid().ToString();
         connection.PrivateKeyString = key;
 
         var result = await SFTP.DeleteDirectory(_input, connection, _options, default);
@@ -191,7 +191,7 @@ public class ConnectionTests : UnitTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        connection.PrivateKeyPassphrase = "passphrase";
+        connection.PrivateKeyPassphrase = Guid.NewGuid().ToString();
         connection.PrivateKeyFile = string.Empty;
 
         var input = new Input
@@ -208,7 +208,7 @@ public class ConnectionTests : UnitTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        connection.PrivateKeyPassphrase = "passphrase";
+        connection.PrivateKeyPassphrase = Guid.NewGuid().ToString();
         connection.PrivateKeyFile = string.Empty;
 
         var input = new Input
@@ -230,7 +230,7 @@ public class ConnectionTests : UnitTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
-        connection.PrivateKeyPassphrase = "passphrase";
+        connection.PrivateKeyPassphrase = Guid.NewGuid().ToString();
         connection.PrivateKeyString = Guid.NewGuid().ToString();
 
         var input = new Input
@@ -247,7 +247,7 @@ public class ConnectionTests : UnitTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
-        connection.PrivateKeyPassphrase = "passphrase";
+        connection.PrivateKeyPassphrase = Guid.NewGuid().ToString();
         connection.PrivateKeyString = Guid.NewGuid().ToString();
 
         var input = new Input

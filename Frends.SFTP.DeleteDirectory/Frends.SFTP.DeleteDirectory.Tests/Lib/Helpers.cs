@@ -1,6 +1,7 @@
 ﻿namespace Frends.SFTP.DeleteDirectory.Tests;
 
 using System;
+using System.Linq;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Text;
@@ -15,9 +16,9 @@ internal static class Helpers
     /// <summary>
     /// Test credentials for docker server.
     /// </summary>
-    private static readonly string _dockerAddress = "localhost";
-    private static readonly string _dockerUsername = "foo";
-    private static readonly string _dockerPassword = "pass";
+    private static readonly string _dockerAddress = Environment.GetEnvironmentVariable("SFTP_DockerAddress"); // localhost
+    private static readonly string _dockerUsername = Environment.GetEnvironmentVariable("SFTP_DockerUsername"); // "foo"
+    private static readonly string _dockerPassword = Environment.GetEnvironmentVariable("SFTP_DockerPassword"); // "pass"
 
     internal static Connection GetSftpConnection()
     {
@@ -92,28 +93,24 @@ internal static class Helpers
         sftp.Connect();
         sftp.ChangeDirectory("/upload");
         var files = sftp.ListDirectory(".");
-        foreach (var file in files)
-        {
-            if (file.Name != "." && file.Name != "..")
-            {
-                if (file.IsDirectory)
-                {
-                    sftp.ChangeDirectory(file.FullName);
-                    foreach (var f in sftp.ListDirectory("."))
-                    {
-                        if (f.Name != "." && f.Name != "..")
-                        {
-                            sftp.DeleteFile(f.Name);
-                        }
-                    }
+        var validFiles = files.Where(file => file.Name != "." && file.Name != "..");
 
-                    sftp.ChangeDirectory("/upload");
-                    sftp.DeleteDirectory(file.FullName);
-                }
-                else
-                {
-                    sftp.DeleteFile(file.FullName);
-                }
+        foreach (var file in validFiles)
+        {
+            if (file.IsDirectory)
+            {
+                sftp.ChangeDirectory(file.FullName);
+                var directoryFiles = sftp.ListDirectory(".").Where(f => f.Name != "." && f.Name != "..");
+
+                foreach (var f in directoryFiles)
+                    sftp.DeleteFile(f.Name);
+
+                sftp.ChangeDirectory("/upload");
+                sftp.DeleteDirectory(file.FullName);
+            }
+            else
+            {
+                sftp.DeleteFile(file.FullName);
             }
         }
 

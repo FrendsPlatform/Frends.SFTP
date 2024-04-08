@@ -220,7 +220,7 @@ public class ServerFingerprintTests : UnitTestBase
         connection.Authentication = AuthenticationType.UsernamePrivateKeyFile;
         connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
         connection.Password = null;
-        connection.PrivateKeyPassphrase = "passphrase";
+        connection.PrivateKeyPassphrase = Guid.NewGuid().ToString();
         connection.UseKeyboardInteractiveAuthentication = true;
         connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
         connection.ServerFingerPrint = _Sha256Hash.Replace("=", string.Empty);
@@ -231,7 +231,7 @@ public class ServerFingerprintTests : UnitTestBase
         connection.Authentication = AuthenticationType.UsernamePrivateKeyString;
         connection.PrivateKeyFile = null;
         connection.PrivateKeyString = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key"));
-        connection.PrivateKeyPassphrase = "passphrase";
+        connection.PrivateKeyPassphrase = Guid.NewGuid().ToString();
 
         _input.Directory = "upload/subDir";
 
@@ -251,7 +251,7 @@ public class ServerFingerprintTests : UnitTestBase
         connection.Authentication = AuthenticationType.UsernamePrivateKeyFile;
         connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
         connection.Password = null;
-        connection.PrivateKeyPassphrase = "passphrase";
+        connection.PrivateKeyPassphrase = Guid.NewGuid().ToString();
         connection.UseKeyboardInteractiveAuthentication = true;
         connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
         connection.ServerFingerPrint = _Sha256Hash.Replace("=", string.Empty);
@@ -263,7 +263,7 @@ public class ServerFingerprintTests : UnitTestBase
         connection.Authentication = AuthenticationType.UsernamePrivateKeyString;
         connection.PrivateKeyFile = null;
         connection.PrivateKeyString = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key"));
-        connection.PrivateKeyPassphrase = "passphrase";
+        connection.PrivateKeyPassphrase = Guid.NewGuid().ToString();
 
         _input.Directory = "upload/subDir";
 

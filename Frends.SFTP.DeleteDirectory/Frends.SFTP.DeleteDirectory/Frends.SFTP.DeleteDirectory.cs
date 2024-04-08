@@ -64,9 +64,7 @@ public static class SFTP
                     var directoryFiles = client.ListDirectory(".").Where(f => f.Name != "." && f.Name != "..");
 
                     foreach (var f in directoryFiles)
-                    {
                         client.DeleteFile(f.Name);
-                    }
 
                     client.ChangeDirectory(input.Directory);
                     client.DeleteDirectory(file.FullName);
