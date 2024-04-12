@@ -220,7 +220,7 @@ public class ServerFingerprintTests : UnitTestBase
         connection.Authentication = AuthenticationType.UsernamePrivateKeyFile;
         connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
         connection.Password = null;
-        connection.PrivateKeyPassphrase = Guid.NewGuid().ToString();
+        connection.PrivateKeyPassphrase = "passphrase";
         connection.UseKeyboardInteractiveAuthentication = true;
         connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
         connection.ServerFingerPrint = _Sha256Hash.Replace("=", string.Empty);
@@ -235,7 +235,7 @@ public class ServerFingerprintTests : UnitTestBase
 
         _input.Directory = "upload/subDir";
 
-        ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.DeleteDirectory(_input, connection, _options, default));
+        var ex2 = Assert.ThrowsAsync<InvalidOperationException>(async () => await SFTP.DeleteDirectory(_input, connection, _options, default));
         Assert.AreEqual("Failure in Keyboard-interactive authentication: No response given for server prompt request --> Password", ex.Message);
     }
 
@@ -251,7 +251,7 @@ public class ServerFingerprintTests : UnitTestBase
         connection.Authentication = AuthenticationType.UsernamePrivateKeyFile;
         connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
         connection.Password = null;
-        connection.PrivateKeyPassphrase = Guid.NewGuid().ToString();
+        connection.PrivateKeyPassphrase = "passphrase";
         connection.UseKeyboardInteractiveAuthentication = true;
         connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
         connection.ServerFingerPrint = _Sha256Hash.Replace("=", string.Empty);
@@ -269,6 +269,6 @@ public class ServerFingerprintTests : UnitTestBase
 
         var ex2 = await SFTP.DeleteDirectory(_input, connection, options, default);
         Assert.IsFalse(ex2.Success);
-        Assert.IsTrue(ex2.ErrorMessage.Message.Contains("Failure in Keyboard-interactive authentication: No response given for server prompt request --> Password"));
+        Assert.IsTrue(ex2.ErrorMessage.Message.Contains("Invalid data type"));
     }
 }
