@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.SFTP.DownloadFiles.Definitions;
+using System.Collections.Generic;
 
 namespace Frends.SFTP.DownloadFiles.Tests
 {
@@ -134,6 +135,70 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
             Assert.IsTrue(Helpers.SourceFileExists(Path.Combine(to, _source.FileName).Replace("\\", "/")));
+        }
+
+        [Test]
+        public async Task DownloadFiles_TestGuidMacro()
+        {
+            var source = new Source
+            {
+                Directory = "/upload/Upload",
+                FileName = "*",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+                IncludeSubdirectories = true
+            };
+
+            var destination = new Destination
+            {
+                Directory = Path.Combine(_destination.Directory, "%Guid%"),
+                FileName = "",
+                FileNameEncoding = FileEncoding.ANSI,
+                Action = DestinationAction.Overwrite,
+                FileContentEncoding = FileEncoding.ANSI,
+            };
+
+            Helpers.UploadTestFiles("/upload/Upload", 1, null, new List<string> { "test1.txt" });
+
+            for (var i = 0; i <= 10; i++)
+            {
+                Console.WriteLine($"Iteration: {i}");
+                var result = await SFTP.DownloadFiles(source, destination, _connection, _options, _info, new CancellationToken());
+                Assert.IsTrue(result.Success);
+                Assert.AreEqual(1, result.SuccessfulTransferCount);
+            }
+        }
+
+        [Test]
+        public async Task DownloadFiles_TestDateTimeMacro()
+        {
+            var source = new Source
+            {
+                Directory = "/upload/Upload",
+                FileName = "*",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+                IncludeSubdirectories = true
+            };
+
+            var destination = new Destination
+            {
+                Directory = Path.Combine(_destination.Directory, "%DateTime%"),
+                FileName = "",
+                FileNameEncoding = FileEncoding.ANSI,
+                Action = DestinationAction.Overwrite,
+                FileContentEncoding = FileEncoding.ANSI,
+            };
+
+            Helpers.UploadTestFiles("/upload/Upload", 10, null, new List<string> { "test.txt" });
+
+            for (var i = 0; i <= 10; i++)
+            {
+                Console.WriteLine($"Iteration: {i}");
+                var result = await SFTP.DownloadFiles(source, destination, _connection, _options, _info, new CancellationToken());
+                Assert.IsTrue(result.Success);
+                Assert.AreEqual(1, result.SuccessfulTransferCount);
+            }
         }
     }
 }

@@ -9,7 +9,7 @@ internal class SingleFileTransfer
     private readonly ISFTPLogger _logger;
     private readonly SingleFileTransferResult _result;
 
-    public SingleFileTransfer(FileItem file, BatchContext context, SftpClient client, RenamingPolicy renamingPolicy, ISFTPLogger logger)
+    public SingleFileTransfer(FileItem file, string destinationDirectoryWithMacrosExtended, BatchContext context, SftpClient client, RenamingPolicy renamingPolicy, ISFTPLogger logger)
     {
         _renamingPolicy = renamingPolicy;
         _logger = logger;
@@ -21,7 +21,7 @@ internal class SingleFileTransfer
         BatchContext = context;
 
         DestinationFileWithMacrosExpanded = Path.Combine(
-            renamingPolicy.ExpandDirectoryForMacros(context.Destination.Directory),
+            destinationDirectoryWithMacrosExtended,
             renamingPolicy.CreateRemoteFileName(
                 file.Name,
                 context.Destination.FileName));
@@ -388,7 +388,7 @@ internal class SingleFileTransfer
     private void HandleTransferError(Exception exception, string sourceFileRestoreMessage)
     {
         _result.Success = false; // the routine instance should be marked as failed if even one transfer fails
-        var errorMessage = $"Failure in {State}: File '{SourceFile.Name}' could not be transferred to '{BatchContext.Destination.Directory}'. Error: {exception.Message}.";
+        var errorMessage = $"Failure in {State}: File '{SourceFile.Name}' could not be transferred to '{DestinationFileWithMacrosExpanded}'. Error: {exception.Message}.";
         if (!string.IsNullOrEmpty(sourceFileRestoreMessage))
             errorMessage += " " + sourceFileRestoreMessage;
 

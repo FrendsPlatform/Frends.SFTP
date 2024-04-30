@@ -76,7 +76,8 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 else
                     client.DeleteFile(file.FullName);
             }
-            if (client.Exists(dir) && !dir.Equals(_baseDir)) client.DeleteDirectory(dir);
+            if (client.Exists(dir) && !dir.Equals(_baseDir))
+                client.DeleteDirectory(dir);
         }
 
         internal static string[] UploadTestFiles(string destination, int count = 3, string to = null, List<string> filenames = null)
