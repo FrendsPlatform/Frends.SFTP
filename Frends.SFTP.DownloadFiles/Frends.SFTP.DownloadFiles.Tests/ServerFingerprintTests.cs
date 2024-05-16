@@ -162,7 +162,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.Authentication = AuthenticationType.UsernamePrivateKeyFile;
             connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
             connection.Password = null;
-            connection.PrivateKeyPassphrase = "passphrase";
+            connection.PrivateKeyPassphrase = _connection.PrivateKeyPassphrase;
             connection.UseKeyboardInteractiveAuthentication = true;
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
             connection.ServerFingerPrint = _Sha256Hash.Replace("=", "");
@@ -173,7 +173,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.Authentication = AuthenticationType.UsernamePrivateKeyString;
             connection.PrivateKeyFile = null;
             connection.PrivateKeyString = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key"));
-            connection.PrivateKeyPassphrase = "passphrase";
+            connection.PrivateKeyPassphrase = _connection.PrivateKeyPassphrase;
 
             var destination = new Destination
             {
