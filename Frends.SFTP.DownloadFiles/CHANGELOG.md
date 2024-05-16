@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.10.1] - 2024-04-30
+## [2.11.0] - 2024-04-30
 ### Fixed
 - Fixed issue were Task threw exception when using macros in Source Directory.
 

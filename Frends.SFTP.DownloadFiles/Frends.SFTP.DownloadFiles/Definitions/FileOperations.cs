@@ -45,27 +45,9 @@ internal class FileOperations
     {
         FileMode fileMode = overwrite ? FileMode.Create : FileMode.CreateNew;
 
-        var tries = 1;
-        while (tries > 0)
-        {
-            try
-            {
-                using (Stream sourceStream = new FileStream(source, FileMode.Open, FileAccess.Read))
-                {
-                    using (Stream destinationStream = File.Create(remoteFile))
-                    {
-                        await sourceStream.CopyToAsync(destinationStream, bufferSize: 81920, cancellationToken);
-                        break;
-                    }
-                }
-            }
-            catch
-            {
-                if (--tries == 0)
-                    throw;
-                Thread.Sleep(1000);
-            }
-        }
+        using Stream sourceStream = new FileStream(source, FileMode.Open, FileAccess.Read);
+        using Stream destinationStream = new FileStream(remoteFile, fileMode, FileAccess.ReadWrite);
+        await sourceStream.CopyToAsync(destinationStream, bufferSize: 81920, cancellationToken);
     }
 
     internal static async Task MoveAsync(string source, string remoteFile, CancellationToken cancellationToken)
