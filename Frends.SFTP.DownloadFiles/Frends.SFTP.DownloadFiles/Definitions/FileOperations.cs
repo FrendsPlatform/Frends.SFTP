@@ -46,7 +46,7 @@ internal class FileOperations
         FileMode fileMode = overwrite ? FileMode.Create : FileMode.CreateNew;
 
         using Stream sourceStream = new FileStream(source, FileMode.Open, FileAccess.Read);
-        using Stream destinationStream = new FileStream(remoteFile, fileMode, FileAccess.Write);
+        using Stream destinationStream = new FileStream(remoteFile, fileMode, FileAccess.ReadWrite);
         await sourceStream.CopyToAsync(destinationStream, bufferSize: 81920, cancellationToken);
     }
 

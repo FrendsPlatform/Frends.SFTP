@@ -159,7 +159,7 @@ internal class FileTransporter
                     if (!client.IsConnected)
                         await client.ConnectAsync(cancellationToken);
 
-                    var singleTransfer = new SingleFileTransfer(file, _batchContext, client, _renamingPolicy, _logger);
+                    var singleTransfer = new SingleFileTransfer(file, DestinationDirectoryWithMacrosExtended, _batchContext, client, _renamingPolicy, _logger);
                     var result = await singleTransfer.TransferSingleFile(cancellationToken);
                     Result.Add(result);
                 }

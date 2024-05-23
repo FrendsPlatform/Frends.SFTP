@@ -143,7 +143,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         public void DownloadFiles_TestErrorMessage()
         {
             var connection = Helpers.GetSftpConnection();
-            connection.Password = "cuinbeu8i9ch";
+            connection.Password = Guid.NewGuid().ToString();
 
             var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
             Assert.IsTrue(ex.Message.Contains($"SFTP transfer failed: Authentication of SSH session failed: Permission denied (password)"));

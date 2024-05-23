@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.11.0] - 2024-04-30
+### Fixed
+- Fixed issue were Task threw exception when using macros in Source Directory.
+
 ## [2.10.0] - 2024-03-06
 ### Added
 - [Breaking] Added new parameter Source.IncludeSubdirectories which enables source file search from subdirectories.
