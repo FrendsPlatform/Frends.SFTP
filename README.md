@@ -10,6 +10,7 @@ Frends tasks for SFTP operations.
 - [Frends.SFTP.MoveFile](Frends.SFTP.MoveFile/README.md)
 - [Frends.SFTP.ListFiles](Frends.SFTP.ListFiles/README.md)
 - [Frends.SFTP.DeleteFiles](Frends.SFTP.DeleteFiles/README.md)
+- [Frends.SFTP.DeleteDirectory](Frends.SFTP.DeleteDirectory/README.md)
 - [Frends.SFTP.UploadFiles](Frends.SFTP.UploadFiles/README.md)
 - [Frends.SFTP.DownloadFiles](Frends.SFTP.DownloadFiles/README.md)
 
