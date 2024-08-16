@@ -270,7 +270,11 @@ namespace Frends.SFTP.DownloadFiles.Tests
             using (var client = new SftpClient(_dockerAddress, 2222, _dockerUser, _dockerPwd))
             {
                 client.ConnectionInfo.HostKeyAlgorithms.Clear();
-                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) => { return new KeyHostAlgorithm("ssh-rsa", new RsaKey(), data); });
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) =>
+                {
+                    var sshKeyData = new SshKeyData(data);
+                    return new KeyHostAlgorithm("ssh-rsa", new RsaKey(sshKeyData)); 
+                });
 
                 client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
                 {

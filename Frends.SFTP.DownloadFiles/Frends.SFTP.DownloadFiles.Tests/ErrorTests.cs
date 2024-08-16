@@ -162,7 +162,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 Operation = SourceOperation.Nothing,
             };
 
-            using var cancellationTokenSource = new CancellationTokenSource(2000);
+            using var cancellationTokenSource = new CancellationTokenSource(1000);
             var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.DownloadFiles(source, _destination, connection, _options, _info, cancellationTokenSource.Token));
             Assert.IsTrue(ex.Message.Contains("No files transferred."));
             Assert.IsTrue(ex.Message.Contains("Error: The operation was canceled.."));
@@ -184,7 +184,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             var options = new Options
             {
-                Timeout = 2,
+                Timeout = 1,
                 ThrowErrorOnFail = true,
                 RenameSourceFileBeforeTransfer = false,
                 RenameDestinationFileDuringTransfer = true,

@@ -184,7 +184,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             var connection = Helpers.GetSftpConnection();
             var options = new Options
             {
-                Timeout = 2,
+                Timeout = 1,
                 ThrowErrorOnFail = true,
                 RenameSourceFileBeforeTransfer = true,
                 RenameDestinationFileDuringTransfer = true,
@@ -212,7 +212,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             var connection = Helpers.GetSftpConnection();
             var options = new Options
             {
-                Timeout = 2,
+                Timeout = 1,
                 ThrowErrorOnFail = true,
                 RenameSourceFileBeforeTransfer = true,
                 RenameDestinationFileDuringTransfer = true,
