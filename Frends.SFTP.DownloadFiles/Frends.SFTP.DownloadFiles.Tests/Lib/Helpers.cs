@@ -273,7 +273,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
-                    return new KeyHostAlgorithm("ssh-rsa", new RsaKey(sshKeyData)); 
+                    return new KeyHostAlgorithm("ssh-rsa", new RsaKey(sshKeyData));
                 });
 
                 client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
