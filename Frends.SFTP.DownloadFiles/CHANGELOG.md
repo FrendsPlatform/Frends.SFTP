@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.12.0] - 2024-08-16
+### Updated
+- Updated Renci.SshNet library to version 2024.1.0.
+
 ## [2.11.0] - 2024-04-30
 ### Fixed
 - Fixed issue were Task threw exception when using macros in Source Directory.

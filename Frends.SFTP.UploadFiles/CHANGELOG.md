@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.10.0] - 2024-08-16
+### Updated
+- Updated Renci.SshNet library to version 2024.1.0.
+
 ## [2.9.0] - 2023-12-13
 ### Changed 
 - [Breaking] Changed Result property TransferredDestinationFilePaths to string array.
