@@ -99,7 +99,7 @@ public class Connection
     [DisplayFormat(DataFormatString = "Text")]
     public string PrivateKeyPassphrase { get; set; }
 
-     /// <summary>
+    /// <summary>
     /// If set, this encoding will be used to encode and decode command
     /// parameters and server responses, such as file names.
     /// By selecting 'Other' you can use any encoding.
