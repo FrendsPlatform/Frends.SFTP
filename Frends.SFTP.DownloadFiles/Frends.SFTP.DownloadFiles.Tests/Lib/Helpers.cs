@@ -58,6 +58,8 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 UserName = _dockerUser,
                 Authentication = AuthenticationType.UsernamePassword,
                 Password = _dockerPwd,
+                FileNameEncoding = FileEncoding.UTF8,
+                EnableBomForFileName = true,
                 BufferSize = 32,
                 KeepAliveInterval = -1,
                 PrivateKeyPassphrase = _dockerPass,

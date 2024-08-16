@@ -100,6 +100,29 @@ public class Connection
     public string PrivateKeyPassphrase { get; set; }
 
     /// <summary>
+    /// If set, this encoding will be used to encode and decode command
+    /// parameters and server responses, such as file names.
+    /// By selecting 'Other' you can use any encoding.
+    /// </summary>
+    /// <example>FileEncoding.ANSI</example>
+    [DefaultValue(FileEncoding.ANSI)]
+    public FileEncoding FileNameEncoding { get; set; }
+
+    /// <summary>
+    /// Additional option for UTF-8 encoding to enable bom.
+    /// </summary>
+    /// <example>true</example>
+    [UIHint(nameof(FileNameEncoding), "", FileEncoding.UTF8)]
+    public bool EnableBomForFileName { get; set; }
+
+    /// <summary>
+    /// File encoding to be used. A partial list of possible encodings: https://en.wikipedia.org/wiki/Windows_code_page#List.
+    /// </summary>
+    /// <example>utf-8</example>
+    [UIHint(nameof(FileNameEncoding), "", FileEncoding.Other)]
+    public string FileNameEncodingInString { get; set; }
+
+    /// <summary>
     /// Fingerprint of the SFTP server. When using "Username-Password"
     /// authentication it is recommended to use server fingerprint in
     /// order to be sure of the server you are connecting. Supported

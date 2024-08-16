@@ -57,8 +57,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             {
                 Directory = Path.Combine(_destWorkDir, "test%Year%"),
                 FileName = "",
-                FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true,
                 Action = DestinationAction.Error,
             };
 
@@ -153,17 +151,19 @@ namespace Frends.SFTP.DownloadFiles.Tests
             {
                 Directory = Path.Combine(_destination.Directory, "%Guid%"),
                 FileName = "",
-                FileNameEncoding = FileEncoding.ANSI,
                 Action = DestinationAction.Overwrite,
                 FileContentEncoding = FileEncoding.ANSI,
             };
+
+            var connection = Helpers.GetSftpConnection();
+            connection.FileNameEncoding = FileEncoding.ANSI;
 
             Helpers.UploadTestFiles("/upload/Upload", 1, null, new List<string> { "test1.txt" });
 
             for (var i = 0; i <= 10; i++)
             {
                 Console.WriteLine($"Iteration: {i}");
-                var result = await SFTP.DownloadFiles(source, destination, _connection, _options, _info, new CancellationToken());
+                var result = await SFTP.DownloadFiles(source, destination, connection, _options, _info, new CancellationToken());
                 Assert.IsTrue(result.Success);
                 Assert.AreEqual(1, result.SuccessfulTransferCount);
             }
@@ -185,17 +185,19 @@ namespace Frends.SFTP.DownloadFiles.Tests
             {
                 Directory = Path.Combine(_destination.Directory, "%DateTime%"),
                 FileName = "",
-                FileNameEncoding = FileEncoding.ANSI,
                 Action = DestinationAction.Overwrite,
                 FileContentEncoding = FileEncoding.ANSI,
             };
+
+            var connection = Helpers.GetSftpConnection();
+            connection.FileNameEncoding = FileEncoding.ANSI;
 
             Helpers.UploadTestFiles("/upload/Upload", 10, null, new List<string> { "test.txt" });
 
             for (var i = 0; i <= 10; i++)
             {
                 Console.WriteLine($"Iteration: {i}");
-                var result = await SFTP.DownloadFiles(source, destination, _connection, _options, _info, new CancellationToken());
+                var result = await SFTP.DownloadFiles(source, destination, connection, _options, _info, new CancellationToken());
                 Assert.IsTrue(result.Success);
                 Assert.AreEqual(1, result.SuccessfulTransferCount);
             }

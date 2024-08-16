@@ -36,9 +36,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             _destination = new Destination
             {
                 Directory = Path.Combine(_workDir, "destination"),
-                Action = DestinationAction.Error,
-                FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true
+                Action = DestinationAction.Error
             };
 
             _options = new Options

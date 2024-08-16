@@ -408,7 +408,7 @@ internal class FileTransporter
 
         connectionInfo = new ConnectionInfo(connect.Address, connect.Port, connect.UserName, methods.ToArray())
         {
-            Encoding = Util.GetEncoding(destination.FileNameEncoding, destination.FileNameEncodingInString, destination.EnableBomForFileName),
+            Encoding = Util.GetEncoding(connect.FileNameEncoding, connect.FileNameEncodingInString, connect.EnableBomForFileName),
             ChannelCloseTimeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout),
             Timeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout),
         };

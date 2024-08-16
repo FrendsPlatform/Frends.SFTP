@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.0.0] - 2024-08-16
+### Fixed
+- [Breaking] Moved the FileNameEncoding, FileNameEncodingInString and EnableBomForFileName parameters from destination tab to connection.
+
 ## [2.11.0] - 2024-04-30
 ### Fixed
 - Fixed issue were Task threw exception when using macros in Source Directory.
