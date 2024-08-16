@@ -22,9 +22,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             destination = new Destination
             {
                 Directory = Path.Combine(_workDir, "destination"),
-                FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true,
-                Action = DestinationAction.Overwrite,
+                Action = DestinationAction.Overwrite
             };
 
             options = new Options

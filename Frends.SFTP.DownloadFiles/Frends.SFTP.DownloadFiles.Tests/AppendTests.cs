@@ -21,8 +21,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             {
                 Directory = _destWorkDir,
                 FileName = _source.FileName,
-                FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true,
                 Action = DestinationAction.Append,
                 AddNewLine = true,
                 FileContentEncoding = FileEncoding.UTF8,
@@ -62,8 +60,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var destination = new Destination
             {
                 Directory = _destWorkDir,
-                FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true,
                 Action = DestinationAction.Append,
                 AddNewLine = true,
                 FileContentEncoding = FileEncoding.UTF8,
@@ -100,13 +96,12 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var destination = new Destination
             {
                 Directory = _destWorkDir,
-                FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true,
                 Action = DestinationAction.Append,
                 AddNewLine = true,
                 FileContentEncoding = FileEncoding.UTF8,
                 EnableBomForContent = true
             };
+
             var result = await SFTP.DownloadFiles(_source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var content1 = File.ReadAllText(Path.Combine(destination.Directory, _source.FileName));
@@ -136,13 +131,12 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var destination = new Destination
             {
                 Directory = _destWorkDir,
-                FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true,
                 Action = DestinationAction.Append,
                 AddNewLine = true,
                 FileContentEncoding = FileEncoding.UTF8,
                 EnableBomForContent = true
             };
+
             var result = await SFTP.DownloadFiles(_source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             var content1 = File.ReadAllText(Path.Combine(destination.Directory, _source.FileName));
@@ -173,8 +167,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var destination = new Destination
             {
                 Directory = _destWorkDir,
-                FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true,
                 Action = DestinationAction.Append,
                 AddNewLine = true,
                 FileContentEncoding = FileEncoding.UTF8,
@@ -211,8 +203,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var destination = new Destination
             {
                 Directory = _destWorkDir,
-                FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true,
                 Action = DestinationAction.Append,
                 AddNewLine = true,
                 FileContentEncoding = FileEncoding.UTF8,
@@ -257,8 +247,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var destination = new Destination
             {
                 Directory = _destWorkDir,
-                FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true,
                 Action = DestinationAction.Append,
                 AddNewLine = false,
                 FileContentEncoding = FileEncoding.UTF8,
@@ -286,5 +274,3 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
     }
 }
-
-

@@ -94,8 +94,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var destination = new Destination
             {
                 Directory = _destWorkDir,
-                FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true,
                 Action = DestinationAction.Error,
             };
 

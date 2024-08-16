@@ -178,9 +178,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var destination = new Destination
             {
                 Directory = Path.Combine(_workDir, "destination"),
-                Action = DestinationAction.Overwrite,
-                FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true
+                Action = DestinationAction.Overwrite
             };
 
             ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.DownloadFiles(_source, destination, connection, _options, _info, new CancellationToken()));
