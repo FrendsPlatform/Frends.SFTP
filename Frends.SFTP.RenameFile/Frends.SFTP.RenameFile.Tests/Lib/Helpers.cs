@@ -50,7 +50,8 @@ internal static class Helpers
         Tuple<string, string, byte[]> result = null;
         using var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword);
         client.ConnectionInfo.HostKeyAlgorithms.Clear();
-        client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) => {
+        client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) =>
+        {
             var sshKeyData = new SshKeyData(data);
             return new KeyHostAlgorithm("ssh-rsa", new RsaKey(sshKeyData));
         });
