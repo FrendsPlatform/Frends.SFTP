@@ -3,6 +3,7 @@ using Renci.SshNet.Common;
 using System;
 using System.IO;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using Frends.SFTP.MoveFile.Definitions;
 using Frends.SFTP.MoveFile.Enums;
 
@@ -11,6 +12,27 @@ namespace Frends.SFTP.MoveFile.Tests;
 [TestFixture]
 public class ErrorTests
 {
+    [Test]
+    public async Task MoveFile_TestNoSourceFilesFound()
+    {
+        var connection = Helpers.GetSftpConnection();
+
+        var input = new Input
+        {
+            Directory = "/upload",
+            Pattern = "filenotexisting.txt",
+            TargetDirectory = "/upload/moved",
+            CreateTargetDirectories = true,
+            IfTargetFileExists = FileExistsOperation.Throw
+        };
+
+        var result = await SFTP.MoveFile(input, connection, default);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual("No files were found matching the given pattern.", result.Message);
+        Assert.AreEqual(0, result.Files.Count);
+    }
+
     [Test]
     public void MoveFile_TestThrowsWithWrongPort()
     {

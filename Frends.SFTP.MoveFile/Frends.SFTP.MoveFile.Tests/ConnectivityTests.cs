@@ -32,5 +32,15 @@ public class ConnectivityTests : MoveFileTestBase
         var result = await SFTP.MoveFile(_input, _connection, default);
         Assert.IsNotNull(result.Files);
     }
+
+    [Test]
+    public async Task MoveFile_TestWithInteractiveKeyboardAuthentication()
+    {
+        var connection = Helpers.GetSftpConnection();
+        connection.UseKeyboardInteractiveAuthentication = true;
+
+        var result = await SFTP.MoveFile(_input, connection, default);
+        Assert.IsNotNull(result.Files);
+    }
 }
 
