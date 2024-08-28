@@ -134,22 +134,46 @@ internal static class Util
         switch (algorithm)
         {
             case HostKeyAlgorithms.RSA:
-                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) => { return new KeyHostAlgorithm("ssh-rsa", new RsaKey(), data); });
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) =>
+                {
+                    var sshKeyData = new SshKeyData(data);
+                    return new KeyHostAlgorithm("ssh-rsa", new RsaKey(sshKeyData));
+                });
                 break;
             case HostKeyAlgorithms.Ed25519:
-                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-ed25519", (data) => { return new KeyHostAlgorithm("ssh-ed25519", new ED25519Key(), data); });
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-ed25519", (data) =>
+                {
+                    var sshKeyData = new SshKeyData(data);
+                    return new KeyHostAlgorithm("ssh-ed25519", new ED25519Key(sshKeyData));
+                });
                 break;
             case HostKeyAlgorithms.DSS:
-                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-dss", (data) => { return new KeyHostAlgorithm("ssh-dss", new DsaKey(), data); });
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-dss", (data) =>
+                {
+                    var sshKeyData = new SshKeyData(data);
+                    return new KeyHostAlgorithm("ssh-dss", new DsaKey(sshKeyData));
+                });
                 break;
             case HostKeyAlgorithms.nistp256:
-                client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp256", (data) => { return new KeyHostAlgorithm("ecdsa-sha2-nistp256", new EcdsaKey(), data); });
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp256", (data) =>
+                {
+                    var sshKeyData = new SshKeyData(data);
+                    return new KeyHostAlgorithm("ecdsa-sha2-nistp256", new EcdsaKey(sshKeyData));
+                });
                 break;
             case HostKeyAlgorithms.nistp384:
-                client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp384", (data) => { return new KeyHostAlgorithm("ecdsa-sha2-nistp384", new EcdsaKey(), data); });
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp384", (data) =>
+                {
+                    var sshKeyData = new SshKeyData(data);
+                    return new KeyHostAlgorithm("ecdsa-sha2-nistp384", new EcdsaKey(sshKeyData));
+                });
                 break;
             case HostKeyAlgorithms.nistp521:
-                client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp521", (data) => { return new KeyHostAlgorithm("ecdsa-sha2-nistp521", new EcdsaKey(), data); });
+                client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp521", (data) =>
+                {
+                    var sshKeyData = new SshKeyData(data);
+                    return new KeyHostAlgorithm("ecdsa-sha2-nistp521", new EcdsaKey(sshKeyData));
+                });
                 break;
         }
 

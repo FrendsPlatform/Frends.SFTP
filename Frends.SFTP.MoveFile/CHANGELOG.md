@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.0] - 2024-08-19
+### Updated
+- Updated Renci.SshNet library to version 2024.1.0.
+### Added
+- Added more tests.
+
 ## [1.1.0] - 2023-12-22
 ### Updated
 - [Breaking] Updated dependency SSH.NET to the newest version 2023.0.0.
