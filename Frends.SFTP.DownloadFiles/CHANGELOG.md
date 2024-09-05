@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.13.0] - 2024-09-05
+### Fixed
+- Fixed issue with certain SFTP servers which did not use IsRegularFile property on files by modifying the logic to check that the file is not anything else than a regular file.
+
 ## [2.12.0] - 2024-08-16
 ### Updated
 - Updated Renci.SshNet library to version 2024.1.0.

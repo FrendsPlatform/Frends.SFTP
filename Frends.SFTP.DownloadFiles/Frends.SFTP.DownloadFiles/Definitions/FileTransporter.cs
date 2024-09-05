@@ -599,15 +599,15 @@ internal class FileTransporter
 
             if (file.Name.Equals(".") || file.Name.Equals("..")) continue;
 
-            if (file.IsRegularFile && (file.Name.Equals(source.FileName) || Util.FileMatchesMask(Path.GetFileName(file.FullName), source.FileName)))
+            if (file.IsDirectory && source.IncludeSubdirectories)
+                fileItems.AddRange(ListFiles(sftp, source, file.FullName, cancellationToken));
+
+            if (!file.IsDirectory && !file.IsSocket && !file.IsSymbolicLink && !file.IsBlockDevice && !file.IsCharacterDevice && !file.IsNamedPipe && (file.Name.Equals(source.FileName) || Util.FileMatchesMask(Path.GetFileName(file.FullName), source.FileName)))
             {
                 var item = new FileItem(file);
                 _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath}");
                 fileItems.Add(item);
             }
-
-            if (file.IsDirectory && source.IncludeSubdirectories)
-                fileItems.AddRange(ListFiles(sftp, source, file.FullName, cancellationToken));
         }
 
         return fileItems;
