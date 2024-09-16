@@ -114,7 +114,7 @@ public class SFTP
     {
         using var timeoutCts = new CancellationTokenSource();
         CancellationTokenSource linkedCts = null;
-        
+
         if (options.Timeout > 0)
         {
             // Create a new cancellationTokenWithTimeOutSource with a timeout
@@ -186,7 +186,7 @@ public class SFTP
             if (options.Timeout > 0)
                 linkedCts.Dispose();
         }
-        
+
     }
 
     private static string InitializeTemporaryWorkPath(string workDir)
