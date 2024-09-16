@@ -365,6 +365,7 @@ internal class SingleFileTransfer
 
     private void CleanUpFiles()
     {
+        // Clean up temp directory.
         var temporarySourceFile = Path.Combine(WorkFileInfo.WorkFileDir, Path.GetFileName(SourceFileDuringTransfer));
         SetCurrentState(TransferState.CleanUpFiles, $"Checking if temporary source file {temporarySourceFile} exists.");
         var exists = !string.IsNullOrEmpty(temporarySourceFile) && File.Exists(temporarySourceFile);
@@ -373,6 +374,12 @@ internal class SingleFileTransfer
         {
             SetCurrentState(TransferState.CleanUpFiles, $"Removing temporary source file {temporarySourceFile}.");
             TryToRemoveLocalTempFile(temporarySourceFile);
+        }
+
+        // Clean up temp file from source.
+        if (Path.GetFileName(SourceFileDuringTransfer) != SourceFile.Name && File.Exists(SourceFileDuringTransfer))
+        {
+            TryToRemoveLocalTempFile(SourceFileDuringTransfer);
         }
 
         exists = !string.IsNullOrEmpty(DestinationFileDuringTransfer) && File.Exists(DestinationFileDuringTransfer) && BatchContext.Options.RenameDestinationFileDuringTransfer;
