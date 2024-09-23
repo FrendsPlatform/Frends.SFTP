@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.11.0] - 2024-09-16
+### Fixed
+- Fixed memory leak with Cancellation token source by disposing the token source at finally block.
+- Fixed issue with temp files leaving inside the source directory by adding check for them in clean up method.
+
 ## [2.10.0] - 2024-08-16
 ### Updated
 - Updated Renci.SshNet library to version 2024.1.0.

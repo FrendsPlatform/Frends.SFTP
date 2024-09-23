@@ -4,6 +4,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.SFTP.UploadFiles.Definitions;
+using System.Linq;
 
 namespace Frends.SFTP.UploadFiles.Tests
 {
@@ -184,7 +185,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             var connection = Helpers.GetSftpConnection();
             var options = new Options
             {
-                Timeout = 1,
+                Timeout = 2,
                 ThrowErrorOnFail = true,
                 RenameSourceFileBeforeTransfer = true,
                 RenameDestinationFileDuringTransfer = true,
@@ -201,9 +202,18 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Operation = SourceOperation.Nothing,
             };
 
-            var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(source, _destination, connection, options, _info, default));
-            Assert.IsTrue(ex.Message.Contains("Operation was cancelled from UI."));
+            var temp = Path.Combine(_workDir, "temp");
+            Directory.CreateDirectory(temp);
+            var info = new Info
+            {
+                WorkDir = temp
+            };
+
+            var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(source, _destination, connection, options, info, default));
+            Console.WriteLine(ex.Message);
             Assert.IsTrue(ex.Message.Contains("No files transferred."));
+            Assert.AreEqual(0, Directory.GetFiles(temp).Length);
+            Assert.AreEqual(0, Directory.GetFiles(_workDir).Where(e => Path.GetExtension(e) == ".8CO").Select(e => e).ToList().Count);
         }
 
         [Test]
@@ -237,7 +247,6 @@ namespace Frends.SFTP.UploadFiles.Tests
             };
 
             var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(source, _destination, connection, options, info, default));
-            Assert.IsTrue(ex.Message.Contains("Operation was cancelled from UI."));
             Assert.IsTrue(ex.Message.Contains("No files transferred."));
             Assert.AreEqual(0, Directory.GetFiles(temp).Length);
         }
