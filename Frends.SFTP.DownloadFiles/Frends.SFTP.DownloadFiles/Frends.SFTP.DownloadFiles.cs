@@ -173,7 +173,7 @@ public class SFTP
         }
         finally
         {
-            if (options.Timeout > 0)
+            if (linkedCts != null)
                 linkedCts.Dispose();
         }
     }
