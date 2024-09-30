@@ -102,71 +102,80 @@ public class SFTP
     {
         // Create a new cancellationTokenWithTimeOutSource with a timeout
         using var timeoutCts = new CancellationTokenSource();
+        CancellationTokenSource linkedCts = null;
 
         if (options.Timeout > 0)
         {
             timeoutCts.CancelAfter(TimeSpan.FromSeconds(options.Timeout));
 
             // Create a linked token source that combines the external and timeout tokens
-            var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
+            linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
 
             // Get the linked token
             cancellationToken = linkedCts.Token;
         }
 
-        var maxLogEntries = options.OperationLog ? (int?)null : 100;
-        var transferSink = new TransferLogSink(maxLogEntries);
-        var operationsLogger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .WriteTo.Sink(transferSink)
-            .CreateLogger();
-        Log.Logger ??= new LoggerConfiguration()
-            .MinimumLevel
-            .Debug()
-            .CreateLogger();
-        var fileTransferLog = Log.Logger;
-
-        using var logger = InitializeSFTPLogger(operationsLogger);
-        if (string.IsNullOrEmpty(info.ProcessUri))
-            fileTransferLog.Warning("ProcessUri is empty. This means the transfer view cannot link to the correct page.");
-
-        if (!Guid.TryParse(info.TaskExecutionID, out Guid executionId))
+        try
         {
-            fileTransferLog.Warning("'{0}' is not a valid task execution ID, will default to random Guid.", info.TaskExecutionID);
-            executionId = Guid.NewGuid();
+            var maxLogEntries = options.OperationLog ? (int?)null : 100;
+            var transferSink = new TransferLogSink(maxLogEntries);
+            var operationsLogger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Sink(transferSink)
+                .CreateLogger();
+            Log.Logger ??= new LoggerConfiguration()
+                .MinimumLevel
+                .Debug()
+                .CreateLogger();
+            var fileTransferLog = Log.Logger;
+
+            using var logger = InitializeSFTPLogger(operationsLogger);
+            if (string.IsNullOrEmpty(info.ProcessUri))
+                fileTransferLog.Warning("ProcessUri is empty. This means the transfer view cannot link to the correct page.");
+
+            if (!Guid.TryParse(info.TaskExecutionID, out Guid executionId))
+            {
+                fileTransferLog.Warning("'{0}' is not a valid task execution ID, will default to random Guid.", info.TaskExecutionID);
+                executionId = Guid.NewGuid();
+            }
+
+            _batchContext = new BatchContext
+            {
+                Info = info,
+                TempWorkDir = InitializeTemporaryWorkPath(info.WorkDir),
+                Options = options,
+                InstanceId = executionId,
+                ServiceId = info.TransferName,
+                SourceFiles = new List<SftpFile>(),
+                DestinationFiles = new List<FileItem>(),
+                RoutineUri = info.ProcessUri,
+                BatchTransferStartTime = DateTime.Now,
+                Source = source,
+                Destination = destination,
+                Connection = connection,
+            };
+
+            var fileTransporter = new FileTransporter(logger, _batchContext, executionId);
+            var result = await fileTransporter.Run(cancellationToken);
+
+            if (options.ThrowErrorOnFail && !result.Success)
+            {
+                throw new Exception($"SFTP transfer failed: {result.UserResultMessage}. " +
+                                    $"Latest operations: \n{GetLogLines(transferSink.GetBufferedLogMessages())}.");
+            }
+
+            if (result.OperationsLog == null)
+                result.OperationsLog = new Dictionary<string, string>();
+            else if (options.OperationLog)
+                result.OperationsLog = GetLogDictionary(transferSink.GetBufferedLogMessages());
+
+            return new Result(result);
         }
-
-        _batchContext = new BatchContext
+        finally
         {
-            Info = info,
-            TempWorkDir = InitializeTemporaryWorkPath(info.WorkDir),
-            Options = options,
-            InstanceId = executionId,
-            ServiceId = info.TransferName,
-            SourceFiles = new List<SftpFile>(),
-            DestinationFiles = new List<FileItem>(),
-            RoutineUri = info.ProcessUri,
-            BatchTransferStartTime = DateTime.Now,
-            Source = source,
-            Destination = destination,
-            Connection = connection,
-        };
-
-        var fileTransporter = new FileTransporter(logger, _batchContext, executionId);
-        var result = await fileTransporter.Run(cancellationToken);
-
-        if (options.ThrowErrorOnFail && !result.Success)
-        {
-            throw new Exception($"SFTP transfer failed: {result.UserResultMessage}. " +
-                                $"Latest operations: \n{GetLogLines(transferSink.GetBufferedLogMessages())}.");
+            if (options.Timeout > 0)
+                linkedCts.Dispose();
         }
-
-        if (result.OperationsLog == null)
-            result.OperationsLog = new Dictionary<string, string>();
-        else if (options.OperationLog)
-            result.OperationsLog = GetLogDictionary(transferSink.GetBufferedLogMessages());
-
-        return new Result(result);
     }
 
     private static string InitializeTemporaryWorkPath(string workDir)
