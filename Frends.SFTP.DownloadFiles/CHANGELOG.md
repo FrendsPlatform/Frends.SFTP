@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.14.0] - 2024-09-30
+### Fixed
+- Fixed small memory leak with CancellationTokenSource by adding dispose to the end of the Task.
+
 ## [2.13.0] - 2024-09-05
 ### Fixed
 - Fixed issue with certain SFTP servers which did not use IsRegularFile property on files by modifying the logic to check that the file is not anything else than a regular file.
