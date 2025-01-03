@@ -7,8 +7,8 @@ namespace Frends.SFTP.ListFiles.Definitions;
 
 internal class ConnectionInfoBuilder
 {
-    private static Input _input;
-    private static Connection _connection;
+    private Input _input;
+    private Connection _connection;
 
     internal ConnectionInfoBuilder(Input input, Connection connect)
     {
