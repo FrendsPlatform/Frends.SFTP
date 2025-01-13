@@ -7,8 +7,8 @@ namespace Frends.SFTP.RenameFile.Definitions;
 
 internal class ConnectionInfoBuilder
 {
-    private static Connection _connection;
-    private static CancellationToken _cancellationToken;
+    private Connection _connection;
+    private CancellationToken _cancellationToken;
 
     internal ConnectionInfoBuilder(Connection connect, CancellationToken cancellationToken)
     {
