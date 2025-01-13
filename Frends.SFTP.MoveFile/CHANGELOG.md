@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.3.0] - 2025-01-10
+### Fixed
+- Fixed issue with ConnectionInfoBuilder having static properties for connection and input paramaters which lead to Task not being thread safe.
+
 ## [1.2.0] - 2024-08-19
 ### Updated
 - Updated Renci.SshNet library to version 2024.1.0.

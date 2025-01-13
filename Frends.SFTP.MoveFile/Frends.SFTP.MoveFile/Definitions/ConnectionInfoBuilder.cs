@@ -7,8 +7,8 @@ namespace Frends.SFTP.MoveFile.Definitions;
 
 internal class ConnectionInfoBuilder
 {
-    private static Connection _connection;
-    private static Input _input;
+    private Connection _connection;
+    private Input _input;
 
     internal ConnectionInfoBuilder(Connection connect, Input input)
     {
