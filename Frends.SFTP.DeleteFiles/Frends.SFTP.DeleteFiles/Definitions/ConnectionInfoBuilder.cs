@@ -12,9 +12,9 @@ using Frends.SFTP.DeleteFiles.Enums;
 
 internal class ConnectionInfoBuilder
 {
-    private static Input _input;
-    private static Connection _connection;
-    private static CancellationToken _cancellationToken;
+    private Input _input;
+    private Connection _connection;
+    private CancellationToken _cancellationToken;
 
     internal ConnectionInfoBuilder(Input input, Connection connect, CancellationToken cancellationToken)
     {
