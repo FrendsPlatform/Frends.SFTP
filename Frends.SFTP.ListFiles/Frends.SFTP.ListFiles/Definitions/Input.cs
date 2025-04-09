@@ -38,7 +38,7 @@ public class Input
     public bool IncludeSubdirectories { get; set; }
 
     /// <summary>
-    /// Encoding for the read content.
+    /// Encoding for the file names.
     /// By selecting 'Other' you can use any encoding.
     /// </summary>
     /// <example>FileEncoding.ANSI</example>
