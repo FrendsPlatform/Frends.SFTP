@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.5.0] - 2025-04-09
+### Changed
+- Clarified that the encoding parameter is used for the file name encoding.
+
 ## [2.4.0] - 2025-01-03
 ### Fixed
 - Fixed issue with ConnectionInfoBuilder having static properties for connection and input paramaters which lead to Task not being thread safe.
