@@ -516,65 +516,28 @@ internal class FileTransporter
         return new Tuple<List<FileItem>, bool>(fileItems, true);
     }
 
-    public static void CreateDirectoriesRecursively(string fullPath)
+    public static void CreateDirectoriesRecursively(SftpClient client, string path)
     {
-        // Normalize the path
-        fullPath = Path.GetFullPath(fullPath);
-
-        // Split the path into segments
-        string[] parts = fullPath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-        string currentPath = "";
-
-        // Handle root (e.g., "C:\" on Windows or "/" on Unix)
-        if (Path.IsPathRooted(fullPath))
+        path = path.Replace(@"\", "/");
+        if (client.Exists(path)) return;
+        try
         {
-            currentPath = Path.GetPathRoot(fullPath);
+            client.CreateDirectory(path);
         }
-
-        foreach (string part in parts)
+        catch
         {
-            if (string.IsNullOrEmpty(part))
-                continue;
-
-            currentPath = Path.Combine(currentPath, part);
-
-            if (!Directory.Exists(currentPath))
+            var parent = Path.GetDirectoryName(path);
+            if (!string.IsNullOrEmpty(parent))
             {
-                Directory.CreateDirectory(currentPath);
-                Console.WriteLine($"Created: {currentPath}");
-            }
-            else
-            {
-                Console.WriteLine($"Exists: {currentPath}");
+                CreateDirectoriesRecursively(client, parent);
+                client.CreateDirectory(path);
             }
         }
     }
 
     private static void CreateDestinationDirectories(SftpClient client, string path, CancellationToken cancellationToken)
     {
-        //tworz w rekurencji katalogi
-        //Files/A/B
-        //Files/A
-        //Files/
-        //i tak az sie uda jakis stworzyc a potem z powrotem wglab az do Files/A/B
-        //   client.CreateDirectory(path);
-        client.ChangeDirectory(path);
-        // var tempWorkdir = client.WorkingDirectory; 
-        // // client.ChangeDirectory("/");
-        // // Consistent forward slashes
-        // foreach (string dir in path.Replace(@"\", "/").Split('/'))
-        // {
-        //     cancellationToken.ThrowIfCancellationRequested();
-        //     if (!string.IsNullOrWhiteSpace(dir))
-        //     {
-        //         if (!TryToChangeDir(client, dir) && ("/" + dir != client.WorkingDirectory))
-        //         {
-        //             client.CreateDirectory(dir);
-        //             client.ChangeDirectory(dir);
-        //         }
-        //     }
-        // }
-        // client.ChangeDirectory(tempWorkdir);
+        CreateDirectoriesRecursively(client, path);
     }
 
     // Check whether the directory exists by trying to change workingDirectory into it.
