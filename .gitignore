@@ -246,3 +246,6 @@ Frends.Community.*/Frends.Community.*/Frends.Community.*.xml
 
 # PowerShell scripts
 *.ps1
+
+# Rider ignored files
+.idea/

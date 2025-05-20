@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.12.0] - 2025-05-20
+### Fixed
+- Improved directory creation logic for SFTP uploads, enhancing reliability when creating nested directories.
+
 ## [2.11.0] - 2024-09-16
 ### Fixed
 - Fixed memory leak with Cancellation token source by disposing the token source at finally block.

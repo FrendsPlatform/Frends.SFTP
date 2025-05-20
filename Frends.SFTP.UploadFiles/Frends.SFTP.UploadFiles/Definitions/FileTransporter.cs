@@ -516,21 +516,28 @@ internal class FileTransporter
         return new Tuple<List<FileItem>, bool>(fileItems, true);
     }
 
-    private static void CreateDestinationDirectories(SftpClient client, string path, CancellationToken cancellationToken)
+    public static void CreateDirectoriesRecursively(SftpClient client, string path)
     {
-        // Consistent forward slashes
-        foreach (string dir in path.Replace(@"\", "/").Split('/'))
+        path = path.Replace(@"\", "/");
+        if (client.Exists(path)) return;
+        try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (!string.IsNullOrWhiteSpace(dir))
+            client.CreateDirectory(path);
+        }
+        catch
+        {
+            var parent = Path.GetDirectoryName(path);
+            if (!string.IsNullOrEmpty(parent))
             {
-                if (!TryToChangeDir(client, dir) && ("/" + dir != client.WorkingDirectory))
-                {
-                    client.CreateDirectory(dir);
-                    client.ChangeDirectory(dir);
-                }
+                CreateDirectoriesRecursively(client, parent);
+                client.CreateDirectory(path);
             }
         }
+    }
+
+    private static void CreateDestinationDirectories(SftpClient client, string path, CancellationToken cancellationToken)
+    {
+        CreateDirectoriesRecursively(client, path);
     }
 
     // Check whether the directory exists by trying to change workingDirectory into it.
