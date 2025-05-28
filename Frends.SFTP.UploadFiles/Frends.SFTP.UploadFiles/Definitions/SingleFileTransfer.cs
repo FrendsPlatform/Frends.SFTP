@@ -217,26 +217,60 @@ internal class SingleFileTransfer
             TransferState.PutFile,
             $"Uploading {helper}destination file { Path.GetFileName(DestinationFileDuringTransfer)} to destination {DestinationFileWithMacrosExpanded}.");
 
-
-        using (var fs = File.OpenRead(Path.Combine(WorkFileInfo.WorkFileDir, Path.GetFileName(SourceFileDuringTransfer))))
+        try 
         {
-            var asynch = Client.BeginUploadFile(fs, DestinationFileDuringTransfer, removeExisting, null, null, null);
+            using var fileStream = File.OpenRead(Path.Combine(WorkFileInfo.WorkFileDir, 
+                                               Path.GetFileName(SourceFileDuringTransfer)));
+            
+            // Create a TaskCompletionSource to wrap the APM pattern
+            var uploadTask = Task.Factory.FromAsync(
+                (callback, state) => client.BeginUploadFile(fileStream, DestinationFileDuringTransfer, 
+                                                           removeExisting, callback, state),
+                result => client.EndUploadFile(result),
+                null);
 
-            var sftpAsynch = asynch as SftpUploadAsyncResult;
+            // Add timeout
+            using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            var timeoutTask = Task.Delay(TimeSpan.FromSeconds(BatchContext.Connection.ConnectionTimeout), 
+                                       timeoutCts.Token);
 
-            while (!sftpAsynch.IsCompleted)
+            // Wait for either completion or timeout
+            var completedTask = await Task.WhenAny(uploadTask, timeoutTask);
+            
+            if (completedTask == timeoutTask)
             {
-                if (cancellationToken.IsCancellationRequested)
+                // Upload timed out
+                try 
                 {
-                    sftpAsynch.IsUploadCanceled = true;
-                    // This will remove partially uploaded file from the SFTP server.
-                    Client.DeleteFile(DestinationFileDuringTransfer);
-                    _logger.NotifyError(BatchContext, "Operation was cancelled from UI.", new OperationCanceledException());
-                    cancellationToken.ThrowIfCancellationRequested();
+                    client.DeleteFile(DestinationFileDuringTransfer); // Cleanup partial file
                 }
+                catch { /* Ignore cleanup errors */ }
+                
+                throw new TimeoutException($"Upload operation timed out after {BatchContext.Connection.ConnectionTimeout} seconds");
             }
 
-            Client.EndUploadFile(asynch);
+            await uploadTask; // Propagate any exceptions from the upload task
+        }
+        catch (OperationCanceledException)
+        {
+            try 
+            {
+                client.DeleteFile(DestinationFileDuringTransfer);
+            }
+            catch { /* Ignore cleanup errors */ }
+            
+            _logger.NotifyError(BatchContext, "Operation was cancelled.", new OperationCanceledException());
+            throw;
+        }
+        catch (Exception ex)
+        {
+            try 
+            {
+                client.DeleteFile(DestinationFileDuringTransfer);
+            }
+            catch { /* Ignore cleanup errors */ }
+            
+            throw new Exception($"Error uploading file: {ex.Message}", ex);
         }
 
         _logger.NotifyInformation(BatchContext, $"FILE PUT: Source file {SourceFile.FullPath} uploaded to target {DestinationFileWithMacrosExpanded}.");
