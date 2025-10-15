@@ -87,7 +87,7 @@ public class SFTP
                     }
                 }
             }
-        
+
             var encoding = Util.GetEncoding(input.FileEncoding, input.EnableBom, input.EncodingInString);
 
             switch (input.WriteBehaviour)

@@ -203,7 +203,7 @@ internal static class Util
         return;
     }
 
-    public static void CreateDirectoriesRecursively(SftpClient client, string path)
+    internal static void CreateDirectoriesRecursively(SftpClient client, string path)
     {
         path = path.Replace(@"\", "/");
         if (client.Exists(path)) return;
