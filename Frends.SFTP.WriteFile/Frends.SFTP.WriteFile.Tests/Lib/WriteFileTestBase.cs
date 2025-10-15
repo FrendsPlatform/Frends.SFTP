@@ -8,7 +8,9 @@ public class WriteFileTestBase
 {
     internal static Input _input;
     internal static Connection _connection;
+    internal static Options _options;
     internal static string _content;
+
 
     [SetUp]
     public void SetUp()
@@ -22,6 +24,7 @@ public class WriteFileTestBase
             FileEncoding = FileEncoding.ANSI,
             WriteBehaviour = WriteOperation.Error
         };
+        _options = new Options();
     }
 
     [TearDown]

@@ -202,5 +202,23 @@ internal static class Util
 
         return;
     }
-}
 
+    public static void CreateDirectoriesRecursively(SftpClient client, string path)
+    {
+        path = path.Replace(@"\", "/");
+        if (client.Exists(path)) return;
+        try
+        {
+            client.CreateDirectory(path);
+        }
+        catch
+        {
+            var parent = Path.GetDirectoryName(path);
+            if (!string.IsNullOrEmpty(parent))
+            {
+                CreateDirectoriesRecursively(client, parent);
+                client.CreateDirectory(path);
+            }
+        }
+    }
+}

@@ -16,8 +16,9 @@ public class SFTP
     /// </summary>
     /// <param name="connection">Transfer connection parameters</param>
     /// <param name="input">Write options with full path and string content</param>
+    /// <param name="options">Options for write file</param>
     /// <returns>Object {string Path, double SizeInMegaBytes} </returns>
-    public static Result WriteFile([PropertyTab] Input input, [PropertyTab] Connection connection)
+    public static Result WriteFile([PropertyTab] Input input, [PropertyTab] Connection connection, [PropertyTab] Options options)
     {
         ConnectionInfo connectionInfo;
         // Establish connectionInfo with connection parameters
@@ -59,36 +60,66 @@ public class SFTP
 
         if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
-        var encoding = Util.GetEncoding(input.FileEncoding, input.EnableBom, input.EncodingInString);
-
-        switch (input.WriteBehaviour)
+        try
         {
-            case WriteOperation.Append:
-                var content = string.Empty;
-                if (input.AddNewLine)
-                    content = "\n";
-                content += input.Content;
-                client.AppendAllText(input.Path, content, encoding);
-                break;
-            case WriteOperation.Overwrite:
-                if (client.Exists(input.Path))
-                    client.DeleteFile(input.Path);
-                client.WriteAllText(input.Path, input.Content, encoding);
-                break;
-            case WriteOperation.Error:
-                if (client.Exists(input.Path))
-                    throw new ArgumentException($"File already exists: {input.Path}");
-                client.WriteAllText(input.Path, input.Content, encoding);
-                break;
-            default:
+            var targetDirectory = Path.GetDirectoryName(input.Path);
+
+            if (!string.IsNullOrEmpty(targetDirectory))
+            {
+                targetDirectory = targetDirectory.Replace("\\", "/");
+
+                if (!client.Exists(targetDirectory))
+                {
+                    if (options.CreateDestinationDirectories == true)
+                    {
+                        try
+                        {
+                            Util.CreateDirectoriesRecursively(client, targetDirectory);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new ArgumentException($"Error while creating destination directory '{targetDirectory}': {ex.Message}", ex);
+                        }
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"Destination directory '{targetDirectory}' was not found.");
+                    }
+                }
+            }
+        
+            var encoding = Util.GetEncoding(input.FileEncoding, input.EnableBom, input.EncodingInString);
+
+            switch (input.WriteBehaviour)
+            {
+                case WriteOperation.Append:
+                    var content = string.Empty;
+                    if (input.AddNewLine)
+                        content = "\n";
+                    content += input.Content;
+                    client.AppendAllText(input.Path, content, encoding);
+                    break;
+                case WriteOperation.Overwrite:
+                    if (client.Exists(input.Path))
+                        client.DeleteFile(input.Path);
+                    client.WriteAllText(input.Path, input.Content, encoding);
+                    break;
+                case WriteOperation.Error:
+                    if (client.Exists(input.Path))
+                        throw new ArgumentException($"File already exists: {input.Path}");
+                    client.WriteAllText(input.Path, input.Content, encoding);
+                    break;
+                default:
                 throw new ArgumentException($"Unknown WriteBehaviour type: '{input.WriteBehaviour}'.");
+            }
+            var result = new Result(client.Get(input.Path));
+            return result;
         }
-        var result = new Result(client.Get(input.Path));
-
-        client.Disconnect();
-        client.Dispose();
-
-        return result;
+        finally
+        {
+            client.Disconnect();
+            client.Dispose();
+        }
     }
 }
 
