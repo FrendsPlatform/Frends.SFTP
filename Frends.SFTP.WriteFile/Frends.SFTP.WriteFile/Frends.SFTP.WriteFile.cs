@@ -110,7 +110,7 @@ public class SFTP
                     client.WriteAllText(input.Path, input.Content, encoding);
                     break;
                 default:
-                throw new ArgumentException($"Unknown WriteBehaviour type: '{input.WriteBehaviour}'.");
+                    throw new ArgumentException($"Unknown WriteBehaviour type: '{input.WriteBehaviour}'.");
             }
             var result = new Result(client.Get(input.Path));
             return result;
