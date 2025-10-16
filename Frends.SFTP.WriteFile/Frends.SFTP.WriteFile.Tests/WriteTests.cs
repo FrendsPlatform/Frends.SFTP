@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using Frends.SFTP.WriteFile.Enums;
 using Frends.SFTP.WriteFile.Definitions;
+using System;
 
 namespace Frends.SFTP.WriteFile.Tests;
 
@@ -106,7 +107,7 @@ class WriteTests : WriteFileTestBase
     }
 
     [Test]
-    public void WriteFile_TestCreateDestinationDirectories_Success()
+    public void WriteFile_TestCreateDestinationDirectories_NestedDirectories()
     {
         _input.Path = "/upload/new/nested/directory/testfile.txt";
         _input.Content = "Test content for new directory";
@@ -117,6 +118,46 @@ class WriteTests : WriteFileTestBase
         Assert.AreEqual(_input.Path, result.Path);
         Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
         Assert.AreEqual(_input.Content, Helpers.GetDestinationFileContent(_input.Path));
+    }
+
+    [Test]
+    public void WriteFile_TestCreateDestinationDirectories_SingleLevel()
+    {
+        _input.Path = "/upload/singlelevel/testfile.txt";
+        _input.Content = "Test content for single level";
+        var options = new Options { CreateDestinationDirectories = true };
+
+        var result = SFTP.WriteFile(_input, _connection, options);
+
+        Assert.AreEqual(_input.Path, result.Path);
+        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
+    }
+
+    [Test]
+    public void WriteFile_TestCreateDestinationDirectories_ThrowsWhenDisabled()
+    {
+        _input.Path = "/upload/nonexistent/testfile.txt";
+        _input.Content = "Test content";
+        var options = new Options { CreateDestinationDirectories = false };
+
+        var ex = Assert.Throws<ArgumentException>(() =>
+            SFTP.WriteFile(_input, _connection, options));
+
+        Assert.IsTrue(ex.Message.Contains("Destination directory"));
+        Assert.IsTrue(ex.Message.Contains("was not found"));
+    }
+
+    [Test]
+    public void WriteFile_TestCreateDestinationDirectories_FalseWithExistingDirectory()
+    {
+        _input.Path = "/upload/testfile.txt";
+        _input.Content = "Test content";
+        var options = new Options { CreateDestinationDirectories = false };
+
+        var result = SFTP.WriteFile(_input, _connection, options);
+
+        Assert.AreEqual(_input.Path, result.Path);
+        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
     }
 }
 
