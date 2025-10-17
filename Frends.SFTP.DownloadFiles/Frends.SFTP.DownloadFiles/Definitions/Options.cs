@@ -24,14 +24,14 @@ public class Options
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
-    public bool ThrowErrorOnFail { get; set; }
+    public bool ThrowErrorOnFail { get; set; } = true;
 
     /// <summary>
     /// Should the destination file be renamed with temporary file name during file transfer as a locking mechanism.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
-    public bool RenameSourceFileBeforeTransfer { get; set; }
+    public bool RenameSourceFileBeforeTransfer { get; set; } = true;
 
     /// <summary>
     /// File extension for the temporary source file which is used during the transfer.
@@ -47,7 +47,7 @@ public class Options
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
-    public bool RenameDestinationFileDuringTransfer { get; set; }
+    public bool RenameDestinationFileDuringTransfer { get; set; } = true;
 
     /// <summary>
     /// File extension for the temporary destination file which is used during the transfer.
@@ -77,5 +77,5 @@ public class Options
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
-    public bool OperationLog { get; set; }
+    public bool OperationLog { get; set; } = true;
 }
