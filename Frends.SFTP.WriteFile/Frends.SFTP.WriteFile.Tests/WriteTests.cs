@@ -106,26 +106,15 @@ class WriteTests : WriteFileTestBase
         Assert.IsTrue(Helpers.DestinationFileExists(result.Path));
     }
 
-    [Test]
-    public void WriteFile_TestCreateDestinationDirectories_NestedDirectories()
+    [TestCase("/upload/new/nested/directory/testfile.txt", true, "Nested directories")]
+    [TestCase("/upload/singlelevel/testfile.txt", true, "Single level")]
+    [TestCase("/upload/testfile.txt", true, "Existing directory with flag true")]
+    [TestCase("/upload/testfile.txt", false, "Existing directory with flag false")]
+    public void WriteFile_TestCreateDestinationDirectories(string path, bool createDirs, string description)
     {
-        _input.Path = "/upload/new/nested/directory/testfile.txt";
-        _input.Content = "Test content for new directory";
-        var options = new Options { CreateDestinationDirectories = true };
-
-        var result = SFTP.WriteFile(_input, _connection, options);
-
-        Assert.AreEqual(_input.Path, result.Path);
-        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
-        Assert.AreEqual(_input.Content, Helpers.GetDestinationFileContent(_input.Path));
-    }
-
-    [Test]
-    public void WriteFile_TestCreateDestinationDirectories_SingleLevel()
-    {
-        _input.Path = "/upload/singlelevel/testfile.txt";
-        _input.Content = "Test content for single level";
-        var options = new Options { CreateDestinationDirectories = true };
+        _input.Path = path;
+        _input.Content = $"Test content for {description}";
+        var options = new Options { CreateDestinationDirectories = createDirs };
 
         var result = SFTP.WriteFile(_input, _connection, options);
 
@@ -145,19 +134,6 @@ class WriteTests : WriteFileTestBase
 
         Assert.IsTrue(ex.Message.Contains("Destination directory"));
         Assert.IsTrue(ex.Message.Contains("was not found"));
-    }
-
-    [Test]
-    public void WriteFile_TestCreateDestinationDirectories_FalseWithExistingDirectory()
-    {
-        _input.Path = "/upload/testfile.txt";
-        _input.Content = "Test content";
-        var options = new Options { CreateDestinationDirectories = false };
-
-        var result = SFTP.WriteFile(_input, _connection, options);
-
-        Assert.AreEqual(_input.Path, result.Path);
-        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
     }
 }
 
