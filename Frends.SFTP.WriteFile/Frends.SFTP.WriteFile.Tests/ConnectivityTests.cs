@@ -13,7 +13,7 @@ public class ConnectivityTests : WriteFileTestBase
     {
         _connection.BufferSize = 256;
 
-        SFTP.WriteFile(_input, _connection);
+        SFTP.WriteFile(_input, _connection, _options);
         Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
         Assert.AreEqual(_content, Helpers.GetDestinationFileContent(_input.Path));
     }
@@ -25,7 +25,7 @@ public class ConnectivityTests : WriteFileTestBase
         _connection.PrivateKeyPassphrase = "passphrase";
         _connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
-        SFTP.WriteFile(_input, _connection);
+        SFTP.WriteFile(_input, _connection, _options);
         Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
         Assert.AreEqual(_content, Helpers.GetDestinationFileContent(_input.Path));
     }
@@ -39,7 +39,7 @@ public class ConnectivityTests : WriteFileTestBase
         _connection.PrivateKeyPassphrase = "passphrase";
         _connection.PrivateKeyString = key;
 
-        SFTP.WriteFile(_input, _connection);
+        SFTP.WriteFile(_input, _connection, _options);
         Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
         Assert.AreEqual(_content, Helpers.GetDestinationFileContent(_input.Path));
     }
@@ -49,7 +49,7 @@ public class ConnectivityTests : WriteFileTestBase
     {
         _connection.UseKeyboardInteractiveAuthentication = true;
 
-        SFTP.WriteFile(_input, _connection);
+        SFTP.WriteFile(_input, _connection, _options);
         Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
         Assert.AreEqual(_content, Helpers.GetDestinationFileContent(_input.Path));
     }

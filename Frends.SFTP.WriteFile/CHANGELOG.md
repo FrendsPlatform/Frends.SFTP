@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.5.0] - 2025-10-15
+### Added
+- Added new Options class with CreateDestinationDirectories property to enable automatic target directory creation 
+
 ## [2.4.0] - 2025-01-13
 ### Fixed
 - Fixed issue with ConnectionInfoBuilder having static properties for connection and input paramaters which lead to Task not being thread safe.

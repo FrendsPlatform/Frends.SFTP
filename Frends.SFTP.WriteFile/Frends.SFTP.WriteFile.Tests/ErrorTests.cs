@@ -13,10 +13,10 @@ public class ErrorTests : WriteFileTestBase
     [Test]
     public void WriteFile_TestFileExistsThrows()
     {
-        var result = SFTP.WriteFile(_input, _connection);
+        var result = SFTP.WriteFile(_input, _connection, _options);
         Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
 
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection));
+        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection, _options));
         Assert.AreEqual($"File already exists: {_input.Path}", ex.Message);
     }
 
@@ -24,7 +24,7 @@ public class ErrorTests : WriteFileTestBase
     public void WriteFile_TestThrowsWithWrongPort()
     {
         _connection.Port = 51644;
-        var ex = Assert.Throws<SocketException>(() => SFTP.WriteFile(_input, _connection));
+        var ex = Assert.Throws<SocketException>(() => SFTP.WriteFile(_input, _connection, _options));
     }
 
     [Test]
@@ -33,7 +33,7 @@ public class ErrorTests : WriteFileTestBase
         _connection.Password = "demo";
         _connection.Username = "demo";
 
-        var ex = Assert.Throws<SshAuthenticationException>(() => SFTP.WriteFile(_input, _connection));
+        var ex = Assert.Throws<SshAuthenticationException>(() => SFTP.WriteFile(_input, _connection, _options));
         Assert.AreEqual("Permission denied (password).", ex.Message);
     }
 
@@ -44,7 +44,7 @@ public class ErrorTests : WriteFileTestBase
         _connection.PrivateKeyPassphrase = "demo";
         _connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection));
+        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection, _options));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info:"));
     }
 
@@ -55,7 +55,7 @@ public class ErrorTests : WriteFileTestBase
         _connection.PrivateKeyPassphrase = "passphrase";
         _connection.PrivateKeyFile = "";
 
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection));
+        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection, _options));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
@@ -68,7 +68,7 @@ public class ErrorTests : WriteFileTestBase
         _connection.PrivateKeyPassphrase = "passphrase";
         _connection.PrivateKeyString = key.ToString();
 
-        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection));
+        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection, _options));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
@@ -79,7 +79,7 @@ public class ErrorTests : WriteFileTestBase
 
         _connection.ServerFingerPrint = fingerprint;
 
-        var ex = Assert.Throws<SshConnectionException>(() => SFTP.WriteFile(_input, _connection));
+        var ex = Assert.Throws<SshConnectionException>(() => SFTP.WriteFile(_input, _connection, _options));
         Assert.AreEqual("Key exchange negotiation failed.", ex.Message);
     }
 }
