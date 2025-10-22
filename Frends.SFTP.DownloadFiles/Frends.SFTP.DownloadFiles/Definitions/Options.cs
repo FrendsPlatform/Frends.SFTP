@@ -27,7 +27,7 @@ public class Options
     public bool ThrowErrorOnFail { get; set; } = true;
 
     /// <summary>
-    /// Should the destination file be renamed with temporary file name during file transfer as a locking mechanism.
+    /// Should the source file be renamed with temporary file name during file transfer as a locking mechanism.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]

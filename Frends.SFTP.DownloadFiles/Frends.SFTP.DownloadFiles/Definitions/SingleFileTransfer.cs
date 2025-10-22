@@ -70,8 +70,9 @@ internal class SingleFileTransfer
             if (originalDestinationFileExists)
             {
                 OriginalDestinationFileMetadata = new FileItem(DestinationFileWithMacrosExpanded);
-                OriginalDestinationFileCopyPath =
-                    Path.GetTempPath() + Guid.NewGuid() + "_" + OriginalDestinationFileMetadata.Name;
+                OriginalDestinationFileCopyPath = Path.Combine(
+                    Path.GetTempPath(),
+                    $"{Guid.NewGuid()}_{OriginalDestinationFileMetadata.Name}");
                 File.Copy(OriginalDestinationFileMetadata.FullPath, OriginalDestinationFileCopyPath);
             }
 
@@ -439,7 +440,7 @@ internal class SingleFileTransfer
             $"Checking if temporary destination file {DestinationFileDuringTransfer} exists.");
         _logger.NotifyInformation(BatchContext, $"FILE EXISTS {DestinationFileDuringTransfer}: {exists}");
         SetCurrentState(TransferState.CleanUpFiles,
-            $"Removing temporary destination file {WorkFileInfo.WorkFilePath}.");
+            $"Removing temporary destination file {DestinationFileDuringTransfer}.");
         TryToRemoveDestinationTempFile();
     }
 
@@ -576,7 +577,7 @@ internal class SingleFileTransfer
         catch (Exception e)
         {
             message =
-                $"Could not restore original destination file '{Path.GetFileName(DestinationFileWithMacrosExpanded)}' from temporary file '{Path.GetFileName(DestinationFileDuringTransfer)}'. Error: {e.Message}.";
+                $"Could not restore original destination file '{Path.GetFileName(DestinationFileWithMacrosExpanded)}' from temporary file '{Path.GetFileName(OriginalDestinationFileCopyPath)}'. Error: {e.Message}.";
         }
 
         return message;

@@ -243,5 +243,39 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(ex.Message.Contains("No files transferred."));
             Assert.IsEmpty(Directory.GetFiles(_destWorkDir));
         }
+
+        [Test]
+        public void DownloadFiles_ShouldFail_When_SourceMoveFileAlreadyExists_And_DestinationIsRestored()
+        {
+            Directory.CreateDirectory(_destWorkDir);
+            const string archiveDir = "/upload/archive";
+            Helpers.CreateSubDirectory(archiveDir);
+            Helpers.UploadTestFiles(archiveDir, 1, null, [Path.Combine(_workDir, _source.FileName)]);
+            File.WriteAllText(Path.Combine(_destWorkDir, _source.FileName), "Original file content");
+
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = _source.FileName,
+                Operation = SourceOperation.Move,
+                DirectoryToMoveAfterTransfer = archiveDir
+            };
+
+            var destination = new Destination
+            {
+                Directory = _destWorkDir,
+                Action = DestinationAction.Append,
+                FileNameEncoding = FileEncoding.UTF8,
+                EnableBomForFileName = true
+            };
+
+            var contentBefore = File.ReadAllText(Path.Combine(_destWorkDir, _source.FileName));
+            var ex = Assert.ThrowsAsync<Exception>(async () =>
+                await SFTP.DownloadFiles(source, destination, _connection, _options, _info, CancellationToken.None));
+
+            var contentAfter = File.ReadAllText(Path.Combine(_destWorkDir, _source.FileName));
+            Assert.IsTrue(ex.Message.Contains("No files transferred."));
+            Assert.AreEqual(contentBefore, contentAfter);
+        }
     }
 }
