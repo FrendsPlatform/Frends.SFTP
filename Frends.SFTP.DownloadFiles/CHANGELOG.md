@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.15.0] - 2025-10-17
+### Fixed
+- Fixed restoring destination file in any case.
+- 
 ## [2.14.0] - 2024-09-30
 ### Fixed
 - Fixed small memory leak with CancellationTokenSource by adding dispose to the end of the Task.
