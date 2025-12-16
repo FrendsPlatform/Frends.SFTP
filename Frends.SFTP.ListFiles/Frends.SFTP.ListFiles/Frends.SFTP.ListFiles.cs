@@ -76,7 +76,7 @@ namespace Frends.SFTP.ListFiles
                     if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
                     var regex = "^" + Regex.Escape(input.FileMask).Replace("\\?", ".").Replace("\\*", ".*") + "$";
-                    var regexStr = string.IsNullOrEmpty(input.FileMask) ? string.Empty : regex;
+                    var regexStr = string.IsNullOrEmpty(input.FileMask),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,, ? string.Empty : regex;
                     var files = GetFiles(client, regexStr, input.Directory, input, effectiveToken);
                     client.Disconnect();
                     client.Dispose();
@@ -87,8 +87,11 @@ namespace Frends.SFTP.ListFiles
             }
             catch (OperationCanceledException)
             {
-                throw new TimeoutException(
-                    $"SFTP operation exceeded maximum execution time of {connection.MaxExecutionTimeout} seconds.");
+                if (timeoutCts != null && timeoutCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+                {
+                    throw new TimeoutException($"SFTP operation exceeded maximum execution time of {connection.MaxExecutionTimeout} seconds.");
+                }
+                throw;
             }
         }
 
