@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.6.0] - 2025-12-16
+### Added
+- Added MaxExecutionTimeout parameter (default: 0 = no limit) to set a maximum time limit for the entire SFTP list operation.
+
 ## [2.5.0] - 2025-04-09
 ### Changed
 - Clarified that the encoding parameter is used for the file name encoding.
