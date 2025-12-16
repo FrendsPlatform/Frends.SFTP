@@ -12,7 +12,7 @@ class WriteTests : WriteFileTestBase
     public void WriteFile_TestSimpleWrite()
     {
         var result = SFTP.WriteFile(_input, _connection, _options);
-        Assert.AreEqual(_input.Path, result.Path);
+        Assert.AreEqual(_input.Path, result.RemotePath);
         Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
         Assert.AreEqual(_content, Helpers.GetDestinationFileContent(_input.Path));
     }
@@ -52,7 +52,7 @@ class WriteTests : WriteFileTestBase
         _input.WriteBehaviour = WriteOperation.Overwrite;
 
         var result = SFTP.WriteFile(_input, _connection, _options);
-        Assert.AreEqual(_input.Path, result.Path);
+        Assert.AreEqual(_input.Path, result.RemotePath);
         Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
         Assert.AreEqual(_content, Helpers.GetDestinationFileContent(_input.Path));
 
@@ -68,7 +68,7 @@ class WriteTests : WriteFileTestBase
         _input.Content = "";
 
         var result = SFTP.WriteFile(_input, _connection, _options);
-        Assert.AreEqual(_input.Path, result.Path);
+        Assert.AreEqual(_input.Path, result.RemotePath);
         Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
         Assert.AreEqual(string.Empty, Helpers.GetDestinationFileContent(_input.Path));
     }
@@ -79,31 +79,31 @@ class WriteTests : WriteFileTestBase
         _input.WriteBehaviour = WriteOperation.Overwrite;
 
         var result = SFTP.WriteFile(_input, _connection, _options);
-        Assert.IsTrue(Helpers.DestinationFileExists(result.Path));
+        Assert.IsTrue(Helpers.DestinationFileExists(result.RemotePath));
 
 
         _input.FileEncoding = FileEncoding.ASCII;
         result = SFTP.WriteFile(_input, _connection, _options);
-        Assert.IsTrue(Helpers.DestinationFileExists(result.Path));
+        Assert.IsTrue(Helpers.DestinationFileExists(result.RemotePath));
 
         _input.FileEncoding = FileEncoding.UTF8;
         _input.EnableBom = true;
         result = SFTP.WriteFile(_input, _connection, _options);
-        Assert.IsTrue(Helpers.DestinationFileExists(result.Path));
+        Assert.IsTrue(Helpers.DestinationFileExists(result.RemotePath));
 
         _input.FileEncoding = FileEncoding.UTF8;
         _input.EnableBom = false;
         result = SFTP.WriteFile(_input, _connection, _options);
-        Assert.IsTrue(Helpers.DestinationFileExists(result.Path));
+        Assert.IsTrue(Helpers.DestinationFileExists(result.RemotePath));
 
         _input.FileEncoding = FileEncoding.WINDOWS1252;
         result = SFTP.WriteFile(_input, _connection, _options);
-        Assert.IsTrue(Helpers.DestinationFileExists(result.Path));
+        Assert.IsTrue(Helpers.DestinationFileExists(result.RemotePath));
 
         _input.FileEncoding = FileEncoding.Other;
         _input.EncodingInString = "iso-8859-1";
         result = SFTP.WriteFile(_input, _connection, _options);
-        Assert.IsTrue(Helpers.DestinationFileExists(result.Path));
+        Assert.IsTrue(Helpers.DestinationFileExists(result.RemotePath));
     }
 
     [TestCase("/upload/new/nested/directory/testfile.txt", true, "Nested directories")]
@@ -118,7 +118,7 @@ class WriteTests : WriteFileTestBase
 
         var result = SFTP.WriteFile(_input, _connection, options);
 
-        Assert.AreEqual(_input.Path, result.Path);
+        Assert.AreEqual(_input.Path, result.RemotePath);
         Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
     }
 

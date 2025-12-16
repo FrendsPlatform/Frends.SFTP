@@ -2,6 +2,7 @@
 using Renci.SshNet;
 using Frends.SFTP.WriteFile.Definitions;
 using Frends.SFTP.WriteFile.Enums;
+using Renci.SshNet.Sftp;
 
 namespace Frends.SFTP.WriteFile;
 
@@ -112,8 +113,15 @@ public class SFTP
                 default:
                     throw new ArgumentException($"Unknown WriteBehaviour type: '{input.WriteBehaviour}'.");
             }
-            var result = new Result(client.Get(input.Path));
-            return result;
+            
+            if (options.VerifyWrite)
+            {
+                return new Result(client.Get(input.Path));
+            }
+            else
+            {
+                return new Result(input.Path);
+            }
         }
         finally
         {
@@ -122,4 +130,3 @@ public class SFTP
         }
     }
 }
-
