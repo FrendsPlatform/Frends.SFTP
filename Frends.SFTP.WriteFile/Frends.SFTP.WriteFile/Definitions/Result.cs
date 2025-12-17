@@ -14,7 +14,7 @@ public class Result
     /// <example>/upload/test.txt</example>
     [DisplayFormat(DataFormatString = "Text")]
     public string RemotePath { get; }
-        /// <summary>
+    /// <summary>
     /// Size of the new file in destination.
     /// </summary>
     /// <example>3.2</example>
