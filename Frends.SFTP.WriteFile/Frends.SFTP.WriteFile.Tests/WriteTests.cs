@@ -135,5 +135,30 @@ class WriteTests : WriteFileTestBase
         Assert.IsTrue(ex.Message.Contains("Destination directory"));
         Assert.IsTrue(ex.Message.Contains("was not found"));
     }
-}
 
+    [Test]
+    public void WriteFile_TestVerifyWriteEnabled()
+    {
+        _options.VerifyWrite = true;
+        _input.Content = new string('a', 1024 * 1024);
+
+        var result = SFTP.WriteFile(_input, _connection, _options);
+
+        Assert.AreEqual(_input.Path, result.RemotePath);
+        Assert.IsTrue(result.Verified);
+        Assert.Greater(result.SizeInMegaBytes, 0d);
+    }
+
+    [Test]
+    public void WriteFile_TestVerifyWriteDisabled()
+    {
+        _options.VerifyWrite = false;
+
+        var result = SFTP.WriteFile(_input, _connection, _options);
+
+        Assert.AreEqual(_input.Path, result.RemotePath);
+        Assert.IsFalse(result.Verified);
+        Assert.IsTrue(Helpers.DestinationFileExists(_input.Path));
+        Assert.AreEqual(_content, Helpers.GetDestinationFileContent(_input.Path));
+    }
+}
