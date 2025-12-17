@@ -120,7 +120,18 @@ public class SFTP
             }
             else
             {
-                return new Result(input.Path);
+                // If skipping verification, calculate size locally so the Result.SizeInMegaBytes isn't empty
+                string payload;
+                if (input.WriteBehaviour == WriteOperation.Append)
+                    payload = input.AddNewLine ? "\n" + input.Content : input.Content;
+                else
+                    payload = input.Content;
+
+                var bytes = encoding.GetByteCount(payload);
+                if (input.WriteBehaviour != WriteOperation.Append && input.EnableBom)
+                    bytes += encoding.GetPreamble().Length;
+                
+                return new Result(input.Path, bytes);
             }
         }
         finally
