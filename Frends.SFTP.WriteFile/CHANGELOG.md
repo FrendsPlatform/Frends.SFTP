@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.5.4] - 2025-12-17
+### Added
+- Added `VerifyWrite` option to allow skipping post-write verification (useful when the SFTP user does not have read permissions).
+
 ## [2.5.0] - 2025-10-15
 ### Added
 - Added new Options class with CreateDestinationDirectories property to enable automatic target directory creation 
