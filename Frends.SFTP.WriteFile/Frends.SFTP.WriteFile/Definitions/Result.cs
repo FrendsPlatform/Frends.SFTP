@@ -11,6 +11,7 @@ public class Result
     /// <summary>
     /// Full path to the written file.
     /// </summary>
+    /// <example>/upload/test.txt</example>
     [DisplayFormat(DataFormatString = "Text")]
     public string RemotePath { get; }
         /// <summary>

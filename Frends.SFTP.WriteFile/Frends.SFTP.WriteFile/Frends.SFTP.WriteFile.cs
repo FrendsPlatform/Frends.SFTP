@@ -18,7 +18,7 @@ public class SFTP
     /// <param name="connection">Transfer connection parameters</param>
     /// <param name="input">Write options with full path and string content</param>
     /// <param name="options">Options for write file</param>
-    /// <returns>Object {string Path, double SizeInMegaBytes} </returns>
+    /// <returns>Object {string RemotePath, double SizeInMegaBytes, bool Verified} </returns>
     public static Result WriteFile([PropertyTab] Input input, [PropertyTab] Connection connection, [PropertyTab] Options options)
     {
         ConnectionInfo connectionInfo;
