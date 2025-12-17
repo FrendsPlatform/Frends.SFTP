@@ -3,11 +3,10 @@
 ## [3.5.5] - 2025-12-17
 ### Added
 - Added `VerifyWrite` option to allow skipping post-write verification (useful when the SFTP user does not have read permissions).
+- Added `Result.Verified` property to indicate whether verification was performed.
 
 ### Changed
 - [Breaking] Renamed `Result.Path` to `Result.RemotePath` for clarity. Update existing code to use `result.RemotePath` instead of `result.Path`.
-- [Breaking] Made `Result.SizeInMegaBytes` property publicly readable.
-- Added `Result.Verified` property to indicate whether verification was performed.
 
 ## [2.5.0] - 2025-10-15
 ### Added

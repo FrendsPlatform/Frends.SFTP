@@ -41,7 +41,7 @@ public class Result
     /// </summary>
     internal Result(ISftpFile sftpFile)
     {
-        RemotePath = sftpFile.FullName;
+        RemotePath = sftpFile?.FullName ?? throw new ArgumentNullException(nameof(sftpFile));
         SizeInMegaBytes = Math.Round((sftpFile.Length / 1024d / 1024d), 3);
         Verified = true;
     }

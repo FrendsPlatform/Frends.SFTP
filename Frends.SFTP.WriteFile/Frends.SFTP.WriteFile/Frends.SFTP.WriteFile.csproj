@@ -24,6 +24,8 @@
     <None Include="FrendsTaskMetadata.json" Pack="true" PackagePath="/">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\CHANGELOG.md" Pack="true" PackagePath="/"/>
+    <None Include="..\migration.json" Pack="true" PackagePath="/"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -36,4 +38,3 @@
   </ItemGroup>
 
 </Project>
-
