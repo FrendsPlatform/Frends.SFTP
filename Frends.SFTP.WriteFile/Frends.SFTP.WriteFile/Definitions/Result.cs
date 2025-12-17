@@ -29,7 +29,7 @@ public class Result
     /// <summary>
     /// Constructor for skipped verification.
     /// </summary>
-    public Result(string remotePath, long fileSize)
+    internal Result(string remotePath, long fileSize)
     {
         RemotePath = remotePath ?? throw new ArgumentNullException(nameof(remotePath));
         SizeInMegaBytes = Math.Round((fileSize / 1024d / 1024d), 3);
@@ -39,7 +39,7 @@ public class Result
     /// <summary>
     /// Constructor for successful verification.
     /// </summary>
-    public Result(ISftpFile sftpFile)
+    internal Result(ISftpFile sftpFile)
     {
         RemotePath = sftpFile.FullName;
         SizeInMegaBytes = Math.Round((sftpFile.Length / 1024d / 1024d), 3);
