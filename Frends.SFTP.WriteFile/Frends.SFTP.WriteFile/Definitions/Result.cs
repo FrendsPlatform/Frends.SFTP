@@ -21,12 +21,12 @@ public class Result
 
 
     /// <summary>
-    /// Indicates whether the file verification was successful.
+    /// Indicates whether the file verification was made.
     /// </summary>
     public bool Verified { get; }
 
     /// <summary>
-    /// Constructor for failed verification.
+    /// Constructor for skipped verification.
     /// </summary>
     public Result(string remotePath)
     {
