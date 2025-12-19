@@ -19,6 +19,16 @@ public class Connection
     public int ConnectionTimeout { get; set; }
 
     /// <summary>
+    /// The maximum length of time, in seconds, for the entire SFTP operation to complete.
+    /// This includes connection establishment, file listing, and all subdirectory traversal.
+    /// Acts as a safety timeout in addition to ConnectionTimeout and OperationTimeout settings.
+    /// You can use value 0 to indicate that the operation does not time out.
+    /// </summary>
+    /// <example>600</example>
+    [DefaultValue(0)]
+    public int MaxExecutionTimeout { get; set; }
+
+    /// <summary>
     /// SFTP host address
     /// </summary>
     /// <example>localhost</example>
