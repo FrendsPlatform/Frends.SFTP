@@ -43,7 +43,7 @@ namespace Frends.SFTP.ListFiles
                     }
                     catch (Exception e)
                     {
-                        throw new ArgumentException($"Error when initializing connection info: {e}");
+                        throw new ArgumentException($"Error when initializing connection info: {e}", e);
                     }
 
                     using var client = new SftpClient(connectionInfo);
@@ -61,9 +61,9 @@ namespace Frends.SFTP.ListFiles
                             // If this check fails then SSH.NET will throw an SshConnectionException - with a message of "Key exchange negotiation failed".
                             userResultMessage = Util.CheckServerFingerprint(client, expectedServerFingerprint);
                         }
-                        catch
+                        catch (Exception e)
                         {
-                            throw new ArgumentException($"Error when checking the server fingerprint: {userResultMessage}");
+                            throw new ArgumentException($"Error when checking the server fingerprint: {userResultMessage}", e);
                         }
                     }
 
@@ -76,7 +76,7 @@ namespace Frends.SFTP.ListFiles
                     if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
                     var regex = "^" + Regex.Escape(input.FileMask).Replace("\\?", ".").Replace("\\*", ".*") + "$";
-                    var regexStr = string.IsNullOrEmpty(input.FileMask),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,, ? string.Empty : regex;
+                    var regexStr = string.IsNullOrEmpty(input.FileMask) ? string.Empty : regex;
                     var files = GetFiles(client, regexStr, input.Directory, input, effectiveToken);
                     client.Disconnect();
                     client.Dispose();
@@ -85,11 +85,11 @@ namespace Frends.SFTP.ListFiles
 
                 }, effectiveToken);
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException e)
             {
                 if (timeoutCts != null && timeoutCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
                 {
-                    throw new TimeoutException($"SFTP operation exceeded maximum execution time of {connection.MaxExecutionTimeout} seconds.");
+                    throw new TimeoutException($"SFTP operation exceeded maximum execution time of {connection.MaxExecutionTimeout} seconds.", e);
                 }
                 throw;
             }
