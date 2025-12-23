@@ -1,0 +1,13 @@
+{
+  "task": "Frends.SFTP.WriteFile",
+  "fromVersion": "<= 2.5.0",
+  "toVersion": ">= 3.5.5",
+  "breakingChanges": [
+    {
+      "type": "rename",
+      "from": "Result.Path",
+      "to": "Result.RemotePath",
+      "howToFix": "Update all references from `result.Path` to `result.RemotePath`."
+    }
+  ]
+}

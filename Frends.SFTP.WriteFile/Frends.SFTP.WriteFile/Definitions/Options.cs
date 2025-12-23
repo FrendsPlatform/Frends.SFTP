@@ -15,4 +15,12 @@ public class Options
     /// <example>true</example>
     [DefaultValue(false)]
     public bool CreateDestinationDirectories { get; set; }
+
+    /// <summary>
+    /// Verify that the file was written successfully by checking its existence and size after the write operation.
+    /// Note: This requires permission to read the file on the server.
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(true)]
+    public bool VerifyWrite { get; set; } = true;
 }

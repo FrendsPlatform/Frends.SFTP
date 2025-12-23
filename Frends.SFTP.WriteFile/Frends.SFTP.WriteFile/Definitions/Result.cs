@@ -4,27 +4,48 @@ using System.ComponentModel.DataAnnotations;
 namespace Frends.SFTP.WriteFile.Definitions;
 
 /// <summary>
-/// Return object with private setters
+/// Return object for verification result
 /// </summary>
 public class Result
 {
     /// <summary>
     /// Full path to the written file.
     /// </summary>
-    /// <example>/destination/newfile.txt</example>
+    /// <example>/upload/test.txt</example>
     [DisplayFormat(DataFormatString = "Text")]
-    public string Path { get; private set; }
-
+    public string RemotePath { get; }
     /// <summary>
     /// Size of the new file in destination.
     /// </summary>
     /// <example>3.2</example>
-    public double SizeInMegaBytes { get; private set; }
+    public double SizeInMegaBytes { get; }
 
-    internal Result(ISftpFile file)
+
+    /// <summary>
+    /// Indicates whether the file verification was made.
+    /// </summary>
+    public bool Verified { get; }
+
+    /// <summary>
+    /// Constructor for skipped verification.
+    /// </summary>
+    internal Result(string remotePath, long fileSize)
     {
-        Path = file.FullName;
-        SizeInMegaBytes = Math.Round((file.Length / 1024d / 1024d), 3);
+        RemotePath = remotePath ?? throw new ArgumentNullException(nameof(remotePath));
+        SizeInMegaBytes = Math.Round((fileSize / 1024d / 1024d), 3);
+        Verified = false;
     }
+
+    /// <summary>
+    /// Constructor for successful verification.
+    /// </summary>
+    internal Result(ISftpFile sftpFile)
+    {
+        RemotePath = sftpFile?.FullName ?? throw new ArgumentNullException(nameof(sftpFile));
+        SizeInMegaBytes = Math.Round((sftpFile.Length / 1024d / 1024d), 3);
+        Verified = true;
+    }
+
 }
+
 

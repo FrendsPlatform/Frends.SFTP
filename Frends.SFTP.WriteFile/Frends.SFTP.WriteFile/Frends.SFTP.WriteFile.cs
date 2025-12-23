@@ -2,6 +2,7 @@
 using Renci.SshNet;
 using Frends.SFTP.WriteFile.Definitions;
 using Frends.SFTP.WriteFile.Enums;
+using Renci.SshNet.Sftp;
 
 namespace Frends.SFTP.WriteFile;
 
@@ -17,7 +18,7 @@ public class SFTP
     /// <param name="connection">Transfer connection parameters</param>
     /// <param name="input">Write options with full path and string content</param>
     /// <param name="options">Options for write file</param>
-    /// <returns>Object {string Path, double SizeInMegaBytes} </returns>
+    /// <returns>Object {string RemotePath, double SizeInMegaBytes, bool Verified} </returns>
     public static Result WriteFile([PropertyTab] Input input, [PropertyTab] Connection connection, [PropertyTab] Options options)
     {
         ConnectionInfo connectionInfo;
@@ -112,8 +113,26 @@ public class SFTP
                 default:
                     throw new ArgumentException($"Unknown WriteBehaviour type: '{input.WriteBehaviour}'.");
             }
-            var result = new Result(client.Get(input.Path));
-            return result;
+            
+            if (options.VerifyWrite)
+            {
+                return new Result(client.Get(input.Path));
+            }
+            else
+            {
+                // If skipping verification, calculate size locally so the Result.SizeInMegaBytes isn't empty
+                string payload;
+                if (input.WriteBehaviour == WriteOperation.Append)
+                    payload = input.AddNewLine ? "\n" + input.Content : input.Content;
+                else
+                    payload = input.Content;
+
+                var bytes = encoding.GetByteCount(payload);
+                if (input.WriteBehaviour != WriteOperation.Append && input.EnableBom)
+                    bytes += encoding.GetPreamble().Length;
+                
+                return new Result(input.Path, bytes);
+            }
         }
         finally
         {
@@ -122,4 +141,3 @@ public class SFTP
         }
     }
 }
-

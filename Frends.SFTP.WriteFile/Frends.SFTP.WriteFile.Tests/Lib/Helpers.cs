@@ -108,6 +108,15 @@ internal static class Helpers
         return content;
     }
 
+    internal static long GetDestinationFileSize(string path)
+    {
+        using var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword);
+        client.Connect();
+        var size = client.GetAttributes(path).Size;
+        client.Disconnect();
+        return size;
+    }
+
     internal static void DeleteDestinationFiles()
     {
         using var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword);
