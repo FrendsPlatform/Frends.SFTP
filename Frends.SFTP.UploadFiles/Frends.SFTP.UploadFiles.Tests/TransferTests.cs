@@ -50,6 +50,21 @@ namespace Frends.SFTP.UploadFiles.Tests
         }
 
         [Test]
+        public async Task UploadFiles_TestUploadWithDefaultFileNameUploadsEverything()
+        {
+            var source = new Source
+            {
+                Directory = _workDir,
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing
+            };
+
+            var result = await SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(3, result.SuccessfulTransferCount);
+        }
+
+        [Test]
         public async Task UploadFiles_TestWithOperationLogDisabled()
         {
             var options = new Options
@@ -483,10 +498,6 @@ namespace Frends.SFTP.UploadFiles.Tests
             var result = await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
-
         }
     }
 }
-
-
-
