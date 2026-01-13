@@ -21,6 +21,7 @@ public class SFTP
     public static async Task<Result> ReadFile([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
     {
         ConnectionInfo connectionInfo;
+
         // Establish connectionInfo with connection parameters
         try
         {
@@ -33,6 +34,9 @@ public class SFTP
         }
 
         using var client = new SftpClient(connectionInfo);
+        client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+        client.OperationTimeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+        client.BufferSize = connection.BufferSize * 1024;
 
         if (connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
             Util.ForceHostKeyAlgorithm(client, connection.HostKeyAlgorithm);
@@ -41,16 +45,17 @@ public class SFTP
         if (!string.IsNullOrEmpty(connection.ServerFingerPrint))
         {
             var userResultMessage = "";
+
             try
             {
                 userResultMessage = Util.CheckServerFingerprint(client, connection.ServerFingerPrint);
             }
-            catch (Exception ex) { throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}"); }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}");
+            }
         }
 
-        client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
-
-        client.BufferSize = connection.BufferSize * 1024;
 
         await client.ConnectAsync(cancellationToken);
 
@@ -66,4 +71,3 @@ public class SFTP
         return result;
     }
 }
-
