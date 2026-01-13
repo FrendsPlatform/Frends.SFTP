@@ -43,6 +43,9 @@ public static class SFTP
         }
 
         using var client = new SftpClient(connectionInfo);
+        client.OperationTimeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+        client.KeepAliveInterval = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+        client.BufferSize = connection.BufferSize * 1024;
 
         if (connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
             Util.ForceHostKeyAlgorithm(client, connection.HostKeyAlgorithm);
@@ -51,6 +54,7 @@ public static class SFTP
         if (!string.IsNullOrEmpty(connection.ServerFingerPrint))
         {
             var userResultMessage = string.Empty;
+
             try
             {
                 userResultMessage = Util.CheckServerFingerprint(client, connection.ServerFingerPrint);
@@ -60,10 +64,6 @@ public static class SFTP
                 throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}");
             }
         }
-
-        client.OperationTimeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
-        client.KeepAliveInterval = TimeSpan.FromSeconds(connection.ConnectionTimeout);
-        client.BufferSize = connection.BufferSize * 1024;
 
         await client.ConnectAsync(cancellationToken);
 
@@ -125,6 +125,7 @@ public static class SFTP
     private static string[] ConvertObjectToStringArray(object objectArray)
     {
         var res = objectArray as object[];
+
         return res?.OfType<string>().ToArray();
     }
 }
