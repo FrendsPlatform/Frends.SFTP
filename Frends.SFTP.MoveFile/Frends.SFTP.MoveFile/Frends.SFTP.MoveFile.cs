@@ -21,6 +21,7 @@ public class SFTP
     public static async Task<Result> MoveFile([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
     {
         ConnectionInfo connectionInfo;
+
         // Establish connectionInfo with connection parameters
         try
         {
@@ -33,6 +34,10 @@ public class SFTP
         }
 
         using var client = new SftpClient(connectionInfo);
+        client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+        client.OperationTimeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+        client.KeepAliveInterval = TimeSpan.FromMilliseconds(connection.KeepAliveInterval);
+        client.BufferSize = connection.BufferSize * 1024;
 
         if (connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
             Util.ForceHostKeyAlgorithm(client, connection.HostKeyAlgorithm);
@@ -40,20 +45,22 @@ public class SFTP
         // Check the fingerprint of the server if given.
         if (!string.IsNullOrEmpty(connection.ServerFingerPrint))
         {
-            try { Util.CheckServerFingerprint(client, connection.ServerFingerPrint); }
-            catch (Exception ex) { throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}"); }
+            try
+            {
+                Util.CheckServerFingerprint(client, connection.ServerFingerPrint);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}");
+            }
         }
-
-        client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
-        client.KeepAliveInterval = TimeSpan.FromMilliseconds(connection.KeepAliveInterval);
-
-        client.BufferSize = connection.BufferSize * 1024;
 
         await client.ConnectAsync(cancellationToken);
 
         if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
         var files = ListSourceFiles(client, input, cancellationToken);
+
         if (files.Count == 0) return new Result(new List<FileItem>(), "No files were found matching the given pattern.");
 
         var transferredFiles = new List<FileItem>();
@@ -75,6 +82,7 @@ public class SFTP
         foreach (var file in files)
         {
             cancellationToken.ThrowIfCancellationRequested();
+
             switch (input.IfTargetFileExists)
             {
                 case FileExistsOperation.Throw:
@@ -82,21 +90,27 @@ public class SFTP
                     {
                         var filesMoved = transferredFiles.Count > 0 ? transferredFiles.Count.ToString() : "No files";
                         var msg = $"File '{file}' already exists. {filesMoved} moved.";
+
                         throw new ArgumentException($"File '{file}' already exists.");
                     }
+
                     transferredFiles.Add(Move(client, file));
+
                     break;
                 case FileExistsOperation.Rename:
                     file.DestinationPath = GetNonConflictingDestinationFilePath(client, file.SourcePath, file.DestinationPath);
                     transferredFiles.Add(Move(client, file));
+
                     break;
                 case FileExistsOperation.Overwrite:
                     if (client.Exists(file.DestinationPath))
                         client.Delete(file.DestinationPath);
                     transferredFiles.Add(Move(client, file));
+
                     break;
             }
         }
+
         client.Disconnect();
         client.Dispose();
 
@@ -107,6 +121,7 @@ public class SFTP
     {
         var sf = client.Get(file.SourcePath);
         sf.MoveTo(file.DestinationPath);
+
         return file;
     }
 
@@ -126,14 +141,17 @@ public class SFTP
                 fileItems.Add(item);
             }
         }
+
         return fileItems;
     }
 
     private static void AssertNoTargetFileConflicts(SftpClient client, List<string> files)
     {
         var duplicateTargetPaths = files.GroupBy(v => v).Where(x => x.Count() > 1).Select(k => k.Key).ToList();
+
         if (duplicateTargetPaths.Any())
             throw new IOException($"Multiple files written to {string.Join(", ", duplicateTargetPaths)}. The files would get overwritten. No files moved.");
+
         foreach (var targetFile in files)
         {
             if (client.Exists(targetFile))
@@ -144,12 +162,13 @@ public class SFTP
     private static string GetNonConflictingDestinationFilePath(SftpClient client, string sourceFilePath, string destFilePath)
     {
         var count = 1;
+
         while (client.Exists(destFilePath))
         {
             var tempFileName = $"{Path.GetFileNameWithoutExtension(sourceFilePath)}({count++})";
             destFilePath = Path.Combine(Path.GetDirectoryName(destFilePath), path2: tempFileName + Path.GetExtension(sourceFilePath)).Replace("\\", "/");
         }
+
         return destFilePath;
     }
 }
-

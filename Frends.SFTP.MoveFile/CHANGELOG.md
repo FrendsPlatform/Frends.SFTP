@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.4.0] - 2026-01-13
+### Fixed
+- Operation timeout is now using the Connection.ConnectionTimeout parameter.
+
 ## [1.3.0] - 2025-01-10
 ### Fixed
 - Fixed issue with ConnectionInfoBuilder having static properties for connection and input paramaters which lead to Task not being thread safe.
