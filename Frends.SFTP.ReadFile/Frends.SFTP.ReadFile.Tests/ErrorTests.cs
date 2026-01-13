@@ -3,6 +3,7 @@ using Renci.SshNet.Common;
 using System;
 using System.IO;
 using System.Net.Sockets;
+using System.Threading;
 using Frends.SFTP.ReadFile.Definitions;
 using Frends.SFTP.ReadFile.Enums;
 
@@ -23,7 +24,6 @@ public class ErrorTests
 
         var ex = Assert.ThrowsAsync<SftpPathNotFoundException>(async () => await SFTP.ReadFile(input, connection, default));
         Assert.AreEqual($"No such file", ex.Message);
-
     }
 
     [Test]
@@ -130,5 +130,25 @@ public class ErrorTests
         var ex = Assert.ThrowsAsync<SshConnectionException>(async () => await SFTP.ReadFile(input, connection, default));
         Assert.AreEqual("Key exchange negotiation failed.", ex.Message);
     }
-}
 
+    [Test]
+    public void ReadFile_TestThrowsWithKeyboardInteractiveMissingCorrectPrompts()
+    {
+        var connection = Helpers.GetSftpConnection();
+        connection.Authentication = AuthenticationType.UsernamePassword;
+        connection.UseKeyboardInteractiveAuthentication = true;
+        connection.Password = string.Empty;
+        connection.PromptAndResponse = new PromptResponse[]
+        {
+            new() { Prompt = "Password:", Response = "pass" },
+        };
+        var input = new Input
+        {
+            Path = "/upload/test.txt",
+            FileEncoding = FileEncoding.ANSI,
+        };
+
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ReadFile(input, connection, CancellationToken.None));
+        Assert.That(ex.Message.Contains("Failure in Keyboard-interactive authentication: No response given for server prompt request -->"), Is.True);
+    }
+}
