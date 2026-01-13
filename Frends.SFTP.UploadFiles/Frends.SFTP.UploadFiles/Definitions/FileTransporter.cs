@@ -542,6 +542,7 @@ internal class FileTransporter
         foreach (var file in files)
         {
             cancellationToken.ThrowIfCancellationRequested();
+
             if (Path.GetFileName(file).Equals(source.FileName) || Util.FileMatchesMask(Path.GetFileName(file), source.FileName))
             {
                 var item = new FileItem(Path.GetFullPath(file));
