@@ -20,8 +20,8 @@ public class Source
     /// File name or file mask of the files to be fetched.
     /// </summary>
     /// <example>test.txt</example>
-    [DefaultValue("\"\"")]
-    public string FileName { get; set; }
+    [DefaultValue("")]
+    public string FileName { get; set; } = string.Empty;
 
     /// <summary>
     /// What to do if source file is not found. Error = alarm and fail,

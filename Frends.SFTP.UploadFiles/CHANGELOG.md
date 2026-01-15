@@ -3,6 +3,10 @@
 ### Fixed
 - Operation timeout is now using the Connection.ConnectionTimeout parameter.
 
+## [2.13.0] - 2026-01-12
+### Fixed
+- The default Source.FileName is "". "" means that it matches all files (same behavior as for "*") 
+
 ## [2.12.0] - 2025-05-20
 ### Fixed
 - Improved directory creation logic for SFTP uploads, enhancing reliability when creating nested directories.
