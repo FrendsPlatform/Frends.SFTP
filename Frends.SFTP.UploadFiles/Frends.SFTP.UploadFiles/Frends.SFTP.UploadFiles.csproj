@@ -1,45 +1,45 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-	  <TargetFrameworks>net6.0;netstandard2.0;net471</TargetFrameworks>
-	  <LangVersion>latest</LangVersion>
-	  <ImplicitUsings>enable</ImplicitUsings>
-	  <IncludeSource>true</IncludeSource>
-	  <AssemblyName>Frends.SFTP.UploadFiles</AssemblyName>
-	  <RootNamespace>Frends.SFTP.UploadFiles</RootNamespace>
+    <PropertyGroup>
+        <TargetFrameworks>net6.0;netstandard2.0;net471</TargetFrameworks>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IncludeSource>true</IncludeSource>
+        <AssemblyName>Frends.SFTP.UploadFiles</AssemblyName>
+        <RootNamespace>Frends.SFTP.UploadFiles</RootNamespace>
 
-	  <Version>2.13.0</Version>
-	  <Authors>Frends</Authors>
-	  <Copyright>Frends</Copyright>
-	  <Company>Frends</Company>
-	  <Product>Frends</Product>
-	  <PackageTags>Frends</PackageTags>
-	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
-	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
-	  <Description>Uploads files through SFTP connection.</Description>
-	  <PackageProjectUrl>https://frends.com/</PackageProjectUrl>
-	  <RepositoryUrl>https://github.com/FrendsPlatform/Frends.SFTP/tree/main/Frends.SFTP.UploadFiles</RepositoryUrl>
-  </PropertyGroup>
+        <Version>2.14.0</Version>
+        <Authors>Frends</Authors>
+        <Copyright>Frends</Copyright>
+        <Company>Frends</Company>
+        <Product>Frends</Product>
+        <PackageTags>Frends</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Description>Uploads files through SFTP connection.</Description>
+        <PackageProjectUrl>https://frends.com/</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/FrendsPlatform/Frends.SFTP/tree/main/Frends.SFTP.UploadFiles</RepositoryUrl>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
-    <None Include="FrendsTaskMetadata.json" Pack="true" PackagePath="/">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-	  <None Include="../../ApacheLicense.txt" Pack="true" PackagePath="/">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-  </ItemGroup>
+    <ItemGroup>
+        <None Include="..\.editorconfig" Link=".editorconfig"/>
+        <None Include="FrendsTaskMetadata.json" Pack="true" PackagePath="/">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Include="../../ApacheLicense.txt" Pack="true" PackagePath="/">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-	<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-	<PackageReference Include="System.Net.Http" Version="4.3.4" />
-	<PackageReference Include="Serilog" Version="2.11.0" />
-    <PackageReference Include="SSH.NET" Version="2024.1.0" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
-	<PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CSharp" Version="4.7.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0"/>
+        <PackageReference Include="System.Net.Http" Version="4.3.4"/>
+        <PackageReference Include="Serilog" Version="2.11.0"/>
+        <PackageReference Include="SSH.NET" Version="2024.1.0"/>
+        <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0"/>
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0"/>
+    </ItemGroup>
 
 </Project>
 
