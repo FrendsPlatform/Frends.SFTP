@@ -35,6 +35,7 @@ namespace Frends.SFTP.ListFiles
                 return await Task.Run(async () =>
                 {
                     ConnectionInfo connectionInfo;
+
                     // Establish connectionInfo with connection parameters
                     try
                     {
@@ -47,15 +48,20 @@ namespace Frends.SFTP.ListFiles
                     }
 
                     using var client = new SftpClient(connectionInfo);
+                    client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+                    client.OperationTimeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+                    client.KeepAliveInterval = TimeSpan.FromSeconds(connection.ConnectionTimeout);
 
                     if (connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
                         Util.ForceHostKeyAlgorithm(client, connection.HostKeyAlgorithm);
 
                     var expectedServerFingerprint = connection.ServerFingerPrint;
+
                     // Check the fingerprint of the server if given.
                     if (!string.IsNullOrEmpty(expectedServerFingerprint))
                     {
                         var userResultMessage = "";
+
                         try
                         {
                             // If this check fails then SSH.NET will throw an SshConnectionException - with a message of "Key exchange negotiation failed".
@@ -66,10 +72,6 @@ namespace Frends.SFTP.ListFiles
                             throw new ArgumentException($"Error when checking the server fingerprint: {userResultMessage}", e);
                         }
                     }
-
-                    client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
-                    client.OperationTimeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
-                    client.KeepAliveInterval = TimeSpan.FromSeconds(connection.ConnectionTimeout);
 
                     await client.ConnectAsync(effectiveToken);
 
@@ -82,7 +84,6 @@ namespace Frends.SFTP.ListFiles
                     client.Dispose();
 
                     return new Result(files);
-
                 }, effectiveToken);
             }
             catch (OperationCanceledException e)
@@ -91,6 +92,7 @@ namespace Frends.SFTP.ListFiles
                 {
                     throw new TimeoutException($"SFTP operation exceeded maximum execution time of {connection.MaxExecutionTimeout} seconds.", e);
                 }
+
                 throw;
             }
         }
@@ -119,6 +121,7 @@ namespace Frends.SFTP.ListFiles
                         directoryList.AddRange(GetFiles(sftp, regexStr, file.FullName, input, cancellationToken));
                 }
             }
+
             return directoryList;
         }
 

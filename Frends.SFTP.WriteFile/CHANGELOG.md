@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.6.0] - 2026-01-13
+### Fixed
+- Operation timeout is now using the Connection.ConnectionTimeout parameter.
+
 ## [2.5.0] - 2025-10-15
 ### Added
 - Added new Options class with CreateDestinationDirectories property to enable automatic target directory creation 

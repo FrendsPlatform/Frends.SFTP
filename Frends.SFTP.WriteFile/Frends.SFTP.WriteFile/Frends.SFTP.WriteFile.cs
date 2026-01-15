@@ -21,6 +21,7 @@ public class SFTP
     public static Result WriteFile([PropertyTab] Input input, [PropertyTab] Connection connection, [PropertyTab] Options options)
     {
         ConnectionInfo connectionInfo;
+
         // Establish connectionInfo with connection parameters
         try
         {
@@ -33,6 +34,9 @@ public class SFTP
         }
 
         using var client = new SftpClient(connectionInfo);
+        client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+        client.OperationTimeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+        client.BufferSize = connection.BufferSize * 1024;
 
         //Disable support for these host key exchange algorithms relating: https://github.com/FrendsPlatform/Frends.SFTP/security/dependabot/4
         client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256");
@@ -45,16 +49,16 @@ public class SFTP
         if (!string.IsNullOrEmpty(connection.ServerFingerPrint))
         {
             var userResultMessage = "";
+
             try
             {
                 userResultMessage = Util.CheckServerFingerprint(client, connection.ServerFingerPrint);
             }
-            catch (Exception ex) { throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}"); }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}");
+            }
         }
-
-        client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
-
-        client.BufferSize = connection.BufferSize * 1024;
 
         client.Connect();
 
@@ -98,21 +102,26 @@ public class SFTP
                         content = "\n";
                     content += input.Content;
                     client.AppendAllText(input.Path, content, encoding);
+
                     break;
                 case WriteOperation.Overwrite:
                     if (client.Exists(input.Path))
                         client.DeleteFile(input.Path);
                     client.WriteAllText(input.Path, input.Content, encoding);
+
                     break;
                 case WriteOperation.Error:
                     if (client.Exists(input.Path))
                         throw new ArgumentException($"File already exists: {input.Path}");
                     client.WriteAllText(input.Path, input.Content, encoding);
+
                     break;
                 default:
                     throw new ArgumentException($"Unknown WriteBehaviour type: '{input.WriteBehaviour}'.");
             }
+
             var result = new Result(client.Get(input.Path));
+
             return result;
         }
         finally
@@ -122,4 +131,3 @@ public class SFTP
         }
     }
 }
-

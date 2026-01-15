@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.7.0] - 2026-01-13
+### Fixed
+- Operation timeout is now using the Connection.ConnectionTimeout parameter.
+
 ## [2.6.0] - 2025-12-16
 ### Added
 - Added MaxExecutionTimeout parameter (default: 0 = no limit) to set a maximum time limit for the entire SFTP list operation.

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+using Frends.SFTP.ReadFile.Definitions;
 using NUnit.Framework;
 using Frends.SFTP.ReadFile.Enums;
 
@@ -55,5 +57,20 @@ public class ConnectivityTests : ReadFileTestBase
         Assert.AreEqual(_input.Path, result.Path);
         Assert.AreEqual(_content, result.Content);
     }
-}
 
+    [Test]
+    public async Task ReadFile_TestWithKeyboardInteractiveAdditionalPrompts()
+    {
+        _connection.Authentication = AuthenticationType.UsernamePassword;
+        _connection.UseKeyboardInteractiveAuthentication = true;
+        _connection.Password = string.Empty;
+        _connection.PromptAndResponse = new PromptResponse[]
+        {
+            new() { Prompt = "password", Response = "pass" },
+        };
+
+        var result = await SFTP.ReadFile(_input, _connection, CancellationToken.None);
+        Assert.AreEqual(_input.Path, result.Path);
+        Assert.AreEqual(_content, result.Content);
+    }
+}

@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.16.0] - 2026-01-13
+### Fixed
+- Operation timeout is now using the Connection.ConnectionTimeout parameter.
+
 ## [2.15.0] - 2025-10-17
 ### Fixed
 - Fixed restoring destination file in any case.

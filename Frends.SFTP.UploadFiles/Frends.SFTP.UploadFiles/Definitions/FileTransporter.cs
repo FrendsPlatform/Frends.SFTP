@@ -56,6 +56,7 @@ internal class FileTransporter
     public async Task<FileTransferResult> Run(CancellationToken cancellationToken)
     {
         var userResultMessage = "";
+
         try
         {
             // Fetch source file info and check if files were returned.
@@ -66,6 +67,7 @@ internal class FileTransporter
             {
                 userResultMessage = $"Directory '{_batchContext.Source.Directory}' doesn't exists.";
                 _logger.NotifyInformation(_batchContext, userResultMessage);
+
                 return FormFailedFileTransferResult(userResultMessage);
             }
 
@@ -83,6 +85,7 @@ internal class FileTransporter
                 _batchContext.SourceFiles = files;
 
                 ConnectionInfo connectionInfo;
+
                 try
                 {
                     connectionInfo = GetConnectionInfo(_batchContext.Destination, _batchContext.Connection);
@@ -91,6 +94,7 @@ internal class FileTransporter
                 {
                     userResultMessage = $"Error when initializing connection info: {e}";
                     _logger.NotifyError(null, "Error when initializing connection info: ", e);
+
                     return FormFailedFileTransferResult(userResultMessage);
                 }
 
@@ -98,86 +102,88 @@ internal class FileTransporter
 
                 _logger.NotifyInformation(_batchContext, "Negotiation started.");
 
-                using (var client = new SftpClient(connectionInfo))
+                using var client = new SftpClient(connectionInfo);
+
+                client.KeepAliveInterval = TimeSpan.FromMilliseconds(_batchContext.Connection.KeepAliveInterval);
+                client.OperationTimeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
+                client.BufferSize = _batchContext.Connection.BufferSize * 1024;
+
+                try
                 {
+                    if (_batchContext.Connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
+                        ForceHostKeyAlgorithm(client, _batchContext.Connection.HostKeyAlgorithm);
+
+                    var expectedServerFingerprint = _batchContext.Connection.ServerFingerPrint;
+
                     try
                     {
-                        if (_batchContext.Connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
-                            ForceHostKeyAlgorithm(client, _batchContext.Connection.HostKeyAlgorithm);
+                        CheckServerFingerprint(client, expectedServerFingerprint);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.NotifyError(null, $"Error when checking the server fingerprint: {ex.Message}", ex);
 
-                        var expectedServerFingerprint = _batchContext.Connection.ServerFingerPrint;
+                        return FormFailedFileTransferResult(userResultMessage);
+                    }
 
-                        try
+                    SetCurrentState(TransferState.Connection, $"Connecting to {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using SFTP.");
+
+                    await client.ConnectAsync(cancellationToken);
+
+                    if (!client.IsConnected)
+                    {
+                        _logger.NotifyError(null, "Error while connecting to destination: ", new SshConnectionException(userResultMessage));
+
+                        return FormFailedFileTransferResult(userResultMessage);
+                    }
+
+                    _logger.NotifyInformation(_batchContext, "Negotiation finished.");
+
+                    // Check does the destination directory exists.
+                    if (!client.Exists(DestinationDirectoryWithMacrosExtended))
+                    {
+                        if (_batchContext.Options.CreateDestinationDirectories)
                         {
-                            CheckServerFingerprint(client, expectedServerFingerprint);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.NotifyError(null, $"Error when checking the server fingerprint: {ex.Message}", ex);
-                            return FormFailedFileTransferResult(userResultMessage);
-                        }
-
-                        client.KeepAliveInterval = TimeSpan.FromMilliseconds(_batchContext.Connection.KeepAliveInterval);
-                        client.OperationTimeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout);
-
-                        client.BufferSize = _batchContext.Connection.BufferSize * 1024;
-
-                        SetCurrentState(TransferState.Connection, $"Connecting to {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using SFTP.");
-
-                        await client.ConnectAsync(cancellationToken);
-
-                        if (!client.IsConnected)
-                        {
-                            _logger.NotifyError(null, "Error while connecting to destination: ", new SshConnectionException(userResultMessage));
-                            return FormFailedFileTransferResult(userResultMessage);
-                        }
-
-                        _logger.NotifyInformation(_batchContext, "Negotiation finished.");
-
-                        // Check does the destination directory exists.
-                        if (!client.Exists(DestinationDirectoryWithMacrosExtended))
-                        {
-                            if (_batchContext.Options.CreateDestinationDirectories)
+                            try
                             {
-                                try
-                                {
-                                    SetCurrentState(TransferState.CreateDestinationDirectories, $"Creating destination directory {DestinationDirectoryWithMacrosExtended}.");
-                                    CreateDestinationDirectories(client, DestinationDirectoryWithMacrosExtended, cancellationToken);
-                                    _logger.NotifyInformation(_batchContext, $"DIRECTORY CREATE: Destination directory {DestinationDirectoryWithMacrosExtended} created.");
-                                }
-                                catch (Exception ex)
-                                {
-                                    userResultMessage = $"Error while creating destination directory '{DestinationDirectoryWithMacrosExtended}': {ex.Message}";
-                                    _logger.NotifyError(_batchContext, userResultMessage, ex);
-                                    return FormFailedFileTransferResult(userResultMessage);
-                                }
+                                SetCurrentState(TransferState.CreateDestinationDirectories, $"Creating destination directory {DestinationDirectoryWithMacrosExtended}.");
+                                CreateDestinationDirectories(client, DestinationDirectoryWithMacrosExtended, cancellationToken);
+                                _logger.NotifyInformation(_batchContext, $"DIRECTORY CREATE: Destination directory {DestinationDirectoryWithMacrosExtended} created.");
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                userResultMessage = $"Destination directory '{DestinationDirectoryWithMacrosExtended}' was not found.";
-                                _logger.NotifyError(_batchContext, userResultMessage, new ArgumentException("No such directory."));
+                                userResultMessage = $"Error while creating destination directory '{DestinationDirectoryWithMacrosExtended}': {ex.Message}";
+                                _logger.NotifyError(_batchContext, userResultMessage, ex);
+
                                 return FormFailedFileTransferResult(userResultMessage);
                             }
                         }
-
-                        foreach (var file in files)
+                        else
                         {
-                            if (cancellationToken.IsCancellationRequested)
-                                return FormResultFromSingleTransferResults(_result);
+                            userResultMessage = $"Destination directory '{DestinationDirectoryWithMacrosExtended}' was not found.";
+                            _logger.NotifyError(_batchContext, userResultMessage, new ArgumentException("No such directory."));
 
-                            // Check that the connection is alive and if not try to connect again.
-                            if (!client.IsConnected)
-                                await client.ConnectAsync(cancellationToken);
-
-                            var singleTransfer = new SingleFileTransfer(file, DestinationDirectoryWithMacrosExtended, _batchContext, client, _renamingPolicy, _logger);
-                            var result = await singleTransfer.TransferSingleFile(cancellationToken);
-                            _result.Add(result);
+                            return FormFailedFileTransferResult(userResultMessage);
                         }
                     }
-                    finally
+
+                    foreach (var file in files)
                     {
-                        client.Disconnect();
+                        if (cancellationToken.IsCancellationRequested)
+                            return FormResultFromSingleTransferResults(_result);
+
+                        // Check that the connection is alive and if not try to connect again.
+                        if (!client.IsConnected)
+                            await client.ConnectAsync(cancellationToken);
+
+                        var singleTransfer = new SingleFileTransfer(file, DestinationDirectoryWithMacrosExtended, _batchContext, client, _renamingPolicy, _logger);
+                        var result = await singleTransfer.TransferSingleFile(cancellationToken);
+                        _result.Add(result);
                     }
+                }
+                finally
+                {
+                    client.Disconnect();
                 }
             }
         }
@@ -185,42 +191,49 @@ internal class FileTransporter
         {
             userResultMessage = $"Error when fetching source files: {ex.Message}, {userResultMessage}";
             _logger.NotifyError(_batchContext, userResultMessage, ex);
+
             return FormFailedFileTransferResult(userResultMessage);
         }
         catch (SshConnectionException ex)
         {
             userResultMessage = $"Error when establishing connection to the Server: {ex.Message}, {userResultMessage}";
             _logger.NotifyError(_batchContext, userResultMessage, ex);
+
             return FormFailedFileTransferResult(userResultMessage);
         }
         catch (SocketException ex)
         {
             userResultMessage = $"Unable to establish the socket: {ex.Message}, {userResultMessage}";
             _logger.NotifyError(_batchContext, userResultMessage, ex);
+
             return FormFailedFileTransferResult(userResultMessage);
         }
         catch (SshAuthenticationException ex)
         {
             userResultMessage = $"Authentication of SSH session failed: {ex.Message}, {userResultMessage}";
             _logger.NotifyError(_batchContext, userResultMessage, ex);
+
             return FormFailedFileTransferResult(userResultMessage);
         }
         catch (SftpPathNotFoundException ex)
         {
             userResultMessage = $"Error when establishing connection to the Server: {ex.Message}, {userResultMessage}";
             _logger.NotifyError(_batchContext, userResultMessage, ex);
+
             return FormFailedFileTransferResult(userResultMessage);
         }
         catch (ArgumentException ex)
         {
             userResultMessage = $"{ex.Message} {userResultMessage}";
             _logger.NotifyError(_batchContext, userResultMessage, ex);
+
             return FormFailedFileTransferResult(userResultMessage);
         }
         catch (Exception ex)
         {
             userResultMessage = $"Error when executing file transfer: {ex.Message}, {userResultMessage}";
             _logger.NotifyError(_batchContext, userResultMessage, ex);
+
             return FormFailedFileTransferResult(userResultMessage);
         }
         finally
@@ -232,6 +245,7 @@ internal class FileTransporter
     }
 
     #region Helper methods
+
     private ConnectionInfo GetConnectionInfo(Destination destination, Connection connect)
     {
         ConnectionInfo connectionInfo;
@@ -253,6 +267,7 @@ internal class FileTransporter
         }
 
         PrivateKeyFile privateKey = null;
+
         if (connect.Authentication == AuthenticationType.UsernamePrivateKeyFile || connect.Authentication == AuthenticationType.UsernamePasswordPrivateKeyFile)
         {
             if (string.IsNullOrEmpty(connect.PrivateKeyFile))
@@ -261,6 +276,7 @@ internal class FileTransporter
                 ? new PrivateKeyFile(connect.PrivateKeyFile, connect.PrivateKeyPassphrase)
                 : new PrivateKeyFile(connect.PrivateKeyFile);
         }
+
         if (connect.Authentication == AuthenticationType.UsernamePrivateKeyString || connect.Authentication == AuthenticationType.UsernamePasswordPrivateKeyString)
         {
             if (string.IsNullOrEmpty(connect.PrivateKeyString))
@@ -270,24 +286,30 @@ internal class FileTransporter
                 ? new PrivateKeyFile(stream, connect.PrivateKeyPassphrase)
                 : new PrivateKeyFile(stream, "");
         }
+
         switch (connect.Authentication)
         {
             case AuthenticationType.UsernamePassword:
                 methods.Add(new PasswordAuthenticationMethod(connect.UserName, connect.Password));
+
                 break;
             case AuthenticationType.UsernamePrivateKeyFile:
                 methods.Add(new PrivateKeyAuthenticationMethod(connect.UserName, privateKey));
+
                 break;
             case AuthenticationType.UsernamePasswordPrivateKeyFile:
                 methods.Add(new PasswordAuthenticationMethod(connect.UserName, connect.Password));
                 methods.Add(new PrivateKeyAuthenticationMethod(connect.UserName, privateKey));
+
                 break;
             case AuthenticationType.UsernamePrivateKeyString:
                 methods.Add(new PrivateKeyAuthenticationMethod(connect.UserName, privateKey));
+
                 break;
             case AuthenticationType.UsernamePasswordPrivateKeyString:
                 methods.Add(new PasswordAuthenticationMethod(connect.UserName, connect.Password));
                 methods.Add(new PrivateKeyAuthenticationMethod(connect.UserName, privateKey));
+
                 break;
             default:
                 throw new ArgumentException($"Unknown Authentication type: '{connect.Authentication}'.");
@@ -320,6 +342,7 @@ internal class FileTransporter
                     if (!_batchContext.Connection.PromptAndResponse.Any() || !_batchContext.Connection.PromptAndResponse.Select(p => p.Prompt.ToLower()).ToList().Contains(serverPrompt.Request.Replace(":", "").Trim().ToLower()))
                     {
                         var errorMsg = $"Failure in Keyboard-interactive authentication: No response given for server prompt request --> {serverPrompt.Request.Replace(":", "").Trim()}";
+
                         throw new ArgumentException(errorMsg);
                     }
 
@@ -330,6 +353,7 @@ internal class FileTransporter
                     }
                 }
             }
+
             _logger.NotifyInformation(_batchContext, "Keyboard-Interactive negotiation finished.");
         }
     }
@@ -344,43 +368,55 @@ internal class FileTransporter
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ssh-rsa", new RsaKey(sshKeyData));
                 });
+
                 break;
             case HostKeyAlgorithms.Ed25519:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-ed25519", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ssh-ed25519", new ED25519Key(sshKeyData));
                 });
+
                 break;
             case HostKeyAlgorithms.DSS:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-dss", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ssh-dss", new DsaKey(sshKeyData));
                 });
+
                 break;
             case HostKeyAlgorithms.nistp256:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp256", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ecdsa-sha2-nistp256", new EcdsaKey(sshKeyData));
                 });
+
                 break;
             case HostKeyAlgorithms.nistp384:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp384", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ecdsa-sha2-nistp384", new EcdsaKey(sshKeyData));
                 });
+
                 break;
             case HostKeyAlgorithms.nistp521:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp521", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ecdsa-sha2-nistp521", new EcdsaKey(sshKeyData));
                 });
+
                 break;
         }
 
@@ -407,16 +443,15 @@ internal class FileTransporter
                         e.CanTrust = expectedServerFingerprint.ToLower() == MD5serverFingerprint.Replace(":", "").ToLower();
                         if (!e.CanTrust)
                             userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                    $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{MD5serverFingerprint}'.";
+                                                $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{MD5serverFingerprint}'.";
                     }
                     else
                     {
                         e.CanTrust = e.FingerPrint.SequenceEqual(Util.ConvertFingerprintToByteArray(expectedServerFingerprint));
                         if (!e.CanTrust)
                             userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                    $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{MD5serverFingerprint}'.";
+                                                $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{MD5serverFingerprint}'.";
                     }
-
                 }
                 else if (Util.IsSha256(expectedServerFingerprint))
                 {
@@ -426,6 +461,7 @@ internal class FileTransporter
                         {
                             SHAServerFingerprint = Util.ToHex(mySHA256.ComputeHash(e.HostKey));
                         }
+
                         e.CanTrust = (SHAServerFingerprint == expectedServerFingerprint);
                         if (!e.CanTrust)
                             userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
@@ -465,6 +501,7 @@ internal class FileTransporter
             foreach (var path in _filePaths)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+
                 if (File.Exists(path))
                 {
                     var item = new FileItem(Path.GetFullPath(path));
@@ -519,7 +556,9 @@ internal class FileTransporter
     public static void CreateDirectoriesRecursively(SftpClient client, string path)
     {
         path = path.Replace(@"\", "/");
+
         if (client.Exists(path)) return;
+
         try
         {
             client.CreateDirectory(path);
@@ -527,6 +566,7 @@ internal class FileTransporter
         catch
         {
             var parent = Path.GetDirectoryName(path);
+
             if (!string.IsNullOrEmpty(parent))
             {
                 CreateDirectoriesRecursively(client, parent);
@@ -546,9 +586,13 @@ internal class FileTransporter
         try
         {
             client.ChangeDirectory(dir);
+
             return true;
         }
-        catch { return false; }
+        catch
+        {
+            return false;
+        }
     }
 
     private static string[] ConvertObjectToStringArray(object objectArray)
@@ -556,12 +600,14 @@ internal class FileTransporter
         if (!objectArray.GetType().IsArray)
             throw new ArgumentException($"Invalid type for parameter FilePaths. Expected array but was {objectArray.GetType()}");
         var res = objectArray as object[];
+
         return res.OfType<string>().ToArray();
     }
 
     private static FileTransferResult FormFailedFileTransferResult(string userResultMessage)
     {
         userResultMessage += "No files transferred.";
+
         return new FileTransferResult
         {
             ActionSkipped = true,
@@ -586,7 +632,7 @@ internal class FileTransporter
         _logger.LogBatchFinished(_batchContext, userResultMessage, success, actionSkipped);
 
         var transferErrors = singleResults.Where(r => r.ErrorMessages.Any()).GroupBy(r => r.TransferredFile ?? "--unknown--")
-                .ToDictionary(rg => rg.Key, rg => (IList<string>)rg.SelectMany(r => r.ErrorMessages).ToList());
+            .ToDictionary(rg => rg.Key, rg => (IList<string>)rg.SelectMany(r => r.ErrorMessages).ToList());
 
         var transferredFileResults = singleResults.Where(r => r.Success && !r.ActionSkipped).ToList();
 
@@ -653,9 +699,11 @@ internal class FileTransporter
         {
             case SourceAction.Error:
                 _logger.NotifyError(context, msg, new FileNotFoundException());
+
                 return new SingleFileTransferResult { Success = false, ErrorMessages = { msg } };
             case SourceAction.Info:
                 _logger.NotifyInformation(context, msg);
+
                 return new SingleFileTransferResult { Success = true, ActionSkipped = true, ErrorMessages = { msg } };
             case SourceAction.Ignore:
                 return new SingleFileTransferResult { Success = true, ActionSkipped = true, ErrorMessages = { msg } };
@@ -694,4 +742,3 @@ internal class FileTransporter
     #endregion
 
 }
-

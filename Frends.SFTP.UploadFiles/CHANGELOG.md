@@ -1,4 +1,7 @@
 # Changelog
+## [2.13.0] - 2026-01-13
+### Fixed
+- Operation timeout is now using the Connection.ConnectionTimeout parameter.
 
 ## [2.13.0] - 2026-01-12
 ### Fixed
