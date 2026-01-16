@@ -1,3 +1,5 @@
+using System;
+using System.Threading;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using Frends.SFTP.MoveFile.Enums;
@@ -51,5 +53,13 @@ class MoveTests : MoveFileTestBase
         result = await SFTP.MoveFile(_input, _connection, default);
         Assert.IsTrue(Helpers.DestinationFileExists(result.Files[0].DestinationPath));
     }
-}
 
+    [Test]
+    public async Task MoveFile_CreatesNestedDirectories()
+    {
+        _input.CreateTargetDirectories = true;
+        _input.TargetDirectory = $"/upload/{Guid.NewGuid()}/test/nested/directory";
+        var result = await SFTP.MoveFile(_input, _connection, CancellationToken.None);
+        Assert.IsTrue(Helpers.DestinationFileExists(result.Files[0].DestinationPath));
+    }
+}
