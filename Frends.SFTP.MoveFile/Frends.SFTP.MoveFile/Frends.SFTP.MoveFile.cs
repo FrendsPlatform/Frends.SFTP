@@ -74,7 +74,16 @@ public class SFTP
         if (!client.Exists(input.TargetDirectory))
         {
             if (input.CreateTargetDirectories)
-                client.CreateDirectory(input.TargetDirectory);
+            {
+                try
+                {
+                    Util.CreateDirectoriesRecursively(client, input.TargetDirectory);
+                }
+                catch (Exception ex)
+                {
+                    throw new ArgumentException($"Error while creating destination directory '{input.TargetDirectory}': {ex.Message}", ex);
+                }
+            }
             else
                 throw new DirectoryNotFoundException($"Target directory {input.TargetDirectory} does not exist.");
         }

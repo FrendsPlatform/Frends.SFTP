@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+using Frends.SFTP.MoveFile.Definitions;
 using NUnit.Framework;
 using Frends.SFTP.MoveFile.Enums;
 
@@ -42,5 +44,19 @@ public class ConnectivityTests : MoveFileTestBase
         var result = await SFTP.MoveFile(_input, connection, default);
         Assert.IsNotNull(result.Files);
     }
-}
 
+    [Test]
+    public async Task MoveFile_TestWithKeyboardInteractiveAdditionalPrompts()
+    {
+        _connection.Authentication = AuthenticationType.UsernamePassword;
+        _connection.UseKeyboardInteractiveAuthentication = true;
+        _connection.Password = string.Empty;
+        _connection.PromptAndResponse = new PromptResponse[]
+        {
+            new() { Prompt = "password", Response = "pass" },
+        };
+
+        var result = await SFTP.MoveFile(_input, _connection, CancellationToken.None);
+        Assert.IsNotNull(result.Files);
+    }
+}

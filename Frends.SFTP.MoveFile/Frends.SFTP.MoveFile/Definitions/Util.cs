@@ -23,6 +23,7 @@ internal static class Util
         var result = new StringBuilder(bytes.Length * 2);
         for (int i = 0; i < bytes.Length; i++)
             result.Append(bytes[i].ToString("x2"));
+
         return result.ToString();
     }
 
@@ -33,9 +34,13 @@ internal static class Util
             var arr = new byte[hex.Length / 2];
             for (var i = 0; i < arr.Length; i++)
                 arr[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
+
             return true;
         }
-        catch { return false; }
+        catch
+        {
+            return false;
+        }
     }
 
     internal static bool IsMD5(string input)
@@ -59,9 +64,13 @@ internal static class Util
             if (!input.EndsWith("="))
                 input += '=';
             Convert.FromBase64String(input);
+
             return true;
         }
-        catch { return false; }
+        catch
+        {
+            return false;
+        }
     }
 
     internal static string CheckServerFingerprint(SftpClient client, string expectedServerFingerprint)
@@ -84,16 +93,15 @@ internal static class Util
                         e.CanTrust = expectedServerFingerprint.ToLower() == MD5serverFingerprint.Replace(":", "").ToLower();
                         if (!e.CanTrust)
                             userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                    $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{MD5serverFingerprint}'.";
+                                                $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{MD5serverFingerprint}'.";
                     }
                     else
                     {
                         e.CanTrust = e.FingerPrint.SequenceEqual(ConvertFingerprintToByteArray(expectedServerFingerprint));
                         if (!e.CanTrust)
                             userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                    $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{MD5serverFingerprint}'.";
+                                                $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{MD5serverFingerprint}'.";
                     }
-
                 }
                 else if (IsSha256(expectedServerFingerprint))
                 {
@@ -103,6 +111,7 @@ internal static class Util
                         {
                             SHAServerFingerprint = ToHex(mySHA256.ComputeHash(e.HostKey));
                         }
+
                         e.CanTrust = (SHAServerFingerprint == expectedServerFingerprint);
                         if (!e.CanTrust)
                             userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
@@ -137,43 +146,55 @@ internal static class Util
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ssh-rsa", new RsaKey(sshKeyData));
                 });
+
                 break;
             case HostKeyAlgorithms.Ed25519:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-ed25519", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ssh-ed25519", new ED25519Key(sshKeyData));
                 });
+
                 break;
             case HostKeyAlgorithms.DSS:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-dss", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ssh-dss", new DsaKey(sshKeyData));
                 });
+
                 break;
             case HostKeyAlgorithms.nistp256:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp256", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ecdsa-sha2-nistp256", new EcdsaKey(sshKeyData));
                 });
+
                 break;
             case HostKeyAlgorithms.nistp384:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp384", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ecdsa-sha2-nistp384", new EcdsaKey(sshKeyData));
                 });
+
                 break;
             case HostKeyAlgorithms.nistp521:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp521", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ecdsa-sha2-nistp521", new EcdsaKey(sshKeyData));
                 });
+
                 break;
         }
 
@@ -216,14 +237,39 @@ internal static class Util
                 return Encoding.Default;
             case FileEncoding.WINDOWS1252:
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
                 return Encoding.GetEncoding("windows-1252");
             case FileEncoding.Other:
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
                 var e = Encoding.GetEncoding(encodingString);
+
                 if (e == null) throw new ArgumentException($"Encoding string {encodingString} is not a valid code page name.");
+
                 return e;
             default:
                 throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{encoding}'.");
+        }
+    }
+
+    internal static void CreateDirectoriesRecursively(SftpClient client, string path)
+    {
+        path = path.Replace(@"\", "/");
+
+        if (client.Exists(path)) return;
+
+        try
+        {
+            client.CreateDirectory(path);
+        }
+        catch
+        {
+            var parent = Path.GetDirectoryName(path);
+
+            if (!string.IsNullOrEmpty(parent))
+            {
+                CreateDirectoriesRecursively(client, parent);
+                client.CreateDirectory(path);
+            }
         }
     }
 }
