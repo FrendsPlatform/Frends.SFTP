@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- Task can create now nested target directories.
+- Task can now create nested target directories.
 
 ## [1.4.0] - 2026-01-13
 
