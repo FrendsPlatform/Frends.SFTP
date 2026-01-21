@@ -63,10 +63,15 @@ internal class SingleFileTransfer
     internal async Task<SingleFileTransferResult> TransferSingleFile(CancellationToken cancellationToken)
     {
         OriginalDestinationFileCopyPath = string.Empty;
-        var originalDestinationFileExists = DestinationFileExists(DestinationFileWithMacrosExpanded);
 
         try
         {
+            _result.TransferredFile = SourceFile.Name;
+            _result.TransferredFilePath = SourceFile.FullPath;
+
+            await GetSourceFile(cancellationToken);
+
+            var originalDestinationFileExists = DestinationFileExists(DestinationFileWithMacrosExpanded);
             if (originalDestinationFileExists)
             {
                 OriginalDestinationFileMetadata = new FileItem(DestinationFileWithMacrosExpanded);
@@ -75,11 +80,6 @@ internal class SingleFileTransfer
                     $"{Guid.NewGuid()}_{OriginalDestinationFileMetadata.Name}");
                 File.Copy(OriginalDestinationFileMetadata.FullPath, OriginalDestinationFileCopyPath);
             }
-
-            _result.TransferredFile = SourceFile.Name;
-            _result.TransferredFilePath = SourceFile.FullPath;
-
-            await GetSourceFile(cancellationToken);
 
             if (originalDestinationFileExists)
             {
@@ -131,15 +131,23 @@ internal class SingleFileTransfer
 
     private async Task GetSourceFile(CancellationToken cancellationToken)
     {
+        string targetFilename = string.Empty;
+
         if (BatchContext.Options.RenameSourceFileBeforeTransfer)
             await RenameSourceFile(cancellationToken);
         else
             SourceFileDuringTransfer = SourceFile.FullPath;
 
-        SetCurrentState(TransferState.GetFile,
-            $"Downloading temporary source file {Path.GetFileName(SourceFileDuringTransfer)} to local temp folder {WorkFileInfo.WorkFileDir}");
+        if (BatchContext.Options.ReplaceNotAllowedCharsInDownloadFileName)
+            targetFilename = CleanWindowsFileName(SourceFile.Name, BatchContext.Options.ReplaceNotAllowedCharWithChar);
+        else
+            targetFilename = SourceFileDuringTransfer;
 
-        using var fs = File.Open(Path.Combine(WorkFileInfo.WorkFileDir, Path.GetFileName(SourceFileDuringTransfer)),
+        SetCurrentState(TransferState.GetFile,
+            $"Downloading temporary source file {Path.GetFileName(targetFilename)} to local temp folder {WorkFileInfo.WorkFileDir}");
+
+        using var fs = File.Open(
+            Path.Combine(WorkFileInfo.WorkFileDir, Path.GetFileName(targetFilename)),
             FileMode.Create);
         var asynch = Client.BeginDownloadFile(SourceFileDuringTransfer, fs);
 
@@ -155,7 +163,44 @@ internal class SingleFileTransfer
             }
         }
 
+        SourceFileDuringTransfer = SourceFileDuringTransfer.Replace(SourceFile.Name, targetFilename);
+        DestinationFileWithMacrosExpanded = Path.Combine(Path.GetDirectoryName(DestinationFileWithMacrosExpanded), targetFilename);
+
         Client.EndDownloadFile(asynch);
+    }
+
+
+
+    private static readonly string[] ReservedNames = new[]
+    {
+        "CON", "PRN", "AUX", "NUL",
+        "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+        "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
+    };
+
+    public static string CleanWindowsFileName(string fileName, string replacement = "_")
+    {
+        // Step 1: Replace invalid characters
+        foreach (char c in Path.GetInvalidFileNameChars())
+        {
+            fileName = fileName.Replace(c.ToString(), replacement);
+        }
+
+        // Step 2: Trim trailing periods and spaces
+        fileName = fileName.TrimEnd(' ', '.');
+
+        // Step 3: Avoid reserved names (case-insensitive)
+        if (ReservedNames.Contains(fileName, StringComparer.OrdinalIgnoreCase))
+        {
+            fileName += "_";
+        }
+
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            return "unnamed";
+        }
+
+        return fileName;
     }
 
     private bool DestinationFileExists(string path)
@@ -301,7 +346,11 @@ internal class SingleFileTransfer
 
     private async Task ExecuteSourceOperation(CancellationToken cancellationToken)
     {
-        var filePath = string.IsNullOrEmpty(SourceFileDuringTransfer) ? SourceFile.FullPath : SourceFileDuringTransfer;
+        var filePath = string.Empty;
+        if(BatchContext.Options.ReplaceNotAllowedCharsInDownloadFileName)
+            filePath = SourceFile.FullPath;
+        else
+            filePath = string.IsNullOrEmpty(SourceFileDuringTransfer) ? SourceFile.FullPath : SourceFileDuringTransfer;
         ISftpFile file;
 
         switch (BatchContext.Source.Operation)
