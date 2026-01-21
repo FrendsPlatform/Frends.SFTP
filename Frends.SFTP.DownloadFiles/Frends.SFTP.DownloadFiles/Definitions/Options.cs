@@ -59,6 +59,22 @@ public class Options
     public string DestinationFileExtension { get; set; }
 
     /// <summary>
+    /// Should the destination file name be renamed to remove invalid chars.
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(false)]
+    public bool ReplaceNotAllowedCharsInDownloadFileName { get; set; } = true;
+
+    /// <summary>
+    /// Char to replace not allowed chars with when file is written to local server.
+    /// </summary>
+    /// <example>.8CO</example>
+    [DefaultValue("_")]
+    [UIHint(nameof(ReplaceNotAllowedCharsInDownloadFileName), "", true)]
+    [DisplayFormat(DataFormatString = "Text")]
+    public string ReplaceNotAllowedCharWithChar { get; set; }
+
+    /// <summary>
     /// Should the destination directories be created if they do not exist. May not work on all servers.
     /// </summary>
     /// <example>true</example>

@@ -206,11 +206,40 @@ namespace Frends.SFTP.DownloadFiles.Tests
             {
                 ThrowErrorOnFail = true,
                 RenameSourceFileBeforeTransfer = true,
-                RenameDestinationFileDuringTransfer = false,
+                RenameDestinationFileDuringTransfer = true,
                 CreateDestinationDirectories = true,
                 PreserveLastModified = false,
                 OperationLog = true
             };
+
+            var result = await SFTP.DownloadFiles(_source, destination, _connection, options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+
+            Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, _source.FileName)));
+        }
+
+        [Test]
+        public async Task DownloadFiles_TestTransferWithNotAllowedCharsInFileName()
+        {
+            var destination = new Destination
+            {
+                Directory = Path.Combine(_workDir, "destination"),
+                Action = DestinationAction.Overwrite,
+            };
+
+            var options = new Options
+            {
+                ThrowErrorOnFail = true,
+                RenameSourceFileBeforeTransfer = false,
+                RenameDestinationFileDuringTransfer = false,
+                ReplaceNotAllowedCharsInDownloadFileName = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true
+            };
+
+            _source.Operation = SourceOperation.Delete;
 
             var result = await SFTP.DownloadFiles(_source, destination, _connection, options, _info, new CancellationToken());
             Assert.IsTrue(result.Success);
