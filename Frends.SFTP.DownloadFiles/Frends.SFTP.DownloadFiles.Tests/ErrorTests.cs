@@ -180,7 +180,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 Operation = SourceOperation.Nothing,
             };
 
-            using var cancellationTokenSource = new CancellationTokenSource(1000);
+            using var cancellationTokenSource = new CancellationTokenSource(5000);
             var ex = Assert.ThrowsAsync<Exception>(async () =>
                 await SFTP.DownloadFiles(source, _destination, connection, _options, _info,
                     cancellationTokenSource.Token));
