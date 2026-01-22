@@ -8,11 +8,14 @@ internal class WorkFileInfo
 
     internal readonly string WorkFileDir;
 
-    public WorkFileInfo(string originalFileName, string workFileName, string workFileDir)
+    internal readonly string SafeTempFileName;
+
+    public WorkFileInfo(string originalFileName, string workFileName, string workFileDir, string safeTempFileName)
     {
         OriginalFileName = originalFileName ?? string.Empty;
         WorkFileName = workFileName ?? string.Empty;
         WorkFileDir = workFileDir ?? string.Empty;
+        SafeTempFileName = safeTempFileName;
     }
 
     public string WorkFilePath

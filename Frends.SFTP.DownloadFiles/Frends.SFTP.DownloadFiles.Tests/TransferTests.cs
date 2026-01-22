@@ -450,6 +450,53 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(4, result.SuccessfulTransferCount);
         }
+
+        [Test]
+        public async Task DownloadFiles_TestTransferWithWindowsInvalidCharactersInFileName()
+        {
+            var safeTempFileName = "backup_temp_file.conf";
+            var sourceFileName = "backup_2024-01-22_10:30:45.conf";
+            var destinationFileName = "backup_2024-01-22_103045.conf";
+
+            // Upload test file with safe name first
+            var files = new List<string> { safeTempFileName };
+            Helpers.UploadTestFiles(_source.Directory, 0, null, files);
+
+            Helpers.RenameFileOnSftpServer(_source.Directory, safeTempFileName, sourceFileName);
+
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = sourceFileName,
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing
+            };
+
+            var destination = new Destination
+            {
+                Directory = _destination.Directory,
+                FileName = destinationFileName,
+                FileNameEncoding = FileEncoding.UTF8,
+                Action = DestinationAction.Overwrite
+            };
+
+            var options = new Options
+            {
+                ThrowErrorOnFail = true,
+                RenameSourceFileBeforeTransfer = false,
+                RenameDestinationFileDuringTransfer = false,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true
+            };
+
+            var result = await SFTP.DownloadFiles(source, destination, _connection, options, _info, new CancellationToken());
+
+            Assert.IsTrue(result.Success, "Should handle Windows-invalid characters in source filename");
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, destinationFileName)),
+                "Destination file should exist with Windows-safe filename");
+        }
     }
 }
 
