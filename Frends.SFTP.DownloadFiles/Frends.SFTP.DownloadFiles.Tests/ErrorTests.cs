@@ -184,8 +184,6 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var ex = Assert.ThrowsAsync<Exception>(async () =>
                 await SFTP.DownloadFiles(source, _destination, connection, _options, _info,
                     cancellationTokenSource.Token));
-            Console.WriteLine($"ACTUAL ERROR MESSAGE: '{ex.Message}'");
-            TestContext.WriteLine($"ACTUAL ERROR MESSAGE: '{ex.Message}'");
             Assert.IsTrue(ex.Message.Contains("No files transferred."));
             Assert.IsTrue(ex.Message.Contains("Error: The operation was canceled.."));
             Assert.IsTrue(Helpers.SourceFileExists($"{source.Directory}/{source.FileName}"));
