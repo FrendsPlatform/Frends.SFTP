@@ -26,7 +26,8 @@ internal class SingleFileTransfer
             renamingPolicy.CreateRemoteFileName(
                 file.Name,
                 context.Destination.FileName));
-        WorkFileInfo = new WorkFileInfo(file.Name, Path.GetFileName(DestinationFileWithMacrosExpanded), BatchContext.TempWorkDir, Guid.NewGuid().ToString() + ".tmp");
+        WorkFileInfo = new WorkFileInfo(file.Name, Path.GetFileName(DestinationFileWithMacrosExpanded),
+            BatchContext.TempWorkDir, Guid.NewGuid().ToString() + ".tmp");
 
         _result = new SingleFileTransferResult { Success = true };
     }
@@ -83,13 +84,16 @@ internal class SingleFileTransfer
             if (originalDestinationFileExists)
             {
                 DestinationFile = new FileItem(DestinationFileWithMacrosExpanded);
+
                 switch (BatchContext.Destination.Action)
                 {
                     case DestinationAction.Append:
                         await AppendDestinationFile(cancellationToken);
+
                         break;
                     case DestinationAction.Overwrite:
                         await PutDestinationFile(removeExisting: true, cancellationToken);
+
                         break;
                     case DestinationAction.Error:
                         throw new DestinationFileExistsException(Path.GetFileName(DestinationFileWithMacrosExpanded));
@@ -105,21 +109,40 @@ internal class SingleFileTransfer
             await ExecuteSourceOperation(cancellationToken);
 
             _logger.LogTransferSuccess(this, BatchContext);
+            CleanUpSourceFiles();
+            CleanUpDestinationFiles();
         }
         catch (Exception ex)
         {
-            var sourceFileRestoreMessage = RestoreSourceFileAfterErrorIfItWasRenamed();
+            var (restoreSourceSuccess, sourceFileRestoreMessage) = RestoreSourceFileAfterErrorIfItWasRenamed();
             HandleTransferError(ex, sourceFileRestoreMessage);
 
-            var destinationFileRestoreMessage = RestoreDestinationFile();
+            if (restoreSourceSuccess)
+            {
+                CleanUpSourceFiles();
+            }
+            else
+            {
+                _logger.NotifyInformation(BatchContext, "Restoring the source file failed, hence it won’t be deleted.");
+            }
+
+            var (restoreDestinationSuccess, destinationFileRestoreMessage) = RestoreDestinationFile();
             HandleTransferError(ex, destinationFileRestoreMessage);
-        }
-        finally
-        {
-            CleanUpFiles();
+
+            if (restoreDestinationSuccess)
+            {
+                CleanUpDestinationFiles();
+            }
+            else
+            {
+                _logger.NotifyInformation(
+                    BatchContext,
+                    "Restoring the destination file failed, hence it won’t be deleted.");
+            }
         }
 
         _result.DestinationFilePath = DestinationFileWithMacrosExpanded;
+
         return _result;
     }
 
@@ -173,6 +196,7 @@ internal class SingleFileTransfer
         if (!string.IsNullOrEmpty(SourceFileDuringTransfer))
         {
             await Client.RenameFileAsync(SourceFileDuringTransfer, SourceFile.FullPath, cancellationToken);
+
             return;
         }
 
@@ -310,6 +334,7 @@ internal class SingleFileTransfer
                     $"Deleting source file {Path.GetFileName(SourceFile.FullPath)} after transfer.");
                 await Client.DeleteFileAsync(filePath, cancellationToken);
                 _logger.NotifyInformation(BatchContext, $"FILE DELETE: Source file {filePath} deleted.");
+
                 break;
 
             case SourceOperation.Nothing:
@@ -330,6 +355,7 @@ internal class SingleFileTransfer
                     _renamingPolicy.ExpandDirectoryForMacros(BatchContext.Source.DirectoryToMoveAfterTransfer);
                 SetCurrentState(TransferState.SourceOperationMove,
                     $"Moving source file {SourceFile.FullPath} to {moveToPath}.");
+
                 if (!Client.Exists(moveToPath))
                 {
                     var msg =
@@ -339,6 +365,7 @@ internal class SingleFileTransfer
                 }
 
                 var destFileName = Path.Combine(moveToPath, SourceFile.Name).Replace("\\", "/");
+
                 if (Client.Exists(destFileName))
                     throw new Exception(
                         $"Failure in source operation: File {Path.GetFileName(destFileName)} exists in move to directory.");
@@ -416,29 +443,36 @@ internal class SingleFileTransfer
                 if (WorkFile.FullPath == null)
                     _logger.NotifyInformation(BatchContext,
                         "Source end point returned null as the renamed file. It should return the name of the renamed file.");
+
                 break;
         }
     }
 
-    private void CleanUpFiles()
+    private void CleanUpSourceFiles()
     {
         var temporarySourceFile = Path.Combine(WorkFileInfo.WorkFileDir, WorkFileInfo.SafeTempFileName);
         SetCurrentState(TransferState.CleanUpFiles, $"Checking if temporary source file {temporarySourceFile} exists.");
         var exists = !string.IsNullOrEmpty(temporarySourceFile) && File.Exists(temporarySourceFile);
         _logger.NotifyInformation(BatchContext, $"FILE EXISTS {temporarySourceFile}: {exists}");
-        if (exists)
-        {
-            SetCurrentState(TransferState.CleanUpFiles, $"Removing temporary source file {temporarySourceFile}.");
-            TryToRemoveLocalTempFile(temporarySourceFile);
-        }
 
-        exists = !string.IsNullOrEmpty(DestinationFileDuringTransfer) && File.Exists(DestinationFileDuringTransfer) &&
-                 BatchContext.Options.RenameDestinationFileDuringTransfer;
         if (!exists) return;
-        SetCurrentState(TransferState.CleanUpFiles,
+        SetCurrentState(TransferState.CleanUpFiles, $"Removing temporary source file {temporarySourceFile}.");
+        TryToRemoveLocalTempFile(temporarySourceFile);
+    }
+
+    private void CleanUpDestinationFiles()
+    {
+        SetCurrentState(
+            TransferState.CleanUpFiles,
             $"Checking if temporary destination file {DestinationFileDuringTransfer} exists.");
+        var exists = !string.IsNullOrEmpty(DestinationFileDuringTransfer) &&
+                     File.Exists(DestinationFileDuringTransfer) &&
+                     BatchContext.Options.RenameDestinationFileDuringTransfer;
         _logger.NotifyInformation(BatchContext, $"FILE EXISTS {DestinationFileDuringTransfer}: {exists}");
-        SetCurrentState(TransferState.CleanUpFiles,
+
+        if (!exists) return;
+        SetCurrentState(
+            TransferState.CleanUpFiles,
             $"Removing temporary destination file {DestinationFileDuringTransfer}.");
         TryToRemoveDestinationTempFile();
     }
@@ -499,7 +533,7 @@ internal class SingleFileTransfer
         }
     }
 
-    private string RestoreSourceFileAfterErrorIfItWasRenamed()
+    private (bool, string) RestoreSourceFileAfterErrorIfItWasRenamed()
     {
         // Check that the connection is alive and if not try to connect again
         if (!Client.IsConnected)
@@ -519,7 +553,8 @@ internal class SingleFileTransfer
                         Client.RenameFile(SourceFileDuringTransfer, SourceFile.FullPath);
                     if (BatchContext.Options.RenameSourceFileBeforeTransfer && !Client.Exists(SourceFile.FullPath))
                         Client.RenameFile(SourceFileDuringTransfer, SourceFile.FullPath);
-                    return "[Source file restored.]";
+
+                    return (true, "[Source file restored.]");
                 }
             }
             catch (Exception ex)
@@ -528,11 +563,12 @@ internal class SingleFileTransfer
                     $"Could not restore original source file '{Path.GetFileName(SourceFile.FullPath)}' from temporary file '{Path.GetFileName(SourceFileDuringTransfer)}'. Error: {ex.Message}.";
 
                 _logger.NotifyError(BatchContext, message, ex);
-                return $"[{message}]";
+
+                return (false, $"[{message}]");
             }
         }
 
-        return string.Empty;
+        return (true, string.Empty);
     }
 
     private void RestoreSourceFileIfItWasMoved()
@@ -556,9 +592,11 @@ internal class SingleFileTransfer
         if (!Client.Exists(path)) throw new ArgumentException("Failure in restoring moved source file.");
     }
 
-    private string RestoreDestinationFile()
+    private (bool, string) RestoreDestinationFile()
     {
         string message;
+        bool success = true;
+
         try
         {
             if (OriginalDestinationFileMetadata is null)
@@ -577,9 +615,10 @@ internal class SingleFileTransfer
         {
             message =
                 $"Could not restore original destination file '{Path.GetFileName(DestinationFileWithMacrosExpanded)}' from temporary file '{Path.GetFileName(OriginalDestinationFileCopyPath)}'. Error: {e.Message}.";
+            success = false;
         }
 
-        return message;
+        return (success, message);
     }
 
     private bool ShouldSourceFileBeRestoredOnError()
