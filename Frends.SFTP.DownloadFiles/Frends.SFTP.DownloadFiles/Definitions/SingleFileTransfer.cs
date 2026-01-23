@@ -26,8 +26,7 @@ internal class SingleFileTransfer
             renamingPolicy.CreateRemoteFileName(
                 file.Name,
                 context.Destination.FileName));
-        WorkFileInfo = new WorkFileInfo(file.Name, Path.GetFileName(DestinationFileWithMacrosExpanded),
-            BatchContext.TempWorkDir);
+        WorkFileInfo = new WorkFileInfo(file.Name, Path.GetFileName(DestinationFileWithMacrosExpanded), BatchContext.TempWorkDir, Guid.NewGuid().ToString() + ".tmp");
 
         _result = new SingleFileTransferResult { Success = true };
     }
@@ -139,7 +138,7 @@ internal class SingleFileTransfer
         SetCurrentState(TransferState.GetFile,
             $"Downloading temporary source file {Path.GetFileName(SourceFileDuringTransfer)} to local temp folder {WorkFileInfo.WorkFileDir}");
 
-        using var fs = File.Open(Path.Combine(WorkFileInfo.WorkFileDir, Path.GetFileName(SourceFileDuringTransfer)),
+        using var fs = File.Open(Path.Combine(WorkFileInfo.WorkFileDir, WorkFileInfo.SafeTempFileName),
             FileMode.Create);
         var asynch = Client.BeginDownloadFile(SourceFileDuringTransfer, fs);
 
@@ -193,7 +192,7 @@ internal class SingleFileTransfer
 
     private async Task AppendDestinationFile(CancellationToken cancellationToken)
     {
-        var filePath = Path.Combine(WorkFileInfo.WorkFileDir, Path.GetFileName(SourceFileDuringTransfer));
+        var filePath = Path.Combine(WorkFileInfo.WorkFileDir, WorkFileInfo.SafeTempFileName);
 
         if (BatchContext.Options.RenameDestinationFileDuringTransfer)
             await RenameDestinationFile(cancellationToken);
@@ -256,7 +255,7 @@ internal class SingleFileTransfer
             $"Downloading {helper}destination file {Path.GetFileName(DestinationFileDuringTransfer)}.");
 
         await FileOperations.CopyAsync(
-            Path.Combine(WorkFileInfo.WorkFileDir, Path.GetFileName(SourceFileDuringTransfer)),
+            Path.Combine(WorkFileInfo.WorkFileDir, WorkFileInfo.SafeTempFileName),
             DestinationFileDuringTransfer, removeExisting, cancellationToken);
 
         _logger.NotifyInformation(BatchContext,
@@ -423,7 +422,7 @@ internal class SingleFileTransfer
 
     private void CleanUpFiles()
     {
-        var temporarySourceFile = Path.Combine(WorkFileInfo.WorkFileDir, Path.GetFileName(SourceFileDuringTransfer));
+        var temporarySourceFile = Path.Combine(WorkFileInfo.WorkFileDir, WorkFileInfo.SafeTempFileName);
         SetCurrentState(TransferState.CleanUpFiles, $"Checking if temporary source file {temporarySourceFile} exists.");
         var exists = !string.IsNullOrEmpty(temporarySourceFile) && File.Exists(temporarySourceFile);
         _logger.NotifyInformation(BatchContext, $"FILE EXISTS {temporarySourceFile}: {exists}");

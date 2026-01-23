@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.17.0] - 2026-01-22
+### Fixed
+- Use safe GUID temp filename to handle source files with Windows-invalid characters
+
 ## [2.16.0] - 2026-01-13
 ### Fixed
 - Operation timeout is now using the Connection.ConnectionTimeout parameter.

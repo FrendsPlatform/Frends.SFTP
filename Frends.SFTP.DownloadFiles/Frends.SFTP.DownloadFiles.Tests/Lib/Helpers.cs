@@ -305,6 +305,19 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 result.Append(bytes[i].ToString("x2"));
             return result.ToString();
         }
+
+        internal static void RenameFileOnSftpServer(string directory, string oldName, string newName)
+        {
+            GetCredentialsFromEnvFile();
+            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUser, _dockerPwd))
+            {
+                client.Connect();
+                var oldPath = directory + "/" + oldName;
+                var newPath = directory + "/" + newName;
+                client.RenameFile(oldPath, newPath);
+                client.Disconnect();
+            }
+        }
     }
 }
 
