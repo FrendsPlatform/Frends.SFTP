@@ -25,6 +25,7 @@ internal static class Util
         var result = new StringBuilder(bytes.Length * 2);
         for (int i = 0; i < bytes.Length; i++)
             _ = result.Append(bytes[i].ToString("x2"));
+
         return result.ToString();
     }
 
@@ -35,10 +36,13 @@ internal static class Util
             var arr = new byte[hex.Length / 2];
             for (var i = 0; i < arr.Length; i++)
                 arr[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
+
             return true;
         }
         catch
-        { return false; }
+        {
+            return false;
+        }
     }
 
     internal static bool IsMD5(string input)
@@ -62,6 +66,7 @@ internal static class Util
             if (!input.EndsWith('='))
                 input += '=';
             Convert.FromBase64String(input);
+
             return true;
         }
         catch { return false; }
@@ -73,7 +78,7 @@ internal static class Util
         var md5serverFingerprint = string.Empty;
         var shaServerFingerprint = string.Empty;
 
-        client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
+        client.HostKeyReceived += delegate(object sender, HostKeyEventArgs e)
         {
             md5serverFingerprint = e.FingerPrintMD5;
             shaServerFingerprint = e.FingerPrintSHA256;
@@ -82,17 +87,18 @@ internal static class Util
             {
                 if (!expectedServerFingerprint.Contains(':'))
                 {
-                    e.CanTrust = expectedServerFingerprint.ToLower() == md5serverFingerprint.Replace(":", string.Empty).ToLower();
+                    e.CanTrust = expectedServerFingerprint.ToLower() ==
+                                 md5serverFingerprint.Replace(":", string.Empty).ToLower();
                     if (!e.CanTrust)
                         userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{md5serverFingerprint}'.";
+                                            $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{md5serverFingerprint}'.";
                 }
                 else
                 {
                     e.CanTrust = e.FingerPrint.SequenceEqual(ConvertFingerprintToByteArray(expectedServerFingerprint));
                     if (!e.CanTrust)
                         userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{md5serverFingerprint}'.";
+                                            $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{md5serverFingerprint}'.";
                 }
             }
             else if (IsSha256(expectedServerFingerprint))
@@ -111,7 +117,8 @@ internal static class Util
                 }
                 else
                 {
-                    e.CanTrust = shaServerFingerprint == expectedServerFingerprint || shaServerFingerprint.Replace("=", string.Empty) == expectedServerFingerprint;
+                    e.CanTrust = shaServerFingerprint == expectedServerFingerprint ||
+                                 shaServerFingerprint.Replace("=", string.Empty) == expectedServerFingerprint;
                     if (!e.CanTrust)
                         userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
                                             $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{shaServerFingerprint}'.";
@@ -137,43 +144,46 @@ internal static class Util
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ssh-rsa", new RsaKey(sshKeyData));
                 });
+
                 break;
             case HostKeyAlgorithms.Ed25519:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-ed25519", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ssh-ed25519", new ED25519Key(sshKeyData));
                 });
-                break;
-            case HostKeyAlgorithms.DSS:
-                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-dss", (data) =>
-                {
-                    var sshKeyData = new SshKeyData(data);
-                    return new KeyHostAlgorithm("ssh-dss", new DsaKey(sshKeyData));
-                });
+
                 break;
             case HostKeyAlgorithms.Nistp256:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp256", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ecdsa-sha2-nistp256", new EcdsaKey(sshKeyData));
                 });
+
                 break;
             case HostKeyAlgorithms.Nistp384:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp384", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ecdsa-sha2-nistp384", new EcdsaKey(sshKeyData));
                 });
+
                 break;
             case HostKeyAlgorithms.Nistp521:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp521", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
+
                     return new KeyHostAlgorithm("ecdsa-sha2-nistp521", new EcdsaKey(sshKeyData));
                 });
+
                 break;
         }
     }
@@ -190,11 +200,15 @@ internal static class Util
                 return Encoding.Default;
             case FileEncoding.WINDOWS1252:
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
                 return Encoding.GetEncoding("windows-1252");
             case FileEncoding.Other:
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
                 var e = Encoding.GetEncoding(encodingString);
-                if (e == null) throw new ArgumentException($"Encoding string {encodingString} is not a valid code page name.");
+
+                if (e == null)
+                    throw new ArgumentException($"Encoding string {encodingString} is not a valid code page name.");
+
                 return e;
             default:
                 throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{encoding}'.");
