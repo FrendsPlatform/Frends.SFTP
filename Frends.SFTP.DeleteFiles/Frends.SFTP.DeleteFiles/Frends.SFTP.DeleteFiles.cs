@@ -25,7 +25,8 @@ public static class SFTP
     /// <param name="connection">Connection parameters.</param>
     /// <param name="cancellationToken">Cancellation token given by Frends.</param>
     /// <returns>Object { List&lt;FileItem&gt; Files[ Object { string Name, string Path, Double SizeInMegaBytes } ] }.</returns>
-    public static async Task<Result> DeleteFiles([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
+    public static async Task<Result> DeleteFiles([PropertyTab] Input input, [PropertyTab] Connection connection,
+        CancellationToken cancellationToken)
     {
         var deletedFiles = new List<FileItem>();
 
@@ -67,7 +68,8 @@ public static class SFTP
 
         await client.ConnectAsync(cancellationToken);
 
-        if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
+        if (!client.IsConnected)
+            throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
         var files = await GetFiles(client, input, cancellationToken);
 
@@ -83,7 +85,8 @@ public static class SFTP
         return new Result(deletedFiles);
     }
 
-    private static async Task<List<FileItem>> GetFiles(SftpClient sftp, Input input, CancellationToken cancellationToken)
+    private static async Task<List<FileItem>> GetFiles(SftpClient sftp, Input input,
+        CancellationToken cancellationToken)
     {
         var directoryList = new List<FileItem>();
         var filePaths = ConvertObjectToStringArray(input.FilePaths);
@@ -110,7 +113,8 @@ public static class SFTP
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                if (file.Name != "." && file.Name != ".." && !file.IsDirectory && Regex.IsMatch(file.Name, regexStr, RegexOptions.IgnoreCase))
+                if (file.Name != "." && file.Name != ".." && !file.IsDirectory &&
+                    Regex.IsMatch(file.Name, regexStr, RegexOptions.IgnoreCase))
                     directoryList.Add(new FileItem(file));
             }
 

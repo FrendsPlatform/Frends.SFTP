@@ -160,15 +160,6 @@ internal static class Util
                 });
 
                 break;
-            case HostKeyAlgorithms.DSS:
-                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-dss", (data) =>
-                {
-                    var sshKeyData = new SshKeyData(data);
-
-                    return new KeyHostAlgorithm("ssh-dss", new DsaKey(sshKeyData));
-                });
-
-                break;
             case HostKeyAlgorithms.nistp256:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp256", (data) =>
                 {
@@ -202,7 +193,7 @@ internal static class Util
     }
 
     /// <summary>
-    /// Checks if the file name matches the given file mask. 
+    /// Checks if the file name matches the given file mask.
     /// The file mask is checked with a kludgey regular expression.
     /// </summary>
     internal static bool FileMatchesMask(string filename, string mask)

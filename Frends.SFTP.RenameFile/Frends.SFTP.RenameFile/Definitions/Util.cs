@@ -147,13 +147,6 @@ internal static class Util
                     return new KeyHostAlgorithm("ssh-ed25519", new ED25519Key(sshKeyData));
                 });
                 break;
-            case HostKeyAlgorithms.DSS:
-                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-dss", (data) =>
-                {
-                    var sshKeyData = new SshKeyData(data);
-                    return new KeyHostAlgorithm("ssh-dss", new DsaKey(sshKeyData));
-                });
-                break;
             case HostKeyAlgorithms.nistp256:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp256", (data) =>
                 {
