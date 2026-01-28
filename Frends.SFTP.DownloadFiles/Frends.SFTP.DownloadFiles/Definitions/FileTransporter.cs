@@ -393,10 +393,7 @@ internal class FileTransporter
 
                 return new SingleFileTransferResult { Success = true, ActionSkipped = true, ErrorMessages = { msg } };
             case SourceAction.Ignore:
-                return new SingleFileTransferResult
-                {
-                    Success = true, ActionSkipped = true, ErrorMessages = { msg }, EnableOperationsLog = false
-                };
+                return new SingleFileTransferResult { Success = true, ActionSkipped = true, ErrorMessages = { msg }, EnableOperationsLog = false };
             default:
                 throw new Exception("Unknown operation in NoSourceOperation.");
         }

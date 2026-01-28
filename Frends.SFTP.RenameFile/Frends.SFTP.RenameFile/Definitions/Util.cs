@@ -73,7 +73,7 @@ internal static class Util
         var MD5serverFingerprint = string.Empty;
         var SHAServerFingerprint = string.Empty;
 
-        client.HostKeyReceived += delegate(object _, HostKeyEventArgs e)
+        client.HostKeyReceived += delegate (object _, HostKeyEventArgs e)
         {
             try
             {

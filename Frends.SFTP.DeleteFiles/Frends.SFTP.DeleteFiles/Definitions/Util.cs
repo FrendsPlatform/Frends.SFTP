@@ -77,7 +77,7 @@ internal static class Util
         string md5ServerFingerprint;
         string shaServerFingerprint;
 
-        client.HostKeyReceived += delegate(object _, HostKeyEventArgs e)
+        client.HostKeyReceived += delegate (object _, HostKeyEventArgs e)
         {
             try
             {
