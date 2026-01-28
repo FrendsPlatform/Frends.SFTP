@@ -34,7 +34,7 @@ public class ErrorTests
         connection.Port = 51644;
         var input = new Input
         {
-            Path = "/upload/ t",
+            Path = "/upload/t",
             RenameBehaviour = RenameBehaviour.Throw
         };
 

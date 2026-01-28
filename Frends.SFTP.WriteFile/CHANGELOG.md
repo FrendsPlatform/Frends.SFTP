@@ -25,7 +25,7 @@
 
 ### Fixed
 
-- Fixed issue with ConnectionInfoBuilder having static properties for connection and input paramaters which lead to Task
+- Fixed issue with ConnectionInfoBuilder having static properties for connection and input parameters which lead to Task
   not being thread safe.
 
 ## [2.3.0] - 2024-08-19

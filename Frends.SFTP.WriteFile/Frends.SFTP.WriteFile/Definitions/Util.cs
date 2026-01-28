@@ -166,7 +166,7 @@ internal static class Util
             }
             catch (Exception ex)
             {
-                throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}");
+                throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}", ex);
             }
         };
     }

@@ -639,7 +639,7 @@ internal class FileTransporter
                 cancellationToken.ThrowIfCancellationRequested();
 
                 if (!client.Exists(file))
-                    _logger.NotifyError(_batchContext, $"File does not exist: '{file}",
+                    _logger.NotifyError(_batchContext, $"File does not exist: '{file}'",
                         new SftpPathNotFoundException());
                 else
                     fileItems.Add(new FileItem(client.Get(file)));
