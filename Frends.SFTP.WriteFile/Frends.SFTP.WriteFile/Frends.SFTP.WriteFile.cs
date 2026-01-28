@@ -48,16 +48,8 @@ public class SFTP
         // Check the fingerprint of the server if given.
         if (!string.IsNullOrEmpty(connection.ServerFingerPrint))
         {
-            var userResultMessage = "";
+             Util.AddServerFingerprintCheck(client, connection.ServerFingerPrint);
 
-            try
-            {
-                userResultMessage = Util.CheckServerFingerprint(client, connection.ServerFingerPrint);
-            }
-            catch (Exception ex)
-            {
-                throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}");
-            }
         }
 
         client.Connect();

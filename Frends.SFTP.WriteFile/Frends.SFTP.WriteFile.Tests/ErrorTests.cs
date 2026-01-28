@@ -79,8 +79,8 @@ public class ErrorTests : WriteFileTestBase
 
         _connection.ServerFingerPrint = fingerprint;
 
-        var ex = Assert.Throws<SshConnectionException>(() => SFTP.WriteFile(_input, _connection, _options));
-        Assert.AreEqual("Key exchange negotiation failed.", ex.Message);
+        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection, _options));
+        Assert.IsTrue(ex.Message.StartsWith("Error when checking the server fingerprint:"), ex.Message);
     }
 }
 
