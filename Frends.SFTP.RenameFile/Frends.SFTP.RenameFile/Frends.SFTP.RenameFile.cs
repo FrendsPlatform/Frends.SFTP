@@ -18,7 +18,8 @@ public class SFTP
     /// <param name="input">Rename options with full path, new file name and renaming behaviour.</param>
     /// <param name="cancellationToken">Token given by Frends to terminate the Task.</param>
     /// <returns>Result object { string Path }</returns>
-    public static async Task<Result> RenameFile([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
+    public static async Task<Result> RenameFile([PropertyTab] Input input, [PropertyTab] Connection connection,
+        CancellationToken cancellationToken)
     {
         ConnectionInfo connectionInfo;
 
@@ -44,21 +45,13 @@ public class SFTP
         // Check the fingerprint of the server if given.
         if (!string.IsNullOrEmpty(connection.ServerFingerPrint))
         {
-            var userResultMessage = "";
-
-            try
-            {
-                userResultMessage = Util.CheckServerFingerprint(client, connection.ServerFingerPrint);
-            }
-            catch (Exception ex)
-            {
-                throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}");
-            }
+            Util.AddServerFingerprintCheck(client, connection.ServerFingerPrint);
         }
 
         await client.ConnectAsync(cancellationToken);
 
-        if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
+        if (!client.IsConnected)
+            throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
         var directory = Path.GetDirectoryName(input.Path).Replace("\\", "/");
         var newFileFullPath = Path.Combine(directory, input.NewFileName).Replace("\\", "/");
@@ -90,14 +83,16 @@ public class SFTP
         return new Result(newFileFullPath);
     }
 
-    private static string GetNonConflictingDestinationFilePath(SftpClient client, string sourceFilePath, string destFilePath)
+    private static string GetNonConflictingDestinationFilePath(SftpClient client, string sourceFilePath,
+        string destFilePath)
     {
         var count = 1;
 
         while (client.Exists(destFilePath))
         {
             var tempFileName = $"{Path.GetFileNameWithoutExtension(sourceFilePath)}({count++})";
-            destFilePath = Path.Combine(Path.GetDirectoryName(destFilePath), path2: tempFileName + Path.GetExtension(sourceFilePath)).Replace("\\", "/");
+            destFilePath = Path.Combine(Path.GetDirectoryName(destFilePath),
+                path2: tempFileName + Path.GetExtension(sourceFilePath)).Replace("\\", "/");
         }
 
         return destFilePath;

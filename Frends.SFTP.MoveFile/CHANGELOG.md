@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.0.0] - 2026-01-27
+
+### Changed
+
+#### Breaking changes!
+
+- Updated dependency SSH.NET to the newest version 2025.1.0.
+- Drop DSS support
+
 ## [1.5.0] - 2026-01-16
 
 ### Fixed

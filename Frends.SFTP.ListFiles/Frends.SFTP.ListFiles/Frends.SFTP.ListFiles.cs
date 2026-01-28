@@ -19,7 +19,8 @@ namespace Frends.SFTP.ListFiles
         /// <param name="input">Source file location</param>
         /// <param name="cancellationToken">CancellationToken is given by the Frends UI</param>
         /// <returns>Object { int FileCount, List&lt;FileItem&gt; Files }</returns>
-        public static async Task<Result> ListFiles([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
+        public static async Task<Result> ListFiles([PropertyTab] Input input, [PropertyTab] Connection connection,
+            CancellationToken cancellationToken)
         {
             using var timeoutCts = connection.MaxExecutionTimeout > 0
                 ? CancellationTokenSource.CreateLinkedTokenSource(cancellationToken)
@@ -60,22 +61,13 @@ namespace Frends.SFTP.ListFiles
                     // Check the fingerprint of the server if given.
                     if (!string.IsNullOrEmpty(expectedServerFingerprint))
                     {
-                        var userResultMessage = "";
-
-                        try
-                        {
-                            // If this check fails then SSH.NET will throw an SshConnectionException - with a message of "Key exchange negotiation failed".
-                            userResultMessage = Util.CheckServerFingerprint(client, expectedServerFingerprint);
-                        }
-                        catch (Exception e)
-                        {
-                            throw new ArgumentException($"Error when checking the server fingerprint: {userResultMessage}", e);
-                        }
+                        Util.AddServerFingerprintCheck(client, expectedServerFingerprint);
                     }
 
                     await client.ConnectAsync(effectiveToken);
 
-                    if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
+                    if (!client.IsConnected)
+                        throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
                     var regex = "^" + Regex.Escape(input.FileMask).Replace("\\?", ".").Replace("\\*", ".*") + "$";
                     var regexStr = string.IsNullOrEmpty(input.FileMask) ? string.Empty : regex;
@@ -88,16 +80,20 @@ namespace Frends.SFTP.ListFiles
             }
             catch (OperationCanceledException e)
             {
-                if (timeoutCts != null && timeoutCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+                if (timeoutCts != null && timeoutCts.IsCancellationRequested &&
+                    !cancellationToken.IsCancellationRequested)
                 {
-                    throw new TimeoutException($"SFTP operation exceeded maximum execution time of {connection.MaxExecutionTimeout} seconds.", e);
+                    throw new TimeoutException(
+                        $"SFTP operation exceeded maximum execution time of {connection.MaxExecutionTimeout} seconds.",
+                        e);
                 }
 
                 throw;
             }
         }
 
-        private static List<FileItem> GetFiles(SftpClient sftp, string regexStr, string directory, Input input, CancellationToken cancellationToken)
+        private static List<FileItem> GetFiles(SftpClient sftp, string regexStr, string directory, Input input,
+            CancellationToken cancellationToken)
         {
             var directoryList = new List<FileItem>();
 
@@ -113,7 +109,8 @@ namespace Frends.SFTP.ListFiles
                         || (file.IsDirectory && input.IncludeType == IncludeType.Directory)
                         || (file.IsRegularFile && input.IncludeType == IncludeType.File))
                     {
-                        if (Regex.IsMatch(file.Name, regexStr, RegexOptions.IgnoreCase) || FileMatchesMask(file.Name, input.FileMask))
+                        if (Regex.IsMatch(file.Name, regexStr, RegexOptions.IgnoreCase) ||
+                            FileMatchesMask(file.Name, input.FileMask))
                             directoryList.Add(new FileItem(file));
                     }
 

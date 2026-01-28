@@ -53,21 +53,13 @@ public static class SFTP
         // Check the fingerprint of the server if given.
         if (!string.IsNullOrEmpty(connection.ServerFingerPrint))
         {
-            var userResultMessage = string.Empty;
-
-            try
-            {
-                userResultMessage = Util.CheckServerFingerprint(client, connection.ServerFingerPrint);
-            }
-            catch (Exception ex)
-            {
-                throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}");
-            }
+            Util.AddServerFingerprintCheck(client, connection.ServerFingerPrint);
         }
 
         await client.ConnectAsync(cancellationToken);
 
-        if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
+        if (!client.IsConnected)
+            throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
         var files = await GetFiles(client, input, cancellationToken);
 
@@ -110,7 +102,8 @@ public static class SFTP
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                if (file.Name != "." && file.Name != ".." && !file.IsDirectory && Regex.IsMatch(file.Name, regexStr, RegexOptions.IgnoreCase))
+                if (file.Name != "." && file.Name != ".." && !file.IsDirectory &&
+                    Regex.IsMatch(file.Name, regexStr, RegexOptions.IgnoreCase))
                     directoryList.Add(new FileItem(file));
             }
 

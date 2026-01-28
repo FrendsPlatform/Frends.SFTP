@@ -152,8 +152,8 @@ public class ErrorTests
             IfTargetFileExists = FileExistsOperation.Throw
         };
 
-        var ex = Assert.ThrowsAsync<SshConnectionException>(async () => await SFTP.MoveFile(input, connection, default));
-        Assert.AreEqual("Key exchange negotiation failed.", ex.Message);
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.MoveFile(input, connection, default));
+        Assert.That(ex.Message.StartsWith("Error when checking the server fingerprint:"), ex.Message);
     }
 }
 

@@ -18,7 +18,8 @@ public class SFTP
     /// <param name="input">Write options with full path and string content</param>
     /// <param name="options">Options for write file</param>
     /// <returns>Object {string Path, double SizeInMegaBytes} </returns>
-    public static Result WriteFile([PropertyTab] Input input, [PropertyTab] Connection connection, [PropertyTab] Options options)
+    public static Result WriteFile([PropertyTab] Input input, [PropertyTab] Connection connection,
+        [PropertyTab] Options options)
     {
         ConnectionInfo connectionInfo;
 
@@ -48,21 +49,13 @@ public class SFTP
         // Check the fingerprint of the server if given.
         if (!string.IsNullOrEmpty(connection.ServerFingerPrint))
         {
-            var userResultMessage = "";
-
-            try
-            {
-                userResultMessage = Util.CheckServerFingerprint(client, connection.ServerFingerPrint);
-            }
-            catch (Exception ex)
-            {
-                throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}");
-            }
+            Util.AddServerFingerprintCheck(client, connection.ServerFingerPrint);
         }
 
         client.Connect();
 
-        if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
+        if (!client.IsConnected)
+            throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
         try
         {
@@ -82,7 +75,8 @@ public class SFTP
                         }
                         catch (Exception ex)
                         {
-                            throw new ArgumentException($"Error while creating destination directory '{targetDirectory}': {ex.Message}", ex);
+                            throw new ArgumentException(
+                                $"Error while creating destination directory '{targetDirectory}': {ex.Message}", ex);
                         }
                     }
                     else

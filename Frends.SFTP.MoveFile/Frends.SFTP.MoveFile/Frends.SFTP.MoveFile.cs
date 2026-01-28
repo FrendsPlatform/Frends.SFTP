@@ -18,7 +18,8 @@ public class SFTP
     /// <param name="input">Read options with full path and encoding</param>
     /// <param name="cancellationToken">CancellationToken given by Frends.</param>
     /// <returns>Object { List&lt;FileItem&gt; Files [ { string SourcePath, string DestinationPath } ], string Message }</returns>
-    public static async Task<Result> MoveFile([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
+    public static async Task<Result> MoveFile([PropertyTab] Input input, [PropertyTab] Connection connection,
+        CancellationToken cancellationToken)
     {
         ConnectionInfo connectionInfo;
 
@@ -45,23 +46,18 @@ public class SFTP
         // Check the fingerprint of the server if given.
         if (!string.IsNullOrEmpty(connection.ServerFingerPrint))
         {
-            try
-            {
-                Util.CheckServerFingerprint(client, connection.ServerFingerPrint);
-            }
-            catch (Exception ex)
-            {
-                throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}");
-            }
+            Util.AddServerFingerprintCheck(client, connection.ServerFingerPrint);
         }
 
         await client.ConnectAsync(cancellationToken);
 
-        if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
+        if (!client.IsConnected)
+            throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
         var files = ListSourceFiles(client, input, cancellationToken);
 
-        if (files.Count == 0) return new Result(new List<FileItem>(), "No files were found matching the given pattern.");
+        if (files.Count == 0)
+            return new Result(new List<FileItem>(), "No files were found matching the given pattern.");
 
         var transferredFiles = new List<FileItem>();
 
@@ -81,7 +77,8 @@ public class SFTP
                 }
                 catch (Exception ex)
                 {
-                    throw new ArgumentException($"Error while creating destination directory '{input.TargetDirectory}': {ex.Message}", ex);
+                    throw new ArgumentException(
+                        $"Error while creating destination directory '{input.TargetDirectory}': {ex.Message}", ex);
                 }
             }
             else
@@ -107,7 +104,8 @@ public class SFTP
 
                     break;
                 case FileExistsOperation.Rename:
-                    file.DestinationPath = GetNonConflictingDestinationFilePath(client, file.SourcePath, file.DestinationPath);
+                    file.DestinationPath =
+                        GetNonConflictingDestinationFilePath(client, file.SourcePath, file.DestinationPath);
                     transferredFiles.Add(Move(client, file));
 
                     break;
@@ -123,7 +121,8 @@ public class SFTP
         client.Disconnect();
         client.Dispose();
 
-        return new Result(transferredFiles, $"Successfully moved {transferredFiles.Count} files to {input.TargetDirectory}.");
+        return new Result(transferredFiles,
+            $"Successfully moved {transferredFiles.Count} files to {input.TargetDirectory}.");
     }
 
     private static FileItem Move(SftpClient client, FileItem file)
@@ -146,7 +145,8 @@ public class SFTP
 
             if (file.Name.Equals(input.Pattern) || Util.FileMatchesMask(Path.GetFileName(file.FullName), input.Pattern))
             {
-                var item = new FileItem(file.FullName, Path.Combine(input.TargetDirectory, Path.GetFileName(file.FullName)).Replace("\\", "/"));
+                var item = new FileItem(file.FullName,
+                    Path.Combine(input.TargetDirectory, Path.GetFileName(file.FullName)).Replace("\\", "/"));
                 fileItems.Add(item);
             }
         }
@@ -159,7 +159,8 @@ public class SFTP
         var duplicateTargetPaths = files.GroupBy(v => v).Where(x => x.Count() > 1).Select(k => k.Key).ToList();
 
         if (duplicateTargetPaths.Any())
-            throw new IOException($"Multiple files written to {string.Join(", ", duplicateTargetPaths)}. The files would get overwritten. No files moved.");
+            throw new IOException(
+                $"Multiple files written to {string.Join(", ", duplicateTargetPaths)}. The files would get overwritten. No files moved.");
 
         foreach (var targetFile in files)
         {
@@ -168,14 +169,16 @@ public class SFTP
         }
     }
 
-    private static string GetNonConflictingDestinationFilePath(SftpClient client, string sourceFilePath, string destFilePath)
+    private static string GetNonConflictingDestinationFilePath(SftpClient client, string sourceFilePath,
+        string destFilePath)
     {
         var count = 1;
 
         while (client.Exists(destFilePath))
         {
             var tempFileName = $"{Path.GetFileNameWithoutExtension(sourceFilePath)}({count++})";
-            destFilePath = Path.Combine(Path.GetDirectoryName(destFilePath), path2: tempFileName + Path.GetExtension(sourceFilePath)).Replace("\\", "/");
+            destFilePath = Path.Combine(Path.GetDirectoryName(destFilePath),
+                path2: tempFileName + Path.GetExtension(sourceFilePath)).Replace("\\", "/");
         }
 
         return destFilePath;

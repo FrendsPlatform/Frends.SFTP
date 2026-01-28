@@ -18,7 +18,8 @@ public class SFTP
     /// <param name="input">Read options with full path and encoding</param>
     /// <param name="cancellationToken">Token given by Frends to enable Task termination.</param>
     /// <returns>Result object { string Content, string Path, double SizeInMegaBytes, DateTime LastWriteTime }</returns>
-    public static async Task<Result> ReadFile([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
+    public static async Task<Result> ReadFile([PropertyTab] Input input, [PropertyTab] Connection connection,
+        CancellationToken cancellationToken)
     {
         ConnectionInfo connectionInfo;
 
@@ -44,22 +45,14 @@ public class SFTP
         // Check the fingerprint of the server if given.
         if (!string.IsNullOrEmpty(connection.ServerFingerPrint))
         {
-            var userResultMessage = "";
-
-            try
-            {
-                userResultMessage = Util.CheckServerFingerprint(client, connection.ServerFingerPrint);
-            }
-            catch (Exception ex)
-            {
-                throw new ArgumentException($"Error when checking the server fingerprint: {ex.Message}");
-            }
+            Util.AddServerFingerprintCheck(client, connection.ServerFingerPrint);
         }
 
 
         await client.ConnectAsync(cancellationToken);
 
-        if (!client.IsConnected) throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
+        if (!client.IsConnected)
+            throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
         var encoding = Util.GetEncoding(input.FileEncoding, input.EnableBom, input.EncodingInString);
         var content = client.ReadAllText(input.Path, encoding);
 

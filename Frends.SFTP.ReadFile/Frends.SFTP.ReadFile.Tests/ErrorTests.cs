@@ -16,14 +16,11 @@ public class ErrorTests
     public void ReadFile_TestFileNotExistsThrows()
     {
         var connection = Helpers.GetSftpConnection();
-        var input = new Input
-        {
-            Path = "/upload/test.txt",
-            FileEncoding = FileEncoding.ANSI,
-        };
+        var input = new Input { Path = "/upload/test.txt", FileEncoding = FileEncoding.ANSI, };
 
-        var ex = Assert.ThrowsAsync<SftpPathNotFoundException>(async () => await SFTP.ReadFile(input, connection, default));
-        Assert.AreEqual($"No such file", ex.Message);
+        var ex = Assert.ThrowsAsync<SftpPathNotFoundException>(async () =>
+            await SFTP.ReadFile(input, connection, default));
+        Assert.That(ex.Message.StartsWith("No such file"), ex.Message);
     }
 
     [Test]
@@ -31,11 +28,7 @@ public class ErrorTests
     {
         var connection = Helpers.GetSftpConnection();
         connection.Port = 51644;
-        var input = new Input
-        {
-            Path = "/upload/test.txt",
-            FileEncoding = FileEncoding.ANSI,
-        };
+        var input = new Input { Path = "/upload/test.txt", FileEncoding = FileEncoding.ANSI, };
 
         Assert.ThrowsAsync<SocketException>(async () => await SFTP.ReadFile(input, connection, default));
     }
@@ -47,13 +40,10 @@ public class ErrorTests
         connection.Password = "demo";
         connection.Username = "demo";
 
-        var input = new Input
-        {
-            Path = "/upload/test.txt",
-            FileEncoding = FileEncoding.ANSI,
-        };
+        var input = new Input { Path = "/upload/test.txt", FileEncoding = FileEncoding.ANSI, };
 
-        var ex = Assert.ThrowsAsync<SshAuthenticationException>(async () => await SFTP.ReadFile(input, connection, default));
+        var ex = Assert.ThrowsAsync<SshAuthenticationException>(async () =>
+            await SFTP.ReadFile(input, connection, default));
         Assert.AreEqual("Permission denied (password).", ex.Message);
     }
 
@@ -63,13 +53,10 @@ public class ErrorTests
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
         connection.PrivateKeyPassphrase = "demo";
-        connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
+        connection.PrivateKeyFile =
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
-        var input = new Input
-        {
-            Path = "/upload/test.txt",
-            FileEncoding = FileEncoding.ANSI,
-        };
+        var input = new Input { Path = "/upload/test.txt", FileEncoding = FileEncoding.ANSI, };
 
         var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ReadFile(input, connection, default));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info:"));
@@ -83,11 +70,7 @@ public class ErrorTests
         connection.PrivateKeyPassphrase = "passphrase";
         connection.PrivateKeyFile = "";
 
-        var input = new Input
-        {
-            Path = "/upload/test.txt",
-            FileEncoding = FileEncoding.ANSI,
-        };
+        var input = new Input { Path = "/upload/test.txt", FileEncoding = FileEncoding.ANSI, };
 
         var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ReadFile(input, connection, default));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
@@ -103,11 +86,7 @@ public class ErrorTests
         connection.PrivateKeyPassphrase = "passphrase";
         connection.PrivateKeyString = key.ToString();
 
-        var input = new Input
-        {
-            Path = "/upload/test.txt",
-            FileEncoding = FileEncoding.ANSI,
-        };
+        var input = new Input { Path = "/upload/test.txt", FileEncoding = FileEncoding.ANSI, };
 
         var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ReadFile(input, connection, default));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
@@ -121,14 +100,10 @@ public class ErrorTests
         var connection = Helpers.GetSftpConnection();
         connection.ServerFingerPrint = fingerprint;
 
-        var input = new Input
-        {
-            Path = "/upload/test.txt",
-            FileEncoding = FileEncoding.ANSI,
-        };
+        var input = new Input { Path = "/upload/test.txt", FileEncoding = FileEncoding.ANSI, };
 
-        var ex = Assert.ThrowsAsync<SshConnectionException>(async () => await SFTP.ReadFile(input, connection, default));
-        Assert.AreEqual("Key exchange negotiation failed.", ex.Message);
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ReadFile(input, connection, default));
+        Assert.IsTrue(ex.Message.StartsWith("Error when checking the server fingerprint:"), ex.Message);
     }
 
     [Test]
@@ -138,17 +113,14 @@ public class ErrorTests
         connection.Authentication = AuthenticationType.UsernamePassword;
         connection.UseKeyboardInteractiveAuthentication = true;
         connection.Password = string.Empty;
-        connection.PromptAndResponse = new PromptResponse[]
-        {
-            new() { Prompt = "Password:", Response = "pass" },
-        };
-        var input = new Input
-        {
-            Path = "/upload/test.txt",
-            FileEncoding = FileEncoding.ANSI,
-        };
+        connection.PromptAndResponse = new PromptResponse[] { new() { Prompt = "Password:", Response = "pass" }, };
+        var input = new Input { Path = "/upload/test.txt", FileEncoding = FileEncoding.ANSI, };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ReadFile(input, connection, CancellationToken.None));
-        Assert.That(ex.Message.Contains("Failure in Keyboard-interactive authentication: No response given for server prompt request -->"), Is.True);
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
+            await SFTP.ReadFile(input, connection, CancellationToken.None));
+        Assert.That(
+            ex.Message.Contains(
+                "Failure in Keyboard-interactive authentication: No response given for server prompt request -->"),
+            Is.True);
     }
 }

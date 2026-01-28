@@ -95,8 +95,8 @@ public class ServerFingerprintTests : ListFilesTestBase
         var connection = Helpers.GetSftpConnection();
         connection.ServerFingerPrint = "73:58:DF:2D:CD:12:35:AB:7D:00:41:F0:1E:62:15:E0";
 
-        var ex = Assert.ThrowsAsync<SshConnectionException>(async () => await SFTP.ListFiles(_input, connection, new CancellationToken()));
-        Assert.IsTrue(ex.Message.StartsWith("Key exchange negotiation failed."));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(_input, connection, new CancellationToken()));
+        Assert.IsTrue(ex.Message.StartsWith("Error when checking the server fingerprint:"));
     }
 
     [Test]
@@ -105,8 +105,8 @@ public class ServerFingerprintTests : ListFilesTestBase
         var connection = Helpers.GetSftpConnection();
         connection.ServerFingerPrint = "c4b56fba6167c11f62e26b192c839d394e5c8d278b614b81345d037d178442f2";
 
-        var ex = Assert.ThrowsAsync<SshConnectionException>(async () => await SFTP.ListFiles(_input, connection, new CancellationToken()));
-        Assert.IsTrue(ex.Message.StartsWith("Key exchange negotiation failed."));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(_input, connection, new CancellationToken()));
+        Assert.IsTrue(ex.Message.StartsWith("Error when checking the server fingerprint:"));
     }
 
     [Test]
@@ -115,8 +115,8 @@ public class ServerFingerprintTests : ListFilesTestBase
         var connection = Helpers.GetSftpConnection();
         connection.ServerFingerPrint = "nuDEsWN4tfEQ684+x+7RySiCwj+GXmX2CfBaBHeSqO8=";
 
-        var ex = Assert.ThrowsAsync<SshConnectionException>(async () => await SFTP.ListFiles(_input, connection, new CancellationToken()));
-        Assert.IsTrue(ex.Message.StartsWith("Key exchange negotiation failed."));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(_input, connection, new CancellationToken()));
+        Assert.IsTrue(ex.Message.StartsWith("Error when checking the server fingerprint:"));
     }
 
     [Test]
@@ -125,8 +125,8 @@ public class ServerFingerprintTests : ListFilesTestBase
         var connection = Helpers.GetSftpConnection();
         connection.ServerFingerPrint = "nuDEsWN4tfEQ684x7RySiCwjGXmX2CfBaBHeSqO8vfiurenvire56";
 
-        var ex = Assert.ThrowsAsync<SshConnectionException>(async () => await SFTP.ListFiles(_input, connection, new CancellationToken()));
-        Assert.IsTrue(ex.Message.StartsWith("Key exchange negotiation failed."));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(_input, connection, new CancellationToken()));
+        Assert.IsTrue(ex.Message.StartsWith("Error when checking the server fingerprint:"));
     }
 }
 

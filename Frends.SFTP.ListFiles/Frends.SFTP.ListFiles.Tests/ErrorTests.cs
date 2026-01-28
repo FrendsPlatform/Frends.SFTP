@@ -25,7 +25,7 @@ public class ErrorTests : ListFilesTestBase
         };
 
         var ex = Assert.ThrowsAsync<SftpPathNotFoundException>(async () => await SFTP.ListFiles(input, _connection, new CancellationToken()));
-        Assert.AreEqual($"No such file", ex.Message);
+        Assert.That(ex.Message.StartsWith("No such file"), ex.Message);
 
     }
 
@@ -148,8 +148,8 @@ public class ErrorTests : ListFilesTestBase
             FileEncoding = FileEncoding.ANSI
         };
 
-        var ex = Assert.ThrowsAsync<SshConnectionException>(async () => await SFTP.ListFiles(input, connection, new CancellationToken()));
-        Assert.AreEqual("Key exchange negotiation failed.", ex.Message);
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, new CancellationToken()));
+        Assert.That(ex.Message.Contains("Error when checking the server fingerprint:"), ex.Message);
     }
 
     [Test]
