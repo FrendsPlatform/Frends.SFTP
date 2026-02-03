@@ -20,6 +20,7 @@
 ### Fixed
 
 - The default Source.FileName is "". "" means that it matches all files (same behavior as for "*")
+- Improved asynchronous logic and cancellation token timeout handling
 
 ## [2.12.0] - 2025-05-20
 
