@@ -544,8 +544,15 @@ internal class FileTransporter
                     {
                         if (!expectedServerFingerprint.Contains(':'))
                         {
-                            e.CanTrust = expectedServerFingerprint.ToLower() ==
-                                         md5serverFingerprint.Replace(":", string.Empty).ToLower();
+                            var normalizedExpected = expectedServerFingerprint
+                                .Replace(":", string.Empty)
+                                .Replace("-", string.Empty)
+                                .ToLowerInvariant();
+                            var normalizedActual = md5serverFingerprint
+                                .Replace(":", string.Empty)
+                                .Replace("-", string.Empty)
+                                .ToLowerInvariant();
+                            e.CanTrust = normalizedActual == normalizedExpected;
 
                             if (!e.CanTrust)
                             {

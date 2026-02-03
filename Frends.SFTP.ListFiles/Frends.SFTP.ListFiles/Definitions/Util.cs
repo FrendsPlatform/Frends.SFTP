@@ -91,12 +91,7 @@ internal static class Util
                 return Encoding.GetEncoding("windows-1252");
             case FileEncoding.Other:
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-                var e = Encoding.GetEncoding(encodingString);
-
-                if (e == null)
-                    throw new ArgumentException($"Encoding string {encodingString} is not a valid code page name.");
-
-                return e;
+                return Encoding.GetEncoding(encodingString);
             default:
                 throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{encoding}'.");
         }

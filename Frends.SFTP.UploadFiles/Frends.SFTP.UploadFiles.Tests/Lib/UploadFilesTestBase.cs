@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Renci.SshNet;
 using Frends.SFTP.UploadFiles.Definitions;
 using NUnit.Framework;

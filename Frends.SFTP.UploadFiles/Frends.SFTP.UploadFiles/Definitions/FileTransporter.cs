@@ -448,8 +448,8 @@ internal class FileTransporter
                     {
                         if (!expectedServerFingerprint.Contains(':'))
                         {
-                            e.CanTrust = expectedServerFingerprint.ToLower() ==
-                                         MD5serverFingerprint.Replace(":", "").ToLower();
+                            e.CanTrust = expectedServerFingerprint.Replace("-", string.Empty).ToLower() ==
+                                         MD5serverFingerprint.Replace(":", "").Replace("-", string.Empty).ToLower();
                             if (!e.CanTrust)
                                 userResultMessage =
                                     $"Can't trust SFTP server. The server fingerprint does not match. " +
@@ -475,7 +475,8 @@ internal class FileTransporter
                                 SHAServerFingerprint = Util.ToHex(mySHA256.ComputeHash(e.HostKey));
                             }
 
-                            e.CanTrust = (SHAServerFingerprint == expectedServerFingerprint);
+                            e.CanTrust = (string.Equals(SHAServerFingerprint, expectedServerFingerprint,
+                                StringComparison.InvariantCultureIgnoreCase));
                             if (!e.CanTrust)
                                 userResultMessage =
                                     $"Can't trust SFTP server. The server fingerprint does not match. " +
@@ -483,8 +484,10 @@ internal class FileTransporter
                         }
                         else
                         {
-                            e.CanTrust = (SHAServerFingerprint == expectedServerFingerprint ||
-                                          SHAServerFingerprint.Replace("=", "") == expectedServerFingerprint);
+                            e.CanTrust = (string.Equals(SHAServerFingerprint, expectedServerFingerprint,
+                                StringComparison.InvariantCultureIgnoreCase) || string.Equals(
+                                SHAServerFingerprint.Replace("=", ""), expectedServerFingerprint,
+                                StringComparison.InvariantCultureIgnoreCase));
                             if (!e.CanTrust)
                                 userResultMessage =
                                     $"Can't trust SFTP server. The server fingerprint does not match. " +
