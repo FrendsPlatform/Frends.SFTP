@@ -34,9 +34,12 @@ internal class FileTransporter
         _filePaths = ConvertObjectToStringArray(context.Source.FilePaths);
 
         if (_filePaths == null || !_filePaths.Any())
-            SourceDirectoryWithMacrosExtended = string.IsNullOrEmpty(context.Source.Directory) ? "/" : _renamingPolicy.ExpandDirectoryForMacros(context.Source.Directory);
+            SourceDirectoryWithMacrosExtended = string.IsNullOrEmpty(context.Source.Directory)
+                ? "/"
+                : _renamingPolicy.ExpandDirectoryForMacros(context.Source.Directory);
 
-        DestinationDirectoryWithMacrosExtended = _renamingPolicy.ExpandDirectoryForMacros(context.Destination.Directory);
+        DestinationDirectoryWithMacrosExtended =
+            _renamingPolicy.ExpandDirectoryForMacros(context.Destination.Directory);
     }
 
     private List<SingleFileTransferResult> Result { get; set; }
@@ -47,7 +50,8 @@ internal class FileTransporter
 
     internal async Task<FileTransferResult> Run(CancellationToken cancellationToken)
     {
-        _logger.NotifyInformation(_batchContext, $"Connecting to {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using SFTP.");
+        _logger.NotifyInformation(_batchContext,
+            $"Connecting to {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using SFTP.");
 
         var userResultMessage = string.Empty;
 
@@ -82,7 +86,7 @@ internal class FileTransporter
 
             try
             {
-                CheckServerFingerprint(client, expectedServerFingerprint);
+                AddServerFingerprintCheck(client, expectedServerFingerprint);
             }
             catch (Exception e)
             {
@@ -95,7 +99,8 @@ internal class FileTransporter
 
             if (!client.IsConnected)
             {
-                _logger.NotifyError(null, "Error while connecting to destination: ", new SshConnectionException(userResultMessage));
+                _logger.NotifyError(null, "Error while connecting to destination: ",
+                    new SshConnectionException(userResultMessage));
 
                 return FormFailedFileTransferResult(userResultMessage);
             }
@@ -139,20 +144,23 @@ internal class FileTransporter
                         }
                         catch (Exception ex)
                         {
-                            userResultMessage = $"Error while creating destination directory '{DestinationDirectoryWithMacrosExtended}': {ex.Message}";
+                            userResultMessage =
+                                $"Error while creating destination directory '{DestinationDirectoryWithMacrosExtended}': {ex.Message}";
 
                             return FormFailedFileTransferResult(userResultMessage);
                         }
                     }
                     else
                     {
-                        userResultMessage = $"Destination directory '{DestinationDirectoryWithMacrosExtended}' was not found.";
+                        userResultMessage =
+                            $"Destination directory '{DestinationDirectoryWithMacrosExtended}' was not found.";
 
                         return FormFailedFileTransferResult(userResultMessage);
                     }
                 }
 
-                _batchContext.DestinationFiles = GetDestinationFiles(DestinationDirectoryWithMacrosExtended, cancellationToken);
+                _batchContext.DestinationFiles =
+                    GetDestinationFiles(DestinationDirectoryWithMacrosExtended, cancellationToken);
 
                 foreach (var file in files)
                 {
@@ -163,7 +171,8 @@ internal class FileTransporter
                     if (!client.IsConnected)
                         await client.ConnectAsync(cancellationToken);
 
-                    var singleTransfer = new SingleFileTransfer(file, DestinationDirectoryWithMacrosExtended, _batchContext, client, _renamingPolicy, _logger);
+                    var singleTransfer = new SingleFileTransfer(file, DestinationDirectoryWithMacrosExtended,
+                        _batchContext, client, _renamingPolicy, _logger);
                     var result = await singleTransfer.TransferSingleFile(cancellationToken);
                     Result.Add(result);
                 }
@@ -252,15 +261,6 @@ internal class FileTransporter
                 });
 
                 break;
-            case HostKeyAlgorithms.DSS:
-                client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-dss", (data) =>
-                {
-                    var sshKeyData = new SshKeyData(data);
-
-                    return new KeyHostAlgorithm("ssh-dss", new DsaKey(sshKeyData));
-                });
-
-                break;
             case HostKeyAlgorithms.Nistp256:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp256", (data) =>
                 {
@@ -344,7 +344,8 @@ internal class FileTransporter
                 $"{errorMessages.Count} Errors: {string.Join(", \n", errorMessages)}.");
         }
 
-        var transferredFiles = results.Where(x => x.Success && !x.ActionSkipped).Select(x => x.TransferredFile).ToList();
+        var transferredFiles =
+            results.Where(x => x.Success && !x.ActionSkipped).Select(x => x.TransferredFile).ToList();
 
         userResultMessage = transferredFiles.Any()
             ? MessageJoin(
@@ -362,10 +363,13 @@ internal class FileTransporter
 
     private static void LogSourceSystemInfo(BatchContext context, ISFTPLogger logger)
     {
-        logger.NotifyInformation(context, $"Assembly: {Assembly.GetAssembly(typeof(SftpClient)).GetName().Name} {Assembly.GetAssembly(typeof(SftpClient)).GetName().Version}");
+        logger.NotifyInformation(context,
+            $"Assembly: {Assembly.GetAssembly(typeof(SftpClient)).GetName().Name} {Assembly.GetAssembly(typeof(SftpClient)).GetName().Version}");
         var bit = Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit";
-        logger.NotifyInformation(context, $"Platform: {RuntimeInformation.OSDescription} {bit}; CLR: {RuntimeInformation.FrameworkDescription}");
-        logger.NotifyInformation(context, $"Culture: {CultureInfo.CurrentCulture.TwoLetterISOLanguageName}; {Encoding.Default.WebName}");
+        logger.NotifyInformation(context,
+            $"Platform: {RuntimeInformation.OSDescription} {bit}; CLR: {RuntimeInformation.FrameworkDescription}");
+        logger.NotifyInformation(context,
+            $"Culture: {CultureInfo.CurrentCulture.TwoLetterISOLanguageName}; {Encoding.Default.WebName}");
     }
 
     private SingleFileTransferResult NoSourceOperation(BatchContext context, Source source)
@@ -417,7 +421,8 @@ internal class FileTransporter
 
         PrivateKeyFile privateKey = null;
 
-        if (connect.Authentication == AuthenticationType.UsernamePrivateKeyFile || connect.Authentication == AuthenticationType.UsernamePasswordPrivateKeyFile)
+        if (connect.Authentication == AuthenticationType.UsernamePrivateKeyFile ||
+            connect.Authentication == AuthenticationType.UsernamePasswordPrivateKeyFile)
         {
             if (string.IsNullOrEmpty(connect.PrivateKeyFile))
                 throw new ArgumentException("Private key file path was not given.");
@@ -426,7 +431,8 @@ internal class FileTransporter
                 : new PrivateKeyFile(connect.PrivateKeyFile);
         }
 
-        if (connect.Authentication == AuthenticationType.UsernamePrivateKeyString || connect.Authentication == AuthenticationType.UsernamePasswordPrivateKeyString)
+        if (connect.Authentication == AuthenticationType.UsernamePrivateKeyString ||
+            connect.Authentication == AuthenticationType.UsernamePasswordPrivateKeyString)
         {
             if (string.IsNullOrEmpty(connect.PrivateKeyString))
                 throw new ArgumentException("Private key string was not given.");
@@ -466,7 +472,9 @@ internal class FileTransporter
 
         connectionInfo = new ConnectionInfo(connect.Address, connect.Port, connect.UserName, methods.ToArray())
         {
-            Encoding = Util.GetEncoding(destination.FileNameEncoding, destination.FileNameEncodingInString, destination.EnableBomForFileName),
+            Encoding =
+                Util.GetEncoding(destination.FileNameEncoding, destination.FileNameEncodingInString,
+                    destination.EnableBomForFileName),
             ChannelCloseTimeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout),
             Timeout = TimeSpan.FromSeconds(_batchContext.Connection.ConnectionTimeout),
         };
@@ -478,7 +486,8 @@ internal class FileTransporter
     {
         if (e.Prompts.Any())
         {
-            _logger.NotifyInformation(_batchContext, $"Keyboard-Interactive negotiation started with the server {_batchContext.Connection.Address}.");
+            _logger.NotifyInformation(_batchContext,
+                $"Keyboard-Interactive negotiation started with the server {_batchContext.Connection.Address}.");
 
             foreach (var serverPrompt in e.Prompts)
             {
@@ -491,15 +500,19 @@ internal class FileTransporter
                 }
                 else
                 {
-                    if (!_batchContext.Connection.PromptAndResponse.Any() || !_batchContext.Connection.PromptAndResponse.Select(p => p.Prompt.ToLower()).ToList().Contains(serverPrompt.Request.Replace(":", string.Empty).Trim().ToLower()))
+                    if (!_batchContext.Connection.PromptAndResponse.Any() || !_batchContext.Connection.PromptAndResponse
+                            .Select(p => p.Prompt.ToLower()).ToList()
+                            .Contains(serverPrompt.Request.Replace(":", string.Empty).Trim().ToLower()))
                     {
-                        var errorMsg = $"Failure in Keyboard-interactive authentication: No response given for server prompt request --> {serverPrompt.Request.Replace(":", string.Empty).Trim()}";
+                        var errorMsg =
+                            $"Failure in Keyboard-interactive authentication: No response given for server prompt request --> {serverPrompt.Request.Replace(":", string.Empty).Trim()}";
 
                         throw new ArgumentException(errorMsg);
                     }
 
                     foreach (var prompt in _batchContext.Connection.PromptAndResponse
-                                 .Where(e => serverPrompt.Request.IndexOf(e.Prompt, StringComparison.InvariantCultureIgnoreCase) != -1))
+                                 .Where(e => serverPrompt.Request.IndexOf(e.Prompt,
+                                     StringComparison.InvariantCultureIgnoreCase) != -1))
                         serverPrompt.Response = prompt.Response;
                 }
             }
@@ -508,92 +521,121 @@ internal class FileTransporter
         }
     }
 
-    private void CheckServerFingerprint(SftpClient client, string expectedServerFingerprint)
+    private void AddServerFingerprintCheck(SftpClient client, string expectedServerFingerprint)
     {
         var userResultMessage = string.Empty;
         var md5serverFingerprint = string.Empty;
         var shaServerFingerprint = string.Empty;
 
-        client.HostKeyReceived += (sender, e) =>
+        client.HostKeyReceived += (_, e) =>
         {
-            md5serverFingerprint = BitConverter.ToString(e.FingerPrint).Replace('-', ':');
-
-            using (SHA256 mySHA256 = SHA256.Create())
+            try
             {
-                shaServerFingerprint = Convert.ToBase64String(mySHA256.ComputeHash(e.HostKey));
-            }
+                md5serverFingerprint = BitConverter.ToString(e.FingerPrint).Replace('-', ':');
 
-            if (!string.IsNullOrEmpty(expectedServerFingerprint))
-            {
-                if (Util.IsMD5(expectedServerFingerprint.Replace(":", string.Empty).Replace("-", string.Empty)))
+                using (SHA256 mySHA256 = SHA256.Create())
                 {
-                    if (!expectedServerFingerprint.Contains(':'))
-                    {
-                        e.CanTrust = expectedServerFingerprint.ToLower() == md5serverFingerprint.Replace(":", string.Empty).ToLower();
+                    shaServerFingerprint = Convert.ToBase64String(mySHA256.ComputeHash(e.HostKey));
+                }
 
-                        if (!e.CanTrust)
+                if (!string.IsNullOrEmpty(expectedServerFingerprint))
+                {
+                    if (Util.IsMD5(expectedServerFingerprint.Replace(":", string.Empty).Replace("-", string.Empty)))
+                    {
+                        if (!expectedServerFingerprint.Contains(':'))
                         {
-                            userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                                $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{md5serverFingerprint}'.";
+                            var normalizedExpected = expectedServerFingerprint
+                                .Replace(":", string.Empty)
+                                .Replace("-", string.Empty)
+                                .ToLowerInvariant();
+                            var normalizedActual = md5serverFingerprint
+                                .Replace(":", string.Empty)
+                                .Replace("-", string.Empty)
+                                .ToLowerInvariant();
+                            e.CanTrust = normalizedActual == normalizedExpected;
+
+                            if (!e.CanTrust)
+                            {
+                                userResultMessage =
+                                    $"Can't trust SFTP server. The server fingerprint does not match. " +
+                                    $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{md5serverFingerprint}'.";
+                            }
+                        }
+                        else
+                        {
+                            e.CanTrust =
+                                e.FingerPrint.SequenceEqual(
+                                    Util.ConvertFingerprintToByteArray(expectedServerFingerprint));
+
+                            if (!e.CanTrust)
+                            {
+                                userResultMessage =
+                                    $"Can't trust SFTP server. The server fingerprint does not match. " +
+                                    $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{md5serverFingerprint}'.";
+                            }
+                        }
+                    }
+                    else if (Util.IsSha256(expectedServerFingerprint))
+                    {
+                        if (Util.TryConvertHexStringToHex(expectedServerFingerprint))
+                        {
+                            using (SHA256 mySHA256 = SHA256.Create())
+                            {
+                                shaServerFingerprint = Util.ToHex(mySHA256.ComputeHash(e.HostKey));
+                            }
+
+                            e.CanTrust = shaServerFingerprint == expectedServerFingerprint;
+
+                            if (!e.CanTrust)
+                            {
+                                userResultMessage =
+                                    $"Can't trust SFTP server. The server fingerprint does not match. " +
+                                    $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{shaServerFingerprint}'.";
+                            }
+                        }
+                        else
+                        {
+                            e.CanTrust = shaServerFingerprint == expectedServerFingerprint ||
+                                         shaServerFingerprint.Replace("=", string.Empty) == expectedServerFingerprint;
+
+                            if (!e.CanTrust)
+                            {
+                                userResultMessage =
+                                    $"Can't trust SFTP server. The server fingerprint does not match. " +
+                                    $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{shaServerFingerprint}'.";
+                            }
                         }
                     }
                     else
                     {
-                        e.CanTrust = e.FingerPrint.SequenceEqual(Util.ConvertFingerprintToByteArray(expectedServerFingerprint));
-
-                        if (!e.CanTrust)
-                        {
-                            userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                                $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{md5serverFingerprint}'.";
-                        }
+                        userResultMessage = "Expected server fingerprint was given in unsupported format.";
+                        e.CanTrust = false;
                     }
-                }
-                else if (Util.IsSha256(expectedServerFingerprint))
-                {
-                    if (Util.TryConvertHexStringToHex(expectedServerFingerprint))
+
+                    if (!e.CanTrust)
                     {
-                        using (SHA256 mySHA256 = SHA256.Create())
-                        {
-                            shaServerFingerprint = Util.ToHex(mySHA256.ComputeHash(e.HostKey));
-                        }
+                        _logger.NotifyError(_batchContext, userResultMessage, new SshConnectionException());
 
-                        e.CanTrust = shaServerFingerprint == expectedServerFingerprint;
-
-                        if (!e.CanTrust)
-                        {
-                            userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                                $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{shaServerFingerprint}'.";
-                        }
-                    }
-                    else
-                    {
-                        e.CanTrust = shaServerFingerprint == expectedServerFingerprint || shaServerFingerprint.Replace("=", string.Empty) == expectedServerFingerprint;
-
-                        if (!e.CanTrust)
-                        {
-                            userResultMessage = $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                                $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{shaServerFingerprint}'.";
-                        }
+                        throw new ArgumentException(userResultMessage);
                     }
                 }
-                else
-                {
-                    userResultMessage = "Expected server fingerprint was given in unsupported format.";
-                    e.CanTrust = false;
-                }
 
-                if (!e.CanTrust)
-                    _logger.NotifyError(_batchContext, userResultMessage, new SshConnectionException());
+                _logger.NotifyInformation(_batchContext, $"Server: {client.ConnectionInfo.ServerVersion}");
+                _logger.NotifyInformation(_batchContext, $"Fingerprint (MD5): {md5serverFingerprint.ToLower()}");
+                _logger.NotifyInformation(_batchContext,
+                    $"Fingerprint (SHA-256): {shaServerFingerprint.Replace("=", string.Empty)}");
+                _logger.NotifyInformation(_batchContext,
+                    $"Cipher info: {client.ConnectionInfo.CurrentKeyExchangeAlgorithm}, {client.ConnectionInfo.CurrentHostKeyAlgorithm}, {client.ConnectionInfo.CurrentServerEncryption}");
             }
-
-            _logger.NotifyInformation(_batchContext, $"Server: {client.ConnectionInfo.ServerVersion}");
-            _logger.NotifyInformation(_batchContext, $"Fingerprint (MD5): {md5serverFingerprint.ToLower()}");
-            _logger.NotifyInformation(_batchContext, $"Fingerprint (SHA-256): {shaServerFingerprint.Replace("=", string.Empty)}");
-            _logger.NotifyInformation(_batchContext, $"Cipher info: {client.ConnectionInfo.CurrentKeyExchangeAlgorithm}, {client.ConnectionInfo.CurrentHostKeyAlgorithm}, {client.ConnectionInfo.CurrentServerEncryption}");
+            catch (Exception exception)
+            {
+                throw new ArgumentException("Error when checking the server fingerprint", exception);
+            }
         };
     }
 
-    private Tuple<List<FileItem>, bool> ListSourceFiles(SftpClient client, Source source, CancellationToken cancellationToken)
+    private Tuple<List<FileItem>, bool> ListSourceFiles(SftpClient client, Source source,
+        CancellationToken cancellationToken)
     {
         var fileItems = new List<FileItem>();
 
@@ -604,7 +646,8 @@ internal class FileTransporter
                 cancellationToken.ThrowIfCancellationRequested();
 
                 if (!client.Exists(file))
-                    _logger.NotifyError(_batchContext, $"File does not exist: '{file}", new SftpPathNotFoundException());
+                    _logger.NotifyError(_batchContext, $"File does not exist: '{file}'",
+                        new SftpPathNotFoundException());
                 else
                     fileItems.Add(new FileItem(client.Get(file)));
             }
@@ -625,7 +668,8 @@ internal class FileTransporter
         return new Tuple<List<FileItem>, bool>(fileItems, true);
     }
 
-    private List<FileItem> ListFiles(SftpClient sftp, Source source, string directory, CancellationToken cancellationToken)
+    private List<FileItem> ListFiles(SftpClient sftp, Source source, string directory,
+        CancellationToken cancellationToken)
     {
         var fileItems = new List<FileItem>();
 
@@ -642,7 +686,10 @@ internal class FileTransporter
             if (file.IsDirectory && source.IncludeSubdirectories)
                 fileItems.AddRange(ListFiles(sftp, source, file.FullName, cancellationToken));
 
-            if (!file.IsDirectory && !file.IsSocket && !file.IsSymbolicLink && !file.IsBlockDevice && !file.IsCharacterDevice && !file.IsNamedPipe && (file.Name.Equals(source.FileName) || Util.FileMatchesMask(Path.GetFileName(file.FullName), source.FileName)))
+            if (!file.IsDirectory && !file.IsSocket && !file.IsSymbolicLink && !file.IsBlockDevice &&
+                !file.IsCharacterDevice && !file.IsNamedPipe && (file.Name.Equals(source.FileName) ||
+                                                                 Util.FileMatchesMask(Path.GetFileName(file.FullName),
+                                                                     source.FileName)))
             {
                 var item = new FileItem(file);
                 _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath}");
@@ -661,7 +708,8 @@ internal class FileTransporter
 
         _logger.LogBatchFinished(_batchContext, userResultMessage, success, actionSkipped);
 
-        var transferErrors = singleResults.Where(r => r.ErrorMessages.Any()).GroupBy(r => r.TransferredFile ?? "--unknown--")
+        var transferErrors = singleResults.Where(r => r.ErrorMessages.Any())
+            .GroupBy(r => r.TransferredFile ?? "--unknown--")
             .ToDictionary(rg => rg.Key, rg => (IList<string>)rg.SelectMany(r => r.ErrorMessages).ToList());
 
         var transferredFileResults = singleResults.Where(r => r.Success && !r.ActionSkipped).ToList();
@@ -676,7 +724,8 @@ internal class FileTransporter
             TransferredFileNames = transferredFileResults.Select(r => r.TransferredFile ?? "--unknown--").ToList(),
             TransferErrors = transferErrors,
             TransferredFilePaths = transferredFileResults.Select(r => r.TransferredFilePath ?? "--unknown--").ToList(),
-            TransferredDestinationFilePaths = transferredFileResults.Select(s => s.DestinationFilePath ?? "--unknown--").ToArray(),
+            TransferredDestinationFilePaths =
+                transferredFileResults.Select(s => s.DestinationFilePath ?? "--unknown--").ToArray(),
             OperationsLog = singleResults.Any(x => !x.EnableOperationsLog) ? null : new Dictionary<string, string>(),
         };
     }

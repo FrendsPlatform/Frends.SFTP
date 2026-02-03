@@ -22,11 +22,6 @@ public enum HostKeyAlgorithms
     Ed25519,
 
     /// <summary>
-    /// Force the ssh-dss host key algorithm.
-    /// </summary>
-    DSS,
-
-    /// <summary>
     /// Force the ecdsa-sha2-nistp256 host key algorithm.
     /// </summary>
     Nistp256,

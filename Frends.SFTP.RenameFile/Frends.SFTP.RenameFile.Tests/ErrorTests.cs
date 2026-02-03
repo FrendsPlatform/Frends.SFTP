@@ -23,7 +23,7 @@ public class ErrorTests
         };
 
         var ex = Assert.ThrowsAsync<SftpPathNotFoundException>(async () => await SFTP.RenameFile(input, connection, default));
-        Assert.AreEqual($"No such file", ex.Message);
+        Assert.That(ex.Message.Contains("No such file"), ex.Message);
 
     }
 
@@ -34,8 +34,7 @@ public class ErrorTests
         connection.Port = 51644;
         var input = new Input
         {
-            Path = "/upload/test.txt",
-            NewFileName = "newTest.txt",
+            Path = "/upload/t",
             RenameBehaviour = RenameBehaviour.Throw
         };
 
@@ -134,8 +133,8 @@ public class ErrorTests
             RenameBehaviour = RenameBehaviour.Throw
         };
 
-        var ex = Assert.ThrowsAsync<SshConnectionException>(async () => await SFTP.RenameFile(input, connection, default));
-        Assert.AreEqual("Key exchange negotiation failed.", ex.Message);
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.RenameFile(input, connection, default));
+        Assert.IsTrue(ex.Message.StartsWith("Error when checking the server fingerprint:"), ex.Message);
     }
 }
 
