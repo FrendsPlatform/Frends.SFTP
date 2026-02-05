@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Frends.SFTP.ReadFile.Definitions;
 using NUnit.Framework;
 using Frends.SFTP.ReadFile.Enums;
+using Frends.SFTP.ReadFile.Tests.Lib;
 
 namespace Frends.SFTP.ReadFile.Tests;
 
@@ -14,63 +15,69 @@ public class ConnectivityTests : ReadFileTestBase
     [Test]
     public async Task ReadFile_TestWithLargerBuffer()
     {
-        _connection.BufferSize = 256;
+        Connection.BufferSize = 256;
 
-        var result = await SFTP.ReadFile(_input, _connection, default);
-        Assert.AreEqual(_input.Path, result.Path);
-        Assert.AreEqual(_content, result.Content);
+        var result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
+        Assert.AreEqual(Input.Path, result.Path);
+        Assert.AreEqual(Content, result.TextContent);
     }
 
     [Test]
     public async Task ReadFile_TestWithPrivateKeyFileRsa()
     {
-        _connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        _connection.PrivateKeyPassphrase = "passphrase";
-        _connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
+        Connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
+        Connection.PrivateKeyPassphrase = "passphrase";
+        Connection.PrivateKeyFile =
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
-        var result = await SFTP.ReadFile(_input, _connection, default);
-        Assert.AreEqual(_input.Path, result.Path);
-        Assert.AreEqual(_content, result.Content);
+        var result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
+        Assert.AreEqual(Input.Path, result.Path);
+        Assert.AreEqual(Content, result.TextContent);
     }
 
     [Test]
     public async Task ReadFile_TestWithPrivateKeyFileRsaFromString()
     {
-        var key = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key"));
+        var key = await File.ReadAllTextAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+            "../../../Volumes/ssh_host_rsa_key"));
 
-        _connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
-        _connection.PrivateKeyPassphrase = "passphrase";
-        _connection.PrivateKeyString = key;
+        Connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
+        Connection.PrivateKeyPassphrase = "passphrase";
+        Connection.PrivateKeyString = key;
 
-        var result = await SFTP.ReadFile(_input, _connection, default);
-        Assert.AreEqual(_input.Path, result.Path);
-        Assert.AreEqual(_content, result.Content);
+        var result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
+        Assert.AreEqual(Input.Path, result.Path);
+        Assert.AreEqual(Content, result.TextContent);
     }
 
     [Test]
-    public async Task ReadFile_TestWithKeyboardinteractive()
+    public async Task ReadFile_TestWithKeyboardInteractive()
     {
-        _connection.Authentication = AuthenticationType.UsernamePassword;
-        _connection.UseKeyboardInteractiveAuthentication = true;
+        Connection.Authentication = AuthenticationType.UsernamePassword;
+        Connection.UseKeyboardInteractiveAuthentication = true;
 
-        var result = await SFTP.ReadFile(_input, _connection, default);
-        Assert.AreEqual(_input.Path, result.Path);
-        Assert.AreEqual(_content, result.Content);
+        var result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
+        Assert.AreEqual(Input.Path, result.Path);
+        Assert.AreEqual(Content, result.TextContent);
     }
 
     [Test]
     public async Task ReadFile_TestWithKeyboardInteractiveAdditionalPrompts()
     {
-        _connection.Authentication = AuthenticationType.UsernamePassword;
-        _connection.UseKeyboardInteractiveAuthentication = true;
-        _connection.Password = string.Empty;
-        _connection.PromptAndResponse = new PromptResponse[]
+        Connection.Authentication = AuthenticationType.UsernamePassword;
+        Connection.UseKeyboardInteractiveAuthentication = true;
+        Connection.Password = string.Empty;
+        Connection.PromptAndResponse = new PromptResponse[]
         {
-            new() { Prompt = "password", Response = "pass" },
+            new()
+            {
+                Prompt = "password",
+                Response = "pass"
+            },
         };
 
-        var result = await SFTP.ReadFile(_input, _connection, CancellationToken.None);
-        Assert.AreEqual(_input.Path, result.Path);
-        Assert.AreEqual(_content, result.Content);
+        var result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
+        Assert.AreEqual(Input.Path, result.Path);
+        Assert.AreEqual(Content, result.TextContent);
     }
 }

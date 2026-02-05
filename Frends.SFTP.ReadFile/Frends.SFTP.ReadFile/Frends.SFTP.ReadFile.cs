@@ -8,18 +8,19 @@ namespace Frends.SFTP.ReadFile;
 /// <summary>
 /// Main class of the task.
 /// </summary>
-public class SFTP
+public static class SFTP
 {
     /// <summary>
     /// Reads a file through SFTP connection.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.SFTP.ReadFile)
     /// </summary>
     /// <param name="connection">Transfer connection parameters</param>
-    /// <param name="input">Read options with full path and encoding</param>
+    /// <param name="input">Read options with a full path and encoding</param>
+    /// <param name="options">Additional parameters.</param>
     /// <param name="cancellationToken">Token given by Frends to enable Task termination.</param>
     /// <returns>Result object { string Content, string Path, double SizeInMegaBytes, DateTime LastWriteTime }</returns>
     public static async Task<Result> ReadFile([PropertyTab] Input input, [PropertyTab] Connection connection,
-        CancellationToken cancellationToken)
+        [PropertyTab] Options options, CancellationToken cancellationToken)
     {
         ConnectionInfo connectionInfo;
 
@@ -54,12 +55,17 @@ public class SFTP
         if (!client.IsConnected)
             throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
         var encoding = Util.GetEncoding(input.FileEncoding, input.EnableBom, input.EncodingInString);
-        var content = client.ReadAllText(input.Path, encoding);
 
-        var result = new Result(client.Get(input.Path), content);
+        dynamic content = options.ContentType switch
+        {
+            ContentType.Binary => client.ReadAllBytes(input.Path),
+            ContentType.Text => client.ReadAllText(input.Path, encoding),
+            _ => throw new ArgumentOutOfRangeException(nameof(options), options.ContentType,
+                "Content type not supported."),
+        };
 
-        client.Disconnect();
-        client.Dispose();
+
+        var result = new Result(await client.GetAsync(input.Path, cancellationToken), content);
 
         return result;
     }
