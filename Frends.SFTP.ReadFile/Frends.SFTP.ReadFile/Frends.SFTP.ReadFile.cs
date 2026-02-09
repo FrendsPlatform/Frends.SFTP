@@ -18,7 +18,7 @@ public static class SFTP
     /// <param name="input">Read options with a full path and encoding</param>
     /// <param name="options">Additional parameters.</param>
     /// <param name="cancellationToken">Token given by Frends to enable Task termination.</param>
-    /// <returns>Result object { string Content, string Path, double SizeInMegaBytes, DateTime LastWriteTime }</returns>
+    /// <returns>Result object { string TextContent, byte[] BinaryContent, string Path, double SizeInMegaBytes, DateTime LastWriteTime }</returns>
     public static async Task<Result> ReadFile([PropertyTab] Input input, [PropertyTab] Connection connection,
         [PropertyTab] Options options, CancellationToken cancellationToken)
     {
