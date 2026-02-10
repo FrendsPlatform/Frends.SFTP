@@ -11,6 +11,6 @@ public class Options
     /// Determines if the content of the file is returned as string or byte array.
     /// </summary>
     /// <example>ContentType.Text</example>
-    [DefaultValue(true)]
+    [DefaultValue(ContentType.Text)]
     public ContentType ContentType { get; set; } = ContentType.Text;
 }
