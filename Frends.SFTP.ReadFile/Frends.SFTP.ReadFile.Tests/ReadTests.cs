@@ -1,17 +1,31 @@
+using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Frends.SFTP.ReadFile.Definitions;
 using NUnit.Framework;
 using Frends.SFTP.ReadFile.Enums;
+using Frends.SFTP.ReadFile.Tests.Lib;
 
 namespace Frends.SFTP.ReadFile.Tests;
 
 [TestFixture]
-class ReadTests : ReadFileTestBase
+internal class ReadTests : ReadFileTestBase
 {
     [Test]
     public async Task ReadFile_TestSimpleRead()
     {
-        var result = await SFTP.ReadFile(_input, _connection, default);
-        Assert.AreEqual(_content, result.Content);
+        var result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
+        Assert.AreEqual(Content, result.TextContent);
+        Assert.AreEqual(Array.Empty<byte>(), result.BinaryContent);
+    }
+
+    [Test]
+    public async Task ReadFile_TestReadBinary()
+    {
+        Options.ContentType = ContentType.Binary;
+        var result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
+        Assert.That(result.BinaryContent.Length, Is.GreaterThan(0));
+        Assert.AreEqual(string.Empty, result.TextContent);
     }
 
     [Test]
@@ -19,44 +33,43 @@ class ReadTests : ReadFileTestBase
     {
         var content = "";
 
-        Helpers.OverrideDummyFile(_input.Path, content);
+        Helpers.OverrideDummyFile(Input.Path, content);
 
-        var result = await SFTP.ReadFile(_input, _connection, default);
-        Assert.AreEqual(string.Empty, result.Content);
+        var result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
+        Assert.AreEqual(string.Empty, result.TextContent);
     }
 
     [Test]
     public async Task ReadFile_TestWithDifferentEncoding()
     {
-        _input.FileEncoding = FileEncoding.ANSI;
+        Input.FileEncoding = FileEncoding.ANSI;
 
-        Helpers.GenerateDummyFile(_input.Path, _content);
+        Helpers.GenerateDummyFile(Input.Path, Content);
 
-        var result = await SFTP.ReadFile(_input, _connection, default);
-        Assert.AreEqual(_content, result.Content);
+        var result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
+        Assert.AreEqual(Content, result.TextContent);
 
-        _input.FileEncoding = FileEncoding.ASCII;
-        result = await SFTP.ReadFile(_input, _connection, default);
-        Assert.AreEqual(_content, result.Content);
+        Input.FileEncoding = FileEncoding.ASCII;
+        result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
+        Assert.AreEqual(Content, result.TextContent);
 
-        _input.FileEncoding = FileEncoding.UTF8;
-        _input.EnableBom = true;
-        result = await SFTP.ReadFile(_input, _connection, default);
-        Assert.AreEqual(_content, result.Content);
+        Input.FileEncoding = FileEncoding.UTF8;
+        Input.EnableBom = true;
+        result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
+        Assert.AreEqual(Content, result.TextContent);
 
-        _input.FileEncoding = FileEncoding.UTF8;
-        _input.EnableBom = false;
-        result = await SFTP.ReadFile(_input, _connection, default);
-        Assert.AreEqual(_content, result.Content);
+        Input.FileEncoding = FileEncoding.UTF8;
+        Input.EnableBom = false;
+        result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
+        Assert.AreEqual(Content, result.TextContent);
 
-        _input.FileEncoding = FileEncoding.WINDOWS1252;
-        result = await SFTP.ReadFile(_input, _connection, default);
-        Assert.AreEqual(_content, result.Content);
+        Input.FileEncoding = FileEncoding.WINDOWS1252;
+        result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
+        Assert.AreEqual(Content, result.TextContent);
 
-        _input.FileEncoding = FileEncoding.Other;
-        _input.EncodingInString = "iso-8859-1";
-        result = await SFTP.ReadFile(_input, _connection, default);
-        Assert.AreEqual(_content, result.Content);
+        Input.FileEncoding = FileEncoding.Other;
+        Input.EncodingInString = "iso-8859-1";
+        result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
+        Assert.AreEqual(Content, result.TextContent);
     }
 }
-

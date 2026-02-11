@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.1.0] - 2026-02-05
+
+### Added
+
+- Added support for binary files
+
 ## [3.0.0] - 2026-01-27
 
 ### Changed
