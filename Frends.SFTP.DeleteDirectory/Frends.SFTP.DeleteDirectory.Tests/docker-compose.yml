@@ -1,0 +1,15 @@
+﻿version: '3'
+
+# Usage https://github.com/atmoz/sftp
+
+services:
+ sftp_server:
+  build:
+    context: .
+  ports:
+   - "2222:22"
+  volumes:
+   - ./Volumes/ssh_host_rsa_key.pub:/home/foo/.ssh/keys/ssh_host_rsa_key.pub:ro
+   - ./Volumes/share:/home/foo/share
+  command: 
+   - "foo:pass:::upload"
