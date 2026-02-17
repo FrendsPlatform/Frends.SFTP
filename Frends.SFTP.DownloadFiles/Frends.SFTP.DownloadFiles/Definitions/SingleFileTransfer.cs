@@ -71,7 +71,7 @@ internal class SingleFileTransfer
             {
                 OriginalDestinationFileMetadata = new FileItem(DestinationFileWithMacrosExpanded);
                 OriginalDestinationFileCopyPath = Path.Combine(
-                    Path.GetTempPath(),
+                    BatchContext.TempWorkDir,
                     $"{Guid.NewGuid()}_{OriginalDestinationFileMetadata.Name}");
                 File.Copy(OriginalDestinationFileMetadata.FullPath, OriginalDestinationFileCopyPath);
             }

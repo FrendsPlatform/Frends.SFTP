@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.1.0] - 2026-02-17
+
+### Fixed
+
+- Fixed the issue with not deleting all temporary files.
+
 ## [3.0.0] - 2026-01-27
 
 ### Changed

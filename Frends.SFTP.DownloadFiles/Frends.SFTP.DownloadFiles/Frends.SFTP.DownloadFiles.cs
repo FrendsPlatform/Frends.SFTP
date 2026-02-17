@@ -131,18 +131,20 @@ public class SFTP
 
             using var logger = InitializeSFTPLogger(operationsLogger);
             if (string.IsNullOrEmpty(info.ProcessUri))
-                fileTransferLog.Warning("ProcessUri is empty. This means the transfer view cannot link to the correct page.");
+                fileTransferLog.Warning(
+                    "ProcessUri is empty. This means the transfer view cannot link to the correct page.");
 
             if (!Guid.TryParse(info.TaskExecutionID, out Guid executionId))
             {
-                fileTransferLog.Warning("'{0}' is not a valid task execution ID, will default to random Guid.", info.TaskExecutionID);
+                fileTransferLog.Warning("'{0}' is not a valid task execution ID, will default to random Guid.",
+                    info.TaskExecutionID);
                 executionId = Guid.NewGuid();
             }
 
             _batchContext = new BatchContext
             {
                 Info = info,
-                TempWorkDir = InitializeTemporaryWorkPath(info.WorkDir),
+                TempWorkDir = CreateTempWorkDir(info.WorkDir),
                 Options = options,
                 InstanceId = executionId,
                 ServiceId = info.TransferName,
@@ -178,20 +180,13 @@ public class SFTP
         }
     }
 
-    private static string InitializeTemporaryWorkPath(string workDir)
+    private static string CreateTempWorkDir(string workDir)
     {
-        var tempWorkDir = GetTemporaryWorkPath(workDir);
-        Directory.CreateDirectory(tempWorkDir);
-        return tempWorkDir;
-    }
+        var workDirBase = string.IsNullOrEmpty(workDir) ? Path.GetTempPath() : workDir;
+        var finalWorkDir = Path.Combine(workDirBase, Path.GetRandomFileName());
+        Directory.CreateDirectory(finalWorkDir);
 
-    private static string GetTemporaryWorkPath(string workDir)
-    {
-        var tempWorkDirBase = workDir;
-
-        if (string.IsNullOrEmpty(workDir)) tempWorkDirBase = Path.GetTempPath();
-
-        return Path.Combine(tempWorkDirBase, Path.GetRandomFileName());
+        return finalWorkDir;
     }
 
     private static string GetLogLines(IEnumerable<Tuple<DateTimeOffset, string>> buffer)
