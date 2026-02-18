@@ -50,17 +50,16 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 PreserveLastModified = false,
                 OperationLog = true
             };
-
-            _info = new Info
-            {
-                WorkDir = null,
-            };
         }
 
         [SetUp]
         public virtual void Setup()
         {
             Helpers.UploadTestFiles(_source.Directory, 3);
+            _info = new Info
+            {
+                WorkDir = null,
+            };
         }
 
         [TearDown]
@@ -87,6 +86,3 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
     }
 }
-
-
-

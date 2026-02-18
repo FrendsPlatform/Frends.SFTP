@@ -499,7 +499,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
 
         [Test]
-        public async Task DownloadFiles_TestWorkdirIsDeletedAfterTransfer()
+        public async Task DownloadFiles_TestWorkdirIsClearedAfterTransfer()
         {
             var workDir = Path.Combine(_workDir, "workdir");
             Directory.CreateDirectory(workDir);
