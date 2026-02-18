@@ -497,6 +497,21 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(File.Exists(Path.Combine(destination.Directory, destinationFileName)),
                 "Destination file should exist with Windows-safe filename");
         }
+
+        [Test]
+        public async Task DownloadFiles_TestWorkdirIsDeletedAfterTransfer()
+        {
+            var workDir = Path.Combine(_workDir, "workdir");
+            Directory.CreateDirectory(workDir);
+            _info.WorkDir = workDir;
+
+            var result = await SFTP.DownloadFiles(_source, _destination, _connection, _options, _info, CancellationToken.None);
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+            Assert.IsFalse(Directory.EnumerateFileSystemEntries(workDir).Any());
+
+        }
     }
 }
 
