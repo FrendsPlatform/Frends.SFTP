@@ -229,7 +229,7 @@ internal class FileTransporter
         }
         finally
         {
-            CleanTempFiles(_batchContext);
+            CleanTempWorkDir();
         }
 
         return FormResultFromSingleTransferResults(Result);
@@ -730,16 +730,15 @@ internal class FileTransporter
         };
     }
 
-    private void CleanTempFiles(BatchContext context)
+    private void CleanTempWorkDir()
     {
         try
         {
-            if (!string.IsNullOrEmpty(context.TempWorkDir) && Directory.Exists(context.TempWorkDir))
-                Directory.Delete(context.TempWorkDir, true);
+            Directory.Delete(_batchContext.TempWorkDir, true);
         }
         catch (Exception ex)
         {
-            _logger.NotifyError(context, "Temp workdir cleanup failed.", ex);
+            _logger.NotifyError(_batchContext, "Temp workdir cleanup failed.", ex);
         }
     }
 

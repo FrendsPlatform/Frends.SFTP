@@ -130,19 +130,25 @@ public class SFTP
             var fileTransferLog = Log.Logger;
 
             using var logger = InitializeSFTPLogger(operationsLogger);
+
             if (string.IsNullOrEmpty(info.ProcessUri))
-                fileTransferLog.Warning("ProcessUri is empty. This means the transfer view cannot link to the correct page.");
+            {
+                fileTransferLog.Warning(
+                    "ProcessUri is empty. This means the transfer view cannot link to the correct page.");
+            }
 
             if (!Guid.TryParse(info.TaskExecutionID, out Guid executionId))
             {
-                fileTransferLog.Warning("'{0}' is not a valid task execution ID, will default to random Guid.", info.TaskExecutionID);
+                fileTransferLog.Warning(
+                    "'{0}' is not a valid task execution ID, will default to random Guid.",
+                    info.TaskExecutionID);
                 executionId = Guid.NewGuid();
             }
 
             _batchContext = new BatchContext
             {
                 Info = info,
-                TempWorkDir = InitializeTemporaryWorkPath(info.WorkDir),
+                TempWorkDir = CreateTempWorkDir(info.WorkDir),
                 Options = options,
                 InstanceId = executionId,
                 ServiceId = info.TransferName,
@@ -178,27 +184,21 @@ public class SFTP
         }
     }
 
-    private static string InitializeTemporaryWorkPath(string workDir)
+    private static string CreateTempWorkDir(string workDir)
     {
-        var tempWorkDir = GetTemporaryWorkPath(workDir);
-        Directory.CreateDirectory(tempWorkDir);
-        return tempWorkDir;
-    }
+        var workDirBase = string.IsNullOrEmpty(workDir) ? Path.GetTempPath() : workDir;
+        var finalWorkDir = Path.Combine(workDirBase, Path.GetRandomFileName());
+        Directory.CreateDirectory(finalWorkDir);
 
-    private static string GetTemporaryWorkPath(string workDir)
-    {
-        var tempWorkDirBase = workDir;
-
-        if (string.IsNullOrEmpty(workDir)) tempWorkDirBase = Path.GetTempPath();
-
-        return Path.Combine(tempWorkDirBase, Path.GetRandomFileName());
+        return finalWorkDir;
     }
 
     private static string GetLogLines(IEnumerable<Tuple<DateTimeOffset, string>> buffer)
     {
         try
         {
-            return string.Join("\n", buffer.Select(x => x.Item1 == DateTimeOffset.MinValue ? "..." : $"{x.Item1:HH:mm:ssZ}: {x.Item2}"));
+            return string.Join("\n",
+                buffer.Select(x => x.Item1 == DateTimeOffset.MinValue ? "..." : $"{x.Item1:HH:mm:ssZ}: {x.Item2}"));
         }
         catch (Exception e)
         {
@@ -209,6 +209,7 @@ public class SFTP
     private static SFTPLogger InitializeSFTPLogger(ILogger notificationLogger)
     {
         var logger = new SFTPLogger(notificationLogger);
+
         return logger;
     }
 
@@ -220,8 +221,7 @@ public class SFTP
         {
             return entries
                 .Where(e => e?.Item2 != null) // Filter out nulls
-                .ToLookup(
-                    x => x.Item1.ToString(dateFormat))
+                .ToLookup(x => x.Item1.ToString(dateFormat))
                 .ToDictionary(
                     x => x.Key,
                     x => string.Join("\n", x.Select(k => k.Item2)));
@@ -230,7 +230,9 @@ public class SFTP
         {
             return new Dictionary<string, string>
             {
-                { DateTimeOffset.Now.ToString(dateFormat), $"Error while creating operation log: \n{e}." },
+                {
+                    DateTimeOffset.Now.ToString(dateFormat), $"Error while creating operation log: \n{e}."
+                },
             };
         }
     }
