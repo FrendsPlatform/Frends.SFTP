@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.0.0] - 2026-04-26
+
+### Changed
+
+- Drop support for .NET Framework 4.7.1 and .NET Standard 2.0.
+
 ## [3.0.0] - 2026-01-27
 
 ### Changed
