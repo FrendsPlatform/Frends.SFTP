@@ -7,7 +7,7 @@
         <AssemblyName>Frends.SFTP.ReadFile</AssemblyName>
         <RootNamespace>Frends.SFTP.ReadFile</RootNamespace>
 
-        <Version>3.1.0</Version>
+        <Version>3.1.1</Version>
         <Authors>Frends</Authors>
         <Copyright>Frends</Copyright>
         <Company>Frends</Company>

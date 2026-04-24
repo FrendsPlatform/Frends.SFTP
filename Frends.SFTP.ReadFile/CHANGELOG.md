@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.1.1] - 2026-04-24
+
+### Fixed
+
+- Updated documentation to reflect that PuTTY (.ppk) private key format is now natively supported via SSH.NET 2025.1.0.
+
 ## [3.1.0] - 2026-02-05
 
 ### Added

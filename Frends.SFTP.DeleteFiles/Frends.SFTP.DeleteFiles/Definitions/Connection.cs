@@ -57,10 +57,7 @@ public class Connection
     public string Password { get; set; }
 
     /// <summary>
-    /// Full path to private key file. Supported private key formats: OpenSSH and ssh.com.
-    /// PuTTY keys can be converted with puttygen.exe application.
-    /// 1. Load your key file into puttygen.exe
-    /// 2. Conversion > Export OpenSSH key (not the "force new file format" option)
+    /// Full path to private key file. Supported private key formats: OpenSSH, ssh.com and PuTTY (.ppk).
     /// </summary>
     /// <example>C:\path\to\private\key</example>
     [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyFile)]
@@ -68,10 +65,7 @@ public class Connection
     public string PrivateKeyFile { get; set; }
 
     /// <summary>
-    /// Private key as a string, supported private key formats: OpenSSH and ssh.com.
-    /// PuTTY keys can be converted with puttygen.exe application.
-    /// 1. Load your key file into puttygen.exe
-    /// 2. Conversion > Export OpenSSH key (not the "force new file format" option)
+    /// Private key as a string. Supported private key formats: OpenSSH, ssh.com and PuTTY (.ppk).
     /// </summary>
     /// <example>
     /// -----BEGIN RSA PRIVATE KEY-----
