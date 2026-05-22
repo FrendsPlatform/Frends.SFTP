@@ -24,17 +24,20 @@ internal class SingleFileTransfer
             destinationDirectoryWithMacrosExtended,
             file.RelativeDirectoryPath);
 
-        if (!string.IsNullOrEmpty(file.RelativeDirectoryPath) && destinationDirectoryWithMacrosExtended.Contains("%SourceRelativeDirectory%", StringComparison.OrdinalIgnoreCase))
+        if (destinationDirectoryWithMacrosExtended.Contains("%SourceRelativeDirectory%", StringComparison.OrdinalIgnoreCase))
         {
             if (!client.Exists(finalDestinationDirectory))
             {
+                if (!context.Options.CreateDestinationDirectories)
+                    throw new ArgumentException($"Destination directory '{finalDestinationDirectory}' was not found.");
+
                 try
                 {
                     FileTransporter.CreateDirectoriesRecursively(client, finalDestinationDirectory);
                     _logger.NotifyInformation(context, $"Created directory: {finalDestinationDirectory}");
                 }
                 catch (Exception ex)
-                {
+               {
                     _logger.NotifyError(context, $"Failed to create directory '{finalDestinationDirectory}': {ex.Message}", ex);
                     throw;
                 }

@@ -605,6 +605,12 @@ internal class FileTransporter
             foreach (var dir in directories)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                var attrs = File.GetAttributes(dir);
+                if ((attrs & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint)
+                {
+                    _logger.NotifyInformation(_batchContext, $"Skipping reparse point directory '{dir}'.");
+                    continue;
+                }
                 fileItems.AddRange(ListFilesRecursive(source, dir, rootDirectory, cancellationToken));
             }
         }

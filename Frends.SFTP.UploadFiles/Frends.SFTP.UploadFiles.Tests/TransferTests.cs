@@ -508,8 +508,8 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 { "",                  new List<string> { "root.txt" } },
                 { "sub1",              new List<string> { "file1.txt" } },
-                { "sub1\\sub2",        new List<string> { "file2.txt" } },
-                { "sub1\\sub2\\sub3",  new List<string> { "file3.txt" } },
+                { Path.Combine("sub1","sub2"),        new List<string> { "file2.txt" } },
+                { Path.Combine("sub1","sub2","sub3"),  new List<string> { "file3.txt" } },
             });
 
             var source = new Source
@@ -546,7 +546,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 { "",          new List<string> { "root.txt" } },
                 { "sub1",      new List<string> { "file1.txt" } },
-                { "sub1\\sub2", new List<string> { "file2.txt" } },
+                { Path.Combine("sub1","sub2"), new List<string> { "file2.txt" } },
             });
 
             var source = new Source
@@ -582,7 +582,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 { "",          new List<string> { "root1.txt", "root2.txt" } },
                 { "sub1",      new List<string> { "file1.txt" } },
-                { "sub1\\sub2", new List<string> { "file2.txt" } },
+                { Path.Combine("sub1","sub2"), new List<string> { "file2.txt" } },
             });
 
             var source = new Source
