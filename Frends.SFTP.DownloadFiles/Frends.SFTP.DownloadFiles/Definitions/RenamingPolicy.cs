@@ -58,6 +58,18 @@ internal class RenamingPolicy
         return ExpandFileMacros(directory);
     }
 
+    public string ExpandSourceRelativeDirectoryMacro(string path, string relativeDirectoryPath)
+    {
+        if (string.IsNullOrEmpty(path))
+            return path;
+
+        return Regex.Replace(
+            path,
+            Regex.Escape("%SourceRelativeDirectory%"),
+            relativeDirectoryPath ?? string.Empty,
+            RegexOptions.IgnoreCase);
+    }
+
     public string CreateRemoteFileNameForRename(string originalFilePath, string sourceOperationTo)
     {
         if (string.IsNullOrEmpty(sourceOperationTo))

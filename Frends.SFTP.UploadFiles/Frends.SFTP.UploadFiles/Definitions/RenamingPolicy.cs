@@ -56,6 +56,18 @@ internal class RenamingPolicy
         return ExpandFileMacros(directory);
     }
 
+    public string ExpandSourceRelativeDirectoryMacro(string path, string relativeDirectoryPath)
+    {
+        if (string.IsNullOrEmpty(path))
+            return path;
+
+        return Regex.Replace(
+            path,
+            Regex.Escape("%SourceRelativeDirectory%"),
+            relativeDirectoryPath ?? string.Empty,
+            RegexOptions.IgnoreCase);
+    }
+
     public static string CanonizeAndCheckPath(string path)
     {
         path = path.Replace(Path.DirectorySeparatorChar, '/'); // make all the paths use forward slashes - this should be supported on File, FTP, and SFTP
@@ -152,62 +164,89 @@ internal class RenamingPolicy
     private static bool IsFileMask(string s)
     {
         bool b = false;
+
         if (s == null) return false;
+
         if (s.Contains('*')) b = true;
-        if (s.Contains('?')) b = true;
+
         return b;
     }
 
     private static IDictionary<string, Func<string, string>> InitializeSourceFileNameMacroHandlers()
     {
         return new Dictionary<string, Func<string, string>>
-            {
-                {"%SourceFileName%", Path.GetFileNameWithoutExtension},
-                {"%SourceFileExtension%", (originalFile) => Path.HasExtension(originalFile) ? Path.GetExtension(originalFile) : string.Empty},
-            };
-    }
-
-    private static IDictionary<string, Func<string, string>> InitializeMacroHandlers(string transferName, Guid transferId)
-    {
-        return new Dictionary<string, Func<string, string>>
-            {
-                {"%Ticks%", (s) => DateTime.Now.Ticks.ToString()},
-                {"%DateTimeMs%", (s) => DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-fff")},
-                {"%DateTime%", (s) => DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")},
-                {"%Date%", (s) => DateTime.Now.ToString("yyyy-MM-dd")},
-                {"%Time%", (s) => DateTime.Now.ToString("HH-mm-ss")},
-                {"%Year%", (s) => DateTime.Now.ToString("yyyy")},
-                {"%Month%", (s) => DateTime.Now.ToString("MM")},
-                {"%Day%", (s) => DateTime.Now.ToString("dd")},
-                {"%Hour%", (s) => DateTime.Now.ToString("HH")},
-                {"%Minute%", (s) => DateTime.Now.ToString("mm")},
-                {"%Second%", (s) => DateTime.Now.ToString("ss")},
-                {"%Millisecond%", (s) => DateTime.Now.ToString("fff")},
-                {"%Guid%", (s) => Guid.NewGuid().ToString()},
-                {"%TransferName%", (s) => !string.IsNullOrEmpty(transferName) ? transferName : string.Empty},
-                {"%TransferId%", (s) => transferId.ToString().ToUpper()},
-                {"%WeekDay%", (s) => (DateTime.Now.DayOfWeek > 0 ? (int)DateTime.Now.DayOfWeek : 7).ToString()}
-            };
-    }
-
-    private string ReplaceSourceFileMacro(string fileDefinition, string originalFile)
-    {
-        return ExpandMacrosFromDictionary(fileDefinition, SourceFileNameMacroHandlers, originalFile); ;
-    }
-
-    private string ReplaceMacro(string fileDefinition)
-    {
-        return ExpandMacrosFromDictionary(fileDefinition, MacroHandlers, "");
-    }
-
-    private static string ExpandMacrosFromDictionary(string fileDefinition, IDictionary<string, Func<string, string>> macroHandlers, string originalFile)
-    {
-        foreach (var macroHandler in macroHandlers)
         {
-            fileDefinition = Regex.Replace(fileDefinition, Regex.Escape(macroHandler.Key), macroHandler.Value.Invoke(originalFile), RegexOptions.IgnoreCase);
+            {
+                "%SourceFileName%", s =>
+                {
+                    var filenameWithoutExtension = Path.GetFileNameWithoutExtension(s);
+                    if (string.IsNullOrEmpty(filenameWithoutExtension))
+                        filenameWithoutExtension = Path.GetFileName(s);
+
+                    return filenameWithoutExtension;
+                }
+            },
+            {
+                "%SourceFileExtension%",
+                s =>
+                {
+                    var extension = Path.GetExtension(s);
+
+                    return extension;
+                }
+            }
+        };
+    }
+
+    private static IDictionary<string, Func<string, string>> InitializeMacroHandlers(string transferName,
+        Guid transferId)
+    {
+        return new Dictionary<string, Func<string, string>>(StringComparer.InvariantCultureIgnoreCase)
+        {
+            { "%Ticks%", (s) => DateTime.Now.Ticks.ToString() },
+            { "%DateTime%", (s) => DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") },
+            { "%DateTimeMs%", (s) => DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-fff") },
+            { "%Date%", (s) => DateTime.Now.ToString("yyyy-MM-dd") },
+            { "%Time%", (s) => DateTime.Now.ToString("HH-mm-ss") },
+            { "%Year%", (s) => DateTime.Now.Year.ToString() },
+            { "%Month%", (s) => DateTime.Now.Month.ToString("00") },
+            { "%Day%", (s) => DateTime.Now.Day.ToString("00") },
+            { "%Hour%", (s) => DateTime.Now.Hour.ToString("00") },
+            { "%Minute%", (s) => DateTime.Now.Minute.ToString("00") },
+            { "%Second%", (s) => DateTime.Now.Second.ToString("00") },
+            { "%Millisecond%", (s) => DateTime.Now.Millisecond.ToString("000") },
+            { "%WeekDay%", (s) => ((int)DateTime.Now.DayOfWeek == 0 ? 7 : (int)DateTime.Now.DayOfWeek).ToString() },
+            { "%Guid%", (s) => Guid.NewGuid().ToString() },
+            { "%TransferId%", (s) => transferId.ToString() },
+            { "%TransferName%", (s) => transferName }
+        };
+    }
+
+    private string ReplaceMacro(string fileName)
+    {
+        foreach (var key in MacroHandlers.Keys)
+        {
+            while (fileName.ToUpperInvariant().Contains(key.ToUpperInvariant()))
+            {
+                fileName = Regex.Replace(fileName, Regex.Escape(key), MacroHandlers[key](fileName), RegexOptions.IgnoreCase);
+            }
         }
 
-        return fileDefinition;
+        return fileName;
+    }
+
+    private string ReplaceSourceFileMacro(string fileName, string originalFilePath)
+    {
+        foreach (var key in SourceFileNameMacroHandlers.Keys)
+        {
+            while (fileName.ToUpperInvariant().Contains(key.ToUpperInvariant()))
+            {
+                fileName = Regex.Replace(fileName, Regex.Escape(key),
+                    SourceFileNameMacroHandlers[key].Invoke(originalFilePath), RegexOptions.IgnoreCase);
+            }
+        }
+
+        return fileName;
     }
 }
 

@@ -12,21 +12,25 @@ internal class FileItem
 
     public long Size { get; set; }
 
+    public string RelativeDirectoryPath { get; set; }
+
     public FileItem(ISftpFile file)
     {
         Modified = file.LastWriteTime;
         Name = file.Name;
         Size = file.Length;
         FullPath = file.FullName;
+        RelativeDirectoryPath = string.Empty;
     }
 
-    public FileItem(string fullPath)
+    public FileItem(string fullPath, string relativeDirectoryPath = "")
     {
         var fi = new FileInfo(fullPath);
         Modified = fi.LastWriteTime;
         Name = Path.GetFileName(fullPath);
         Size = TryGetFileLength(fi) ? fi.Length : 0;
         FullPath = fullPath;
+        RelativeDirectoryPath = relativeDirectoryPath;
     }
 
     /// <summary>

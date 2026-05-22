@@ -499,5 +499,117 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
+
+        [Test]
+        public async Task UploadFiles_TestPreserveDirectoryStructureWithMacro()
+        {
+            var localSourceDir = Path.Combine(_workDir, "nested_source");
+            Helpers.CreateLocalFilesWithSubdirectories(localSourceDir, new Dictionary<string, List<string>>
+            {
+                { "",                  new List<string> { "root.txt" } },
+                { "sub1",              new List<string> { "file1.txt" } },
+                { "sub1\\sub2",        new List<string> { "file2.txt" } },
+                { "sub1\\sub2\\sub3",  new List<string> { "file3.txt" } },
+            });
+
+            var source = new Source
+            {
+                Directory = localSourceDir,
+                FileName = "*.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+                IncludeSubdirectories = true
+            };
+
+            var destination = new Destination
+            {
+                Directory = "/upload/%SourceRelativeDirectory%",
+                Action = DestinationAction.Error
+            };
+
+            var result = await SFTP.UploadFiles(source, destination, _connection, _options, _info, new CancellationToken());
+
+            Assert.IsTrue(result.Success, "Transfer should succeed");
+            Assert.AreEqual(4, result.SuccessfulTransferCount, "Should transfer 4 files");
+
+            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/root.txt"));
+            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/sub1/file1.txt"));
+            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/sub1/sub2/file2.txt"));
+            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/sub1/sub2/sub3/file3.txt"));
+        }
+
+        [Test]
+        public async Task UploadFiles_TestRecursiveWithoutMacro()
+        {
+            var localSourceDir = Path.Combine(_workDir, "nested_source2");
+            Helpers.CreateLocalFilesWithSubdirectories(localSourceDir, new Dictionary<string, List<string>>
+            {
+                { "",          new List<string> { "root.txt" } },
+                { "sub1",      new List<string> { "file1.txt" } },
+                { "sub1\\sub2", new List<string> { "file2.txt" } },
+            });
+
+            var source = new Source
+            {
+                Directory = localSourceDir,
+                FileName = "*.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+                IncludeSubdirectories = true
+            };
+
+            var destination = new Destination
+            {
+                Directory = "/upload/flat",
+                Action = DestinationAction.Overwrite
+            };
+
+            var result = await SFTP.UploadFiles(source, destination, _connection, _options, _info, new CancellationToken());
+
+            Assert.IsTrue(result.Success, "Transfer should succeed");
+            Assert.AreEqual(3, result.SuccessfulTransferCount, "Should transfer 3 files");
+
+            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/flat/root.txt"));
+            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/flat/file1.txt"));
+            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/flat/file2.txt"));
+        }
+
+        [Test]
+        public async Task UploadFiles_TestWithoutIncludeSubdirectories_OnlyRootFiles()
+        {
+            var localSourceDir = Path.Combine(_workDir, "nested_source3");
+            Helpers.CreateLocalFilesWithSubdirectories(localSourceDir, new Dictionary<string, List<string>>
+            {
+                { "",          new List<string> { "root1.txt", "root2.txt" } },
+                { "sub1",      new List<string> { "file1.txt" } },
+                { "sub1\\sub2", new List<string> { "file2.txt" } },
+            });
+
+            var source = new Source
+            {
+                Directory = localSourceDir,
+                FileName = "*.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+                IncludeSubdirectories = false,
+            };
+
+            var destination = new Destination
+            {
+                Directory = "/upload/root_only",
+                Action = DestinationAction.Error
+            };
+
+            var result = await SFTP.UploadFiles(source, destination, _connection, _options, _info, new CancellationToken());
+
+            Assert.IsTrue(result.Success, "Transfer should succeed");
+            Assert.AreEqual(2, result.SuccessfulTransferCount, "Should transfer ONLY 2 files from root directory");
+
+            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/root_only/root1.txt"));
+            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/root_only/root2.txt"));
+
+            Assert.IsFalse(Helpers.CheckFileExistsInDestination("/upload/root_only/file1.txt"));
+            Assert.IsFalse(Helpers.CheckFileExistsInDestination("/upload/root_only/file2.txt"));
+        }
     }
 }

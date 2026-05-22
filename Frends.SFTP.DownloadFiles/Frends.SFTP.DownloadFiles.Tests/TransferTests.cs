@@ -512,8 +512,87 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsFalse(Directory.EnumerateFileSystemEntries(workDir).Any());
 
         }
+
+        [Test]
+        public async Task DownloadFiles_TestPreserveDirectoryStructureWithMacro()
+        {
+            Helpers.UploadTestFilesMultiDir(new Dictionary<string, List<string>>
+            {
+                { "/upload/",                  new List<string> { "root.txt" } },
+                { "/upload/sub1/",             new List<string> { "file1.txt" } },
+                { "/upload/sub1/sub2/",        new List<string> { "file2.txt" } },
+                { "/upload/sub1/sub2/sub3/",   new List<string> { "file3.txt" } },
+            });
+
+            var source = new Source
+            {
+                Directory = "/upload/",
+                FileName = "*.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+                IncludeSubdirectories = true
+            };
+
+            var destination = new Destination
+            {
+                Directory = Path.Combine(_destWorkDir, "%SourceRelativeDirectory%"),
+                Action = DestinationAction.Error,
+                FileNameEncoding = FileEncoding.UTF8,
+                EnableBomForFileName = true
+            };
+
+            var result = await SFTP.DownloadFiles(source, destination, _connection, _options, _info, new CancellationToken());
+
+            Assert.IsTrue(result.Success, "Transfer should succeed");
+            Assert.AreEqual(4, result.SuccessfulTransferCount, "Should transfer 4 files");
+
+            Assert.IsTrue(File.Exists(Path.Combine(_destWorkDir, "root.txt")));
+            Assert.IsTrue(File.Exists(Path.Combine(_destWorkDir, "sub1", "file1.txt")));
+            Assert.IsTrue(File.Exists(Path.Combine(_destWorkDir, "sub1", "sub2", "file2.txt")));
+            Assert.IsTrue(File.Exists(Path.Combine(_destWorkDir, "sub1", "sub2", "sub3", "file3.txt")));
+
+            Assert.IsTrue(Directory.Exists(Path.Combine(_destWorkDir, "sub1")));
+            Assert.IsTrue(Directory.Exists(Path.Combine(_destWorkDir, "sub1", "sub2")));
+            Assert.IsTrue(Directory.Exists(Path.Combine(_destWorkDir, "sub1", "sub2", "sub3")));
+        }
+
+        [Test]
+        public async Task DownloadFiles_TestRecursiveWithoutMacro_BackwardCompatibility()
+        {
+            Helpers.UploadTestFilesMultiDir(new Dictionary<string, List<string>>
+            {
+                { "/upload/",                  new List<string> { "root.txt" } },
+                { "/upload/sub1/",             new List<string> { "file1.txt" } },
+                { "/upload/sub1/sub2/",        new List<string> { "file2.txt" } },
+            });
+
+            var source = new Source
+            {
+                Directory = "/upload/",
+                FileName = "*.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+                IncludeSubdirectories = true
+            };
+
+            var destination = new Destination
+            {
+                Directory = _destWorkDir,
+                Action = DestinationAction.Error,
+                FileNameEncoding = FileEncoding.UTF8,
+                EnableBomForFileName = true
+            };
+
+            var result = await SFTP.DownloadFiles(source, destination, _connection, _options, _info, new CancellationToken());
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(3, result.SuccessfulTransferCount);
+            Assert.IsTrue(File.Exists(Path.Combine(_destWorkDir, "root.txt")));
+            Assert.IsTrue(File.Exists(Path.Combine(_destWorkDir, "file1.txt")));
+            Assert.IsTrue(File.Exists(Path.Combine(_destWorkDir, "file2.txt")));
+
+            Assert.IsFalse(Directory.Exists(Path.Combine(_destWorkDir, "sub1")));
+            Assert.IsFalse(Directory.Exists(Path.Combine(_destWorkDir, "sub1", "sub2")));
+        }
     }
 }
-
-
-

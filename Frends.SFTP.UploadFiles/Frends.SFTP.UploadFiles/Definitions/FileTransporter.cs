@@ -562,28 +562,73 @@ internal class FileTransporter
         if (!Directory.Exists(SourceDirectoryWithMacrosExtended))
             return new Tuple<List<FileItem>, bool>(fileItems, false);
 
-        // fetch all file names in given directory
-        var files = Directory.GetFiles(SourceDirectoryWithMacrosExtended);
+        fileItems = ListFiles(source, SourceDirectoryWithMacrosExtended, cancellationToken);
 
         // return Tuple with empty list and success.true if files are not found.
-        if (files.Length == 0)
+        if (fileItems.Count == 0)
             return new Tuple<List<FileItem>, bool>(fileItems, true);
 
-        // create List of FileItems from found files.
+        return new Tuple<List<FileItem>, bool>(fileItems, true);
+    }
+
+    private List<FileItem> ListFiles(Source source, string directory, CancellationToken cancellationToken)
+    {
+        return ListFilesRecursive(source, directory, SourceDirectoryWithMacrosExtended, cancellationToken);
+    }
+
+    private List<FileItem> ListFilesRecursive(Source source, string currentDirectory, string rootDirectory, CancellationToken cancellationToken)
+    {
+        var fileItems = new List<FileItem>();
+
+        var relativePath = GetRelativePath(rootDirectory, currentDirectory);
+
+        // Get files in current directory
+        var files = Directory.GetFiles(currentDirectory);
+
         foreach (var file in files)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             if (Path.GetFileName(file).Equals(source.FileName) ||
-                Util.FileMatchesMask(Path.GetFileName(file), source.FileName) || source.FileName == string.Empty)
+                Util.FileMatchesMask(Path.GetFileName(file), source.FileName) || 
+                source.FileName == string.Empty)
             {
-                var item = new FileItem(Path.GetFullPath(file));
-                _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath}.");
+                var item = new FileItem(Path.GetFullPath(file), relativePath);
+                _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath} (Relative: '{item.RelativeDirectoryPath}')");
                 fileItems.Add(item);
             }
         }
 
-        return new Tuple<List<FileItem>, bool>(fileItems, true);
+        // Recursively process subdirectories if enabled
+        if (source.IncludeSubdirectories)
+        {
+            var directories = Directory.GetDirectories(currentDirectory);
+
+            foreach (var dir in directories)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                fileItems.AddRange(ListFilesRecursive(source, dir, rootDirectory, cancellationToken));
+            }
+        }
+
+        return fileItems;
+    }
+
+    private string GetRelativePath(string rootDirectory, string currentDirectory)
+    {
+        var normalizedRoot = Path.GetFullPath(rootDirectory).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+        var normalizedCurrent = Path.GetFullPath(currentDirectory).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+
+        if (normalizedCurrent.Equals(normalizedRoot, StringComparison.OrdinalIgnoreCase))
+            return string.Empty;
+
+        if (normalizedCurrent.StartsWith(normalizedRoot, StringComparison.OrdinalIgnoreCase))
+        {
+            var relativePath = normalizedCurrent.Substring(normalizedRoot.Length);
+            return relativePath.TrimEnd(Path.DirectorySeparatorChar);
+        }
+
+        return string.Empty;
     }
 
     public static void CreateDirectoriesRecursively(SftpClient client, string path)
@@ -780,6 +825,8 @@ internal class FileTransporter
         logger.NotifyInformation(context,
             $"Culture: {CultureInfo.CurrentCulture.TwoLetterISOLanguageName}; {Encoding.Default.WebName}");
     }
+
+
 
     #endregion
 

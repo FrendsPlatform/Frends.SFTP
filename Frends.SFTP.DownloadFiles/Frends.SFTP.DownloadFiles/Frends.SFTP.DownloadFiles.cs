@@ -80,6 +80,13 @@ public class SFTP
     /// - %TransferName% = will be replaced with TransferName parameter specified in Connection point schema.
     /// - %TransferGroupName% = will be replaced with TransferGroupName parameter specified in routine's task arguments.
     ///
+    /// Destination directory has one additional macro:
+    ///
+    /// - %SourceRelativeDirectory% = will be replaced with the relative path from source directory to file's directory during recursive downloads.
+    ///   Empty for files in root source directory. Example: for source '/upload/' and file '/upload/sub1/sub2/file.txt',
+    ///   macro expands to 'sub1\sub2\'. Use in Destination.Directory like 'C:\download\%SourceRelativeDirectory%'
+    ///   to preserve source folder structure.
+    ///
     /// Destination file name has two additional macros that can be used for dynamically creating destination file name.
     ///
     /// - %SourceFileName% = will be replaced with source file name without extension.
