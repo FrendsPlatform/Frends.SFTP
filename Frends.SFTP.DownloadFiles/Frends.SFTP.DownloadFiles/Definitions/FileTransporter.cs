@@ -651,8 +651,7 @@ internal class FileTransporter
                 cancellationToken.ThrowIfCancellationRequested();
 
                 if (!client.Exists(file))
-                    _logger.NotifyError(_batchContext, $"File does not exist: '{file}'",
-                        new SftpPathNotFoundException());
+                    _logger.NotifyError(_batchContext, $"File does not exist: '{file}'", new SftpPathNotFoundException());
                 else
                     fileItems.Add(new FileItem(client.Get(file)));
             }
@@ -685,7 +684,6 @@ internal class FileTransporter
         var files = sftp.ListDirectory(currentDirectory).ToList();
 
         var relativePath = GetRelativePath(rootDirectory, currentDirectory);
-
 
         foreach (var file in files)
         {

@@ -391,8 +391,7 @@ internal class SingleFileTransfer
                 var destFileName = Path.Combine(moveToPath, SourceFile.Name).Replace("\\", "/");
 
                 if (Client.Exists(destFileName))
-                    throw new Exception(
-                        $"Failure in source operation: File {Path.GetFileName(destFileName)} exists in move to directory.");
+                    throw new Exception($"Failure in source operation: File {Path.GetFileName(destFileName)} exists in move to directory.");
 
                 try
                 {
@@ -465,8 +464,7 @@ internal class SingleFileTransfer
                 WorkFile = new FileItem(file);
 
                 if (WorkFile.FullPath == null)
-                    _logger.NotifyInformation(BatchContext,
-                        "Source end point returned null as the renamed file. It should return the name of the renamed file.");
+                    _logger.NotifyInformation(BatchContext, "Source end point returned null as the renamed file. It should return the name of the renamed file.");
 
                 break;
         }

@@ -337,7 +337,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 {
                     var pathParts = destination.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
                     var currentPath = "";
-                    
+
                     foreach (var part in pathParts)
                     {
                         currentPath = currentPath + "/" + part;

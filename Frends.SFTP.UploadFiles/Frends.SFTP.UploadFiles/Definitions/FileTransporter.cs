@@ -589,9 +589,7 @@ internal class FileTransporter
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (Path.GetFileName(file).Equals(source.FileName) ||
-                Util.FileMatchesMask(Path.GetFileName(file), source.FileName) || 
-                source.FileName == string.Empty)
+            if (Path.GetFileName(file).Equals(source.FileName) || Util.FileMatchesMask(Path.GetFileName(file), source.FileName) || source.FileName == string.Empty)
             {
                 var item = new FileItem(Path.GetFullPath(file), relativePath);
                 _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath} (Relative: '{item.RelativeDirectoryPath}')");

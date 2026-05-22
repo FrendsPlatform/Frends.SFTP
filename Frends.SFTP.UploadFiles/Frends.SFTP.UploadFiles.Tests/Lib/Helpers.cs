@@ -233,7 +233,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             foreach (var (relativePath, filenames) in dirToFiles)
             {
                 var fullPath = Path.Combine(baseDirectory, relativePath);
-                
+
                 if (!Directory.Exists(fullPath))
                     Directory.CreateDirectory(fullPath);
 
