@@ -37,7 +37,7 @@ internal class SingleFileTransfer
                     _logger.NotifyInformation(context, $"Created directory: {finalDestinationDirectory}");
                 }
                 catch (Exception ex)
-               {
+                {
                     _logger.NotifyError(context, $"Failed to create directory '{finalDestinationDirectory}': {ex.Message}", ex);
                     throw;
                 }
