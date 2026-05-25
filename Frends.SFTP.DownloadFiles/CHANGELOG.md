@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.1.0] - 2026-05-22
+
+### Added
+
+- Added support for %SourceRelativeDirectory% macro in Destination.Directory. This macro preserves the source folder structure during download when used with Source.IncludeSubdirectories=true. For files in the root source directory, the macro expands to an empty string. Example: for source '/upload/' and file '/upload/sub1/sub2/file.txt', the macro expands to 'sub1\sub2\'.
+
 ## [4.0.0] - 2026-04-26
 
 ### Changed

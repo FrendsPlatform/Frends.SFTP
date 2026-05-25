@@ -34,9 +34,11 @@ internal class FileTransporter
         _filePaths = ConvertObjectToStringArray(context.Source.FilePaths);
 
         if (_filePaths == null || !_filePaths.Any())
+        {
             SourceDirectoryWithMacrosExtended = string.IsNullOrEmpty(context.Source.Directory)
                 ? "/"
                 : _renamingPolicy.ExpandDirectoryForMacros(context.Source.Directory);
+        }
 
         DestinationDirectoryWithMacrosExtended =
             _renamingPolicy.ExpandDirectoryForMacros(context.Destination.Directory);
@@ -50,7 +52,8 @@ internal class FileTransporter
 
     internal async Task<FileTransferResult> Run(CancellationToken cancellationToken)
     {
-        _logger.NotifyInformation(_batchContext,
+        _logger.NotifyInformation(
+            _batchContext,
             $"Connecting to {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using SFTP.");
 
         var userResultMessage = string.Empty;
@@ -99,7 +102,9 @@ internal class FileTransporter
 
             if (!client.IsConnected)
             {
-                _logger.NotifyError(null, "Error while connecting to destination: ",
+                _logger.NotifyError(
+                    null,
+                    "Error while connecting to destination: ",
                     new SshConnectionException(userResultMessage));
 
                 return FormFailedFileTransferResult(userResultMessage);
@@ -646,8 +651,7 @@ internal class FileTransporter
                 cancellationToken.ThrowIfCancellationRequested();
 
                 if (!client.Exists(file))
-                    _logger.NotifyError(_batchContext, $"File does not exist: '{file}'",
-                        new SftpPathNotFoundException());
+                    _logger.NotifyError(_batchContext, $"File does not exist: '{file}'", new SftpPathNotFoundException());
                 else
                     fileItems.Add(new FileItem(client.Get(file)));
             }
@@ -668,15 +672,19 @@ internal class FileTransporter
         return new Tuple<List<FileItem>, bool>(fileItems, true);
     }
 
-    private List<FileItem> ListFiles(SftpClient sftp, Source source, string directory,
-        CancellationToken cancellationToken)
+    private List<FileItem> ListFiles(SftpClient sftp, Source source, string directory, CancellationToken cancellationToken)
+    {
+        return ListFilesRecursive(sftp, source, directory, SourceDirectoryWithMacrosExtended, cancellationToken);
+    }
+
+    private List<FileItem> ListFilesRecursive(SftpClient sftp, Source source, string currentDirectory, string rootDirectory, CancellationToken cancellationToken)
     {
         var fileItems = new List<FileItem>();
 
-        // fetch all file names in given directory
-        var files = sftp.ListDirectory(directory).ToList();
+        var files = sftp.ListDirectory(currentDirectory).ToList();
 
-        // create List of FileItems from found files.
+        var relativePath = GetRelativePath(rootDirectory, currentDirectory);
+
         foreach (var file in files)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -684,20 +692,35 @@ internal class FileTransporter
             if (file.Name.Equals(".") || file.Name.Equals("..")) continue;
 
             if (file.IsDirectory && source.IncludeSubdirectories)
-                fileItems.AddRange(ListFiles(sftp, source, file.FullName, cancellationToken));
+                fileItems.AddRange(ListFilesRecursive(sftp, source, file.FullName, rootDirectory, cancellationToken));
 
             if (!file.IsDirectory && !file.IsSocket && !file.IsSymbolicLink && !file.IsBlockDevice &&
-                !file.IsCharacterDevice && !file.IsNamedPipe && (file.Name.Equals(source.FileName) ||
-                                                                 Util.FileMatchesMask(Path.GetFileName(file.FullName),
-                                                                     source.FileName)))
+                !file.IsCharacterDevice && !file.IsNamedPipe && (file.Name.Equals(source.FileName) || Util.FileMatchesMask(Path.GetFileName(file.FullName), source.FileName)))
             {
-                var item = new FileItem(file);
-                _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath}");
+                var item = new FileItem(file, relativePath);
+                _logger.NotifyInformation(_batchContext, $"FILE LIST {item.FullPath} (Relative: '{item.RelativeDirectoryPath}')");
                 fileItems.Add(item);
             }
         }
 
         return fileItems;
+    }
+
+    private string GetRelativePath(string rootDirectory, string currentDirectory)
+    {
+        var normalizedRoot = rootDirectory.TrimEnd('/') + "/";
+        var normalizedCurrent = currentDirectory.TrimEnd('/') + "/";
+
+        if (normalizedCurrent.Equals(normalizedRoot, StringComparison.OrdinalIgnoreCase))
+            return string.Empty;
+
+        if (normalizedCurrent.StartsWith(normalizedRoot, StringComparison.OrdinalIgnoreCase))
+        {
+            var relativePath = normalizedCurrent.Substring(normalizedRoot.Length);
+            return relativePath.Replace('/', Path.DirectorySeparatorChar);
+        }
+
+        return string.Empty;
     }
 
     private FileTransferResult FormResultFromSingleTransferResults(List<SingleFileTransferResult> singleResults)

@@ -10,7 +10,7 @@ internal class SingleFileTransfer
     private readonly ISFTPLogger _logger;
     private readonly SingleFileTransferResult _result;
 
-    public SingleFileTransfer(FileItem file, string destinationDirectory, BatchContext context, SftpClient client, RenamingPolicy renamingPolicy, ISFTPLogger logger)
+    public SingleFileTransfer(FileItem file, string destinationDirectoryWithMacrosExtended, BatchContext context, SftpClient client, RenamingPolicy renamingPolicy, ISFTPLogger logger)
     {
         _renamingPolicy = renamingPolicy;
         _logger = logger;
@@ -20,10 +20,34 @@ internal class SingleFileTransfer
         SourceFile = file;
         BatchContext = context;
 
-        DestinationFileWithMacrosExpanded = RenamingPolicy.CanonizeAndCheckPath(Path.Combine(destinationDirectory, renamingPolicy.CreateRemoteFileName(
+        var finalDestinationDirectory = _renamingPolicy.ExpandSourceRelativeDirectoryMacro(
+            destinationDirectoryWithMacrosExtended,
+            file.RelativeDirectoryPath);
+
+        if (destinationDirectoryWithMacrosExtended.Contains("%SourceRelativeDirectory%", StringComparison.OrdinalIgnoreCase))
+        {
+            if (!client.Exists(finalDestinationDirectory))
+            {
+                if (!context.Options.CreateDestinationDirectories)
+                    throw new ArgumentException($"Destination directory '{finalDestinationDirectory}' was not found.");
+
+                try
+                {
+                    FileTransporter.CreateDirectoriesRecursively(client, finalDestinationDirectory);
+                    _logger.NotifyInformation(context, $"Created directory: {finalDestinationDirectory}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.NotifyError(context, $"Failed to create directory '{finalDestinationDirectory}': {ex.Message}", ex);
+                    throw;
+                }
+            }
+        }
+
+        DestinationFileWithMacrosExpanded = RenamingPolicy.CanonizeAndCheckPath(Path.Combine(finalDestinationDirectory, renamingPolicy.CreateRemoteFileName(
             file.Name,
             context.Destination.FileName)));
-        if (destinationDirectory.Contains('/')) DestinationFileWithMacrosExpanded = DestinationFileWithMacrosExpanded.Replace("\\", "/");
+        if (finalDestinationDirectory.Contains('/')) DestinationFileWithMacrosExpanded = DestinationFileWithMacrosExpanded.Replace("\\", "/");
         WorkFileInfo = new WorkFileInfo(file.Name, Path.GetFileName(DestinationFileWithMacrosExpanded), BatchContext.TempWorkDir);
 
         _result = new SingleFileTransferResult { Success = true };

@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.0] - 2026-05-22
+
+### Added
+
+- Added new parameter Source.IncludeSubdirectories which enables recursive file search from subdirectories. Default value is false to maintain backward compatibility.
+- Added support for %SourceRelativeDirectory% macro in Destination.Directory. This macro preserves the source folder structure during upload when used with IncludeSubdirectories=true. For files in the root source directory, the macro expands to an empty string. Example: for source 'C:\upload\' and file 'C:\upload\sub1\sub2\file.txt', the macro expands to 'sub1/sub2/'.
+
 ## [4.0.0] - 2026-04-26
 
 ### Changed

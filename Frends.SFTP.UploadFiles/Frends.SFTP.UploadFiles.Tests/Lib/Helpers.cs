@@ -222,8 +222,27 @@ namespace Frends.SFTP.UploadFiles.Tests
                 result.Append(bytes[i].ToString("x2"));
             return result.ToString();
         }
+
+        internal static void CreateLocalFilesWithSubdirectories(string baseDirectory, Dictionary<string, List<string>> dirToFiles)
+        {
+            if (Directory.Exists(baseDirectory))
+                Directory.Delete(baseDirectory, true);
+
+            Directory.CreateDirectory(baseDirectory);
+
+            foreach (var (relativePath, filenames) in dirToFiles)
+            {
+                var fullPath = Path.Combine(baseDirectory, relativePath);
+
+                if (!Directory.Exists(fullPath))
+                    Directory.CreateDirectory(fullPath);
+
+                foreach (var filename in filenames)
+                {
+                    var filePath = Path.Combine(fullPath, filename);
+                    File.WriteAllText(filePath, "This is a test file for nested structure.");
+                }
+            }
+        }
     }
 }
-
-
-

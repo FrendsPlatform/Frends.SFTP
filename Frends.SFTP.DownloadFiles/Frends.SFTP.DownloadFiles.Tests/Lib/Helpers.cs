@@ -318,8 +318,47 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 client.Disconnect();
             }
         }
+
+        internal static void UploadTestFilesMultiDir(Dictionary<string, List<string>> dirToFiles)
+        {
+            using (var client = new SftpClient(_dockerAddress, 2222, _dockerUser, _dockerPwd))
+            {
+                client.Connect();
+
+                if (client.Exists(_baseDir))
+                    DeleteDirectory(client, _baseDir);
+
+                if (!client.Exists(_baseDir))
+                    client.CreateDirectory(_baseDir);
+
+                var sortedDirs = dirToFiles.OrderBy(kvp => kvp.Key.Count(c => c == '/')).ToList();
+
+                foreach (var (destination, filenames) in sortedDirs)
+                {
+                    var pathParts = destination.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                    var currentPath = "";
+
+                    foreach (var part in pathParts)
+                    {
+                        currentPath = currentPath + "/" + part;
+                        if (!client.Exists(currentPath))
+                        {
+                            client.CreateDirectory(currentPath);
+                        }
+                    }
+
+                    client.ChangeDirectory(destination);
+
+                    var files = CreateDummyFiles(0, filenames);
+                    foreach (var file in files)
+                    {
+                        using var fs = File.OpenRead(file);
+                        client.UploadFile(fs, Path.GetFileName(file), true);
+                    }
+                }
+
+                client.Disconnect();
+            }
+        }
     }
 }
-
-
-
