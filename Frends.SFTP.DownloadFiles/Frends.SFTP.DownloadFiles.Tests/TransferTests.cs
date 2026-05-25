@@ -557,7 +557,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
 
         [Test]
-        public async Task DownloadFiles_TestRecursiveWithoutMacro_BackwardCompatibility()
+        public async Task DownloadFiles_TestRecursiveWithoutMacro()
         {
             Helpers.UploadTestFilesMultiDir(new Dictionary<string, List<string>>
             {
@@ -593,6 +593,53 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             Assert.IsFalse(Directory.Exists(Path.Combine(_destWorkDir, "sub1")));
             Assert.IsFalse(Directory.Exists(Path.Combine(_destWorkDir, "sub1", "sub2")));
+        }
+
+        [Test]
+        public async Task DownloadFiles_TestWithoutIncludeSubdirectories_OnlyRootFiles()
+        {
+
+            Helpers.UploadTestFilesMultiDir(new Dictionary<string, List<string>>
+            {
+                { "/upload/",           new List<string> { "root1.txt", "root2.txt" } },
+                { "/upload/sub1/",      new List<string> { "file1.txt" } },
+                { "/upload/sub1/sub2/", new List<string> { "file2.txt" } }
+            });
+
+            var source = new Source
+            {
+                Directory = "/upload/",
+                FileName = "*.txt",
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+                IncludeSubdirectories = false
+            };
+
+            var destination = new Destination
+            {
+                Directory = _destWorkDir,
+                Action = DestinationAction.Error,
+                FileNameEncoding = FileEncoding.UTF8,
+                EnableBomForFileName = true
+            };
+
+            var result = await SFTP.DownloadFiles(source, destination, _connection, _options, _info, new CancellationToken());
+
+            Assert.IsTrue(result.Success, "Transfer should succeed");
+            Assert.AreEqual(2, result.SuccessfulTransferCount, "Should transfer ONLY 2 files from root directory");
+
+            Assert.IsTrue(File.Exists(Path.Combine(_destWorkDir, "root1.txt")),
+                "root1.txt should be downloaded");
+            Assert.IsTrue(File.Exists(Path.Combine(_destWorkDir, "root2.txt")),
+                "root2.txt should be downloaded");
+
+            Assert.IsFalse(File.Exists(Path.Combine(_destWorkDir, "file1.txt")),
+                "file1.txt from subdirectory should NOT be downloaded");
+            Assert.IsFalse(File.Exists(Path.Combine(_destWorkDir, "file2.txt")),
+                "file2.txt from subdirectory should NOT be downloaded");
+
+            Assert.IsFalse(Directory.Exists(Path.Combine(_destWorkDir, "sub1")),
+                "sub1 directory should NOT be created");
         }
     }
 }
