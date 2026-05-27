@@ -33,7 +33,9 @@ internal class FileTransporter
             ? ConvertObjectToStringArray(context.Source.FilePaths)
             : null;
 
-        SourceDirectoryWithMacrosExtended = _renamingPolicy.ExpandDirectoryForMacros(context.Source.Directory);
+        SourceDirectoryWithMacrosExtended = string.IsNullOrEmpty(context.Source.Directory)
+            ? string.Empty
+            : _renamingPolicy.ExpandDirectoryForMacros(context.Source.Directory);
         DestinationDirectoryWithMacrosExtended = string.IsNullOrEmpty(context.Destination.Directory)
             ? "/"
             : _renamingPolicy.ExpandDirectoryForMacros(context.Destination.Directory);

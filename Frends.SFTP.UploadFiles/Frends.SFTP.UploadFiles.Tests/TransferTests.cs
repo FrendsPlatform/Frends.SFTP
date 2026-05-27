@@ -611,5 +611,27 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsFalse(Helpers.CheckFileExistsInDestination("/upload/root_only/file1.txt"));
             Assert.IsFalse(Helpers.CheckFileExistsInDestination("/upload/root_only/file2.txt"));
         }
+
+        [Test]
+        public async Task UploadFiles_TestWithFilePathsAndNullDirectory()
+        {
+            var files = Helpers.CreateDummyFiles(3);
+
+            var filePaths = new string[] { files[0], files[1] };
+
+            var source = new Source
+            {
+                Directory = null, // Directory is null
+                FileName = string.Empty,
+                Action = SourceAction.Error,
+                Operation = SourceOperation.Nothing,
+                FilePaths = filePaths
+            };
+
+            var result = await SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.IsFalse(result.ActionSkipped);
+            Assert.AreEqual(2, result.SuccessfulTransferCount);
+        }
     }
 }

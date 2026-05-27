@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.2.0] - 2026-05-27
+
+### Fixed
+
+- Fixed NullReferenceException when using FilePaths parameter with null or empty Directory value.
+
 ## [4.1.0] - 2026-05-22
 
 ### Added
