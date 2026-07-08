@@ -6,7 +6,7 @@
         {
             if (addNewLine)
             {
-                using (var stream = File.Open(remoteFile, FileMode.Open, FileAccess.ReadWrite))
+                using (var stream = new FileStream(remoteFile, FileMode.Open, FileAccess.ReadWrite, FileShare.None, bufferSize: 4096, useAsync: true))
                 using (var reader = new StreamReader(stream))
                 using (var writer = new StreamWriter(stream))
                 {
@@ -22,9 +22,9 @@
                 }
             }
 
-            using (var srcStream = new FileStream(source, FileMode.Open, FileAccess.Read))
+            using (var srcStream = new FileStream(source, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true))
             {
-                using (var outStream = new FileStream(remoteFile, FileMode.Append, FileAccess.Write))
+                using (var outStream = new FileStream(remoteFile, FileMode.Append, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
                 {
                     byte[] buff = new byte[4096];
                     int r;
@@ -40,9 +40,8 @@
         internal static async Task CopyAsync(string source, string remoteFile, bool overwrite, CancellationToken cancellationToken)
         {
             FileMode fileMode = overwrite ? FileMode.Create : FileMode.CreateNew;
-
-            using (Stream sourceStream = new FileStream(source, FileMode.Open, FileAccess.Read))
-            using (Stream destinationStream = new FileStream(remoteFile, fileMode, FileAccess.Write))
+            using (Stream sourceStream = new FileStream(source, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true))
+            using (Stream destinationStream = new FileStream(remoteFile, fileMode, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
             {
                 await sourceStream.CopyToAsync(destinationStream, bufferSize: 81920, cancellationToken);
             }
