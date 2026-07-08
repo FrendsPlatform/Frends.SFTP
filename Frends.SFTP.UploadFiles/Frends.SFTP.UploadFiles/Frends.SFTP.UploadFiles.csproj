@@ -41,10 +41,6 @@
         <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0"/>
         <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0"/>
     </ItemGroup>
-	
-    <ItemGroup>
-      <InternalsVisibleTo Include="Frends.SFTP.UploadFiles.Tests" />
-    </ItemGroup>
 
 </Project>
 
