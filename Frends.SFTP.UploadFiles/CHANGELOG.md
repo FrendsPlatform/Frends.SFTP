@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.3.0] - 2026-07-08
+
+### Fixed
+
+- Fixed thread pool exhaustion in FileOperations
+
 ## [4.2.0] - 2026-05-27
 
 ### Fixed
