@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.5.5] - 2025-12-17
+## [Unreleased]
 ### Added
 - Added `VerifyWrite` option to allow skipping post-write verification (useful when the SFTP user does not have read permissions).
 - Added `Result.Verified` property to indicate whether verification was performed.
