@@ -29,6 +29,26 @@ internal class ReadTests : ReadFileTestBase
     }
 
     [Test]
+    public async Task ReadFile_Iso88591EncodingShouldWork()
+    {
+        Input.FileEncoding = FileEncoding.Other;
+        Input.EncodingInString = "iso-8859-1";
+
+        var result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
+        Assert.AreEqual(Content, result.TextContent);
+    }
+
+    [Test]
+    public void ReadFile_InvalidEncodingNameShouldThrowClearError()
+    {
+        Input.FileEncoding = FileEncoding.Other;
+        Input.EncodingInString = "iso-invalid-encoding";
+
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None));
+        Assert.IsTrue(ex.Message.Contains("Unknown encoding: 'iso-invalid-encoding'"), ex.Message);
+    }
+
+    [Test]
     public async Task ReadFile_TestWithEmptyContent()
     {
         var content = "";

@@ -10,6 +10,35 @@ namespace Frends.SFTP.UploadFiles.Tests
     class EncodingTests : UploadFilesTestBase
     {
         [Test]
+        public async Task UploadFiles_Iso88591FileNameEncodingShouldWork()
+        {
+            var destination = new Destination
+            {
+                Directory = "/upload/Upload",
+                FileNameEncoding = FileEncoding.Other,
+                FileNameEncodingInString = "iso-8859-1"
+            };
+
+            var result = await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.SuccessfulTransferCount);
+        }
+
+        [Test]
+        public void UploadFiles_InvalidEncodingNameShouldThrowClearError()
+        {
+            var destination = new Destination
+            {
+                Directory = "/upload/Upload",
+                FileNameEncoding = FileEncoding.Other,
+                FileNameEncodingInString = "iso-invalid-encoding"
+            };
+
+            var ex = Assert.CatchAsync<System.Exception>(async () => await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken()));
+            Assert.IsTrue(ex.Message.Contains("Unknown encoding: 'iso-invalid-encoding'"), ex.Message);
+        }
+
+        [Test]
         public async Task UploadFiles_TransferWithANSIFileNameEncoding()
         {
             var destination = new Destination

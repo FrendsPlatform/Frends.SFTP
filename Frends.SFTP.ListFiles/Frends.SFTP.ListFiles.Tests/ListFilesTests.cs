@@ -66,6 +66,26 @@ public class ListFilesTest : ListFilesTestBase
     }
 
     [Test]
+    public async Task ListFiles_Iso88591EncodingShouldWork()
+    {
+        _input.FileEncoding = FileEncoding.Other;
+        _input.EncodingInString = "iso-8859-1";
+
+        var result = await SFTP.ListFiles(_input, _connection, new CancellationToken());
+        Assert.AreEqual(3, result.FileCount);
+    }
+
+    [Test]
+    public void ListFiles_InvalidEncodingNameShouldThrowClearError()
+    {
+        _input.FileEncoding = FileEncoding.Other;
+        _input.EncodingInString = "iso-invalid-encoding";
+
+        var ex = Assert.ThrowsAsync<System.ArgumentException>(async () => await SFTP.ListFiles(_input, _connection, new CancellationToken()));
+        Assert.IsTrue(ex.Message.Contains("Unknown encoding: 'iso-invalid-encoding'"), ex.Message);
+    }
+
+    [Test]
     public async Task ListFiles_TestWithDifferentEncoding()
     {
         _input.IncludeType = IncludeType.Directory;

@@ -247,6 +247,60 @@ namespace Frends.SFTP.DownloadFiles.Tests
         }
 
         [Test]
+        public async Task DownloadFiles_NoSourceFilesWithOtherEncodingAndIgnoreShouldNotThrowException()
+        {
+            var options = new Options
+            {
+                ThrowErrorOnFail = true,
+                CreateDestinationDirectories = true,
+                OperationLog = true
+            };
+
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "*.csv",
+                Action = SourceAction.Ignore,
+                Operation = SourceOperation.Nothing
+            };
+
+            var destination = new Destination
+            {
+                Directory = _destination.Directory,
+                Action = _destination.Action,
+                FileNameEncoding = FileEncoding.Other,
+                FileNameEncodingInString = "iso-8859-1"
+            };
+
+            var result = await SFTP.DownloadFiles(source, destination, _connection, options, _info, new CancellationToken());
+            Assert.IsTrue(result.ActionSkipped);
+            Assert.IsTrue(result.UserResultMessage.Contains("No files transferred"));
+        }
+
+        [Test]
+        public void DownloadFiles_InvalidEncodingNameShouldThrowClearError()
+        {
+            var source = new Source
+            {
+                Directory = _source.Directory,
+                FileName = "*.csv",
+                Action = SourceAction.Ignore,
+                Operation = SourceOperation.Nothing
+            };
+
+            var destination = new Destination
+            {
+                Directory = _destination.Directory,
+                Action = _destination.Action,
+                FileNameEncoding = FileEncoding.Other,
+                FileNameEncodingInString = "iso-invalid-encoding"
+            };
+
+            var ex = Assert.CatchAsync<Exception>(async () => await SFTP.DownloadFiles(source, destination, _connection, _options, _info, new CancellationToken()));
+            Assert.IsTrue(ex.Message.Contains("Unknown encoding: 'iso-invalid-encoding'"), ex.Message);
+        }
+
+        [Test]
         public async Task DownloadFiles_NoSourceFilesAndInfoShouldNotThrowException()
         {
             var options = new Options

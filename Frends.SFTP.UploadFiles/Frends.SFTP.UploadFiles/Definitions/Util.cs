@@ -105,9 +105,26 @@ internal static class Util
             case FileEncoding.WINDOWS1252:
                 return CodePagesEncodingProvider.Instance.GetEncoding("windows-1252");
             case FileEncoding.Other:
-                return CodePagesEncodingProvider.Instance.GetEncoding(encodingString);
+                return GetOtherEncoding(encodingString);
             default:
                 throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{encoding}'.");
+        }
+    }
+
+    private static Encoding GetOtherEncoding(string encodingString)
+    {
+        if (string.IsNullOrWhiteSpace(encodingString))
+            throw new ArgumentException("Encoding name was not given.");
+
+        // Built-in encodings such as iso-8859-1 are not returned by CodePagesEncodingProvider.
+        try
+        {
+            return CodePagesEncodingProvider.Instance.GetEncoding(encodingString)
+                   ?? Encoding.GetEncoding(encodingString);
+        }
+        catch (ArgumentException)
+        {
+            throw new ArgumentException($"Unknown encoding: '{encodingString}'.");
         }
     }
 }

@@ -1,6 +1,7 @@
 namespace Frends.SFTP.DeleteFiles.Tests;
 
 using System.Threading.Tasks;
+using Frends.SFTP.DeleteFiles.Enums;
 using NUnit.Framework;
 using Renci.SshNet.Common;
 
@@ -15,6 +16,26 @@ internal class UnitTests : UnitTestBase
     {
         var result = await SFTP.DeleteFiles(_input, _connection, default);
         Assert.AreEqual(3, result.Files.Count);
+    }
+
+    [Test]
+    public async Task DeleteFiles_Iso88591EncodingShouldWork()
+    {
+        _input.FileEncoding = FileEncoding.Other;
+        _input.EncodingInString = "iso-8859-1";
+
+        var result = await SFTP.DeleteFiles(_input, _connection, default);
+        Assert.AreEqual(3, result.Files.Count);
+    }
+
+    [Test]
+    public void DeleteFiles_InvalidEncodingNameShouldThrowClearError()
+    {
+        _input.FileEncoding = FileEncoding.Other;
+        _input.EncodingInString = "iso-invalid-encoding";
+
+        var ex = Assert.ThrowsAsync<System.ArgumentException>(async () => await SFTP.DeleteFiles(_input, _connection, default));
+        Assert.IsTrue(ex.Message.Contains("Unknown encoding: 'iso-invalid-encoding'"), ex.Message);
     }
 
     [Test]

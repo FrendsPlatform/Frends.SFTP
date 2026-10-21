@@ -107,8 +107,25 @@ internal static class Util
             FileEncoding.ASCII => new ASCIIEncoding(),
             FileEncoding.ANSI => Encoding.Default,
             FileEncoding.WINDOWS1252 => CodePagesEncodingProvider.Instance.GetEncoding("windows-1252"),
-            FileEncoding.Other => CodePagesEncodingProvider.Instance.GetEncoding(encodingString),
+            FileEncoding.Other => GetOtherEncoding(encodingString),
             _ => throw new ArgumentOutOfRangeException($"Unknown Encoding type: '{encoding}'."),
         };
+    }
+
+    private static Encoding GetOtherEncoding(string encodingString)
+    {
+        if (string.IsNullOrWhiteSpace(encodingString))
+            throw new ArgumentException("Encoding name was not given.");
+
+        // Built-in encodings such as iso-8859-1 are not returned by CodePagesEncodingProvider.
+        try
+        {
+            return CodePagesEncodingProvider.Instance.GetEncoding(encodingString)
+                   ?? Encoding.GetEncoding(encodingString);
+        }
+        catch (ArgumentException)
+        {
+            throw new ArgumentException($"Unknown encoding: '{encodingString}'.");
+        }
     }
 }

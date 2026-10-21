@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.4.0] - 2026-10-21
+
+### Fixed
+
+- An empty or unknown encoding name now gives a clear error message ("Unknown encoding: '...'") instead of a NullReferenceException.
+
 ## [4.3.0] - 2026-07-08
 
 ### Fixed
