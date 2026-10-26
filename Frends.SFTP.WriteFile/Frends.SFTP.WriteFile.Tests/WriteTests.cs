@@ -63,6 +63,26 @@ class WriteTests : WriteFileTestBase
     }
 
     [Test]
+    public void WriteFile_InvalidEncodingNameShouldThrowClearError()
+    {
+        _input.FileEncoding = FileEncoding.Other;
+        _input.EncodingInString = "iso-invalid-encoding";
+
+        var ex = Assert.Throws<ArgumentException>(() => SFTP.WriteFile(_input, _connection, _options));
+        Assert.IsTrue(ex.Message.Contains("Unknown encoding: 'iso-invalid-encoding'"), ex.Message);
+    }
+
+    [Test]
+    public void WriteFile_Iso88591EncodingShouldWork()
+    {
+        _input.FileEncoding = FileEncoding.Other;
+        _input.EncodingInString = "iso-8859-1";
+
+        var result = SFTP.WriteFile(_input, _connection, _options);
+        Assert.IsTrue(Helpers.DestinationFileExists(result.Path));
+    }
+
+    [Test]
     public void WriteFile_TestWithEmptyContent()
     {
         _input.Content = "";

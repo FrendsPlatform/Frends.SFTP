@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.2.0] - 2026-10-21
+
+### Changed
+
+- An empty or unknown encoding name now gives a clear error message ("Unknown encoding: '...'") instead of the default .NET message.
+
 ## [3.1.0] - 2026-02-05
 
 ### Added

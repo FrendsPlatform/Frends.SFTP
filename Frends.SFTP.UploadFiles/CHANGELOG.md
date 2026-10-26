@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.4.0] - 2026-10-21
+
+### Fixed
+
+- An empty or unknown encoding name now gives a clear error message ("Unknown encoding: '...'") instead of a NullReferenceException.
+- Fixed iso-8859-1 and other built-in .NET encodings not being found when entered as a custom encoding
+
 ## [4.3.0] - 2026-07-08
 
 ### Fixed
