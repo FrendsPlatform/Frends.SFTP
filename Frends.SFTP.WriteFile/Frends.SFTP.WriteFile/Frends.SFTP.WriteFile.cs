@@ -1,127 +1,141 @@
-﻿using System.ComponentModel;
-using Renci.SshNet;
+using System.ComponentModel;
 using Frends.SFTP.WriteFile.Definitions;
 using Frends.SFTP.WriteFile.Enums;
+using Frends.SFTP.WriteFile.Helpers;
+using Renci.SshNet;
 
 namespace Frends.SFTP.WriteFile;
 
 /// <summary>
 /// Main class for the task.
 /// </summary>
-public class SFTP
+public static class SFTP
 {
     /// <summary>
     /// Writes string content to a file through SFTP connection.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.SFTP.WriteFile)
     /// </summary>
-    /// <param name="connection">Transfer connection parameters</param>
     /// <param name="input">Write options with full path and string content</param>
+    /// <param name="connection">Transfer connection parameters</param>
     /// <param name="options">Options for write file</param>
-    /// <returns>Object {string Path, double SizeInMegaBytes} </returns>
-    public static Result WriteFile([PropertyTab] Input input, [PropertyTab] Connection connection,
-        [PropertyTab] Options options)
+    /// <param name="cancellationToken">Token given by Frends to enable Task termination.</param>
+    /// <returns>object { bool Success, string Path, double SizeInMegaBytes, object Error { string Message, Exception AdditionalInfo } }</returns>
+    public static Result WriteFile(
+        [PropertyTab] Input input,
+        [PropertyTab] Connection connection,
+        [PropertyTab] Options options,
+        CancellationToken cancellationToken = default)
     {
-        ConnectionInfo connectionInfo;
-
-        // Establish connectionInfo with connection parameters
         try
         {
-            var builder = new ConnectionInfoBuilder(input, connection);
-            connectionInfo = builder.BuildConnectionInfo();
-        }
-        catch (Exception e)
-        {
-            throw new ArgumentException($"Error when initializing connection info: {e}");
-        }
+            cancellationToken.ThrowIfCancellationRequested();
 
-        using var client = new SftpClient(connectionInfo);
-        client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
-        client.OperationTimeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
-        client.BufferSize = connection.BufferSize * 1024;
+            ConnectionInfo connectionInfo;
 
-        //Disable support for these host key exchange algorithms relating: https://github.com/FrendsPlatform/Frends.SFTP/security/dependabot/4
-        client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256");
-        client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256@libssh.org");
-
-        if (connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
-            Util.ForceHostKeyAlgorithm(client, connection.HostKeyAlgorithm);
-
-        // Check the fingerprint of the server if given.
-        if (!string.IsNullOrEmpty(connection.ServerFingerPrint))
-        {
-            Util.AddServerFingerprintCheck(client, connection.ServerFingerPrint);
-        }
-
-        client.Connect();
-
-        if (!client.IsConnected)
-            throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
-
-        try
-        {
-            var targetDirectory = Path.GetDirectoryName(input.Path);
-
-            if (!string.IsNullOrEmpty(targetDirectory))
+            try
             {
-                targetDirectory = targetDirectory.Replace("\\", "/");
+                var builder = new ConnectionInfoBuilder(input, connection);
+                connectionInfo = builder.BuildConnectionInfo();
+            }
+            catch (Exception ex)
+            {
+                return new ArgumentException($"Error when initializing connection info: {ex}", ex).Handle(options);
+            }
 
-                if (!client.Exists(targetDirectory))
+            using var client = new SftpClient(connectionInfo);
+            client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+            client.OperationTimeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+            client.BufferSize = connection.BufferSize * 1024;
+
+            // Disable support for these host key exchange algorithms:
+            // https://github.com/FrendsPlatform/Frends.SFTP/security/dependabot/4
+            client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256");
+            client.ConnectionInfo.KeyExchangeAlgorithms.Remove("curve25519-sha256@libssh.org");
+
+            if (connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
+                Util.ForceHostKeyAlgorithm(client, connection.HostKeyAlgorithm);
+
+            // Check the fingerprint of the server if given.
+            if (!string.IsNullOrEmpty(connection.ServerFingerPrint))
+            {
+                Util.AddServerFingerprintCheck(client, connection.ServerFingerPrint);
+            }
+
+            client.Connect();
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (!client.IsConnected)
+                throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
+
+            try
+            {
+                var targetDirectory = Path.GetDirectoryName(input.Path);
+
+                if (!string.IsNullOrEmpty(targetDirectory))
                 {
-                    if (options.CreateDestinationDirectories == true)
+                    targetDirectory = targetDirectory.Replace("\\", "/");
+
+                    if (!client.Exists(targetDirectory))
                     {
-                        try
+                        if (options.CreateDestinationDirectories)
                         {
-                            Util.CreateDirectoriesRecursively(client, targetDirectory);
+                            try
+                            {
+                                Util.CreateDirectoriesRecursively(client, targetDirectory);
+                            }
+                            catch (Exception ex)
+                            {
+                                return new ArgumentException(
+                                    $"Error while creating destination directory '{targetDirectory}': {ex.Message}", ex)
+                                    .Handle(options);
+                            }
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            throw new ArgumentException(
-                                $"Error while creating destination directory '{targetDirectory}': {ex.Message}", ex);
+                            throw new ArgumentException($"Destination directory '{targetDirectory}' was not found.");
                         }
-                    }
-                    else
-                    {
-                        throw new ArgumentException($"Destination directory '{targetDirectory}' was not found.");
                     }
                 }
+
+                cancellationToken.ThrowIfCancellationRequested();
+                var encoding = Util.GetEncoding(input.FileEncoding, input.EnableBom, input.EncodingInString);
+
+                switch (input.WriteBehaviour)
+                {
+                    case WriteOperation.Append:
+                        var content = string.Empty;
+                        if (input.AddNewLine)
+                            content = "\n";
+                        content += input.Content;
+                        client.AppendAllText(input.Path, content, encoding);
+
+                        break;
+                    case WriteOperation.Overwrite:
+                        if (client.Exists(input.Path))
+                            client.DeleteFile(input.Path);
+                        client.WriteAllText(input.Path, input.Content, encoding);
+
+                        break;
+                    case WriteOperation.Error:
+                        if (client.Exists(input.Path))
+                            throw new ArgumentException($"File already exists: {input.Path}");
+                        client.WriteAllText(input.Path, input.Content, encoding);
+
+                        break;
+                    default:
+                        throw new ArgumentException($"Unknown WriteBehaviour type: '{input.WriteBehaviour}'.");
+                }
+
+                return new Result(client.Get(input.Path));
             }
-
-            var encoding = Util.GetEncoding(input.FileEncoding, input.EnableBom, input.EncodingInString);
-
-            switch (input.WriteBehaviour)
+            finally
             {
-                case WriteOperation.Append:
-                    var content = string.Empty;
-                    if (input.AddNewLine)
-                        content = "\n";
-                    content += input.Content;
-                    client.AppendAllText(input.Path, content, encoding);
-
-                    break;
-                case WriteOperation.Overwrite:
-                    if (client.Exists(input.Path))
-                        client.DeleteFile(input.Path);
-                    client.WriteAllText(input.Path, input.Content, encoding);
-
-                    break;
-                case WriteOperation.Error:
-                    if (client.Exists(input.Path))
-                        throw new ArgumentException($"File already exists: {input.Path}");
-                    client.WriteAllText(input.Path, input.Content, encoding);
-
-                    break;
-                default:
-                    throw new ArgumentException($"Unknown WriteBehaviour type: '{input.WriteBehaviour}'.");
+                client.Disconnect();
             }
-
-            var result = new Result(client.Get(input.Path));
-
-            return result;
         }
-        finally
+        catch (Exception ex)
         {
-            client.Disconnect();
-            client.Dispose();
+            return ex.Handle(options);
         }
     }
 }
