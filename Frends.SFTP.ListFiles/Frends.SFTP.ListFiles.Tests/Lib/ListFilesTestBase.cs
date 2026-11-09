@@ -8,11 +8,13 @@ public class ListFilesTestBase
 {
     protected static Connection _connection;
     protected static Input _input;
+    protected static Options _options;
 
     [SetUp]
     public void Setup()
     {
         _connection = Helpers.GetSftpConnection();
+        _options = new Options();
         _input = new Input
         {
             Directory = "/upload",
@@ -31,4 +33,3 @@ public class ListFilesTestBase
         Helpers.DeleteTestFiles();
     }
 }
-

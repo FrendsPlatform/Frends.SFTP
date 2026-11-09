@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.2.0] - 2026-11-09
+
+### Changed
+
+- Added options to control whether failures are thrown or returned with a custom error message.
+
 ## [3.1.0] - 2026-10-21
 
 ### Changed

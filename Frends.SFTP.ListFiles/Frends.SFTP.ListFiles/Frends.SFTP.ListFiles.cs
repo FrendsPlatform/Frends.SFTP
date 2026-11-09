@@ -3,13 +3,14 @@ using Renci.SshNet;
 using System.Text.RegularExpressions;
 using Frends.SFTP.ListFiles.Definitions;
 using Frends.SFTP.ListFiles.Enums;
+using Frends.SFTP.ListFiles.Helpers;
 
 namespace Frends.SFTP.ListFiles
 {
     /// <summary>
     /// Main class of the Task
     /// </summary>
-    public class SFTP
+    public static class SFTP
     {
         /// <summary>
         /// List files from set destination directory with optional file mask through SFTP connection.
@@ -17,11 +18,14 @@ namespace Frends.SFTP.ListFiles
         /// </summary>
         /// <param name="connection">Transfer connection parameters</param>
         /// <param name="input">Source file location</param>
+        /// <param name="options">Additional task options</param>
         /// <param name="cancellationToken">CancellationToken is given by the Frends UI</param>
-        /// <returns>Object { int FileCount, List&lt;FileItem&gt; Files }</returns>
+        /// <returns>object { bool Success, int FileCount, List&lt;FileItem&gt; Files, object Error { string Message, Exception AdditionalInfo } }</returns>
         public static async Task<Result> ListFiles([PropertyTab] Input input, [PropertyTab] Connection connection,
-            CancellationToken cancellationToken)
+            [PropertyTab] Options options, CancellationToken cancellationToken)
         {
+            options ??= new Options();
+
             using var timeoutCts = connection.MaxExecutionTimeout > 0
                 ? CancellationTokenSource.CreateLinkedTokenSource(cancellationToken)
                 : null;
@@ -33,62 +37,69 @@ namespace Frends.SFTP.ListFiles
 
             try
             {
-                return await Task.Run(async () =>
+                try
                 {
-                    ConnectionInfo connectionInfo;
-
-                    // Establish connectionInfo with connection parameters
-                    try
+                    return await Task.Run(async () =>
                     {
-                        var builder = new ConnectionInfoBuilder(input, connection);
-                        connectionInfo = builder.BuildConnectionInfo();
-                    }
-                    catch (Exception e)
-                    {
-                        throw new ArgumentException($"Error when initializing connection info: {e}", e);
-                    }
+                        ConnectionInfo connectionInfo;
 
-                    using var client = new SftpClient(connectionInfo);
-                    client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
-                    client.OperationTimeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
-                    client.KeepAliveInterval = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+                        // Establish connectionInfo with connection parameters
+                        try
+                        {
+                            var builder = new ConnectionInfoBuilder(input, connection);
+                            connectionInfo = builder.BuildConnectionInfo();
+                        }
+                        catch (Exception e)
+                        {
+                            throw new ArgumentException($"Error when initializing connection info: {e}", e);
+                        }
 
-                    if (connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
-                        Util.ForceHostKeyAlgorithm(client, connection.HostKeyAlgorithm);
+                        using var client = new SftpClient(connectionInfo);
+                        client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+                        client.OperationTimeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+                        client.KeepAliveInterval = TimeSpan.FromSeconds(connection.ConnectionTimeout);
 
-                    var expectedServerFingerprint = connection.ServerFingerPrint;
+                        if (connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
+                            Util.ForceHostKeyAlgorithm(client, connection.HostKeyAlgorithm);
 
-                    // Check the fingerprint of the server if given.
-                    if (!string.IsNullOrEmpty(expectedServerFingerprint))
-                    {
-                        Util.AddServerFingerprintCheck(client, expectedServerFingerprint);
-                    }
+                        var expectedServerFingerprint = connection.ServerFingerPrint;
 
-                    await client.ConnectAsync(effectiveToken);
+                        // Check the fingerprint of the server if given.
+                        if (!string.IsNullOrEmpty(expectedServerFingerprint))
+                        {
+                            Util.AddServerFingerprintCheck(client, expectedServerFingerprint);
+                        }
 
-                    if (!client.IsConnected)
-                        throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
+                        await client.ConnectAsync(effectiveToken);
 
-                    var regex = "^" + Regex.Escape(input.FileMask).Replace("\\?", ".").Replace("\\*", ".*") + "$";
-                    var regexStr = string.IsNullOrEmpty(input.FileMask) ? string.Empty : regex;
-                    var files = GetFiles(client, regexStr, input.Directory, input, effectiveToken);
-                    client.Disconnect();
-                    client.Dispose();
+                        if (!client.IsConnected)
+                            throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
-                    return new Result(files);
-                }, effectiveToken);
-            }
-            catch (OperationCanceledException e)
-            {
-                if (timeoutCts != null && timeoutCts.IsCancellationRequested &&
-                    !cancellationToken.IsCancellationRequested)
-                {
-                    throw new TimeoutException(
-                        $"SFTP operation exceeded maximum execution time of {connection.MaxExecutionTimeout} seconds.",
-                        e);
+                        var regex = "^" + Regex.Escape(input.FileMask).Replace("\\?", ".").Replace("\\*", ".*") + "$";
+                        var regexStr = string.IsNullOrEmpty(input.FileMask) ? string.Empty : regex;
+                        var files = GetFiles(client, regexStr, input.Directory, input, effectiveToken);
+                        client.Disconnect();
+                        client.Dispose();
+
+                        return new Result(files);
+                    }, effectiveToken);
                 }
+                catch (OperationCanceledException e)
+                {
+                    if (timeoutCts != null && timeoutCts.IsCancellationRequested &&
+                        !cancellationToken.IsCancellationRequested)
+                    {
+                        throw new TimeoutException(
+                            $"SFTP operation exceeded maximum execution time of {connection.MaxExecutionTimeout} seconds.",
+                            e);
+                    }
 
-                throw;
+                    throw;
+                }
+            }
+            catch (Exception e)
+            {
+                return e.Handle(options);
             }
         }
 

@@ -27,7 +27,7 @@ public class ConnectivityTests : ListFilesTestBase
             IncludeSubdirectories = false,
             FileEncoding = FileEncoding.ANSI
         };
-        var result = await SFTP.ListFiles(input, connection, new CancellationToken());
+        var result = await SFTP.ListFiles(input, connection, _options, new CancellationToken());
         Assert.AreEqual(3, result.FileCount);
     }
 
@@ -49,7 +49,7 @@ public class ConnectivityTests : ListFilesTestBase
             IncludeSubdirectories = false,
             FileEncoding = FileEncoding.ANSI
         };
-        var result = await SFTP.ListFiles(input, connection, new CancellationToken());
+        var result = await SFTP.ListFiles(input, connection, _options, new CancellationToken());
         Assert.AreEqual(3, result.FileCount);
     }
 
@@ -59,8 +59,7 @@ public class ConnectivityTests : ListFilesTestBase
         var connection = Helpers.GetSftpConnection();
         connection.UseKeyboardInteractiveAuthentication = true;
 
-        var result = await SFTP.ListFiles(_input, connection, new CancellationToken());
+        var result = await SFTP.ListFiles(_input, connection, _options, new CancellationToken());
         Assert.AreEqual(3, result.FileCount);
     }
 }
-

@@ -6,10 +6,16 @@
 public class Result
 {
     /// <summary>
+    /// Indicates if the task completed successfully.
+    /// </summary>
+    /// <example>true</example>
+    public bool Success { get; set; } = true;
+
+    /// <summary>
     /// Count of files found from the directory.
     /// </summary>
     /// <example>2</example>
-    public int FileCount { get; private set; }
+    public int FileCount { get; set; }
 
     /// <summary>
     /// List of file items found from the directory.
@@ -42,12 +48,17 @@ public class Result
 	/// ]
     /// </code>
     /// </example>
-    public List<FileItem> Files { get; private set; }
+    public List<FileItem> Files { get; set; }
 
-    internal Result(List<FileItem> files)
+    /// <summary>
+    /// Error that occurred during task execution.
+    /// </summary>
+    /// <example>object { string Message, Exception AdditionalInfo }</example>
+    public Error Error { get; set; }
+
+    internal Result(List<FileItem> files = null)
     {
-        FileCount = files.Count;
-        Files = files;
+        Files = files ?? new List<FileItem>();
+        FileCount = Files.Count;
     }
 }
-

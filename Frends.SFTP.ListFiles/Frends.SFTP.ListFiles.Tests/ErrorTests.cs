@@ -13,6 +13,25 @@ namespace Frends.SFTP.ListFiles.Tests;
 public class ErrorTests : ListFilesTestBase
 {
     [Test]
+    public async Task ListFiles_TestDirectoryNotExistsCanReturnError()
+    {
+        var input = new Input
+        {
+            Directory = "/upload/nonexisting/directory",
+            FileMask = "*.txt",
+            IncludeType = IncludeType.File,
+            IncludeSubdirectories = true,
+            FileEncoding = FileEncoding.ANSI
+        };
+        var options = new Options { ThrowErrorOnFailure = false };
+
+        var result = await SFTP.ListFiles(input, _connection, options, new CancellationToken());
+
+        Assert.IsFalse(result.Success);
+        Assert.That(result.Error.Message, Does.Contain("No such file"));
+    }
+
+    [Test]
     public void ListFiles_TestDirectoryNotExistsThrows()
     {
         var input = new Input
@@ -24,7 +43,7 @@ public class ErrorTests : ListFilesTestBase
             FileEncoding = FileEncoding.ANSI
         };
 
-        var ex = Assert.ThrowsAsync<SftpPathNotFoundException>(async () => await SFTP.ListFiles(input, _connection, new CancellationToken()));
+        var ex = Assert.ThrowsAsync<SftpPathNotFoundException>(async () => await SFTP.ListFiles(input, _connection, _options, new CancellationToken()));
         Assert.That(ex.Message.StartsWith("No such file"), ex.Message);
 
     }
@@ -43,7 +62,7 @@ public class ErrorTests : ListFilesTestBase
             FileEncoding = FileEncoding.ANSI
         };
 
-        Assert.ThrowsAsync<SocketException>(async () => await SFTP.ListFiles(input, connection, new CancellationToken()));
+        Assert.ThrowsAsync<SocketException>(async () => await SFTP.ListFiles(input, connection, _options, new CancellationToken()));
     }
 
     [Test]
@@ -62,7 +81,7 @@ public class ErrorTests : ListFilesTestBase
             FileEncoding = FileEncoding.ANSI
         };
 
-        var ex = Assert.ThrowsAsync<SshAuthenticationException>(async () => await SFTP.ListFiles(input, connection, new CancellationToken()));
+        var ex = Assert.ThrowsAsync<SshAuthenticationException>(async () => await SFTP.ListFiles(input, connection, _options, new CancellationToken()));
         Assert.AreEqual("Permission denied (password).", ex.Message);
     }
 
@@ -83,7 +102,7 @@ public class ErrorTests : ListFilesTestBase
             FileEncoding = FileEncoding.ANSI
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, new CancellationToken()));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, _options, new CancellationToken()));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info:"));
     }
 
@@ -104,7 +123,7 @@ public class ErrorTests : ListFilesTestBase
             FileEncoding = FileEncoding.ANSI
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, new CancellationToken()));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, _options, new CancellationToken()));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
@@ -127,7 +146,7 @@ public class ErrorTests : ListFilesTestBase
             FileEncoding = FileEncoding.ANSI
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, new CancellationToken()));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, _options, new CancellationToken()));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
@@ -148,7 +167,7 @@ public class ErrorTests : ListFilesTestBase
             FileEncoding = FileEncoding.ANSI
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, new CancellationToken()));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, _options, new CancellationToken()));
         Assert.That(ex.Message.Contains("Error when checking the server fingerprint:"), ex.Message);
     }
 
@@ -168,7 +187,7 @@ public class ErrorTests : ListFilesTestBase
             FileEncoding = FileEncoding.ANSI
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, new CancellationToken()));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, _options, new CancellationToken()));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
@@ -188,8 +207,7 @@ public class ErrorTests : ListFilesTestBase
             FileEncoding = FileEncoding.ANSI
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, new CancellationToken()));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, _options, new CancellationToken()));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 }
-
