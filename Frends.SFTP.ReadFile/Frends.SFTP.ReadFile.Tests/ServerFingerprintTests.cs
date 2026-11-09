@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework;
 using Frends.SFTP.ReadFile.Enums;
 using Frends.SFTP.ReadFile.Tests.Lib;
+using NUnit.Framework;
 
 namespace Frends.SFTP.ReadFile.Tests;
 
@@ -36,7 +36,7 @@ public class ServerFingerprintTests : ReadFileTestBase
     [Test]
     public async Task ReadFile_TestTransferWithExpectedServerFingerprintAsHexSha256WithAltercations()
     {
-        Connection.ServerFingerPrint = sha256Hash.Replace("=", "");
+        Connection.ServerFingerPrint = sha256Hash.Replace("=", string.Empty);
         Connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
         var result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
@@ -76,7 +76,7 @@ public class ServerFingerprintTests : ReadFileTestBase
     [Test]
     public async Task ReadFile_TestTransferWithExpectedServerFingerprintAsMD5Hash()
     {
-        Connection.ServerFingerPrint = md5.Replace(":", "");
+        Connection.ServerFingerPrint = md5.Replace(":", string.Empty);
         Connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
         var result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);

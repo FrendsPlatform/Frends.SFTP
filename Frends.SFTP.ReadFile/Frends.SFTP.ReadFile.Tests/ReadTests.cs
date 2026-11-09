@@ -2,9 +2,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.SFTP.ReadFile.Definitions;
-using NUnit.Framework;
 using Frends.SFTP.ReadFile.Enums;
 using Frends.SFTP.ReadFile.Tests.Lib;
+using NUnit.Framework;
 
 namespace Frends.SFTP.ReadFile.Tests;
 
@@ -15,6 +15,7 @@ internal class ReadTests : ReadFileTestBase
     public async Task ReadFile_TestSimpleRead()
     {
         var result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
+        Assert.That(result.Success, Is.True);
         Assert.AreEqual(Content, result.TextContent);
         Assert.AreEqual(Array.Empty<byte>(), result.BinaryContent);
     }
@@ -51,7 +52,7 @@ internal class ReadTests : ReadFileTestBase
     [Test]
     public async Task ReadFile_TestWithEmptyContent()
     {
-        var content = "";
+        var content = string.Empty;
 
         Helpers.OverrideDummyFile(Input.Path, content);
 

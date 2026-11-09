@@ -1,11 +1,12 @@
-﻿using NUnit.Framework;
-using Renci.SshNet.Common;
 using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 using Frends.SFTP.ReadFile.Definitions;
 using Frends.SFTP.ReadFile.Enums;
+using NUnit.Framework;
+using Renci.SshNet.Common;
 
 namespace Frends.SFTP.ReadFile.Tests;
 
@@ -25,6 +26,29 @@ public class ErrorTests
         var ex = Assert.ThrowsAsync<SftpPathNotFoundException>(async () =>
             await SFTP.ReadFile(input, connection, new Options(), CancellationToken.None));
         Assert.That(ex.Message.StartsWith("No such file"), ex.Message);
+    }
+
+    [Test]
+    public async Task ReadFile_ReturnsErrorWhenConfiguredNotToThrow()
+    {
+        var connection = Helpers.GetSftpConnection();
+        connection.Port = 51644;
+        var input = new Input
+        {
+            Path = "/upload/test.txt",
+            FileEncoding = FileEncoding.ANSI,
+        };
+        var options = new Options
+        {
+            ThrowErrorOnFailure = false,
+            ErrorMessageOnFailure = "Unable to read the requested SFTP file",
+        };
+
+        var result = await SFTP.ReadFile(input, connection, options, CancellationToken.None);
+
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Error.Message, Does.StartWith("Unable to read the requested SFTP file:"));
+        Assert.That(result.Error.AdditionalInfo, Is.TypeOf<SocketException>());
     }
 
     [Test]
@@ -86,7 +110,7 @@ public class ErrorTests
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
         connection.PrivateKeyPassphrase = "passphrase";
-        connection.PrivateKeyFile = "";
+        connection.PrivateKeyFile = string.Empty;
 
         var input = new Input
         {
@@ -151,7 +175,7 @@ public class ErrorTests
             new()
             {
                 Prompt = "Password:",
-                Response = "pass"
+                Response = "pass",
             },
         };
         var input = new Input
