@@ -9,13 +9,14 @@ public enum DestinationAction
     /// Appends the file content to destination file if it exists.
     /// </summary>
     Append,
+
     /// <summary>
     /// Overwrites destination file if it exists.
     /// </summary>
     Overwrite,
+
     /// <summary>
     /// Throws exception if destination file exists.
     /// </summary>
-    Error
+    Error,
 }
-

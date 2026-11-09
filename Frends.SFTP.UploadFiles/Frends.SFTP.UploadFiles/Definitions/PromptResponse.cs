@@ -9,15 +9,15 @@ namespace Frends.SFTP.UploadFiles.Definitions
     public class PromptResponse
     {
         /// <summary>
-        /// Prompt from the server what is to be expected.
+        /// Gets or sets prompt from the server what is to be expected.
         /// </summary>
-        /// <example>Verification code</example>
+        /// <example>Verification code.</example>
         public string Prompt { get; set; }
 
         /// <summary>
-        /// Response for the Prompt from the server.
+        /// Gets or sets response for the Prompt from the server.
         /// </summary>
-        /// <example>123456789</example>
+        /// <example>123456789.</example>
         [PasswordPropertyText]
         [DisplayFormat(DataFormatString = "Text")]
         public string Response { get; set; }

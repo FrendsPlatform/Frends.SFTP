@@ -1,13 +1,13 @@
-﻿using NUnit.Framework;
-using System.IO;
+﻿using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.SFTP.UploadFiles.Definitions;
+using NUnit.Framework;
 
 namespace Frends.SFTP.UploadFiles.Tests
 {
     [TestFixture]
-    class EncodingTests : UploadFilesTestBase
+    internal class EncodingTests : UploadFilesTestBase
     {
         [Test]
         public async Task UploadFiles_Iso88591FileNameEncodingShouldWork()
@@ -16,10 +16,10 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 Directory = "/upload/Upload",
                 FileNameEncoding = FileEncoding.Other,
-                FileNameEncodingInString = "iso-8859-1"
+                FileNameEncodingInString = "iso-8859-1",
             };
 
-            var result = await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -31,10 +31,10 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 Directory = "/upload/Upload",
                 FileNameEncoding = FileEncoding.Other,
-                FileNameEncodingInString = "iso-invalid-encoding"
+                FileNameEncodingInString = "iso-invalid-encoding",
             };
 
-            var ex = Assert.CatchAsync<System.Exception>(async () => await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken()));
+            var ex = Assert.CatchAsync<System.Exception>(async () => await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None));
             Assert.IsTrue(ex.Message.Contains("Unknown encoding: 'iso-invalid-encoding'"), ex.Message);
         }
 
@@ -44,10 +44,10 @@ namespace Frends.SFTP.UploadFiles.Tests
             var destination = new Destination
             {
                 Directory = "/upload/Upload",
-                FileNameEncoding = FileEncoding.ANSI
+                FileNameEncoding = FileEncoding.ANSI,
             };
 
-            var result = await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -58,10 +58,10 @@ namespace Frends.SFTP.UploadFiles.Tests
             var destination = new Destination
             {
                 Directory = "/upload/Upload",
-                FileNameEncoding = FileEncoding.ASCII
+                FileNameEncoding = FileEncoding.ASCII,
             };
 
-            var result = await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -73,10 +73,10 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 Directory = "/upload/Upload",
                 FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = false
+                EnableBomForFileName = false,
             };
 
-            var result = await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -88,10 +88,10 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 Directory = "/upload/Upload",
                 FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true
+                EnableBomForFileName = true,
             };
 
-            var result = await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -102,10 +102,10 @@ namespace Frends.SFTP.UploadFiles.Tests
             var destination = new Destination
             {
                 Directory = "/upload/Upload",
-                FileNameEncoding = FileEncoding.WINDOWS1252
+                FileNameEncoding = FileEncoding.WINDOWS1252,
             };
 
-            var result = await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -117,10 +117,10 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 Directory = "/upload/Upload",
                 FileNameEncoding = FileEncoding.Other,
-                FileNameEncodingInString = "windows-1252"
+                FileNameEncodingInString = "windows-1252",
             };
 
-            var result = await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -132,12 +132,12 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 Directory = "/upload/Upload",
                 FileContentEncoding = FileEncoding.ASCII,
-                Action = DestinationAction.Append
+                Action = DestinationAction.Append,
             };
 
-            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(_workDir, _source.FileName));
+            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
 
-            var result = await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -149,12 +149,12 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 Directory = "/upload/Upload",
                 FileContentEncoding = FileEncoding.ANSI,
-                Action = DestinationAction.Append
+                Action = DestinationAction.Append,
             };
 
-            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(_workDir, _source.FileName));
+            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
 
-            var result = await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -167,12 +167,12 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Directory = "/upload/Upload",
                 FileContentEncoding = FileEncoding.UTF8,
                 EnableBomForContent = true,
-                Action = DestinationAction.Append
+                Action = DestinationAction.Append,
             };
 
-            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(_workDir, _source.FileName));
+            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
 
-            var result = await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -185,12 +185,12 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Directory = "/upload/Upload",
                 FileContentEncoding = FileEncoding.UTF8,
                 EnableBomForContent = false,
-                Action = DestinationAction.Append
+                Action = DestinationAction.Append,
             };
 
-            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(_workDir, _source.FileName));
+            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
 
-            var result = await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -202,12 +202,12 @@ namespace Frends.SFTP.UploadFiles.Tests
             {
                 Directory = "/upload/Upload",
                 FileContentEncoding = FileEncoding.WINDOWS1252,
-                Action = DestinationAction.Append
+                Action = DestinationAction.Append,
             };
 
-            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(_workDir, _source.FileName));
+            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
 
-            var result = await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -220,17 +220,14 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Directory = "/upload/Upload",
                 FileContentEncoding = FileEncoding.Other,
                 FileContentEncodingInString = "Windows-1252",
-                Action = DestinationAction.Append
+                Action = DestinationAction.Append,
             };
 
-            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(_workDir, _source.FileName));
+            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
 
-            var result = await SFTP.UploadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
     }
 }
-
-
-

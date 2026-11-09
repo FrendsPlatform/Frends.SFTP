@@ -1,31 +1,31 @@
-﻿using NUnit.Framework;
+﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System;
-using System.Linq;
 using Frends.SFTP.UploadFiles.Definitions;
+using NUnit.Framework;
 
 namespace Frends.SFTP.UploadFiles.Tests
 {
     [TestFixture]
-    class SourceOperationTests : UploadFilesTestBase
+    internal class SourceOperationTests : UploadFilesTestBase
     {
         [Test]
         public async Task UploadFiles_TestSourceOperationWithMove()
         {
-            var to = Path.Combine(_workDir, "uploaded");
+            var to = Path.Combine(TestWorkDir, "uploaded");
             Directory.CreateDirectory(to);
             var source = new Source
             {
-                Directory = _workDir,
+                Directory = TestWorkDir,
                 FileName = "SFTPUploadTestFile1.txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Move,
-                DirectoryToMoveAfterTransfer = to
+                DirectoryToMoveAfterTransfer = to,
             };
 
-            var result = await SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, TestDestination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -37,18 +37,18 @@ namespace Frends.SFTP.UploadFiles.Tests
         {
             var source = new Source
             {
-                Directory = _workDir,
+                Directory = TestWorkDir,
                 FileName = "SFTPUploadTestFile1.txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Rename,
-                FileNameAfterTransfer = "uploaded_%SourceFileName%.txt"
+                FileNameAfterTransfer = "uploaded_%SourceFileName%.txt",
             };
 
-            var result = await SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, TestDestination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(File.Exists(Path.Combine(_workDir, "uploaded_SFTPUploadTestFile1.txt")));
+            Assert.IsTrue(File.Exists(Path.Combine(TestWorkDir, "uploaded_SFTPUploadTestFile1.txt")));
         }
 
         [Test]
@@ -61,18 +61,18 @@ namespace Frends.SFTP.UploadFiles.Tests
                 RenameDestinationFileDuringTransfer = false,
                 CreateDestinationDirectories = true,
                 PreserveLastModified = false,
-                OperationLog = true
+                OperationLog = true,
             };
-            var result = await SFTP.UploadFiles(_source, _destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, TestDestination, TestConnection, options, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
 
-            Assert.IsTrue(File.Exists(Path.Combine(_workDir, _source.FileName)));
+            Assert.IsTrue(File.Exists(Path.Combine(TestWorkDir, TestSource.FileName)));
         }
 
         [Test]
         public async Task UploadFiles_TestSourceOperationMoveWithRenameFilesDuringTransferDisabled()
         {
-            var to = Path.Combine(_workDir, "destination");
+            var to = Path.Combine(TestWorkDir, "destination");
             Directory.CreateDirectory(to);
             var options = new Options
             {
@@ -81,19 +81,19 @@ namespace Frends.SFTP.UploadFiles.Tests
                 RenameDestinationFileDuringTransfer = false,
                 CreateDestinationDirectories = true,
                 PreserveLastModified = false,
-                OperationLog = true
+                OperationLog = true,
             };
 
             var source = new Source
             {
-                Directory = _workDir,
+                Directory = TestWorkDir,
                 FileName = "SFTPUploadTestFile1.txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Move,
-                DirectoryToMoveAfterTransfer = to
+                DirectoryToMoveAfterTransfer = to,
             };
 
-            var result = await SFTP.UploadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, TestDestination, TestConnection, options, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -110,29 +110,29 @@ namespace Frends.SFTP.UploadFiles.Tests
                 RenameDestinationFileDuringTransfer = false,
                 CreateDestinationDirectories = true,
                 PreserveLastModified = false,
-                OperationLog = true
+                OperationLog = true,
             };
 
             var source = new Source
             {
-                Directory = _workDir,
+                Directory = TestWorkDir,
                 FileName = "SFTPUploadTestFile1.txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Rename,
-                FileNameAfterTransfer = "uploaded_%SourceFileName%%SourceFileExtension%"
+                FileNameAfterTransfer = "uploaded_%SourceFileName%%SourceFileExtension%",
             };
 
-            var result = await SFTP.UploadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, TestDestination, TestConnection, options, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(File.Exists(Path.Combine(_workDir, "uploaded_" + source.FileName)));
+            Assert.IsTrue(File.Exists(Path.Combine(TestWorkDir, "uploaded_" + source.FileName)));
         }
 
         [Test]
         public async Task UploadFiles_TestSourceOperationMoveWithRenameSourceAndDestinationFilesEnabled()
         {
-            var to = Path.Combine(_workDir, "destination");
+            var to = Path.Combine(TestWorkDir, "destination");
             Directory.CreateDirectory(to);
 
             var options = new Options
@@ -142,19 +142,19 @@ namespace Frends.SFTP.UploadFiles.Tests
                 RenameDestinationFileDuringTransfer = true,
                 CreateDestinationDirectories = true,
                 PreserveLastModified = false,
-                OperationLog = true
+                OperationLog = true,
             };
 
             var source = new Source
             {
-                Directory = _workDir,
+                Directory = TestWorkDir,
                 FileName = "SFTPUploadTestFile1.txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Move,
-                DirectoryToMoveAfterTransfer = to
+                DirectoryToMoveAfterTransfer = to,
             };
 
-            var result = await SFTP.UploadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, TestDestination, TestConnection, options, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -171,23 +171,23 @@ namespace Frends.SFTP.UploadFiles.Tests
                 RenameDestinationFileDuringTransfer = true,
                 CreateDestinationDirectories = true,
                 PreserveLastModified = false,
-                OperationLog = true
+                OperationLog = true,
             };
 
             var source = new Source
             {
-                Directory = _workDir,
+                Directory = TestWorkDir,
                 FileName = "SFTPUploadTestFile1.txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Rename,
-                FileNameAfterTransfer = "uploaded_%SourceFileName%%SourceFileExtension%"
+                FileNameAfterTransfer = "uploaded_%SourceFileName%%SourceFileExtension%",
             };
 
-            var result = await SFTP.UploadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, TestDestination, TestConnection, options, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(File.Exists(Path.Combine(_workDir, "uploaded_" + source.FileName)));
+            Assert.IsTrue(File.Exists(Path.Combine(TestWorkDir, "uploaded_" + source.FileName)));
         }
 
         [Test]
@@ -200,39 +200,39 @@ namespace Frends.SFTP.UploadFiles.Tests
                 RenameDestinationFileDuringTransfer = true,
                 CreateDestinationDirectories = true,
                 PreserveLastModified = true,
-                OperationLog = true
+                OperationLog = true,
             };
 
             var source = new Source
             {
-                Directory = _source.Directory,
-                FileName = _source.FileName,
+                Directory = TestSource.Directory,
+                FileName = TestSource.FileName,
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Move,
-                DirectoryToMoveAfterTransfer = Path.Combine(_workDir, "uploaded"),
+                DirectoryToMoveAfterTransfer = Path.Combine(TestWorkDir, "uploaded"),
             };
 
-            var result = await SFTP.UploadFiles(source, _destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, TestDestination, TestConnection, options, TestInfo, CancellationToken.None);
             Assert.IsFalse(result.Success);
 
-            Assert.IsTrue(File.Exists(Path.Combine(_workDir, _source.FileName)));
+            Assert.IsTrue(File.Exists(Path.Combine(TestWorkDir, TestSource.FileName)));
         }
 
         [Test]
         public async Task UploadFiles_TestSourceOperationWithRenameWithDifferentDirectory()
         {
-            var to = Path.Combine(_workDir, "uploaded");
+            var to = Path.Combine(TestWorkDir, "uploaded");
             Directory.CreateDirectory(to);
             var source = new Source
             {
-                Directory = _workDir,
+                Directory = TestWorkDir,
                 FileName = "SFTPUploadTestFile1.txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Rename,
-                FileNameAfterTransfer = Path.Combine(to, "uploaded_%SourceFileName%.txt")
+                FileNameAfterTransfer = Path.Combine(to, "uploaded_%SourceFileName%.txt"),
             };
 
-            var result = await SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, TestDestination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -243,18 +243,18 @@ namespace Frends.SFTP.UploadFiles.Tests
         public async Task UploadFiles_TestSourceOperationWithRenameWithDifferentDirectoryWithMacrosInDirectory()
         {
             var year = DateTime.Now.Year.ToString();
-            var to = Path.Combine(_workDir, $"{year}_uploaded");
+            var to = Path.Combine(TestWorkDir, $"{year}_uploaded");
             Directory.CreateDirectory(to);
             var source = new Source
             {
-                Directory = _workDir,
+                Directory = TestWorkDir,
                 FileName = "SFTPUploadTestFile1.txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Rename,
-                FileNameAfterTransfer = Path.Combine(_workDir + "%Year%_uploaded", "uploaded_%SourceFileName%.txt")
+                FileNameAfterTransfer = Path.Combine(TestWorkDir + "%Year%_uploaded", "uploaded_%SourceFileName%.txt"),
             };
 
-            var result = await SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, TestDestination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -265,18 +265,18 @@ namespace Frends.SFTP.UploadFiles.Tests
         public async Task UploadFiles_TestSourceOperationWithRenameWithDifferentDirectoryWithMacrosInFileName()
         {
             var year = DateTime.Now.Year.ToString();
-            var to = Path.Combine(_workDir, $"{year}_uploaded");
+            var to = Path.Combine(TestWorkDir, $"{year}_uploaded");
             Directory.CreateDirectory(to);
             var source = new Source
             {
-                Directory = _workDir,
+                Directory = TestWorkDir,
                 FileName = "SFTPUploadTestFile1.txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Rename,
-                FileNameAfterTransfer = Path.Combine(to, "uploaded_%SourceFileName%.txt")
+                FileNameAfterTransfer = Path.Combine(to, "uploaded_%SourceFileName%.txt"),
             };
 
-            var result = await SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, TestDestination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -286,51 +286,49 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public async Task UploadFiles_TestSourceOperationMoveThat8COFilesAreNotLeft()
         {
-            var to = Path.Combine(_workDir, "uploaded");
+            var to = Path.Combine(TestWorkDir, "uploaded");
             Directory.CreateDirectory(to);
             var source = new Source
             {
-                Directory = _workDir,
+                Directory = TestWorkDir,
                 FileName = "SFTPUploadTestFile1.txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Move,
-                DirectoryToMoveAfterTransfer = to
+                DirectoryToMoveAfterTransfer = to,
             };
 
-            var result = await SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, TestDestination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
             var files = Directory.GetFiles(to, "*.8CO").ToList();
             Assert.AreEqual(0, files.Count());
             files = Directory.GetFiles(to, "*").ToList();
-            Assert.IsTrue(files.Contains(Path.Combine(to, _source.FileName)));
+            Assert.IsTrue(files.Contains(Path.Combine(to, TestSource.FileName)));
         }
 
         [Test]
         public void UploadFiles_TestSourceOperationMoveFailedAnd8COFilesAreNotLeft()
         {
-            var to = Path.Combine(_workDir, "uploaded");
+            var to = Path.Combine(TestWorkDir, "uploaded");
             Directory.CreateDirectory(to);
             var source = new Source
             {
-                Directory = _workDir,
+                Directory = TestWorkDir,
                 FileName = "SFTPUploadTestFile1.txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Move,
-                DirectoryToMoveAfterTransfer = to
+                DirectoryToMoveAfterTransfer = to,
             };
 
-            File.Copy(Path.Combine(_workDir, source.FileName), Path.Combine(to, source.FileName));
+            File.Copy(Path.Combine(TestWorkDir, source.FileName), Path.Combine(to, source.FileName));
 
-            Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
+            Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(source, TestDestination, TestConnection, TestOptions, TestInfo, CancellationToken.None));
 
-            var files = Directory.GetFiles(_workDir, "frends_*").ToList();
+            var files = Directory.GetFiles(TestWorkDir, "frends_*").ToList();
             Assert.AreEqual(0, files.Count());
-            files = Directory.GetFiles(_workDir, "*").ToList();
-            Assert.IsTrue(files.Contains(Path.Combine(_workDir, _source.FileName)));
+            files = Directory.GetFiles(TestWorkDir, "*").ToList();
+            Assert.IsTrue(files.Contains(Path.Combine(TestWorkDir, TestSource.FileName)));
         }
     }
 }
-
-

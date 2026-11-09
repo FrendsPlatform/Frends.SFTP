@@ -2,20 +2,26 @@
 
 namespace Frends.SFTP.UploadFiles.Definitions;
 
-///<summary>
+/// <summary>
 /// Policies for creating names for remote files: expands macros etc.
-///</summary>
+/// </summary>
 internal class RenamingPolicy
 {
-    private readonly IDictionary<string, Func<string, string>> MacroHandlers;
-    private readonly IDictionary<string, Func<string, string>> SourceFileNameMacroHandlers;
+    private readonly IDictionary<string, Func<string, string>> macroHandlers;
+    private readonly IDictionary<string, Func<string, string>> sourceFileNameMacroHandlers;
 
     public RenamingPolicy(string transferName, Guid transferId)
     {
-        MacroHandlers = InitializeMacroHandlers(transferName, transferId);
-        SourceFileNameMacroHandlers = InitializeSourceFileNameMacroHandlers();
+        macroHandlers = InitializeMacroHandlers(transferName, transferId);
+        sourceFileNameMacroHandlers = InitializeSourceFileNameMacroHandlers();
     }
 
+    /// <summary>
+    /// Creates a destination filename by applying the configured name pattern and macros.
+    /// </summary>
+    /// <param name="originalFileName">Original name of the source file.</param>
+    /// <param name="remoteFileDefinition">Destination filename pattern.</param>
+    /// <returns>Destination filename after applying macros and masks.</returns>
     public string CreateRemoteFileName(string originalFileName, string remoteFileDefinition)
     {
         if (!string.IsNullOrEmpty(remoteFileDefinition) && remoteFileDefinition.Contains('?'))
@@ -29,8 +35,8 @@ internal class RenamingPolicy
         if (string.IsNullOrEmpty(remoteFileDefinition)) return originalFileNameWithoutPath;
 
         if (!IsFileMask(remoteFileDefinition) &&
-            !IsFileMacro(remoteFileDefinition, MacroHandlers) &&
-            !IsFileMacro(remoteFileDefinition, SourceFileNameMacroHandlers))
+            !IsFileMacro(remoteFileDefinition, macroHandlers) &&
+            !IsFileMacro(remoteFileDefinition, sourceFileNameMacroHandlers))
         {
             // remoteFileDefination does not have macros
             var remoteFileName = Path.GetFileName(remoteFileDefinition);
@@ -48,6 +54,11 @@ internal class RenamingPolicy
         return result;
     }
 
+    /// <summary>
+    /// Expands supported macros in a source or destination directory.
+    /// </summary>
+    /// <param name="directory">Directory path that may contain macros.</param>
+    /// <returns>Directory path with supported macros expanded.</returns>
     public string ExpandDirectoryForMacros(string directory)
     {
         if (directory.Contains("%SourceFileName%") || directory.Contains("%SourceFileExtension%"))
@@ -56,6 +67,12 @@ internal class RenamingPolicy
         return ExpandFileMacros(directory);
     }
 
+    /// <summary>
+    /// Replaces the source-relative-directory macro with the file's relative directory.
+    /// </summary>
+    /// <param name="path">Path that may contain the source-relative-directory macro.</param>
+    /// <param name="relativeDirectoryPath">Directory path relative to the source root.</param>
+    /// <returns>Path with the macro replaced.</returns>
     public string ExpandSourceRelativeDirectoryMacro(string path, string relativeDirectoryPath)
     {
         if (string.IsNullOrEmpty(path))
@@ -68,7 +85,12 @@ internal class RenamingPolicy
             RegexOptions.IgnoreCase);
     }
 
-    public static string CanonizeAndCheckPath(string path)
+    /// <summary>
+    /// Normalizes path separators and rejects paths containing invalid characters.
+    /// </summary>
+    /// <param name="path">Path to normalize and validate.</param>
+    /// <returns>Validated path using forward slashes.</returns>
+    public string CanonizeAndCheckPath(string path)
     {
         path = path.Replace(Path.DirectorySeparatorChar, '/'); // make all the paths use forward slashes - this should be supported on File, FTP, and SFTP
 
@@ -77,15 +99,13 @@ internal class RenamingPolicy
         return path;
     }
 
-    private static char[] GetInvalidChars()
-    {
-        List<char> invalidCharacters = new List<char>(Path.GetInvalidFileNameChars());
-        invalidCharacters.Remove('/'); // remove the forward slash, as it is supported
-        invalidCharacters.Remove(':'); // also the colon is supported
-        return invalidCharacters.ToArray();
-    }
-
-    public string CreateRemoteFileNameForRename(string originalFilePath, string sourceOperationTo)
+    /// <summary>
+    /// Creates and validates the destination path for a source-file rename operation.
+    /// </summary>
+    /// <param name="originalFilePath">Path of the source file.</param>
+    /// <param name="sourceOperationTo">Configured destination path for the rename.</param>
+    /// <returns>Validated destination path.</returns>
+    internal string CreateRemoteFileNameForRename(string originalFilePath, string sourceOperationTo)
     {
         if (string.IsNullOrEmpty(sourceOperationTo))
             throw new ArgumentException("When using rename as a source operation, you need to define the new name");
@@ -94,6 +114,14 @@ internal class RenamingPolicy
         filePath = ExpandMacrosAndMasks(originalFilePath, filePath);
 
         return CanonizeAndCheckPath(filePath);
+    }
+
+    private char[] GetInvalidChars()
+    {
+        List<char> invalidCharacters = new List<char>(Path.GetInvalidFileNameChars());
+        invalidCharacters.Remove('/'); // remove the forward slash, as it is supported
+        invalidCharacters.Remove(':'); // also the colon is supported
+        return invalidCharacters.ToArray();
     }
 
     private string ExpandMacrosAndMasks(string originalFilePath, string filePath)
@@ -108,7 +136,7 @@ internal class RenamingPolicy
     private string ExpandFileMacros(string filePath)
     {
         string filename = filePath;
-        if (IsFileMacro(filename, MacroHandlers))
+        if (IsFileMacro(filename, macroHandlers))
             filename = ReplaceMacro(filename);
 
         return filename;
@@ -117,13 +145,13 @@ internal class RenamingPolicy
     private string ExpandSourceFileNameMacros(string filePath, string originalFile)
     {
         string filename = filePath;
-        if (IsFileMacro(filename, SourceFileNameMacroHandlers))
+        if (IsFileMacro(filename, sourceFileNameMacroHandlers))
             filename = ReplaceSourceFileMacro(filename, originalFile);
 
         return filename;
     }
 
-    private static string ExpandFileMasks(string filePath, string originalFileName)
+    private string ExpandFileMasks(string filePath, string originalFileName)
     {
         string filename = filePath;
         if (IsFileMask(filename))
@@ -132,9 +160,9 @@ internal class RenamingPolicy
         return filename;
     }
 
-    private static string NameByMask(string filename, string mask)
+    private string NameByMask(string filename, string mask)
     {
-        //remove extension if it is wanted to be changed, new extension is added later on to new filename
+        // remove extension if it is wanted to be changed, new extension is added later on to new filename
         if (mask.Contains("*."))
             if (Path.HasExtension(filename)) filename = Path.GetFileNameWithoutExtension(filename);
 
@@ -142,14 +170,14 @@ internal class RenamingPolicy
         if (i >= 0)
         {
             string tmp = mask.Substring(0, i);
-            return string.Concat(tmp + filename + mask.Substring(i + 1, (mask.Length - (i + 1))));
+            return string.Concat(tmp + filename + mask.Substring(i + 1, mask.Length - (i + 1)));
         }
 
-        //Not an mask return mask.
+        // Not an mask return mask.
         return mask;
     }
 
-    private static bool IsFileMacro(string s, IDictionary<string, Func<string, string>> macroDictionary)
+    private bool IsFileMacro(string s, IDictionary<string, Func<string, string>> macroDictionary)
     {
         if (s == null) return false;
 
@@ -161,7 +189,7 @@ internal class RenamingPolicy
         return false;
     }
 
-    private static bool IsFileMask(string s)
+    private bool IsFileMask(string s)
     {
         bool b = false;
 
@@ -172,7 +200,7 @@ internal class RenamingPolicy
         return b;
     }
 
-    private static IDictionary<string, Func<string, string>> InitializeSourceFileNameMacroHandlers()
+    private IDictionary<string, Func<string, string>> InitializeSourceFileNameMacroHandlers()
     {
         return new Dictionary<string, Func<string, string>>
         {
@@ -194,11 +222,12 @@ internal class RenamingPolicy
 
                     return extension;
                 }
-            }
+            },
         };
     }
 
-    private static IDictionary<string, Func<string, string>> InitializeMacroHandlers(string transferName,
+    private IDictionary<string, Func<string, string>> InitializeMacroHandlers(
+        string transferName,
         Guid transferId)
     {
         return new Dictionary<string, Func<string, string>>(StringComparer.InvariantCultureIgnoreCase)
@@ -218,17 +247,17 @@ internal class RenamingPolicy
             { "%WeekDay%", (s) => ((int)DateTime.Now.DayOfWeek == 0 ? 7 : (int)DateTime.Now.DayOfWeek).ToString() },
             { "%Guid%", (s) => Guid.NewGuid().ToString() },
             { "%TransferId%", (s) => transferId.ToString() },
-            { "%TransferName%", (s) => transferName }
+            { "%TransferName%", (s) => transferName },
         };
     }
 
     private string ReplaceMacro(string fileName)
     {
-        foreach (var key in MacroHandlers.Keys)
+        foreach (var key in macroHandlers.Keys)
         {
             while (fileName.ToUpperInvariant().Contains(key.ToUpperInvariant()))
             {
-                fileName = Regex.Replace(fileName, Regex.Escape(key), MacroHandlers[key](fileName), RegexOptions.IgnoreCase);
+                fileName = Regex.Replace(fileName, Regex.Escape(key), macroHandlers[key](fileName), RegexOptions.IgnoreCase);
             }
         }
 
@@ -237,16 +266,18 @@ internal class RenamingPolicy
 
     private string ReplaceSourceFileMacro(string fileName, string originalFilePath)
     {
-        foreach (var key in SourceFileNameMacroHandlers.Keys)
+        foreach (var key in sourceFileNameMacroHandlers.Keys)
         {
             while (fileName.ToUpperInvariant().Contains(key.ToUpperInvariant()))
             {
-                fileName = Regex.Replace(fileName, Regex.Escape(key),
-                    SourceFileNameMacroHandlers[key].Invoke(originalFilePath), RegexOptions.IgnoreCase);
+                fileName = Regex.Replace(
+                    fileName,
+                    Regex.Escape(key),
+                    sourceFileNameMacroHandlers[key].Invoke(originalFilePath),
+                    RegexOptions.IgnoreCase);
             }
         }
 
         return fileName;
     }
 }
-

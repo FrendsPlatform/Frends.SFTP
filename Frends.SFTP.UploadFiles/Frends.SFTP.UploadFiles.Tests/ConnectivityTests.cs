@@ -2,8 +2,8 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework;
 using Frends.SFTP.UploadFiles.Definitions;
+using NUnit.Framework;
 
 namespace Frends.SFTP.UploadFiles.Tests
 {
@@ -18,13 +18,13 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             var source = new Source
             {
-                Directory = _workDir,
+                Directory = TestWorkDir,
                 FileName = "LargeTestFile.bin",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Nothing,
             };
 
-            var result = await SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, TestDestination, connection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -37,7 +37,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             connection.UserName = "demo";
             connection.Password = "demo";
 
-            Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
+            Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(TestSource, TestDestination, connection, TestOptions, TestInfo, CancellationToken.None));
         }
 
         [Test]
@@ -48,13 +48,13 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             var source = new Source
             {
-                Directory = _workDir,
+                Directory = TestWorkDir,
                 FileName = "SFTPUploadTestFile2.txt",
                 Action = SourceAction.Error,
-                Operation = SourceOperation.Nothing
+                Operation = SourceOperation.Nothing,
             };
 
-            var result = await SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, TestDestination, connection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -67,13 +67,13 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             var source = new Source
             {
-                Directory = _workDir,
+                Directory = TestWorkDir,
                 FileName = "SFTPUploadTestFile2.txt",
                 Action = SourceAction.Error,
-                Operation = SourceOperation.Nothing
+                Operation = SourceOperation.Nothing,
             };
 
-            var result = await SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, TestDestination, connection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -87,7 +87,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             connection.PrivateKeyPassphrase = "passphrase";
             connection.PrivateKeyString = key;
 
-            var result = await SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, TestDestination, connection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -100,7 +100,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             connection.PrivateKeyPassphrase = "passphrase";
             connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
-            var result = await SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, TestDestination, connection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -111,7 +111,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             var connection = Helpers.GetSftpConnection();
             connection.UseKeyboardInteractiveAuthentication = true;
 
-            var result = await SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, TestDestination, connection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -127,7 +127,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             connection.UseKeyboardInteractiveAuthentication = true;
             connection.PromptAndResponse = new PromptResponse[] { new PromptResponse { Prompt = "Password", Response = "pass" } };
 
-            var result = await SFTP.UploadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, TestDestination, connection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -141,10 +141,10 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Directory = "/upload/Upload",
                 Action = DestinationAction.Overwrite,
                 FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true
+                EnableBomForFileName = true,
             };
 
-            result = await SFTP.UploadFiles(_source, destination, connection, _options, _info, new CancellationToken());
+            result = await SFTP.UploadFiles(TestSource, destination, connection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -158,13 +158,13 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             var source = new Source
             {
-                Directory = _source.Directory,
+                Directory = TestSource.Directory,
                 FileName = "*.bin",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Nothing,
             };
 
-            var result = await SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, TestDestination, connection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(11, result.SuccessfulTransferCount);
         }
@@ -180,18 +180,15 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             var source = new Source
             {
-                Directory = _source.Directory,
+                Directory = TestSource.Directory,
                 FileName = "*.bin",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Nothing,
             };
 
-            var result = await SFTP.UploadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, TestDestination, connection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(11, result.SuccessfulTransferCount);
         }
     }
 }
-
-
-

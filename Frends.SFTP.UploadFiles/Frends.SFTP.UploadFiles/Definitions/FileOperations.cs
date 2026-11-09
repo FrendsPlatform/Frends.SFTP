@@ -18,6 +18,7 @@
                     {
                         writer.Write(Environment.NewLine);
                     }
+
                     writer.Flush();
                 }
             }
@@ -32,6 +33,7 @@
                     {
                         await outStream.WriteAsync(buff, 0, r, cancellationToken);
                     }
+
                     outStream.Flush();
                 }
             }

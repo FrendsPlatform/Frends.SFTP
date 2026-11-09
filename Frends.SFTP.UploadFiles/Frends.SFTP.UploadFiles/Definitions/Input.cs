@@ -6,20 +6,20 @@ namespace Frends.SFTP.UploadFiles.Definitions;
 public class Input
 {
     /// <summary>
-    /// Source file location and post-transfer actions.
+    /// Gets or sets source file location and post-transfer actions.
     /// </summary>
-    /// <example>object { string Directory = "/outbound", string FileName = "*.csv" }</example>
+    /// <example>object { string Directory = "/outbound", string FileName = "*.csv" }.</example>
     public Source Source { get; set; }
 
     /// <summary>
-    /// Destination directory and file transfer settings.
+    /// Gets or sets destination directory and file transfer settings.
     /// </summary>
-    /// <example>object { string Directory = "/incoming", string FileName = "%SourceFileName%.csv" }</example>
+    /// <example>object { string Directory = "/incoming", string FileName = "%SourceFileName%.csv" }.</example>
     public Destination Destination { get; set; }
 
     /// <summary>
-    /// Execution metadata supplied by Frends.
+    /// Gets or sets execution metadata supplied by Frends.
     /// </summary>
-    /// <example>object { string TransferName = "OutboundTransfer", string WorkDir = "/tmp" }</example>
+    /// <example>object { string TransferName = "OutboundTransfer", string WorkDir = "/tmp" }.</example>
     public Info Info { get; set; }
 }

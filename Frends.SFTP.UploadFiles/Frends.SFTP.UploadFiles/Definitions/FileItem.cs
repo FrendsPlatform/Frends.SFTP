@@ -4,16 +4,6 @@ namespace Frends.SFTP.UploadFiles.Definitions;
 
 internal class FileItem
 {
-    public DateTime Modified { get; set; }
-
-    public string Name { get; set; }
-
-    public string FullPath { get; set; }
-
-    public long Size { get; set; }
-
-    public string RelativeDirectoryPath { get; set; }
-
     public FileItem(ISftpFile file)
     {
         Modified = file.LastWriteTime;
@@ -34,9 +24,42 @@ internal class FileItem
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="FileItem"/> class.
     /// Default constructor, use only for testing.
     /// </summary>
-    public FileItem() { }
+    public FileItem()
+    {
+    }
+
+    /// <summary>
+    /// Gets or sets last modified time of the file.
+    /// </summary>
+    /// <example>2026-11-09T11:45:00Z.</example>
+    public DateTime Modified { get; set; }
+
+    /// <summary>
+    /// Gets or sets name of the file without its directory path.
+    /// </summary>
+    /// <example>invoice-2026-11.csv.</example>
+    public string Name { get; set; }
+
+    /// <summary>
+    /// Gets or sets full path of the file at its endpoint.
+    /// </summary>
+    /// <example>/outbound/invoice-2026-11.csv.</example>
+    public string FullPath { get; set; }
+
+    /// <summary>
+    /// Gets or sets size of the file in bytes.
+    /// </summary>
+    /// <example>2048.</example>
+    public long Size { get; set; }
+
+    /// <summary>
+    /// Gets or sets path of the file's directory relative to the configured source directory.
+    /// </summary>
+    /// <example>monthly/november.</example>
+    public string RelativeDirectoryPath { get; set; }
 
     private static bool TryGetFileLength(FileInfo fi)
     {
@@ -51,4 +74,3 @@ internal class FileItem
         }
     }
 }
-

@@ -2,7 +2,13 @@
 
 internal enum EndPoint
 {
+    /// <summary>
+    /// Source file endpoint.
+    /// </summary>
     Source,
-    Destination
-}
 
+    /// <summary>
+    /// Destination SFTP endpoint.
+    /// </summary>
+    Destination,
+}

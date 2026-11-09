@@ -9,17 +9,19 @@ public enum SourceOperation
     /// Deletes the source file after transfer.
     /// </summary>
     Delete,
+
     /// <summary>
     /// Renames the source file after transfer.
     /// </summary>
     Rename,
+
     /// <summary>
     /// Moves the source file after transfer.
     /// </summary>
     Move,
+
     /// <summary>
     /// Leaves the source file unchanged.
     /// </summary>
-    Nothing
+    Nothing,
 }
-

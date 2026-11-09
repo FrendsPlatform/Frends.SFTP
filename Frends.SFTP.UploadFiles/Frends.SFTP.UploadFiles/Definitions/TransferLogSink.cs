@@ -4,57 +4,74 @@ using Serilog.Events;
 namespace Frends.SFTP.UploadFiles.Definitions;
 
 /// <summary>
-/// Sink that is used to store messages and events from seriolog Logger
+/// Sink that is used to store messages and events from seriolog Logger.
 /// </summary>
 internal class TransferLogSink : ILogEventSink
 {
     /// <summary>
-    ///     Always store some initial log messages first
+    ///     Always store some initial log messages first.
     /// </summary>
     private const int DefaultInitialLogMessages = 20;
 
-    private readonly IList<Tuple<DateTimeOffset, string>> _allMsgsBuffer;
-    private readonly CircularBuffer<Tuple<DateTimeOffset, string>> _circularBuffer;
+    private readonly IList<Tuple<DateTimeOffset, string>> allMsgsBuffer;
+    private readonly CircularBuffer<Tuple<DateTimeOffset, string>> circularBuffer;
 
-    private readonly IList<Tuple<DateTimeOffset, string>> _initialLogMessages;
+    private readonly IList<Tuple<DateTimeOffset, string>> initialLogMessages;
 
     public TransferLogSink(int? maxLogEntries)
     {
         if (maxLogEntries != null)
         {
-            _initialLogMessages = new List<Tuple<DateTimeOffset, string>>(DefaultInitialLogMessages);
-            _circularBuffer = new CircularBuffer<Tuple<DateTimeOffset, string>>(maxLogEntries.Value);
+            initialLogMessages = new List<Tuple<DateTimeOffset, string>>(DefaultInitialLogMessages);
+            circularBuffer = new CircularBuffer<Tuple<DateTimeOffset, string>>(maxLogEntries.Value);
         }
-        else
-            _allMsgsBuffer = new List<Tuple<DateTimeOffset, string>>();
-    }
-
-    public void Emit(LogEvent logEvent)
-    {
-        if (_allMsgsBuffer != null)
-            _allMsgsBuffer.Add(new Tuple<DateTimeOffset, string>(logEvent.Timestamp, logEvent.RenderMessage()));
         else
         {
-            if (_initialLogMessages.Count < DefaultInitialLogMessages)
-                _initialLogMessages.Add(
-                    new Tuple<DateTimeOffset, string>(logEvent.Timestamp, logEvent.RenderMessage()));
-            else
-                _circularBuffer.Add(
-                    new Tuple<DateTimeOffset, string>(logEvent.Timestamp, logEvent.RenderMessage()));
+            allMsgsBuffer = new List<Tuple<DateTimeOffset, string>>();
         }
     }
 
+    /// <summary>
+    /// Stores a rendered log event in the configured message buffer.
+    /// </summary>
+    /// <param name="logEvent">Log event to buffer.</param>
+    public void Emit(LogEvent logEvent)
+    {
+        if (allMsgsBuffer != null)
+        {
+            allMsgsBuffer.Add(new Tuple<DateTimeOffset, string>(logEvent.Timestamp, logEvent.RenderMessage()));
+        }
+        else
+        {
+            if (initialLogMessages.Count < DefaultInitialLogMessages)
+            {
+                initialLogMessages.Add(
+                    new Tuple<DateTimeOffset, string>(logEvent.Timestamp, logEvent.RenderMessage()));
+            }
+            else
+            {
+                circularBuffer.Add(
+                    new Tuple<DateTimeOffset, string>(logEvent.Timestamp, logEvent.RenderMessage()));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Returns the buffered log messages in the order they were recorded.
+    /// </summary>
+    /// <returns>Timestamp and message pairs for the buffered entries.</returns>
     public IList<Tuple<DateTimeOffset, string>> GetBufferedLogMessages()
     {
-        if (_allMsgsBuffer != null) return _allMsgsBuffer;
+        if (allMsgsBuffer != null) return allMsgsBuffer;
 
-        var bufferedMessages = _circularBuffer.Latest();
+        var bufferedMessages = circularBuffer.Latest();
         if (bufferedMessages.Any())
-            return _initialLogMessages
+        {
+            return initialLogMessages
                 .Concat(new[] { Tuple.Create(DateTimeOffset.MinValue, "...") })
                 .Concat(bufferedMessages).ToList();
+        }
 
-        return _initialLogMessages;
+        return initialLogMessages;
     }
 }
-

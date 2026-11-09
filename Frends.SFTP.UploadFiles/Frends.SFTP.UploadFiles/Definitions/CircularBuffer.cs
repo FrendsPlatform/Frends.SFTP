@@ -3,43 +3,50 @@
 namespace Frends.SFTP.UploadFiles.Definitions;
 
 /// <summary>
-///     Circular buffer impl, original from https://codereview.stackexchange.com/a/134147
+///     Circular buffer impl, original from https://codereview.stackexchange.com/a/134147.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">Type of the values stored in the buffer.</typeparam>
 internal class CircularBuffer<T>
 {
-    private readonly ConcurrentQueue<T> _data;
-    private readonly ReaderWriterLockSlim _lock = new();
-    private readonly int _size;
+    private readonly ConcurrentQueue<T> data;
+    private readonly ReaderWriterLockSlim @lock = new();
+    private readonly int size;
 
     public CircularBuffer(int size)
     {
         if (size < 1) throw new ArgumentException($"{nameof(size)} cannot be negative or zero");
-        _data = new ConcurrentQueue<T>();
-        _size = size;
+        data = new ConcurrentQueue<T>();
+        this.size = size;
     }
 
+    /// <summary>
+    /// Returns the currently buffered items in insertion order.
+    /// </summary>
+    /// <returns>The buffered items in insertion order.</returns>
     public IReadOnlyList<T> Latest()
     {
-        return _data.ToArray();
+        return data.ToArray();
     }
 
+    /// <summary>
+    /// Adds an item and removes the oldest item when the buffer is full.
+    /// </summary>
+    /// <param name="t">Item to add to the buffer.</param>
     public void Add(T t)
     {
-        _lock.EnterWriteLock();
+        @lock.EnterWriteLock();
         try
         {
-            if (_data.Count == _size)
+            if (data.Count == size)
             {
-                _data.TryDequeue(out T value);
+                data.TryDequeue(out T value);
             }
 
-            _data.Enqueue(t);
+            data.Enqueue(t);
         }
         finally
         {
-            _lock.ExitWriteLock();
+            @lock.ExitWriteLock();
         }
     }
 }
-

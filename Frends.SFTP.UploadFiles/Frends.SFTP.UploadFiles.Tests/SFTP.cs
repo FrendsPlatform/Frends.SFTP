@@ -1,12 +1,10 @@
-global using SFTP = Frends.SFTP.UploadFiles.Tests.Lib.SftpTestAdapter;
-
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.SFTP.UploadFiles.Definitions;
 
-namespace Frends.SFTP.UploadFiles.Tests.Lib;
+namespace Frends.SFTP.UploadFiles.Tests;
 
-internal static class SftpTestAdapter
+internal static class SFTP
 {
     internal static Task<Result> UploadFiles(
         Source source,

@@ -1,10 +1,10 @@
-﻿using System.Text.RegularExpressions;
-using System.Text;
+﻿using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Frends.SFTP.UploadFiles.Definitions;
 
 /// <summary>
-/// Helper methods for file modifications
+/// Helper methods for file modifications.
 /// </summary>
 internal static class Util
 {
@@ -18,10 +18,12 @@ internal static class Util
         const string regexEscape = "<regex>";
         string pattern;
 
-        //check is pure regex wished to be used for matching
+        // check is pure regex wished to be used for matching
         if (mask.StartsWith(regexEscape))
-            //use substring instead of string.replace just in case some has regex like '<regex>//File<regex>' or something else like that
+        {
+            // use substring instead of string.replace just in case some has regex like '<regex>//File<regex>' or something else like that
             pattern = mask.Substring(regexEscape.Length);
+        }
         else
         {
             pattern = mask.Replace(".", "\\.");
@@ -45,6 +47,7 @@ internal static class Util
         {
             result.Append(bytes[i].ToString("x2"));
         }
+
         return result.ToString();
     }
 
@@ -57,9 +60,13 @@ internal static class Util
             {
                 arr[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
             }
+
             return true;
         }
-        catch { return false; }
+        catch
+        {
+            return false;
+        }
     }
 
     internal static bool IsMD5(string input)
@@ -89,7 +96,10 @@ internal static class Util
             Convert.FromBase64String(input);
             return true;
         }
-        catch { return false; }
+        catch
+        {
+            return false;
+        }
     }
 
     internal static Encoding GetEncoding(FileEncoding encoding, string encodingString, bool enableBom)
@@ -128,4 +138,3 @@ internal static class Util
         }
     }
 }
-
