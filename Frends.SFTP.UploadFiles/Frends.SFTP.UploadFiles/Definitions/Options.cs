@@ -20,13 +20,6 @@ public class Options
     public int Timeout { get; set; }
 
     /// <summary>
-    /// Should an exception be thrown when file transfer fails.
-    /// </summary>
-    /// <example>true</example>
-    [DefaultValue(true)]
-    public bool ThrowErrorOnFail { get; set; }
-
-    /// <summary>
     /// Should the destination file be renamed with temporary file name during file transfer as a locking mechanism.
     /// </summary>
     /// <example>true</example>
@@ -87,6 +80,20 @@ public class Options
     /// <example>false</example>
     [DefaultValue(false)]
     public bool AssumeFileExistence { get; set; }
-}
 
+    /// <summary>
+    /// Whether to throw an error when the transfer fails.
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(true)]
+    public bool ThrowErrorOnFailure { get; set; } = true;
+
+    /// <summary>
+    /// Overrides the error message when the transfer fails.
+    /// </summary>
+    /// <example>SFTP upload failed during transfer.</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    [DefaultValue("")]
+    public string ErrorMessageOnFailure { get; set; } = string.Empty;
+}
 

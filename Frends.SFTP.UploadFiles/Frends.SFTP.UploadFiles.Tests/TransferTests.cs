@@ -69,7 +69,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         {
             var options = new Options
             {
-                ThrowErrorOnFail = true,
+                ThrowErrorOnFailure = true,
                 RenameSourceFileBeforeTransfer = true,
                 RenameDestinationFileDuringTransfer = true,
                 CreateDestinationDirectories = true,
@@ -114,7 +114,7 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             var options = new Options
             {
-                ThrowErrorOnFail = false,
+                ThrowErrorOnFailure = false,
                 RenameSourceFileBeforeTransfer = true,
                 RenameDestinationFileDuringTransfer = true,
                 CreateDestinationDirectories = true,
@@ -149,7 +149,7 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             var options = new Options
             {
-                ThrowErrorOnFail = false,
+                ThrowErrorOnFailure = false,
                 RenameSourceFileBeforeTransfer = true,
                 RenameDestinationFileDuringTransfer = true,
                 CreateDestinationDirectories = true,
@@ -173,7 +173,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         {
             var options = new Options
             {
-                ThrowErrorOnFail = false,
+                ThrowErrorOnFailure = false,
                 RenameSourceFileBeforeTransfer = true,
                 RenameDestinationFileDuringTransfer = true,
                 CreateDestinationDirectories = true,
@@ -221,7 +221,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         {
             var options = new Options
             {
-                ThrowErrorOnFail = true,
+                ThrowErrorOnFailure = true,
                 RenameSourceFileBeforeTransfer = true,
                 RenameDestinationFileDuringTransfer = false,
                 CreateDestinationDirectories = true,
@@ -241,7 +241,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         {
             var options = new Options
             {
-                ThrowErrorOnFail = true,
+                ThrowErrorOnFailure = true,
                 RenameSourceFileBeforeTransfer = false,
                 RenameDestinationFileDuringTransfer = true,
                 CreateDestinationDirectories = true,
@@ -354,7 +354,7 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             var options = new Options
             {
-                ThrowErrorOnFail = false,
+                ThrowErrorOnFailure = false,
                 RenameSourceFileBeforeTransfer = true,
                 RenameDestinationFileDuringTransfer = true,
                 CreateDestinationDirectories = true,

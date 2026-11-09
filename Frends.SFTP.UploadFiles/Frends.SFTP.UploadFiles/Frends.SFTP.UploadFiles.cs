@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
-using Renci.SshNet.Sftp;
 using Frends.SFTP.UploadFiles.Definitions;
+using Frends.SFTP.UploadFiles.Helpers;
+using Renci.SshNet.Sftp;
 using Serilog;
 
 namespace Frends.SFTP.UploadFiles;
@@ -8,7 +9,7 @@ namespace Frends.SFTP.UploadFiles;
 /// <summary>
 /// Main class of the Task.
 /// </summary>
-public class SFTP
+public static class SFTP
 {
     private static BatchContext _batchContext;
 
@@ -92,31 +93,15 @@ public class SFTP
     /// - %SourceFileName% = will be replaced with source file name without extension.
     /// - %SourceFileExtension% = will be replaced with source file's extension, with the dot '.' included, i.e. if the source file is named 'foo.txt', the %SourceFileExtension% will be expanded as '.txt'. If the source file name does not have an extension, the macro result will be empty, i.e. for original file name "foo", "bar%SourceFileExtension%" will result in "bar"
     /// </frendsdocs>
-    /// <param name="info">Transfer info parameters</param>
-    /// <param name="connection">Transfer connection parameters</param>
-    /// <param name="source">Source file location</param>
-    /// <param name="destination">Destination directory location</param>
-    /// <param name="options">Transfer options</param>
+    /// <param name="input">Source, destination, and transfer metadata parameters.</param>
+    /// <param name="connection">Transfer connection parameters.</param>
+    /// <param name="options">Transfer options.</param>
     /// <param name="cancellationToken">CancellationToken is given by Frends</param>
-    /// <returns>
-    /// Result object {
-    /// bool ActionSkipped,
-    /// bool Success,
-    /// string UserResultMessage, 
-    /// int SuccessfulTransferCount, 
-    /// int FailedTransferCount, 
-    /// IEnumerable TransferredFileNames, 
-    /// Dictionary TransferErrors, 
-    /// IEnumerable TransferredFilePaths,
-    /// string[] TransferredDestinationFilePaths
-    /// IDictionary OperationsLog } 
-    /// </returns>
+    /// <returns>object { bool ActionSkipped, bool Success, string UserResultMessage, int SuccessfulTransferCount, int FailedTransferCount, IEnumerable&lt;string&gt; TransferredFileNames, Dictionary&lt;string, IList&lt;string&gt;&gt; TransferErrors, IEnumerable&lt;string&gt; TransferredFilePaths, string[] TransferredDestinationFilePaths, IDictionary&lt;string, string&gt; OperationsLog, object Error { string Message, Exception AdditionalInfo } }</returns>
     public static async Task<Result> UploadFiles(
-        [PropertyTab] Source source,
-        [PropertyTab] Destination destination,
+        [PropertyTab] Input input,
         [PropertyTab] Connection connection,
         [PropertyTab] Options options,
-        [PropertyTab] Info info,
         CancellationToken cancellationToken)
     {
         using var timeoutCts = new CancellationTokenSource();
@@ -134,6 +119,8 @@ public class SFTP
             cancellationToken = linkedCts.Token;
         }
 
+        FileTransferResult transferResult = null;
+
         try
         {
             var maxLogEntries = options.OperationLog ? (int?)null : 100;
@@ -150,43 +137,50 @@ public class SFTP
 
             using (var logger = InitializeSFTPLogger(operationsLogger))
             {
-                if (string.IsNullOrEmpty(info.ProcessUri))
+                if (string.IsNullOrEmpty(input.Info.ProcessUri))
                     fileTransferLog.Warning("ProcessUri is empty. This means the transfer view cannot link to the correct page");
 
-                if (!Guid.TryParse(info.TaskExecutionID, out Guid executionId))
+                if (!Guid.TryParse(input.Info.TaskExecutionID, out Guid executionId))
                 {
-                    fileTransferLog.Warning("'{0}' is not a valid task execution ID, will default to random Guid", info.TaskExecutionID);
+                    fileTransferLog.Warning("'{0}' is not a valid task execution ID, will default to random Guid", input.Info.TaskExecutionID);
                     executionId = Guid.NewGuid();
                 }
 
                 _batchContext = new BatchContext
                 {
-                    Info = info,
-                    TempWorkDir = InitializeTemporaryWorkPath(info.WorkDir),
+                    Info = input.Info,
+                    TempWorkDir = InitializeTemporaryWorkPath(input.Info.WorkDir),
                     Options = options,
                     InstanceId = executionId,
-                    ServiceId = info.TransferName,
+                    ServiceId = input.Info.TransferName,
                     SourceFiles = new List<FileItem>(),
                     DestinationFiles = new List<SftpFile>(),
-                    RoutineUri = info.ProcessUri,
+                    RoutineUri = input.Info.ProcessUri,
                     BatchTransferStartTime = DateTime.Now,
-                    Source = source,
-                    Destination = destination,
+                    Source = input.Source,
+                    Destination = input.Destination,
                     Connection = connection
                 };
 
                 var fileTransporter = new FileTransporter(logger, _batchContext, executionId);
-                var result = await fileTransporter.Run(cancellationToken);
+                transferResult = await fileTransporter.Run(cancellationToken);
 
-                if (options.ThrowErrorOnFail && !result.Success)
-                    throw new Exception($"SFTP transfer failed: {result.UserResultMessage}" +
+                if (!transferResult.Success)
+                    throw new Exception($"SFTP transfer failed: {transferResult.UserResultMessage}" +
                                         $"Latest operations: \n{GetLogLines(transferSink.GetBufferedLogMessages())}");
 
                 if (options.OperationLog)
-                    result.OperationsLog = GetLogDictionary(transferSink.GetBufferedLogMessages());
+                    transferResult.OperationsLog = GetLogDictionary(transferSink.GetBufferedLogMessages());
 
-                return new Result(result);
+                return new Result(transferResult);
             }
+        }
+        catch (Exception ex)
+        {
+            var handledResult = ex.Handle(options);
+            return transferResult is { Success: false }
+                ? new Result(transferResult, handledResult.Error)
+                : handledResult;
         }
         finally
         {
@@ -259,4 +253,3 @@ public class SFTP
         }
     }
 }
-
