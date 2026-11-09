@@ -1,16 +1,17 @@
-﻿namespace Frends.SFTP.DownloadFiles;
+namespace Frends.SFTP.DownloadFiles;
 
 using System.ComponentModel;
-using Renci.SshNet.Sftp;
 using Frends.SFTP.DownloadFiles.Definitions;
+using Frends.SFTP.DownloadFiles.Helpers;
+using Renci.SshNet.Sftp;
 using Serilog;
 
 /// <summary>
 /// Main class for the Task.
 /// </summary>
-public class SFTP
+public static class SFTP
 {
-    private static BatchContext _batchContext;
+    private static BatchContext batchContext;
 
     /// <summary>
     /// Downloads file through SFTP connection.
@@ -92,21 +93,21 @@ public class SFTP
     /// - %SourceFileName% = will be replaced with source file name without extension.
     /// - %SourceFileExtension% = will be replaced with source file's extension, with the dot '.' included, i.e. if the source file is named 'foo.txt', the %SourceFileExtension% will be expanded as '.txt'. If the source file name does not have an extension, the macro result will be empty, i.e. for original file name "foo", "bar%SourceFileExtension%" will result in "bar"
     /// </frendsdocs>
-    /// <param name="source">Source file location</param>
-    /// <param name="destination">Destination directory location</param>
-    /// <param name="connection">Transfer connection parameters</param>
-    /// <param name="options">Transfer options</param>
-    /// <param name="info">Transfer info parameters</param>
-    /// <param name="cancellationToken">CancellationToken is given by Frends</param>
-    /// <returns>Result object {bool ActionSkipped, bool Success, string UserResultMessage, int SuccessfulTransferCount, int FailedTransferCount, IEnumrable TransferredFileNames [ string TransferredFileName ], Dictionary TransferErrors { string FileName: [ string TransferError ] }, IEnumerable TransferredFilePaths [ string FilePath ], string[] TransferredDestinationFilePaths [ string FilePath ], IDictionary Operationslog { string TimeStamp, string Operation }} </returns>
+    /// <param name="input">Essential parameters.</param>
+    /// <param name="connection">Connection parameters.</param>
+    /// <param name="options">Additional parameters.</param>
+    /// <param name="cancellationToken">A cancellation token provided by Frends Platform.</param>
+    /// <returns>object { bool ActionSkipped, bool Success, string UserResultMessage, int SuccessfulTransferCount, int FailedTransferCount, IEnumerable&lt;string&gt; TransferredFileNames, Dictionary&lt;string, IList&lt;string&gt;&gt; TransferErrors, IEnumerable&lt;string&gt; TransferredFilePaths, string[] TransferredDestinationFilePaths, IDictionary&lt;string, string&gt; OperationsLog, object Error { string Message, Exception AdditionalInfo } }</returns>
     public static async Task<Result> DownloadFiles(
-        [PropertyTab] Source source,
-        [PropertyTab] Destination destination,
+        [PropertyTab] Input input,
         [PropertyTab] Connection connection,
         [PropertyTab] Options options,
-        [PropertyTab] Info info,
         CancellationToken cancellationToken)
     {
+        var source = input.Source;
+        var destination = input.Destination;
+        var info = input.Info;
+
         // Create a new cancellationTokenWithTimeOutSource with a timeout
         using var timeoutCts = new CancellationTokenSource();
         CancellationTokenSource linkedCts = null;
@@ -152,7 +153,7 @@ public class SFTP
                 executionId = Guid.NewGuid();
             }
 
-            _batchContext = new BatchContext
+            batchContext = new BatchContext
             {
                 Info = info,
                 TempWorkDir = CreateTempWorkDir(info.WorkDir),
@@ -168,10 +169,10 @@ public class SFTP
                 Connection = connection,
             };
 
-            var fileTransporter = new FileTransporter(logger, _batchContext, executionId);
+            var fileTransporter = new FileTransporter(logger, batchContext, executionId);
             var result = await fileTransporter.Run(cancellationToken);
 
-            if (options.ThrowErrorOnFail && !result.Success)
+            if (options.ThrowErrorOnFailure && !result.Success)
             {
                 throw new Exception($"SFTP transfer failed: {result.UserResultMessage}. " +
                                     $"Latest operations: \n{GetLogLines(transferSink.GetBufferedLogMessages())}.");
@@ -182,7 +183,24 @@ public class SFTP
             else if (options.OperationLog)
                 result.OperationsLog = GetLogDictionary(transferSink.GetBufferedLogMessages());
 
-            return new Result(result);
+            return new Result
+            {
+                ActionSkipped = result.ActionSkipped,
+                Success = result.Success,
+                UserResultMessage = result.UserResultMessage,
+                SuccessfulTransferCount = result.SuccessfulTransferCount,
+                FailedTransferCount = result.FailedTransferCount,
+                TransferredFileNames = result.TransferredFileNames,
+                TransferErrors = result.TransferErrors,
+                TransferredFilePaths = result.TransferredFilePaths,
+                TransferredDestinationFilePaths = result.TransferredDestinationFilePaths,
+                OperationsLog = result.OperationsLog,
+                Error = result.Success ? null : new Error { Message = result.UserResultMessage },
+            };
+        }
+        catch (Exception ex)
+        {
+            return ex.Handle(options);
         }
         finally
         {
@@ -204,7 +222,8 @@ public class SFTP
     {
         try
         {
-            return string.Join("\n",
+            return string.Join(
+                "\n",
                 buffer.Select(x => x.Item1 == DateTimeOffset.MinValue ? "..." : $"{x.Item1:HH:mm:ssZ}: {x.Item2}"));
         }
         catch (Exception e)

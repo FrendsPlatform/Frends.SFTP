@@ -1,16 +1,8 @@
-﻿namespace Frends.SFTP.DownloadFiles.Definitions;
+namespace Frends.SFTP.DownloadFiles.Definitions;
 
 internal class WorkFileInfo
 {
-    internal readonly string OriginalFileName;
-
-    internal readonly string WorkFileName;
-
-    internal readonly string WorkFileDir;
-
-    internal readonly string SafeTempFileName;
-
-    public WorkFileInfo(string originalFileName, string workFileName, string workFileDir, string safeTempFileName)
+    internal WorkFileInfo(string originalFileName, string workFileName, string workFileDir, string safeTempFileName)
     {
         OriginalFileName = originalFileName ?? string.Empty;
         WorkFileName = workFileName ?? string.Empty;
@@ -18,7 +10,15 @@ internal class WorkFileInfo
         SafeTempFileName = safeTempFileName;
     }
 
-    public string WorkFilePath
+    internal string OriginalFileName { get; }
+
+    internal string WorkFileName { get; }
+
+    internal string WorkFileDir { get; }
+
+    internal string SafeTempFileName { get; }
+
+    internal string WorkFilePath
     {
         get
         {

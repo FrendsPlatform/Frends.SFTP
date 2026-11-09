@@ -1,37 +1,41 @@
-﻿namespace Frends.SFTP.DownloadFiles.Definitions;
+namespace Frends.SFTP.DownloadFiles.Definitions;
 
 internal class FileTransferInfo
 {
-    public string TransferName { get; set; }
+    internal string TransferName { get; set; }
 
-    public Guid BatchId { get; set; }
+    internal Guid BatchId { get; set; }
 
-    public string SourceFile { get; set; }
+    internal string SourceFile { get; set; }
 
-    public DateTime TransferStarted { get; set; }
+    internal DateTime TransferStarted { get; set; }
 
-    public DateTime TransferEnded { get; set; }
+    internal DateTime TransferEnded { get; set; }
 
-    public string DestinationFile { get; set; }
+    internal string DestinationFile { get; set; }
 
-    public long FileSize { get; set; }
+    internal long FileSize { get; set; }
 
-    public string ErrorInfo { get; set; }
+    internal string ErrorInfo { get; set; }
 
-    public TransferResult Result { get; set; }
+    internal TransferResult Result { get; set; }
 
-    public string DestinationAddress { get; set; }
+    internal string DestinationAddress { get; set; }
 
-    public string SourcePath { get; set; }
+    internal string SourcePath { get; set; }
 
-    public string DestinationPath { get; set; }
+    internal string DestinationPath { get; set; }
 
-    public string ServiceId { get; set; }
+    internal string ServiceId { get; set; }
 
-    public string RoutineUri { get; set; }
+    internal string RoutineUri { get; set; }
 
-    public Guid SingleFileTransferId { get; set; }
+    internal Guid SingleFileTransferId { get; set; }
 
+    /// <summary>
+    /// Returns a string representation of the transfer info.
+    /// </summary>
+    /// <returns>Transfer info as a string.</returns>
     public override string ToString()
     {
         return string.Format(

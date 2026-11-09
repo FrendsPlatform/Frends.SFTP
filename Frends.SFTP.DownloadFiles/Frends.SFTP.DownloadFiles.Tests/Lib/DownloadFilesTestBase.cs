@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Renci.SshNet;
 using Frends.SFTP.DownloadFiles.Definitions;
@@ -43,7 +43,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             _options = new Options
             {
-                ThrowErrorOnFail = true,
+                ThrowErrorOnFailure = true,
                 RenameSourceFileBeforeTransfer = true,
                 RenameDestinationFileDuringTransfer = true,
                 CreateDestinationDirectories = true,

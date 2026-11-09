@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,8 +38,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.ServerFingerPrint = _Sha256Hex;
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
-            var result = await SFTP.DownloadFiles(_source, _destination, connection, _options, _info,
-                new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.IsFalse(result.ActionSkipped);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
@@ -53,8 +52,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.ServerFingerPrint = _Sha256Hash.Replace("=", "");
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
-            var result = await SFTP.DownloadFiles(_source, _destination, connection, _options, _info,
-                new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.IsFalse(result.ActionSkipped);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
@@ -67,8 +65,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.ServerFingerPrint = _Sha256Hash;
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
-            var result = await SFTP.DownloadFiles(_source, _destination, connection, _options, _info,
-                new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.IsFalse(result.ActionSkipped);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
@@ -81,8 +78,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.ServerFingerPrint = _MD5;
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
-            var result = await SFTP.DownloadFiles(_source, _destination, connection, _options, _info,
-                new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.IsFalse(result.ActionSkipped);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
@@ -95,8 +91,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.ServerFingerPrint = _MD5.ToLower();
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
-            var result = await SFTP.DownloadFiles(_source, _destination, connection, _options, _info,
-                new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.IsFalse(result.ActionSkipped);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
@@ -109,8 +104,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.ServerFingerPrint = _MD5.Replace(":", "");
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
-            var result = await SFTP.DownloadFiles(_source, _destination, connection, _options, _info,
-                new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.IsFalse(result.ActionSkipped);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
@@ -124,7 +118,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
+                await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken()));
             Assert.IsTrue(ex.Message.Contains("Error when checking the server fingerprint"), ex.Message);
         }
 
@@ -136,7 +130,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
+                await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken()));
             Assert.IsTrue(ex.Message.Contains("Error when checking the server fingerprint"), ex.Message);
         }
 
@@ -148,7 +142,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
+                await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken()));
             Assert.IsTrue(ex.Message.Contains("Error when checking the server fingerprint"), ex.Message);
         }
 
@@ -160,7 +154,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
+                await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken()));
             Assert.IsTrue(ex.Message.Contains("Error when checking the server fingerprint"), ex.Message);
             Assert.IsTrue(ex.Message.Contains("Expected server fingerprint was given in unsupported format."),
                 ex.Message);
@@ -180,7 +174,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.ServerFingerPrint = _Sha256Hash.Replace("=", "");
 
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
+                await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken()));
             Assert.IsTrue(ex.Message.StartsWith(
                 "SFTP transfer failed: Failure in Keyboard-interactive authentication: No response given for server prompt request --> Password"));
 
@@ -199,7 +193,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
 
             ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(_source, destination, connection, _options, _info, new CancellationToken()));
+                await SFTP.DownloadFiles(new Input { Source = _source, Destination = destination, Info = _info }, connection, _options, new CancellationToken()));
             Assert.IsTrue(ex.Message.StartsWith(
                 "SFTP transfer failed: Failure in Keyboard-interactive authentication: No response given for server prompt request --> Password"));
         }

@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.DownloadFiles.Definitions;
+namespace Frends.SFTP.DownloadFiles.Definitions;
 
 using System.Collections.Concurrent;
 using Serilog.Core;
@@ -14,97 +14,101 @@ internal class TransferLogSink : ILogEventSink
     /// </summary>
     private const int DefaultInitialLogMessages = 20;
 
-    private readonly IList<Tuple<DateTimeOffset, string>> _allMsgsBuffer;
-    private readonly CircularBuffer<Tuple<DateTimeOffset, string>> _circularBuffer;
+    private readonly IList<Tuple<DateTimeOffset, string>> allMsgsBuffer;
+    private readonly CircularBuffer<Tuple<DateTimeOffset, string>> circularBuffer;
 
-    private readonly IList<Tuple<DateTimeOffset, string>> _initialLogMessages;
+    private readonly IList<Tuple<DateTimeOffset, string>> initialLogMessages;
 
-    public TransferLogSink(int? maxLogEntries)
+    internal TransferLogSink(int? maxLogEntries)
     {
         if (maxLogEntries != null)
         {
-            _initialLogMessages = new List<Tuple<DateTimeOffset, string>>(DefaultInitialLogMessages);
-            _circularBuffer = new CircularBuffer<Tuple<DateTimeOffset, string>>(maxLogEntries.Value);
+            initialLogMessages = new List<Tuple<DateTimeOffset, string>>(DefaultInitialLogMessages);
+            circularBuffer = new CircularBuffer<Tuple<DateTimeOffset, string>>(maxLogEntries.Value);
         }
         else
         {
-            _allMsgsBuffer = new List<Tuple<DateTimeOffset, string>>();
+            allMsgsBuffer = new List<Tuple<DateTimeOffset, string>>();
         }
     }
 
+    /// <summary>
+    /// Stores the log event in the buffer.
+    /// </summary>
+    /// <param name="logEvent">Log event to store.</param>
     public void Emit(LogEvent logEvent)
     {
-        if (_allMsgsBuffer != null)
+        if (allMsgsBuffer != null)
         {
-            _allMsgsBuffer.Add(new Tuple<DateTimeOffset, string>(logEvent.Timestamp, logEvent.RenderMessage()));
+            allMsgsBuffer.Add(new Tuple<DateTimeOffset, string>(logEvent.Timestamp, logEvent.RenderMessage()));
         }
         else
         {
-            if (_initialLogMessages.Count < DefaultInitialLogMessages)
+            if (initialLogMessages.Count < DefaultInitialLogMessages)
             {
-                _initialLogMessages.Add(
+                initialLogMessages.Add(
                     new Tuple<DateTimeOffset, string>(logEvent.Timestamp, logEvent.RenderMessage()));
             }
             else
             {
-                _circularBuffer.Add(
+                circularBuffer.Add(
                     new Tuple<DateTimeOffset, string>(logEvent.Timestamp, logEvent.RenderMessage()));
             }
         }
     }
 
-    public IList<Tuple<DateTimeOffset, string>> GetBufferedLogMessages()
+    internal IList<Tuple<DateTimeOffset, string>> GetBufferedLogMessages()
     {
-        if (_allMsgsBuffer != null) return _allMsgsBuffer;
+        if (allMsgsBuffer != null) return allMsgsBuffer;
 
-        var bufferedMessages = _circularBuffer.Latest();
+        var bufferedMessages = circularBuffer.Latest();
         if (bufferedMessages.Any())
         {
-            return _initialLogMessages
+            return initialLogMessages
                 .Concat(new[] { Tuple.Create(DateTimeOffset.MinValue, "...") })
                 .Concat(bufferedMessages).ToList();
         }
 
-        return _initialLogMessages;
+        return initialLogMessages;
     }
 
     /// <summary>
     ///     Circular buffer impl, original from https://codereview.stackexchange.com/a/134147
     /// </summary>
     /// <typeparam name="T">T</typeparam>
-    public class CircularBuffer<T>
+    internal class CircularBuffer<T>
     {
-        private readonly ConcurrentQueue<T> _data;
-        private readonly ReaderWriterLockSlim _lock = new();
-        private readonly int _size;
+        private readonly ConcurrentQueue<T> data;
+        private readonly ReaderWriterLockSlim bufferLock = new();
+        private readonly int size;
 
-        public CircularBuffer(int size)
+        internal CircularBuffer(int size)
         {
             if (size < 1) throw new ArgumentException($"{nameof(size)} cannot be negative or zero");
-            _data = new ConcurrentQueue<T>();
-            _size = size;
+            data = new ConcurrentQueue<T>();
+            this.size = size;
         }
 
-        public IReadOnlyList<T> Latest()
+        internal IReadOnlyList<T> Latest()
         {
-            return _data.ToArray();
+            return data.ToArray();
         }
 
-        public void Add(T t)
+        internal void Add(T t)
         {
-            _lock.EnterWriteLock();
+            bufferLock.EnterWriteLock();
             try
             {
-                if (_data.Count == _size)
+                if (data.Count == size)
                 {
-                    _data.TryDequeue(out _);
+                    data.TryDequeue(out _);
                 }
 
-                _data.Enqueue(t);
+                data.Enqueue(t);
             }
             finally
             {
-                _lock.ExitWriteLock();
+                bufferLock.ExitWriteLock();
             }
         }
     }

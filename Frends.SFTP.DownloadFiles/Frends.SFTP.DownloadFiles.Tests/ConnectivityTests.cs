@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,7 +29,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 Operation = SourceOperation.Nothing,
             };
 
-            var result = await SFTP.DownloadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -42,7 +42,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.UserName = invalidPwd;
             connection.Password = invalidPwd;
 
-            var result = Assert.ThrowsAsync<Exception>(async () => await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
+            var result = Assert.ThrowsAsync<Exception>(async () => await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken()));
             Assert.IsTrue(result.Message.StartsWith("SFTP transfer failed: Authentication of SSH session failed: Permission denied (password)"));
         }
 
@@ -53,7 +53,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
             connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
 
-            var result = await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
@@ -69,7 +69,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
             connection.PrivateKeyString = key;
 
-            var result = await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
@@ -81,7 +81,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var connection = Helpers.GetSftpConnection();
             connection.UseKeyboardInteractiveAuthentication = true;
 
-            var result = await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
@@ -97,7 +97,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.UseKeyboardInteractiveAuthentication = true;
             connection.PromptAndResponse = new PromptResponse[] { new PromptResponse { Prompt = "Password", Response = "pass" } };
 
-            var result = await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
@@ -113,7 +113,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 EnableBomForFileName = true
             };
 
-            result = await SFTP.DownloadFiles(_source, destination, connection, _options, _info, new CancellationToken());
+            result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = destination, Info = _info }, connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
@@ -134,7 +134,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 Operation = SourceOperation.Nothing,
             };
 
-            var result = await SFTP.DownloadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
@@ -156,11 +156,9 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 Operation = SourceOperation.Nothing,
             };
 
-            var result = await SFTP.DownloadFiles(source, _destination, connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
         }
     }
 }
-
-

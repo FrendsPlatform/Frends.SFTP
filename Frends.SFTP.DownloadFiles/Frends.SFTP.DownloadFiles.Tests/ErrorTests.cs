@@ -1,7 +1,8 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using System.IO;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Frends.SFTP.DownloadFiles.Definitions;
 
 namespace Frends.SFTP.DownloadFiles.Tests
@@ -16,7 +17,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             File.Copy(Path.Combine(_workDir, _source.FileName), Path.Combine(_destWorkDir, _source.FileName));
 
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(_source, _destination, _connection, _options, _info, new CancellationToken()));
+                await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, _connection, _options, new CancellationToken()));
             Assert.That(ex.Message.StartsWith("SFTP transfer failed: 2 Errors: Failure in GetFile"),
                 $"Actual message: {ex.Message}");
         }
@@ -33,9 +34,34 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
 
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
+                await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, _connection, _options, new CancellationToken()));
             Assert.IsTrue(
                 ex.Message.StartsWith("SFTP transfer failed: 1 Errors: No source files found from directory"));
+        }
+
+        [Test]
+        public void DownloadFiles_TestCustomErrorMessageOnFailure()
+        {
+            var connection = Helpers.GetSftpConnection();
+            connection.Port = 51651;
+            _options.ErrorMessageOnFailure = "Download failed";
+
+            var ex = Assert.ThrowsAsync<Exception>(async () =>
+                await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken()));
+            Assert.AreEqual("Download failed", ex.Message);
+            Assert.IsTrue(ex.InnerException.Message.StartsWith("SFTP transfer failed:"));
+        }
+
+        [Test]
+        public async Task DownloadFiles_TestErrorIsReturnedWhenThrowErrorOnFailureIsFalse()
+        {
+            var connection = Helpers.GetSftpConnection();
+            connection.Port = 51651;
+            _options.ThrowErrorOnFailure = false;
+
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken());
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(result.UserResultMessage, result.Error.Message);
         }
 
         [Test]
@@ -45,7 +71,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.Port = 51651;
 
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
+                await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken()));
             Assert.IsTrue(
                 ex.Message.StartsWith("SFTP transfer failed: Unable to establish the socket: No such host is known"));
         }
@@ -64,7 +90,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
 
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
+                await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, _connection, _options, new CancellationToken()));
             Assert.IsTrue(
                 ex.Message.StartsWith("SFTP transfer failed: 1 Errors: No source files found from directory"));
             Helpers.DeleteSubDirectory(path);
@@ -85,7 +111,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
 
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, new CancellationToken()));
+                await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, _connection, _options, new CancellationToken()));
             Assert.IsTrue(ex.Message.Contains(
                 $"Operation failed: Source file {_source.FileName} couldn't be moved to given directory {source.DirectoryToMoveAfterTransfer} because the directory didn't exist."));
             Assert.IsTrue(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
@@ -116,7 +142,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
 
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(source, destination, _connection, _options, _info, new CancellationToken()));
+                await SFTP.DownloadFiles(new Input { Source = source, Destination = destination, Info = _info }, _connection, _options, new CancellationToken()));
             Assert.That(ex.Message.StartsWith("SFTP transfer failed: 2 Errors: Failure in GetFile"),
                 $"Actual message: {ex.Message}");
             Assert.IsTrue(
@@ -148,7 +174,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
 
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(source, destination, _connection, _options, _info, new CancellationToken()));
+                await SFTP.DownloadFiles(new Input { Source = source, Destination = destination, Info = _info }, _connection, _options, new CancellationToken()));
             Assert.That(ex.Message.StartsWith("SFTP transfer failed: 2 Errors: Failure in GetFile"),
                 $"Actual message: {ex.Message}");
             Assert.IsTrue(
@@ -162,7 +188,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             connection.Password = Guid.NewGuid().ToString();
 
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(_source, _destination, connection, _options, _info, new CancellationToken()));
+                await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, connection, _options, new CancellationToken()));
             Assert.IsTrue(ex.Message.Contains(
                 $"SFTP transfer failed: Authentication of SSH session failed: Permission denied (password)"));
         }
@@ -182,8 +208,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             using var cancellationTokenSource = new CancellationTokenSource(500);
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(source, _destination, connection, _options, _info,
-                    cancellationTokenSource.Token));
+                await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, connection, _options, cancellationTokenSource.Token));
             Assert.IsTrue(ex.Message.Contains("No files transferred."));
             Assert.IsTrue(ex.Message.Contains("Error: The operation was canceled.."));
             Assert.IsTrue(Helpers.SourceFileExists($"{source.Directory}/{source.FileName}"));
@@ -205,7 +230,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var options = new Options
             {
                 Timeout = 1,
-                ThrowErrorOnFail = true,
+                ThrowErrorOnFailure = true,
                 RenameSourceFileBeforeTransfer = false,
                 RenameDestinationFileDuringTransfer = true,
                 CreateDestinationDirectories = true,
@@ -214,7 +239,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             };
 
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(source, _destination, connection, options, _info, default));
+                await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, connection, options, default));
 
             Assert.IsTrue(ex.Message.Contains("The operation was canceled."));
             Assert.IsTrue(ex.Message.Contains("No files transferred."));
@@ -239,7 +264,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             Assert.IsEmpty(Directory.GetFiles(_destWorkDir));
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(source, _destination, _connection, _options, _info, CancellationToken.None));
+                await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, _connection, _options, CancellationToken.None));
 
             Assert.IsTrue(ex.Message.Contains("No files transferred."));
             Assert.IsEmpty(Directory.GetFiles(_destWorkDir));
@@ -272,7 +297,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             var contentBefore = File.ReadAllText(Path.Combine(_destWorkDir, _source.FileName));
             var ex = Assert.ThrowsAsync<Exception>(async () =>
-                await SFTP.DownloadFiles(source, destination, _connection, _options, _info, CancellationToken.None));
+                await SFTP.DownloadFiles(new Input { Source = source, Destination = destination, Info = _info }, _connection, _options, CancellationToken.None));
 
             var contentAfter = File.ReadAllText(Path.Combine(_destWorkDir, _source.FileName));
             Assert.IsTrue(ex.Message.Contains("No files transferred."));

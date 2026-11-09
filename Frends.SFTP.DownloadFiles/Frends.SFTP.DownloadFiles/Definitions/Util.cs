@@ -1,7 +1,7 @@
-﻿namespace Frends.SFTP.DownloadFiles.Definitions;
+namespace Frends.SFTP.DownloadFiles.Definitions;
 
-using System.Text.RegularExpressions;
 using System.Text;
+using System.Text.RegularExpressions;
 
 /// <summary>
 /// Helper methods for file modifications

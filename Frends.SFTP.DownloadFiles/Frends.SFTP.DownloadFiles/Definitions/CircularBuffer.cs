@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.DownloadFiles.Definitions;
+namespace Frends.SFTP.DownloadFiles.Definitions;
 
 using System.Collections.Concurrent;
 
@@ -8,37 +8,37 @@ using System.Collections.Concurrent;
 /// <typeparam name="T">T</typeparam>
 internal class CircularBuffer<T>
 {
-    private readonly ConcurrentQueue<T> _data;
-    private readonly ReaderWriterLockSlim _lock = new();
-    private readonly int _size;
+    private readonly ConcurrentQueue<T> data;
+    private readonly ReaderWriterLockSlim bufferLock = new();
+    private readonly int size;
 
-    public CircularBuffer(int size)
+    internal CircularBuffer(int size)
     {
         if (size < 1) throw new ArgumentException($"{nameof(size)} cannot be negative or zero");
-        _data = new ConcurrentQueue<T>();
-        _size = size;
+        data = new ConcurrentQueue<T>();
+        this.size = size;
     }
 
-    public IReadOnlyList<T> Latest()
+    internal IReadOnlyList<T> Latest()
     {
-        return _data.ToArray();
+        return data.ToArray();
     }
 
-    public void Add(T t)
+    internal void Add(T t)
     {
-        _lock.EnterWriteLock();
+        bufferLock.EnterWriteLock();
         try
         {
-            if (_data.Count == _size)
+            if (data.Count == size)
             {
-                _data.TryDequeue(out _);
+                data.TryDequeue(out _);
             }
 
-            _data.Enqueue(t);
+            data.Enqueue(t);
         }
         finally
         {
-            _lock.ExitWriteLock();
+            bufferLock.ExitWriteLock();
         }
     }
 }

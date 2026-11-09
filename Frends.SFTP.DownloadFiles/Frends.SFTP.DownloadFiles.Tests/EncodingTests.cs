@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +24,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileNameEncoding = FileEncoding.ANSI
             };
 
-            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = destination, Info = _info }, _connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
@@ -39,7 +39,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileNameEncoding = FileEncoding.ASCII
             };
 
-            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = destination, Info = _info }, _connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
@@ -55,7 +55,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 EnableBomForFileName = false
             };
 
-            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = destination, Info = _info }, _connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
@@ -71,7 +71,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 EnableBomForFileName = true
             };
 
-            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = destination, Info = _info }, _connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
@@ -86,7 +86,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileNameEncoding = FileEncoding.WINDOWS1252
             };
 
-            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = destination, Info = _info }, _connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
@@ -102,7 +102,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileNameEncodingInString = "windows-1252"
             };
 
-            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = destination, Info = _info }, _connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
@@ -121,7 +121,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Directory.CreateDirectory(destination.Directory);
             File.Move(Path.Combine(_workDir, _source.FileName), Path.Combine(_destination.Directory, _source.FileName));
 
-            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = destination, Info = _info }, _connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
@@ -140,7 +140,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Directory.CreateDirectory(destination.Directory);
             File.Move(Path.Combine(_workDir, _source.FileName), Path.Combine(_destination.Directory, _source.FileName));
 
-            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = destination, Info = _info }, _connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
@@ -160,7 +160,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Directory.CreateDirectory(destination.Directory);
             File.Move(Path.Combine(_workDir, _source.FileName), Path.Combine(_destination.Directory, _source.FileName));
 
-            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = destination, Info = _info }, _connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
@@ -180,7 +180,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Directory.CreateDirectory(destination.Directory);
             File.Move(Path.Combine(_workDir, _source.FileName), Path.Combine(_destination.Directory, _source.FileName));
 
-            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = destination, Info = _info }, _connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
@@ -199,7 +199,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Directory.CreateDirectory(destination.Directory);
             File.Move(Path.Combine(_workDir, _source.FileName), Path.Combine(_destination.Directory, _source.FileName));
 
-            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = destination, Info = _info }, _connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
@@ -219,13 +219,10 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Directory.CreateDirectory(destination.Directory);
             File.Move(Path.Combine(_workDir, _source.FileName), Path.Combine(_destination.Directory, _source.FileName));
 
-            var result = await SFTP.DownloadFiles(_source, destination, _connection, _options, _info, new CancellationToken());
+            var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = destination, Info = _info }, _connection, _options, new CancellationToken());
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             Assert.IsTrue(File.Exists(Path.Combine(_destination.Directory, _source.FileName)));
         }
     }
 }
-
-
-
