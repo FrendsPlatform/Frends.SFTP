@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.DeleteFiles.Definitions;
+namespace Frends.SFTP.DeleteFiles.Definitions;
 
 using System.Collections.Generic;
 
@@ -7,14 +7,21 @@ using System.Collections.Generic;
 /// </summary>
 public class Result
 {
-    internal Result(List<FileItem> files)
-    {
-        Files = files;
-    }
+    /// <summary>
+    /// Indicates whether the task completed successfully.
+    /// </summary>
+    /// <example>true</example>
+    public bool Success { get; set; }
 
     /// <summary>
-    /// List of file items deleted from directory.
+    /// List of file items deleted from the directory.
     /// </summary>
-    /// <example>[test.txt, test2.txt]</example>
+    /// <example>[object { Name = "report.csv", Path = "/upload/report.csv", SizeInMegaBytes = 1.25 }]</example>
     public List<FileItem> Files { get; set; }
+
+    /// <summary>
+    /// Error that occurred during task execution.
+    /// </summary>
+    /// <example>object { string Message, Exception AdditionalInfo }</example>
+    public Error Error { get; set; }
 }

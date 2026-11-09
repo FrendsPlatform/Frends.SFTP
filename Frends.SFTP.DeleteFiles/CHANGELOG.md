@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0] - 2026-11-09
+
+### Changed
+
+- Added task options for controlling how failures are reported.
+- Upgraded the task and test projects to .NET 8.
+
 ## [3.1.0] - 2026-10-21
 
 ### Changed

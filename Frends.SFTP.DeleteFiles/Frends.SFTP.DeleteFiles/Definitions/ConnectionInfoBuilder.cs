@@ -1,7 +1,5 @@
-﻿namespace Frends.SFTP.DeleteFiles.Definitions;
+namespace Frends.SFTP.DeleteFiles.Definitions;
 
-using Renci.SshNet;
-using Renci.SshNet.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,12 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Frends.SFTP.DeleteFiles.Enums;
+using Renci.SshNet;
+using Renci.SshNet.Common;
 
 internal class ConnectionInfoBuilder
 {
-    private Input _input;
-    private Connection _connection;
-    private CancellationToken _cancellationToken;
+    private readonly Input _input;
+    private readonly Connection _connection;
+    private readonly CancellationToken _cancellationToken;
 
     internal ConnectionInfoBuilder(Input input, Connection connect, CancellationToken cancellationToken)
     {
