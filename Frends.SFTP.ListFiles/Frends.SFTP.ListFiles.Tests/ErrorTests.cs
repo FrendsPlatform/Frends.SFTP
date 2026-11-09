@@ -1,11 +1,12 @@
-﻿using NUnit.Framework;
-using Renci.SshNet.Common;
 using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 using Frends.SFTP.ListFiles.Definitions;
 using Frends.SFTP.ListFiles.Enums;
+using NUnit.Framework;
+using Renci.SshNet.Common;
 
 namespace Frends.SFTP.ListFiles.Tests;
 
@@ -21,11 +22,11 @@ public class ErrorTests : ListFilesTestBase
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
-            FileEncoding = FileEncoding.ANSI
+            FileEncoding = FileEncoding.ANSI,
         };
         var options = new Options { ThrowErrorOnFailure = false };
 
-        var result = await SFTP.ListFiles(input, _connection, options, new CancellationToken());
+        var result = await SFTP.ListFiles(input, Connection, options, CancellationToken.None);
 
         Assert.IsFalse(result.Success);
         Assert.That(result.Error.Message, Does.Contain("No such file"));
@@ -40,12 +41,11 @@ public class ErrorTests : ListFilesTestBase
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
-            FileEncoding = FileEncoding.ANSI
+            FileEncoding = FileEncoding.ANSI,
         };
 
-        var ex = Assert.ThrowsAsync<SftpPathNotFoundException>(async () => await SFTP.ListFiles(input, _connection, _options, new CancellationToken()));
+        var ex = Assert.ThrowsAsync<SftpPathNotFoundException>(async () => await SFTP.ListFiles(input, Connection, Options, CancellationToken.None));
         Assert.That(ex.Message.StartsWith("No such file"), ex.Message);
-
     }
 
     [Test]
@@ -59,10 +59,10 @@ public class ErrorTests : ListFilesTestBase
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
-            FileEncoding = FileEncoding.ANSI
+            FileEncoding = FileEncoding.ANSI,
         };
 
-        Assert.ThrowsAsync<SocketException>(async () => await SFTP.ListFiles(input, connection, _options, new CancellationToken()));
+        Assert.ThrowsAsync<SocketException>(async () => await SFTP.ListFiles(input, connection, Options, CancellationToken.None));
     }
 
     [Test]
@@ -78,10 +78,10 @@ public class ErrorTests : ListFilesTestBase
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
-            FileEncoding = FileEncoding.ANSI
+            FileEncoding = FileEncoding.ANSI,
         };
 
-        var ex = Assert.ThrowsAsync<SshAuthenticationException>(async () => await SFTP.ListFiles(input, connection, _options, new CancellationToken()));
+        var ex = Assert.ThrowsAsync<SshAuthenticationException>(async () => await SFTP.ListFiles(input, connection, Options, CancellationToken.None));
         Assert.AreEqual("Permission denied (password).", ex.Message);
     }
 
@@ -99,10 +99,10 @@ public class ErrorTests : ListFilesTestBase
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
-            FileEncoding = FileEncoding.ANSI
+            FileEncoding = FileEncoding.ANSI,
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, _options, new CancellationToken()));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, Options, CancellationToken.None));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info:"));
     }
 
@@ -112,7 +112,7 @@ public class ErrorTests : ListFilesTestBase
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
         connection.PrivateKeyPassphrase = "passphrase";
-        connection.PrivateKeyFile = "";
+        connection.PrivateKeyFile = string.Empty;
 
         var input = new Input
         {
@@ -120,10 +120,10 @@ public class ErrorTests : ListFilesTestBase
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
-            FileEncoding = FileEncoding.ANSI
+            FileEncoding = FileEncoding.ANSI,
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, _options, new CancellationToken()));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, Options, CancellationToken.None));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
@@ -143,10 +143,10 @@ public class ErrorTests : ListFilesTestBase
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
-            FileEncoding = FileEncoding.ANSI
+            FileEncoding = FileEncoding.ANSI,
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, _options, new CancellationToken()));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, Options, CancellationToken.None));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
@@ -164,10 +164,10 @@ public class ErrorTests : ListFilesTestBase
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
-            FileEncoding = FileEncoding.ANSI
+            FileEncoding = FileEncoding.ANSI,
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, _options, new CancellationToken()));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, Options, CancellationToken.None));
         Assert.That(ex.Message.Contains("Error when checking the server fingerprint:"), ex.Message);
     }
 
@@ -176,7 +176,7 @@ public class ErrorTests : ListFilesTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
-        connection.PrivateKeyFile = "";
+        connection.PrivateKeyFile = string.Empty;
 
         var input = new Input
         {
@@ -184,10 +184,10 @@ public class ErrorTests : ListFilesTestBase
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
-            FileEncoding = FileEncoding.ANSI
+            FileEncoding = FileEncoding.ANSI,
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, _options, new CancellationToken()));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, Options, CancellationToken.None));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
@@ -196,7 +196,7 @@ public class ErrorTests : ListFilesTestBase
     {
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
-        connection.PrivateKeyString = "";
+        connection.PrivateKeyString = string.Empty;
 
         var input = new Input
         {
@@ -204,10 +204,10 @@ public class ErrorTests : ListFilesTestBase
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = true,
-            FileEncoding = FileEncoding.ANSI
+            FileEncoding = FileEncoding.ANSI,
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, _options, new CancellationToken()));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.ListFiles(input, connection, Options, CancellationToken.None));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 }

@@ -5,6 +5,7 @@
 ### Changed
 
 - Added options to control whether failures are thrown or returned with a custom error message.
+- Updated SSH.NET to 2026.0.0 to address reported security advisories.
 
 ## [3.1.0] - 2026-10-21
 

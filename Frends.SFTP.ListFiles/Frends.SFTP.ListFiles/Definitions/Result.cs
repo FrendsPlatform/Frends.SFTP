@@ -1,10 +1,16 @@
-﻿namespace Frends.SFTP.ListFiles.Definitions;
+namespace Frends.SFTP.ListFiles.Definitions;
 
 /// <summary>
-/// Return object with private setters.
+/// Result of the task.
 /// </summary>
 public class Result
 {
+    internal Result(List<FileItem> files = null)
+    {
+        Files = files ?? new List<FileItem>();
+        FileCount = Files.Count;
+    }
+
     /// <summary>
     /// Indicates if the task completed successfully.
     /// </summary>
@@ -23,29 +29,29 @@ public class Result
     /// <example>
     /// <code>
     /// [
-	///		{
-	///			"FullPath": "/upload/down/test2.txt",
-	///			"IsDirectory": false,
-	///			"IsFile": true,
-	///			"Length": 54,
-	///			"Name": "test2.txt",
-	///			"LastWriteTimeUtc": "2022-11-07T12:17:36Z",
-	///			"LastAccessTimeUtc": "2022-11-07T12:17:37Z",
-	///			"LastWriteTime": "2022-11-07T14:17:36+02:00",
-	///			"LastAccessTime": "2022-11-07T14:17:37+02:00"
-	///		},
-	///		{
-	///			"FullPath": "/upload/down/test1.txt",
-	///			"IsDirectory": false,
-	///			"IsFile": true,
-	///			"Length": 0,
-	///			"Name": "test1.txt",
-	///			"LastWriteTimeUtc": "2022-11-07T12:17:36Z",
-	///			"LastAccessTimeUtc": "2022-11-07T12:17:37Z",
-	///			"LastWriteTime": "2022-11-07T14:17:36+02:00",
-	///			"LastAccessTime": "2022-11-07T14:17:37+02:00"
-	///		},
-	/// ]
+    ///         {
+    ///             "FullPath": "/upload/down/test2.txt",
+    ///             "IsDirectory": false,
+    ///             "IsFile": true,
+    ///             "Length": 54,
+    ///             "Name": "test2.txt",
+    ///             "LastWriteTimeUtc": "2022-11-07T12:17:36Z",
+    ///             "LastAccessTimeUtc": "2022-11-07T12:17:37Z",
+    ///             "LastWriteTime": "2022-11-07T14:17:36+02:00",
+    ///             "LastAccessTime": "2022-11-07T14:17:37+02:00"
+    ///         },
+    ///         {
+    ///             "FullPath": "/upload/down/test1.txt",
+    ///             "IsDirectory": false,
+    ///             "IsFile": true,
+    ///             "Length": 0,
+    ///             "Name": "test1.txt",
+    ///             "LastWriteTimeUtc": "2022-11-07T12:17:36Z",
+    ///             "LastAccessTimeUtc": "2022-11-07T12:17:37Z",
+    ///             "LastWriteTime": "2022-11-07T14:17:36+02:00",
+    ///             "LastAccessTime": "2022-11-07T14:17:37+02:00"
+    ///         },
+    /// ]
     /// </code>
     /// </example>
     public List<FileItem> Files { get; set; }
@@ -55,10 +61,4 @@ public class Result
     /// </summary>
     /// <example>object { string Message, Exception AdditionalInfo }</example>
     public Error Error { get; set; }
-
-    internal Result(List<FileItem> files = null)
-    {
-        Files = files ?? new List<FileItem>();
-        FileCount = Files.Count;
-    }
 }

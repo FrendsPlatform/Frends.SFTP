@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework;
 using Frends.SFTP.ListFiles.Definitions;
 using Frends.SFTP.ListFiles.Enums;
+using NUnit.Framework;
 
 namespace Frends.SFTP.ListFiles.Tests;
 
@@ -25,9 +25,9 @@ public class ConnectivityTests : ListFilesTestBase
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = false,
-            FileEncoding = FileEncoding.ANSI
+            FileEncoding = FileEncoding.ANSI,
         };
-        var result = await SFTP.ListFiles(input, connection, _options, new CancellationToken());
+        var result = await SFTP.ListFiles(input, connection, Options, CancellationToken.None);
         Assert.AreEqual(3, result.FileCount);
     }
 
@@ -47,9 +47,9 @@ public class ConnectivityTests : ListFilesTestBase
             FileMask = "*.txt",
             IncludeType = IncludeType.File,
             IncludeSubdirectories = false,
-            FileEncoding = FileEncoding.ANSI
+            FileEncoding = FileEncoding.ANSI,
         };
-        var result = await SFTP.ListFiles(input, connection, _options, new CancellationToken());
+        var result = await SFTP.ListFiles(input, connection, Options, CancellationToken.None);
         Assert.AreEqual(3, result.FileCount);
     }
 
@@ -59,7 +59,7 @@ public class ConnectivityTests : ListFilesTestBase
         var connection = Helpers.GetSftpConnection();
         connection.UseKeyboardInteractiveAuthentication = true;
 
-        var result = await SFTP.ListFiles(_input, connection, _options, new CancellationToken());
+        var result = await SFTP.ListFiles(Input, connection, Options, CancellationToken.None);
         Assert.AreEqual(3, result.FileCount);
     }
 }

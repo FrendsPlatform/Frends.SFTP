@@ -1,11 +1,11 @@
-﻿using System;
-using System.Text;
+using System;
 using System.Security.Cryptography;
+using System.Text;
+using Frends.SFTP.ListFiles.Definitions;
+using Frends.SFTP.ListFiles.Enums;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using Renci.SshNet.Security;
-using Frends.SFTP.ListFiles.Definitions;
-using Frends.SFTP.ListFiles.Enums;
 
 namespace Frends.SFTP.ListFiles.Tests;
 
@@ -14,18 +14,18 @@ internal static class Helpers
     /// <summary>
     /// Test credentials for docker server.
     /// </summary>
-    readonly static string _dockerAddress = "localhost";
-    readonly static string _dockerUsername = "foo";
-    readonly static string _dockerPassword = "pass";
+    private const string DockerAddress = "localhost";
+    private const string DockerUsername = "foo";
+    private const string DockerPassword = "pass";
 
     internal static Connection GetSftpConnection()
     {
         var connection = new Connection
         {
             ConnectionTimeout = 60,
-            Address = _dockerAddress,
-            Username = _dockerUsername,
-            Password = _dockerPassword,
+            Address = DockerAddress,
+            Username = DockerUsername,
+            Password = DockerPassword,
             Port = 2222,
             Authentication = AuthenticationType.UsernamePassword,
             ServerFingerPrint = null,
@@ -36,7 +36,7 @@ internal static class Helpers
 
     internal static void GenerateDummyFiles()
     {
-        using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+        using (var client = new SftpClient(DockerAddress, 2222, DockerUsername, DockerPassword))
         {
             client.Connect();
             for (var i = 1; i <= 3; i++)
@@ -51,7 +51,7 @@ internal static class Helpers
     internal static Tuple<string, string, byte[]> GetServerFingerPrintsAndHostKey()
     {
         Tuple<string, string, byte[]> result = null;
-        using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+        using (var client = new SftpClient(DockerAddress, 2222, DockerUsername, DockerPassword))
         {
             client.ConnectionInfo.HostKeyAlgorithms.Clear();
             client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) =>
@@ -60,7 +60,7 @@ internal static class Helpers
                 return new KeyHostAlgorithm("ssh-rsa", new RsaKey(sshKeyData));
             });
 
-            client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
+            client.HostKeyReceived += (sender, e) =>
             {
                 result = new Tuple<string, string, byte[]>(e.FingerPrintMD5, e.FingerPrintSHA256, e.HostKey);
                 e.CanTrust = true;
@@ -68,16 +68,18 @@ internal static class Helpers
             client.Connect();
             client.Disconnect();
         }
+
         return result;
     }
 
     internal static string ConvertToSHA256Hex(byte[] hostKey)
     {
-        var fingerprint = "";
+        var fingerprint = string.Empty;
         using (SHA256 mySHA256 = SHA256.Create())
         {
             fingerprint = ToHex(mySHA256.ComputeHash(hostKey));
         }
+
         return fingerprint;
     }
 
@@ -91,7 +93,7 @@ internal static class Helpers
 
     internal static void DeleteTestFiles()
     {
-        using (var sftp = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+        using (var sftp = new SftpClient(DockerAddress, 2222, DockerUsername, DockerPassword))
         {
             sftp.Connect();
             sftp.ChangeDirectory("/upload");
@@ -110,6 +112,7 @@ internal static class Helpers
                                 sftp.DeleteFile(f.Name);
                             }
                         }
+
                         sftp.ChangeDirectory("/upload");
                         sftp.DeleteDirectory(file.FullName);
                     }
@@ -119,6 +122,7 @@ internal static class Helpers
                     }
                 }
             }
+
             sftp.Disconnect();
         }
     }

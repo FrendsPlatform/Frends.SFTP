@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.ExceptionServices;
 using Frends.SFTP.ListFiles.Definitions;
 

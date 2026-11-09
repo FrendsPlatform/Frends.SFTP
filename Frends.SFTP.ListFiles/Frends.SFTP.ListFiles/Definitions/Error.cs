@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.ListFiles.Definitions;
+namespace Frends.SFTP.ListFiles.Definitions;
 
 /// <summary>
 /// Error that occurred during the task.
