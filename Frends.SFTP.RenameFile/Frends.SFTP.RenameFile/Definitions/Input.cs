@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Frends.SFTP.RenameFile.Enums;
 
 namespace Frends.SFTP.RenameFile.Definitions;
@@ -26,5 +26,6 @@ public class Input
     /// How the file rename should work if a file with the new name already exists.
     /// If Rename is selected, will append a number to the new file name e.g. renamed(2).txt
     /// </summary>
+    /// <example>RenameBehaviour.Rename</example>
     public RenameBehaviour RenameBehaviour { get; set; }
 }
