@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.0] - 2026-11-09
+
+### Changed
+
+- **[Breaking Change]** The task now requires an `Options` input, is exposed as a static task class, and uses PascalCase host key algorithm names.
+- Updated the task to .NET 8 and added configurable failure handling.
+
 ## [2.1.0] - 2026-10-21
 
 ### Changed

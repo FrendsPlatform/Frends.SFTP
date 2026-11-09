@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Frends.SFTP.MoveFile.Definitions
@@ -9,15 +9,15 @@ namespace Frends.SFTP.MoveFile.Definitions
     public class PromptResponse
     {
         /// <summary>
-        /// Prompt from the server what is to be expected.
+        /// Gets or sets the server prompt to respond to.
         /// </summary>
-        /// <example>Verification code</example>
+        /// <example><c>Verification code</c>.</example>
         public string Prompt { get; set; }
 
         /// <summary>
-        /// Response for the Prompt from the server.
+        /// Gets or sets the response to the server prompt.
         /// </summary>
-        /// <example>123456789</example>
+        /// <example><c>123456789</c>.</example>
         [PasswordPropertyText]
         [DisplayFormat(DataFormatString = "Text")]
         public string Response { get; set; }
