@@ -1,9 +1,4 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Frends.SFTP.UploadFiles.Definitions;
+﻿using Frends.SFTP.UploadFiles.Definitions;
 using NUnit.Framework;
 
 namespace Frends.SFTP.UploadFiles.Tests

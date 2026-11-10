@@ -1,6 +1,5 @@
 using System.Text;
 using Renci.SshNet;
-using Renci.SshNet.Sftp;
 
 namespace Frends.SFTP.UploadFiles.Definitions;
 

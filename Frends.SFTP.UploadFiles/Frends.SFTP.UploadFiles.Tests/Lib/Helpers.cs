@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using Frends.SFTP.UploadFiles.Definitions;
 using Renci.SshNet;
-using Renci.SshNet.Common;
 using Renci.SshNet.Security;
 
 namespace Frends.SFTP.UploadFiles.Tests
@@ -124,6 +120,26 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             if (client.Exists(dir))
                 client.DeleteDirectory(dir);
+        }
+
+        internal static void CleanDirectory(SftpClient client, string dir)
+        {
+            if (!client.Exists(dir))
+            {
+                client.CreateDirectory(dir);
+                return;
+            }
+
+            foreach (var file in client.ListDirectory(dir))
+            {
+                if ((file.Name != ".") && (file.Name != ".."))
+                {
+                    if (file.IsDirectory)
+                        DeleteDirectory(client, file.FullName);
+                    else
+                        client.DeleteFile(file.FullName);
+                }
+            }
         }
 
         internal static void UploadSingleTestFile(string dir, string pathToFile)

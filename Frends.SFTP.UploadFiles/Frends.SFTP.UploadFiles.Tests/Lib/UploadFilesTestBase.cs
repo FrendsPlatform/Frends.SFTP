@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using Frends.SFTP.UploadFiles.Definitions;
+﻿using Frends.SFTP.UploadFiles.Definitions;
 using NUnit.Framework;
 using Renci.SshNet;
 
@@ -69,20 +65,14 @@ namespace Frends.SFTP.UploadFiles.Tests
         [SetUp]
         public void Setup()
         {
+            CleanRemoteTestDirectory();
             Helpers.CreateDummyFiles(2);
         }
 
         [TearDown]
         public void TearDown()
         {
-            using (var sftp = new SftpClient(TestConnection.Address, TestConnection.Port, TestConnection.UserName, TestConnection.Password))
-            {
-                sftp.Connect();
-                if (sftp.Exists(TestDestination.Directory))
-                    Helpers.DeleteDirectory(sftp, TestDestination.Directory);
-                sftp.Disconnect();
-            }
-
+            CleanRemoteTestDirectory();
             Helpers.DeleteDummyFiles();
         }
 
@@ -90,6 +80,16 @@ namespace Frends.SFTP.UploadFiles.Tests
         public void OneTimeTearDown()
         {
             Directory.Delete(TestWorkDir, true);
+        }
+
+        private static void CleanRemoteTestDirectory()
+        {
+            using (var sftp = new SftpClient(TestConnection.Address, TestConnection.Port, TestConnection.UserName, TestConnection.Password))
+            {
+                sftp.Connect();
+                Helpers.CleanDirectory(sftp, "/upload");
+                sftp.Disconnect();
+            }
         }
     }
 }

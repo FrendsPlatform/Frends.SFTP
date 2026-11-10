@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Frends.SFTP.UploadFiles.Definitions;
 
 namespace Frends.SFTP.UploadFiles.Tests;

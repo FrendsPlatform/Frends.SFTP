@@ -1,4 +1,4 @@
-using Renci.SshNet.Sftp;
+﻿using Renci.SshNet.Sftp;
 
 namespace Frends.SFTP.UploadFiles.Definitions;
 
