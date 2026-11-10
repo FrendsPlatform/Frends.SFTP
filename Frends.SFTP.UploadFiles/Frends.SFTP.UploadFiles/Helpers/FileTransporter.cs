@@ -1,14 +1,15 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using Frends.SFTP.UploadFiles.Definitions;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using Renci.SshNet.Security;
 
-namespace Frends.SFTP.UploadFiles.Definitions;
+namespace Frends.SFTP.UploadFiles.Helpers;
 
 /// <summary>
 /// Main class for SFTP file transfers.

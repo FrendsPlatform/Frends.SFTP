@@ -1,4 +1,5 @@
 ﻿using Frends.SFTP.UploadFiles.Definitions;
+using Frends.SFTP.UploadFiles.Tests.Lib;
 using NUnit.Framework;
 
 namespace Frends.SFTP.UploadFiles.Tests
@@ -45,8 +46,8 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination(destFilePath));
-            Assert.AreEqual(date.ToString(), Helpers.GetLastWriteTimeFromDestination(destFilePath));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination(destFilePath));
+            Assert.AreEqual(date.ToString(), Lib.Helpers.GetLastWriteTimeFromDestination(destFilePath));
         }
 
         [Test]
@@ -59,8 +60,8 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination(destFilePath));
-            Assert.AreEqual(date.ToString(), Helpers.GetLastWriteTimeFromDestination(destFilePath));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination(destFilePath));
+            Assert.AreEqual(date.ToString(), Lib.Helpers.GetLastWriteTimeFromDestination(destFilePath));
         }
 
         [Test]
@@ -73,8 +74,8 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination(destFilePath));
-            Assert.AreEqual(date.ToString(), Helpers.GetLastWriteTimeFromDestination(destFilePath));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination(destFilePath));
+            Assert.AreEqual(date.ToString(), Lib.Helpers.GetLastWriteTimeFromDestination(destFilePath));
         }
 
         [Test]
@@ -87,8 +88,8 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination(destFilePath));
-            Assert.AreEqual(date.ToString(), Helpers.GetLastWriteTimeFromDestination(destFilePath));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination(destFilePath));
+            Assert.AreEqual(date.ToString(), Lib.Helpers.GetLastWriteTimeFromDestination(destFilePath));
         }
 
         [Test]
@@ -113,8 +114,8 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             var destFilePath = destination.Directory + "/" + source.FileName;
 
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination(destFilePath));
-            Assert.AreEqual(date.ToString(), Helpers.GetLastWriteTimeFromDestination(destFilePath));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination(destFilePath));
+            Assert.AreEqual(date.ToString(), Lib.Helpers.GetLastWriteTimeFromDestination(destFilePath));
         }
     }
 }

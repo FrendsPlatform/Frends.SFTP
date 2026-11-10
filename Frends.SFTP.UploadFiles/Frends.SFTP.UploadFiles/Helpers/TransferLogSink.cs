@@ -1,7 +1,7 @@
-using Serilog.Core;
+﻿using Serilog.Core;
 using Serilog.Events;
 
-namespace Frends.SFTP.UploadFiles.Definitions;
+namespace Frends.SFTP.UploadFiles.Helpers;
 
 /// <summary>
 /// Sink that is used to store messages and events from seriolog Logger.

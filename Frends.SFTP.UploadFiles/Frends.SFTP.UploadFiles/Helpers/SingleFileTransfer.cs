@@ -1,7 +1,8 @@
 using System.Text;
+using Frends.SFTP.UploadFiles.Definitions;
 using Renci.SshNet;
 
-namespace Frends.SFTP.UploadFiles.Definitions;
+namespace Frends.SFTP.UploadFiles.Helpers;
 
 internal class SingleFileTransfer
 {

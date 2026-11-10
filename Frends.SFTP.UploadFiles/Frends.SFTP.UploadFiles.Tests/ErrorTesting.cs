@@ -1,4 +1,5 @@
 ﻿using Frends.SFTP.UploadFiles.Definitions;
+using Frends.SFTP.UploadFiles.Tests.Lib;
 using NUnit.Framework;
 
 namespace Frends.SFTP.UploadFiles.Tests
@@ -34,7 +35,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public void UploadFiles_TestThrowsWithWrongPort()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.Port = 51651;
 
             var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(TestSource, TestDestination, connection, TestOptions, TestInfo, default));
@@ -44,7 +45,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public void UploadFiles_TestThrowsWithWrongAddress()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.Address = "local";
 
             var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(TestSource, TestDestination, connection, TestOptions, TestInfo, default));
@@ -54,9 +55,9 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public void UploadFiles_TestThrowsMovedSourceFileIsRestored()
         {
-            Helpers.UploadSingleTestFile(TestDestination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
+            Lib.Helpers.UploadSingleTestFile(TestDestination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
 
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             var source = new Source
             {
                 Directory = TestWorkDir,
@@ -77,7 +78,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public void UploadFiles_TestSourceMoveWithFileAlreadyInMovedFolder()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             var source = new Source
             {
                 Directory = TestWorkDir,
@@ -100,7 +101,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public void UploadFiles_TestErrorMessage()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.Password = "cuinbeu8i9ch";
 
             var ex = Assert.ThrowsAsync<Exception>(async () => await SFTP.UploadFiles(TestSource, TestDestination, connection, TestOptions, TestInfo, default));
@@ -110,7 +111,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public async Task UploadFiles_TestDontThrowWhenFilesInFilePathsAreNotFound()
         {
-            var filePaths = Helpers.CreateDummyFiles(3);
+            var filePaths = Lib.Helpers.CreateDummyFiles(3);
             foreach (var file in filePaths)
             {
                 File.Delete(file.ToString());
@@ -131,7 +132,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public void UploadFiles_TestThrowsWhenFilesInFilePathsAreNotFound()
         {
-            var filePaths = Helpers.CreateDummyFiles(3);
+            var filePaths = Lib.Helpers.CreateDummyFiles(3);
             foreach (var file in filePaths)
             {
                 File.Delete(file.ToString());
@@ -161,7 +162,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public void UploadFiles_TestCancellationToken()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             var source = new Source
             {
                 Directory = TestWorkDir,
@@ -177,7 +178,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public void UploadFiles_TestTimeout()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             var options = new Options
             {
                 Timeout = 1,
@@ -214,7 +215,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public void UploadFiles_TestTimeoutCheckTempFiles()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             var options = new Options
             {
                 Timeout = 1,

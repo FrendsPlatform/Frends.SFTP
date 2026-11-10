@@ -1,6 +1,6 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
-namespace Frends.SFTP.UploadFiles.Definitions;
+namespace Frends.SFTP.UploadFiles.Helpers;
 
 /// <summary>
 /// Policies for creating names for remote files: expands macros etc.

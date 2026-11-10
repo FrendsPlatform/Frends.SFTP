@@ -1,4 +1,5 @@
 ﻿using Frends.SFTP.UploadFiles.Definitions;
+using Frends.SFTP.UploadFiles.Tests.Lib;
 using NUnit.Framework;
 
 namespace Frends.SFTP.UploadFiles.Tests
@@ -23,7 +24,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             var date = DateTime.Now;
             var file = "/upload/Upload/SFTPUploadTestFile1" + date.ToString(@"yyyy-MM-dd") + ".txt";
             Assert.AreEqual(file, result.TransferredDestinationFilePaths.ToList().FirstOrDefault());
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination(file));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination(file));
         }
 
         [Test]
@@ -68,7 +69,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
             var year = DateTime.Now.Year.ToString();
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination("upload/Upload/test" + year));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination("upload/Upload/test" + year));
         }
 
         [Test]

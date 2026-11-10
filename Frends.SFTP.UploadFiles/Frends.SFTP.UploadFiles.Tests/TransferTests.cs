@@ -1,4 +1,5 @@
 using Frends.SFTP.UploadFiles.Definitions;
+using Frends.SFTP.UploadFiles.Tests.Lib;
 using NUnit.Framework;
 
 namespace Frends.SFTP.UploadFiles.Tests
@@ -180,7 +181,7 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Action = DestinationAction.Error,
             };
 
-            Helpers.UploadSingleTestFile(TestDestination.Directory, Path.Combine(TestWorkDir, "SFTPUploadTestFile1.txt"));
+            Lib.Helpers.UploadSingleTestFile(TestDestination.Directory, Path.Combine(TestWorkDir, "SFTPUploadTestFile1.txt"));
 
             var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, options, TestInfo, CancellationToken.None);
             Assert.IsFalse(result.Success);
@@ -199,13 +200,13 @@ namespace Frends.SFTP.UploadFiles.Tests
                 EnableBomForFileName = true,
             };
 
-            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
+            Lib.Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
 
             var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination(destination.Directory + "/" + TestSource.FileName));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination(destination.Directory + "/" + TestSource.FileName));
         }
 
         [Test]
@@ -225,7 +226,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination(TestDestination.Directory + "/" + TestSource.FileName));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination(TestDestination.Directory + "/" + TestSource.FileName));
         }
 
         [Test]
@@ -245,7 +246,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination(TestDestination.Directory + "/" + TestSource.FileName));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination(TestDestination.Directory + "/" + TestSource.FileName));
         }
 
         [Test]
@@ -283,8 +284,8 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public async Task UploadFiles_MassTransferTest()
         {
-            Helpers.CreateDummyFiles(30);
-            Helpers.CopyLargeTestFile(10);
+            Lib.Helpers.CreateDummyFiles(30);
+            Lib.Helpers.CopyLargeTestFile(10);
 
             var source = new Source
             {
@@ -313,7 +314,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public async Task UploadFiles_TestWithFilePaths()
         {
-            var filePaths = Helpers.CreateDummyFiles(3);
+            var filePaths = Lib.Helpers.CreateDummyFiles(3);
 
             var source = new Source
             {
@@ -333,7 +334,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public async Task UploadFiles_TestWithFilePathsThatDontExist()
         {
-            var paths = Helpers.CreateDummyFiles(3).ToList();
+            var paths = Lib.Helpers.CreateDummyFiles(3).ToList();
             paths.Add(@"C:\File\That\Dont\Exist.txt");
             var filePaths = paths.ToArray();
 
@@ -380,7 +381,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public async Task UploadFiles_TestWithFilePathsEvenIfSourceFileIsAssigned()
         {
-            var filePaths = Helpers.CreateDummyFiles(3);
+            var filePaths = Lib.Helpers.CreateDummyFiles(3);
 
             var source = new Source
             {
@@ -400,7 +401,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public async Task UploadFiles_TestWithFilePathsEvenIfSourceFileIsAssignedToAll()
         {
-            var files = Helpers.CreateDummyFiles(6);
+            var files = Lib.Helpers.CreateDummyFiles(6);
 
             var filePaths = new string[] { files[0], files[1], files[2] };
 
@@ -422,7 +423,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public async Task UploadFiles_TestWithFilePathsObjectArray()
         {
-            var files = Helpers.CreateDummyFiles(6);
+            var files = Lib.Helpers.CreateDummyFiles(6);
 
             var filePaths = new object[] { files[0], files[1], files[2] };
 
@@ -444,7 +445,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         [Test]
         public void UploadFiles_ShouldThrowWithIncorrectTypedFilePaths()
         {
-            var files = Helpers.CreateDummyFiles(6);
+            var files = Lib.Helpers.CreateDummyFiles(6);
 
             var filePaths = new List<object> { files[0], files[1], files[2] };
 
@@ -496,7 +497,7 @@ namespace Frends.SFTP.UploadFiles.Tests
         public async Task UploadFiles_TestPreserveDirectoryStructureWithMacro()
         {
             var localSourceDir = Path.Combine(TestWorkDir, "nestedTestSource");
-            Helpers.CreateLocalFilesWithSubdirectories(localSourceDir, new Dictionary<string, List<string>>
+            Lib.Helpers.CreateLocalFilesWithSubdirectories(localSourceDir, new Dictionary<string, List<string>>
             {
                 { string.Empty,                  new List<string> { "root.txt" } },
                 { "sub1",              new List<string> { "file1.txt" } },
@@ -524,17 +525,17 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success, "Transfer should succeed");
             Assert.AreEqual(4, result.SuccessfulTransferCount, "Should transfer 4 files");
 
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/root.txt"));
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/sub1/file1.txt"));
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/sub1/sub2/file2.txt"));
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/sub1/sub2/sub3/file3.txt"));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination("/upload/root.txt"));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination("/upload/sub1/file1.txt"));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination("/upload/sub1/sub2/file2.txt"));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination("/upload/sub1/sub2/sub3/file3.txt"));
         }
 
         [Test]
         public async Task UploadFiles_TestRecursiveWithoutMacro()
         {
             var localSourceDir = Path.Combine(TestWorkDir, "nestedTestSource2");
-            Helpers.CreateLocalFilesWithSubdirectories(localSourceDir, new Dictionary<string, List<string>>
+            Lib.Helpers.CreateLocalFilesWithSubdirectories(localSourceDir, new Dictionary<string, List<string>>
             {
                 { string.Empty,          new List<string> { "root.txt" } },
                 { "sub1",      new List<string> { "file1.txt" } },
@@ -561,16 +562,16 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success, "Transfer should succeed");
             Assert.AreEqual(3, result.SuccessfulTransferCount, "Should transfer 3 files");
 
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/flat/root.txt"));
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/flat/file1.txt"));
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/flat/file2.txt"));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination("/upload/flat/root.txt"));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination("/upload/flat/file1.txt"));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination("/upload/flat/file2.txt"));
         }
 
         [Test]
         public async Task UploadFiles_TestWithoutIncludeSubdirectories_OnlyRootFiles()
         {
             var localSourceDir = Path.Combine(TestWorkDir, "nestedTestSource3");
-            Helpers.CreateLocalFilesWithSubdirectories(localSourceDir, new Dictionary<string, List<string>>
+            Lib.Helpers.CreateLocalFilesWithSubdirectories(localSourceDir, new Dictionary<string, List<string>>
             {
                 { string.Empty,          new List<string> { "root1.txt", "root2.txt" } },
                 { "sub1",      new List<string> { "file1.txt" } },
@@ -597,17 +598,17 @@ namespace Frends.SFTP.UploadFiles.Tests
             Assert.IsTrue(result.Success, "Transfer should succeed");
             Assert.AreEqual(2, result.SuccessfulTransferCount, "Should transfer ONLY 2 files from root directory");
 
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/root_only/root1.txt"));
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination("/upload/root_only/root2.txt"));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination("/upload/root_only/root1.txt"));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination("/upload/root_only/root2.txt"));
 
-            Assert.IsFalse(Helpers.CheckFileExistsInDestination("/upload/root_only/file1.txt"));
-            Assert.IsFalse(Helpers.CheckFileExistsInDestination("/upload/root_only/file2.txt"));
+            Assert.IsFalse(Lib.Helpers.CheckFileExistsInDestination("/upload/root_only/file1.txt"));
+            Assert.IsFalse(Lib.Helpers.CheckFileExistsInDestination("/upload/root_only/file2.txt"));
         }
 
         [Test]
         public async Task UploadFiles_TestWithFilePathsAndNullDirectory()
         {
-            var files = Helpers.CreateDummyFiles(3);
+            var files = Lib.Helpers.CreateDummyFiles(3);
 
             var filePaths = new string[] { files[0], files[1] };
 

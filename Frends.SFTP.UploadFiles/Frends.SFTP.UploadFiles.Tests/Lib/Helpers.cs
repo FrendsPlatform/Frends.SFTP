@@ -4,7 +4,7 @@ using Frends.SFTP.UploadFiles.Definitions;
 using Renci.SshNet;
 using Renci.SshNet.Security;
 
-namespace Frends.SFTP.UploadFiles.Tests
+namespace Frends.SFTP.UploadFiles.Tests.Lib
 {
     internal static class Helpers
     {

@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Renci.SshNet;
 
-namespace Frends.SFTP.UploadFiles.Tests
+namespace Frends.SFTP.UploadFiles.Tests.Lib
 {
     public class UploadFilesTestBase
     {

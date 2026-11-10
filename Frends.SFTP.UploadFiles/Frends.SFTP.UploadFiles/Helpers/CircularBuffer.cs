@@ -1,6 +1,6 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
-namespace Frends.SFTP.UploadFiles.Definitions;
+namespace Frends.SFTP.UploadFiles.Helpers;
 
 /// <summary>
 ///     Circular buffer impl, original from https://codereview.stackexchange.com/a/134147.

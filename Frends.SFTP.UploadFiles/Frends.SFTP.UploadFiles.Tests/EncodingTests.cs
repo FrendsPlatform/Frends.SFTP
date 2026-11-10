@@ -1,4 +1,5 @@
 using Frends.SFTP.UploadFiles.Definitions;
+using Frends.SFTP.UploadFiles.Tests.Lib;
 using NUnit.Framework;
 
 namespace Frends.SFTP.UploadFiles.Tests
@@ -132,7 +133,7 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Action = DestinationAction.Append,
             };
 
-            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
+            Lib.Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
 
             var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
@@ -149,7 +150,7 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Action = DestinationAction.Append,
             };
 
-            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
+            Lib.Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
 
             var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
@@ -167,7 +168,7 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Action = DestinationAction.Append,
             };
 
-            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
+            Lib.Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
 
             var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
@@ -185,7 +186,7 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Action = DestinationAction.Append,
             };
 
-            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
+            Lib.Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
 
             var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
@@ -202,7 +203,7 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Action = DestinationAction.Append,
             };
 
-            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
+            Lib.Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
 
             var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
@@ -220,7 +221,7 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Action = DestinationAction.Append,
             };
 
-            Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
+            Lib.Helpers.UploadSingleTestFile(destination.Directory, Path.Combine(TestWorkDir, TestSource.FileName));
 
             var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);

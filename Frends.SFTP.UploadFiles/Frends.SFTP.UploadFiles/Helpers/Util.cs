@@ -1,7 +1,8 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
+using Frends.SFTP.UploadFiles.Definitions;
 
-namespace Frends.SFTP.UploadFiles.Definitions;
+namespace Frends.SFTP.UploadFiles.Helpers;
 
 /// <summary>
 /// Helper methods for file modifications.

@@ -1,7 +1,8 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
+using Frends.SFTP.UploadFiles.Definitions;
 using Serilog;
 
-namespace Frends.SFTP.UploadFiles.Definitions;
+namespace Frends.SFTP.UploadFiles.Helpers;
 
 internal class SFTPLogger : ISFTPLogger
 {

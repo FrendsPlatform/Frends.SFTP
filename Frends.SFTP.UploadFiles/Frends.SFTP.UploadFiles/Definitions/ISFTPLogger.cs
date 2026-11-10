@@ -1,3 +1,5 @@
+using Frends.SFTP.UploadFiles.Helpers;
+
 namespace Frends.SFTP.UploadFiles.Definitions;
 
 /// <summary>

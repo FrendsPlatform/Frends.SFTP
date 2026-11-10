@@ -1,4 +1,5 @@
 ﻿using Frends.SFTP.UploadFiles.Definitions;
+using Frends.SFTP.UploadFiles.Tests.Lib;
 using NUnit.Framework;
 
 namespace Frends.SFTP.UploadFiles.Tests
@@ -12,7 +13,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             var result = await SFTP.UploadFiles(TestSource, TestDestination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             var fullPath = TestDestination.Directory + "/" + TestSource.FileName;
-            var content1 = Helpers.GetTransferredFileContent(fullPath);
+            var content1 = Lib.Helpers.GetTransferredFileContent(fullPath);
 
             var destination = new Destination
             {
@@ -33,7 +34,7 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             result = await SFTP.UploadFiles(source, destination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
-            var content2 = Helpers.GetTransferredFileContent(fullPath);
+            var content2 = Lib.Helpers.GetTransferredFileContent(fullPath);
             Assert.AreNotEqual(content1, content2);
         }
 
@@ -43,7 +44,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             var result = await SFTP.UploadFiles(TestSource, TestDestination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             var fullPath = TestDestination.Directory + "/" + TestSource.FileName;
-            var content1 = Helpers.GetTransferredFileContent(fullPath);
+            var content1 = Lib.Helpers.GetTransferredFileContent(fullPath);
 
             var options = new Options
             {
@@ -74,7 +75,7 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             result = await SFTP.UploadFiles(source, destination, TestConnection, options, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
-            var content2 = Helpers.GetTransferredFileContent(fullPath);
+            var content2 = Lib.Helpers.GetTransferredFileContent(fullPath);
             Assert.AreNotEqual(content1, content2);
         }
 
@@ -84,7 +85,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             var result = await SFTP.UploadFiles(TestSource, TestDestination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             var fullPath = TestDestination.Directory + "/" + TestSource.FileName;
-            var content1 = Helpers.GetTransferredFileContent(fullPath);
+            var content1 = Lib.Helpers.GetTransferredFileContent(fullPath);
 
             var options = new Options
             {
@@ -115,7 +116,7 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             result = await SFTP.UploadFiles(source, destination, TestConnection, options, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
-            var content2 = Helpers.GetTransferredFileContent(fullPath);
+            var content2 = Lib.Helpers.GetTransferredFileContent(fullPath);
             Assert.AreNotEqual(content1, content2);
         }
 
@@ -125,7 +126,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             var result = await SFTP.UploadFiles(TestSource, TestDestination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             var fullPath = TestDestination.Directory + "/" + TestSource.FileName;
-            var content1 = Helpers.GetTransferredFileContent(fullPath);
+            var content1 = Lib.Helpers.GetTransferredFileContent(fullPath);
 
             var options = new Options
             {
@@ -156,7 +157,7 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             result = await SFTP.UploadFiles(source, destination, TestConnection, options, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
-            var content2 = Helpers.GetTransferredFileContent(fullPath);
+            var content2 = Lib.Helpers.GetTransferredFileContent(fullPath);
             Assert.AreNotEqual(content1, content2);
         }
 
@@ -166,7 +167,7 @@ namespace Frends.SFTP.UploadFiles.Tests
             var result = await SFTP.UploadFiles(TestSource, TestDestination, TestConnection, TestOptions, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             var fullPath = TestDestination.Directory + "/" + TestSource.FileName;
-            var content1 = Helpers.GetTransferredFileContent(fullPath);
+            var content1 = Lib.Helpers.GetTransferredFileContent(fullPath);
 
             var options = new Options
             {
@@ -197,7 +198,7 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             result = await SFTP.UploadFiles(source, destination, TestConnection, options, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
-            var content2 = Helpers.GetTransferredFileContent(fullPath);
+            var content2 = Lib.Helpers.GetTransferredFileContent(fullPath);
             Assert.AreNotEqual(content1, content2);
         }
     }
