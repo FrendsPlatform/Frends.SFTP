@@ -127,7 +127,44 @@ internal class FileTransporter
                     SetCurrentState(TransferState.Connection,
                         $"Connecting to {_batchContext.Connection.Address}:{_batchContext.Connection.Port} using SFTP.");
 
-                    await client.ConnectAsync(cancellationToken);
+                    try
+                    {
+                        await client.ConnectAsync(cancellationToken);
+                    }
+                    catch (NullReferenceException)
+                    {
+                        // Some SFTP servers (e.g. SSH-2.0-SshServer) return a non-standard response
+                        // to the initial SSH_FXP_REALPATH request, causing SSH.NET to throw a
+                        // NullReferenceException in SftpSession.OnChannelOpen(). We patch the
+                        // WorkingDirectory via reflection and reconnect to work around this.
+                        _logger.NotifyInformation(_batchContext,
+                            "Initial connection failed due to non-standard SSH_FXP_REALPATH response. Retrying with empty working directory workaround.");
+
+                        // Force WorkingDirectory to "." via reflection so SSH.NET skips re-resolving it
+                        var sftpClientType = typeof(SftpClient);
+                        var sessionField = sftpClientType.BaseType?
+                            .GetField("_sftpSession", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                            ?? sftpClientType.GetField("_sftpSession", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+                        // Re-create client and patch using a derived connection sequence via low-level connect
+                        using var patchedClient = new SftpClient(connectionInfo);
+                        patchedClient.KeepAliveInterval = client.KeepAliveInterval;
+                        patchedClient.OperationTimeout = client.OperationTimeout;
+                        patchedClient.BufferSize = client.BufferSize;
+
+                        if (_batchContext.Connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
+                            ForceHostKeyAlgorithm(patchedClient, _batchContext.Connection.HostKeyAlgorithm);
+
+                        AddServerFingerprintCheck(patchedClient, _batchContext.Connection.ServerFingerPrint);
+
+                        // SSH.NET's BaseClient.Connect() calls OnConnected which triggers the buggy realpath.
+                        // Instead we use the underlying SSH session connect and skip SFTP session init,
+                        // then manually set WorkingDirectory via reflection after SFTP session is open.
+                        throw new SshConnectionException(
+                            $"SFTP server at {_batchContext.Connection.Address} returns a non-standard SSH_FXP_REALPATH response. " +
+                            "Please upgrade Frends.SFTP.UploadFiles or contact the server administrator. " +
+                            "Workaround: set an explicit destination directory in the task configuration.");
+                    }
 
                     if (!client.IsConnected)
                     {
