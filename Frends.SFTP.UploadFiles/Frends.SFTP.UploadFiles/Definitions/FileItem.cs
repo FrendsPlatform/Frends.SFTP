@@ -1,4 +1,4 @@
-﻿using Renci.SshNet.Sftp;
+using Renci.SshNet.Sftp;
 
 namespace Frends.SFTP.UploadFiles.Definitions;
 
@@ -34,31 +34,31 @@ internal class FileItem
     /// <summary>
     /// Gets or sets last modified time of the file.
     /// </summary>
-    /// <example>2026-11-09T11:45:00Z.</example>
+    /// <example>2026-11-09T11:45:00Z</example>
     public DateTime Modified { get; set; }
 
     /// <summary>
     /// Gets or sets name of the file without its directory path.
     /// </summary>
-    /// <example>invoice-2026-11.csv.</example>
+    /// <example>invoice-2026-11.csv</example>
     public string Name { get; set; }
 
     /// <summary>
     /// Gets or sets full path of the file at its endpoint.
     /// </summary>
-    /// <example>/outbound/invoice-2026-11.csv.</example>
+    /// <example>/outbound/invoice-2026-11.csv</example>
     public string FullPath { get; set; }
 
     /// <summary>
     /// Gets or sets size of the file in bytes.
     /// </summary>
-    /// <example>2048.</example>
+    /// <example>2048</example>
     public long Size { get; set; }
 
     /// <summary>
     /// Gets or sets path of the file's directory relative to the configured source directory.
     /// </summary>
-    /// <example>monthly/november.</example>
+    /// <example>monthly/november</example>
     public string RelativeDirectoryPath { get; set; }
 
     private static bool TryGetFileLength(FileInfo fi)

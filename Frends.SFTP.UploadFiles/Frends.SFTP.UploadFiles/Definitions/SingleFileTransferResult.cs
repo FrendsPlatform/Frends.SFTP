@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.UploadFiles.Definitions;
+namespace Frends.SFTP.UploadFiles.Definitions;
 
 /// <summary>
 /// Result object of one individual file transfer.

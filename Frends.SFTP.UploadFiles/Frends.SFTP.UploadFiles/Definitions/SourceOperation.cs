@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.UploadFiles.Definitions;
+namespace Frends.SFTP.UploadFiles.Definitions;
 
 /// <summary>
 /// Enumeration to specify operation for the source file after transfer.

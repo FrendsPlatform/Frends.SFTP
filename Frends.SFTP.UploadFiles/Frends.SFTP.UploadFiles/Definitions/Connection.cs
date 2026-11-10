@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Frends.SFTP.UploadFiles.Definitions;
@@ -14,7 +14,7 @@ public class Connection
     /// Connection will only time out if the client is idle for assigned period of time.
     /// Default value is 60 seconds.
     /// </summary>
-    /// <example>60.</example>
+    /// <example>60</example>
     [DefaultValue(60)]
     public int ConnectionTimeout { get; set; }
 
@@ -22,28 +22,28 @@ public class Connection
     /// Gets or sets the keep-alive interval in milliseconds. Interval the client send keep-alive packages to the host.
     /// You can use value -1 to disable the keep-alive.
     /// </summary>
-    /// <example>-1.</example>
+    /// <example>-1</example>
     [DefaultValue(-1)]
     public int KeepAliveInterval { get; set; }
 
     /// <summary>
     /// Gets or sets sFTP host address.
     /// </summary>
-    /// <example>localhost.</example>
+    /// <example>localhost</example>
     [DisplayFormat(DataFormatString = "Text")]
     public string Address { get; set; }
 
     /// <summary>
     /// Gets or sets port number to use in the connection to the server.
     /// </summary>
-    /// <example>22.</example>
+    /// <example>22</example>
     [DefaultValue(22)]
     public int Port { get; set; } = 22;
 
     /// <summary>
     /// Gets or sets selection for authentication type.
     /// </summary>
-    /// <example>AuthenticationType.UsernamePassword.</example>
+    /// <example>AuthenticationType.UsernamePassword</example>
     [DisplayFormat(DataFormatString = "Text")]
     public AuthenticationType Authentication { get; set; } = AuthenticationType.UsernamePassword;
 
@@ -51,14 +51,14 @@ public class Connection
     /// Gets or sets username to use for authentication to the server. Note that the file endpoint only supports
     /// username for remote shares and the username must be in the format DOMAIN\Username.
     /// </summary>
-    /// <example>foo.</example>
+    /// <example>foo</example>
     [DisplayFormat(DataFormatString = "Text")]
     public string UserName { get; set; }
 
     /// <summary>
     /// Gets or sets password to use in the authentication to the server.
     /// </summary>
-    /// <example>pass.</example>
+    /// <example>pass</example>
     [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePassword, AuthenticationType.UsernamePasswordPrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyString)]
     [PasswordPropertyText]
     [DisplayFormat(DataFormatString = "Text")]
@@ -67,7 +67,7 @@ public class Connection
     /// <summary>
     /// Gets or sets full path to private key file.
     /// </summary>
-    /// <example>C:\path\to\private\key.</example>
+    /// <example>C:\path\to\private\key</example>
     [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyFile)]
     [DisplayFormat(DataFormatString = "Text")]
     public string PrivateKeyFile { get; set; }
@@ -95,7 +95,7 @@ public class Connection
     /// <summary>
     /// Gets or sets passphrase for the private key file.
     /// </summary>
-    /// <example>passphrase.</example>
+    /// <example>passphrase</example>
     [UIHint(
         nameof(Authentication),
         "",
@@ -124,7 +124,7 @@ public class Connection
     /// Default value is Any which doesn't force the task to use
     /// specific algorithm.
     /// </summary>
-    /// <example>HostKeyAlgorithms.RSA.</example>
+    /// <example>HostKeyAlgorithms.RSA</example>
     [DefaultValue(HostKeyAlgorithms.Any)]
     public HostKeyAlgorithms HostKeyAlgorithm { get; set; }
 
@@ -132,21 +132,21 @@ public class Connection
     /// Gets or sets integer value of used buffer size as KB.
     /// Default value is 32 KB.
     /// </summary>
-    /// <example>32.</example>
+    /// <example>32</example>
     [DefaultValue(32)]
     public uint BufferSize { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether enable if the server uses keyboard-interactive authentication method.
     /// </summary>
-    /// <example>false.</example>
+    /// <example>false</example>
     [DefaultValue(false)]
     public bool UseKeyboardInteractiveAuthentication { get; set; }
 
     /// <summary>
     /// Gets or sets responses for the server prompts when using Keyboard Interactive authentication method.
     /// </summary>
-    /// <example>[object { Prompt = "Continue? (yes/no)", Response = "yes" }].</example>
+    /// <example>[object { Prompt = "Continue? (yes/no)", Response = "yes" }]</example>
     [UIHint(nameof(UseKeyboardInteractiveAuthentication), "", true)]
     public PromptResponse[] PromptAndResponse { get; set; } = Array.Empty<PromptResponse>();
 }

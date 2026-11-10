@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Frends.SFTP.UploadFiles.Definitions
@@ -11,13 +11,13 @@ namespace Frends.SFTP.UploadFiles.Definitions
         /// <summary>
         /// Gets or sets prompt from the server what is to be expected.
         /// </summary>
-        /// <example>Verification code.</example>
+        /// <example>Verification code</example>
         public string Prompt { get; set; }
 
         /// <summary>
         /// Gets or sets response for the Prompt from the server.
         /// </summary>
-        /// <example>123456789.</example>
+        /// <example>123456789</example>
         [PasswordPropertyText]
         [DisplayFormat(DataFormatString = "Text")]
         public string Response { get; set; }

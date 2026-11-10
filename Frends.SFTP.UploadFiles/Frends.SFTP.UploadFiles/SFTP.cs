@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Frends.SFTP.UploadFiles.Definitions;
 using Frends.SFTP.UploadFiles.Helpers;
 using Renci.SshNet.Sftp;
@@ -97,7 +97,7 @@ public static class SFTP
     /// <param name="connection">Transfer connection parameters.</param>
     /// <param name="options">Transfer options.</param>
     /// <param name="cancellationToken">CancellationToken is given by Frends.</param>
-    /// <returns>object { bool ActionSkipped, bool Success, string UserResultMessage, int SuccessfulTransferCount, int FailedTransferCount, IEnumerable&lt;string&gt; TransferredFileNames, Dictionary&lt;string, IList&lt;string&gt;&gt; TransferErrors, IEnumerable&lt;string&gt; TransferredFilePaths, string[] TransferredDestinationFilePaths, IDictionary&lt;string, string&gt; OperationsLog, object Error { string Message, Exception AdditionalInfo } }.</returns>
+    /// <returns>object { bool ActionSkipped, bool Success, string UserResultMessage, int SuccessfulTransferCount, int FailedTransferCount, IEnumerable&lt;string&gt; TransferredFileNames, Dictionary&lt;string, IList&lt;string&gt;&gt; TransferErrors, IEnumerable&lt;string&gt; TransferredFilePaths, string[] TransferredDestinationFilePaths, IDictionary&lt;string, string&gt; OperationsLog, object Error { string Message, Exception AdditionalInfo } }</returns>
     public static async Task<Result> UploadFiles(
         [PropertyTab] Input input,
         [PropertyTab] Connection connection,

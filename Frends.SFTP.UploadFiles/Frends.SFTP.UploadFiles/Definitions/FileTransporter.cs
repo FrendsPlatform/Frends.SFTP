@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -50,7 +50,7 @@ internal class FileTransporter
     /// <summary>
     /// Gets or sets transfer state for SFTP Logger.
     /// </summary>
-    /// <example>TransferState.PutFile.</example>
+    /// <example>TransferState.PutFile</example>
     private TransferState State { get; set; }
 
     /// <summary>

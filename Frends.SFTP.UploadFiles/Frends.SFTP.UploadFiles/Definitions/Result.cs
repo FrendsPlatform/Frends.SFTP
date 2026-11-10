@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.UploadFiles.Definitions;
+namespace Frends.SFTP.UploadFiles.Definitions;
 
 /// <summary>
 /// Return object with private setters.
@@ -26,31 +26,31 @@ public class Result
     /// <summary>
     /// Gets or sets a value indicating whether boolean value of the skipped Action.
     /// </summary>
-    /// <example>false.</example>
+    /// <example>false</example>
     public bool ActionSkipped { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether boolean value of the successful transfer.
     /// </summary>
-    /// <example>true.</example>
+    /// <example>true</example>
     public bool Success { get; set; }
 
     /// <summary>
     /// Gets or sets message of the transfer operations.
     /// </summary>
-    /// <example>1 files transferred: test.txt".</example>
+    /// <example>1 file transferred: test.txt</example>
     public string UserResultMessage { get; set; }
 
     /// <summary>
     /// Gets or sets count of files that has been successfully transferred.
     /// </summary>
-    /// <example>1.</example>
+    /// <example>1</example>
     public int SuccessfulTransferCount { get; set; }
 
     /// <summary>
     /// Gets or sets count of files that have not been transferred.
     /// </summary>
-    /// <example>0.</example>
+    /// <example>0</example>
     public int FailedTransferCount { get; set; }
 
     /// <summary>
@@ -131,6 +131,6 @@ public class Result
     /// <summary>
     /// Gets or sets error that occurred during the task.
     /// </summary>
-    /// <example>object { string Message, Exception AdditionalInfo }.</example>
+    /// <example>object { string Message, Exception AdditionalInfo }</example>
     public Error Error { get; set; }
 }

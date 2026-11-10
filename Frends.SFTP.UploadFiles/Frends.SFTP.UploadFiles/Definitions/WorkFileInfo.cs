@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.UploadFiles.Definitions;
+namespace Frends.SFTP.UploadFiles.Definitions;
 
 internal class WorkFileInfo
 {
@@ -12,25 +12,25 @@ internal class WorkFileInfo
     /// <summary>
     /// Gets the name of the original source file.
     /// </summary>
-    /// <example>invoice-2026-11.csv.</example>
+    /// <example>invoice-2026-11.csv</example>
     public string OriginalFileName { get; }
 
     /// <summary>
     /// Gets the name of the temporary working file.
     /// </summary>
-    /// <example>frends_637896781104694806az33q4kf.8CO.</example>
+    /// <example>frends_637896781104694806az33q4kf.8CO</example>
     public string WorkFileName { get; }
 
     /// <summary>
     /// Gets the directory containing the temporary working file.
     /// </summary>
-    /// <example>/tmp/sftp-work.</example>
+    /// <example>/tmp/sftp-work</example>
     public string WorkFileDir { get; }
 
     /// <summary>
     /// Gets full path of the temporary working file.
     /// </summary>
-    /// <example>/tmp/sftp-work/frends_637896781104694806az33q4kf.8CO.</example>
+    /// <example>/tmp/sftp-work/frends_637896781104694806az33q4kf.8CO</example>
     public string WorkFilePath
     {
         get

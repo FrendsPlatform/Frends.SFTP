@@ -1,4 +1,10 @@
-﻿[*.cs]
+root = true
 
-# IDE0063: Use simple 'using' statement
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.cs]
 dotnet_diagnostic.IDE0063.severity = none

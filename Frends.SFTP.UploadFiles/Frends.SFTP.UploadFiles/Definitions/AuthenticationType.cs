@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.UploadFiles.Definitions;
+namespace Frends.SFTP.UploadFiles.Definitions;
 
 /// <summary>
 /// Enumeration to specify authentication type for the transfer.
