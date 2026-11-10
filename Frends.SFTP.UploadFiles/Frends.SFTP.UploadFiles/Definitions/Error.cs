@@ -6,13 +6,13 @@ namespace Frends.SFTP.UploadFiles.Definitions;
 public class Error
 {
     /// <summary>
-    /// Gets or sets summary of the error.
+    /// Summary of the error.
     /// </summary>
     /// <example>SFTP upload failed because the server connection was refused</example>
     public string Message { get; set; }
 
     /// <summary>
-    /// Gets or sets additional information about the error.
+    /// Additional information about the error.
     /// </summary>
     /// <example>System.Net.Sockets.SocketException: Connection refused</example>
     public Exception AdditionalInfo { get; set; }

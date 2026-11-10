@@ -48,7 +48,7 @@ internal class FileTransporter
     private string DestinationDirectoryWithMacrosExtended { get; set; }
 
     /// <summary>
-    /// Gets or sets transfer state for SFTP Logger.
+    /// Transfer state for SFTP Logger.
     /// </summary>
     /// <example>TransferState.PutFile</example>
     private TransferState State { get; set; }

@@ -9,7 +9,7 @@ namespace Frends.SFTP.UploadFiles.Definitions;
 public class Source
 {
     /// <summary>
-    /// Gets or sets local directory.
+    /// Local directory.
     /// </summary>
     /// <example>C:\directory\</example>
     [DefaultValue("/")]
@@ -17,14 +17,14 @@ public class Source
     public string Directory { get; set; } = "/";
 
     /// <summary>
-    /// Gets or sets file name or file mask of the files to be fetched.
+    /// File name or file mask of the files to be fetched.
     /// </summary>
     /// <example>test.txt</example>
     [DefaultValue("")]
     public string FileName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets a value indicating whether determines if subdirectories should be included when searching source files.
+    /// Determines if subdirectories should be included when searching source files.
     /// Depending on how many subdirectories there are, this operation can be extremely expensive.
     /// </summary>
     /// <example>true</example>
@@ -32,7 +32,7 @@ public class Source
     public bool IncludeSubdirectories { get; set; }
 
     /// <summary>
-    /// Gets or sets what to do if source file is not found. Error = alarm and fail,
+    /// What to do if source file is not found. Error = alarm and fail,
     /// Info = alarm info and quit with success status, Ignore = quit
     /// with success status.
     /// </summary>
@@ -41,14 +41,14 @@ public class Source
     public SourceAction Action { get; set; }
 
     /// <summary>
-    /// Gets or sets what to do with the source file after transfer.
+    /// What to do with the source file after transfer.
     /// </summary>
     /// <example>SourceOperation.Delete</example>
     [DefaultValue(SourceOperation.Delete)]
     public SourceOperation Operation { get; set; }
 
     /// <summary>
-    /// Gets or sets parameter for Rename operation. You can use file macros and also specify a directory
+    /// Parameter for Rename operation. You can use file macros and also specify a directory
     /// where to move the files to, e.g. C:\subdir\%Date%file.txt. If you don't define a
     /// directory path, the source directory is used. When using rename, this parameter
     /// must always contain a file name.
@@ -58,7 +58,7 @@ public class Source
     public string FileNameAfterTransfer { get; set; }
 
     /// <summary>
-    /// Gets or sets parameter for Move operation. Set the full path to the directory without the
+    /// Parameter for Move operation. Set the full path to the directory without the
     /// file name. You can use some macros in the directory name, e.g. C:\subdir\%Year%_uploaded\.
     /// </summary>
     /// <example>C:\directory\transferred\</example>
@@ -66,7 +66,7 @@ public class Source
     public string DirectoryToMoveAfterTransfer { get; set; }
 
     /// <summary>
-    /// Gets or sets the paths to the files to transfer, mainly meant to be used with the file trigger with the syntax: #trigger.data.filePaths
+    /// The paths to the files to transfer, mainly meant to be used with the file trigger with the syntax: #trigger.data.filePaths
     /// Type: System.Object[]
     /// example: string[].
     /// </summary>

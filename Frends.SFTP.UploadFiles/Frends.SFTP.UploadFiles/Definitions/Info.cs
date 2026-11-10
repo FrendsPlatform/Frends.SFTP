@@ -8,7 +8,7 @@ namespace Frends.SFTP.UploadFiles.Definitions;
 public class Info
 {
     /// <summary>
-    /// Gets or sets optional descriptive name for the transfer.
+    /// Optional descriptive name for the transfer.
     /// Will be included in the file transfer log
     /// entries and also in all error messages in the event log.
     /// </summary>
@@ -17,21 +17,21 @@ public class Info
     public string TransferName { get; set; }
 
     /// <summary>
-    /// Gets or sets directory where temporary files are stored during transfer.
+    /// Directory where temporary files are stored during transfer.
     /// </summary>
     /// <example>C:\temp\</example>
     [DefaultValue("")]
     public string WorkDir { get; set; }
 
     /// <summary>
-    /// Gets or sets the process URI, use #process.uri.
+    /// The process URI, use #process.uri.
     /// </summary>
     /// <example>#process.uri</example>
     [DefaultValue("#process.uri")]
     public string ProcessUri { get; set; }
 
     /// <summary>
-    /// Gets or sets reference to the Task execution id, use #process.executionid.
+    /// Reference to the Task execution id, use #process.executionid.
     /// </summary>
     /// <example>#process.executionid</example>
     [DefaultValue("#process.executionid")]

@@ -53,49 +53,49 @@ internal class SingleFileTransfer
     }
 
     /// <summary>
-    /// Gets or sets time when this file transfer started.
+    /// Time when this file transfer started.
     /// </summary>
     /// <example>2026-11-09T12:00:00Z</example>
     public DateTime FileTransferStartTime { get; set; }
 
     /// <summary>
-    /// Gets or sets information about the local working copy of the file.
+    /// Information about the local working copy of the file.
     /// </summary>
     /// <example>object { OriginalFileName = "invoice-2026-11.csv", WorkFileDir = "/tmp/sftp-work" }</example>
     public WorkFileInfo WorkFileInfo { get; set; }
 
     /// <summary>
-    /// Gets or sets local working copy of the source file.
+    /// Local working copy of the source file.
     /// </summary>
     /// <example>object { Name = "invoice-2026-11.csv", FullPath = "/tmp/sftp-work/invoice-2026-11.csv" }</example>
     public FileItem WorkFile { get; set; }
 
     /// <summary>
-    /// Gets or sets sFTP client connected to the destination server.
+    /// SFTP client connected to the destination server.
     /// </summary>
     /// <example>Connected SftpClient for sftp.example.com:22</example>
     public SftpClient Client { get; set; }
 
     /// <summary>
-    /// Gets or sets file selected from the source endpoint.
+    /// File selected from the source endpoint.
     /// </summary>
     /// <example>object { Name = "invoice-2026-11.csv", FullPath = "C:\\outbound\\invoice-2026-11.csv" }</example>
     public FileItem SourceFile { get; set; }
 
     /// <summary>
-    /// Gets or sets existing file at the destination endpoint, when present.
+    /// Existing file at the destination endpoint, when present.
     /// </summary>
     /// <example>object { Name = "invoice-2026-11.csv", FullPath = "/incoming/invoice-2026-11.csv" }</example>
     public FileItem DestinationFile { get; set; }
 
     /// <summary>
-    /// Gets or sets destination path after expanding filename macros.
+    /// Destination path after expanding filename macros.
     /// </summary>
     /// <example>/incoming/invoice-2026-11.csv</example>
     public string DestinationFileWithMacrosExpanded { get; set; }
 
     /// <summary>
-    /// Gets or sets temporary destination path used while a file is being uploaded.
+    /// Temporary destination path used while a file is being uploaded.
     /// </summary>
     /// <example>/incoming/frends_637896781104694806az33q4kf.8CO</example>
     public string DestinationFileDuringTransfer { get; set; }
@@ -103,7 +103,7 @@ internal class SingleFileTransfer
     internal BatchContext BatchContext { get; set; }
 
     /// <summary>
-    /// Gets or sets transfer state for SFTP Logger.
+    /// Transfer state for SFTP Logger.
     /// </summary>
     internal TransferState State { get; set; }
 

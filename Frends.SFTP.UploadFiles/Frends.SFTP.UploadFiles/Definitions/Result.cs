@@ -24,37 +24,37 @@ public class Result
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether boolean value of the skipped Action.
+    /// Boolean value of the skipped Action.
     /// </summary>
     /// <example>false</example>
     public bool ActionSkipped { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether boolean value of the successful transfer.
+    /// Boolean value of the successful transfer.
     /// </summary>
     /// <example>true</example>
     public bool Success { get; set; }
 
     /// <summary>
-    /// Gets or sets message of the transfer operations.
+    /// Message of the transfer operations.
     /// </summary>
     /// <example>1 file transferred: test.txt</example>
     public string UserResultMessage { get; set; }
 
     /// <summary>
-    /// Gets or sets count of files that has been successfully transferred.
+    /// Count of files that has been successfully transferred.
     /// </summary>
     /// <example>1</example>
     public int SuccessfulTransferCount { get; set; }
 
     /// <summary>
-    /// Gets or sets count of files that have not been transferred.
+    /// Count of files that have not been transferred.
     /// </summary>
     /// <example>0</example>
     public int FailedTransferCount { get; set; }
 
     /// <summary>
-    /// Gets or sets list of transferred file names.
+    /// List of transferred file names.
     /// </summary>
     /// <example>
     /// <code>
@@ -67,7 +67,7 @@ public class Result
     public IEnumerable<string> TransferredFileNames { get; set; }
 
     /// <summary>
-    /// Gets or sets dictionary of file names and errors messages of the failed transfers.
+    /// Dictionary of file names and error messages for failed transfers.
     /// </summary>
     /// <example>
     /// <code>
@@ -90,7 +90,7 @@ public class Result
     public Dictionary<string, IList<string>> TransferErrors { get; set; }
 
     /// <summary>
-    /// Gets or sets list of transferred file paths.
+    /// List of transferred file paths.
     /// </summary>
     /// <example>
     /// <code>
@@ -103,7 +103,7 @@ public class Result
     public IEnumerable<string> TransferredFilePaths { get; set; }
 
     /// <summary>
-    /// Gets or sets list of destaintion file paths of the transferred files.
+    /// List of destination file paths of the transferred files.
     /// </summary>
     /// <example>
     /// <code>
@@ -116,7 +116,7 @@ public class Result
     public string[] TransferredDestinationFilePaths { get; set; }
 
     /// <summary>
-    /// Gets or sets operations logs for the transfer.
+    /// Operation logs for the transfer.
     /// </summary>
     /// <example>
     /// <code>
@@ -129,7 +129,7 @@ public class Result
     public IDictionary<string, string> OperationsLog { get; set; }
 
     /// <summary>
-    /// Gets or sets error that occurred during the task.
+    /// Error that occurred during the task.
     /// </summary>
     /// <example>object { string Message, Exception AdditionalInfo }</example>
     public Error Error { get; set; }

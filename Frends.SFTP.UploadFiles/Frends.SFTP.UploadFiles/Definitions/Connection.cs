@@ -9,7 +9,7 @@ namespace Frends.SFTP.UploadFiles.Definitions;
 public class Connection
 {
     /// <summary>
-    /// Gets or sets the lenght of time, in seconds, until the connection times out.
+    /// The length of time, in seconds, until the connection times out.
     /// You can use value -1 to indicate that the connection does not time out.
     /// Connection will only time out if the client is idle for assigned period of time.
     /// Default value is 60 seconds.
@@ -19,7 +19,7 @@ public class Connection
     public int ConnectionTimeout { get; set; }
 
     /// <summary>
-    /// Gets or sets the keep-alive interval in milliseconds. Interval the client send keep-alive packages to the host.
+    /// The keep-alive interval in milliseconds. Interval the client send keep-alive packages to the host.
     /// You can use value -1 to disable the keep-alive.
     /// </summary>
     /// <example>-1</example>
@@ -27,28 +27,28 @@ public class Connection
     public int KeepAliveInterval { get; set; }
 
     /// <summary>
-    /// Gets or sets sFTP host address.
+    /// SFTP host address.
     /// </summary>
     /// <example>localhost</example>
     [DisplayFormat(DataFormatString = "Text")]
     public string Address { get; set; }
 
     /// <summary>
-    /// Gets or sets port number to use in the connection to the server.
+    /// Port number to use in the connection to the server.
     /// </summary>
     /// <example>22</example>
     [DefaultValue(22)]
     public int Port { get; set; } = 22;
 
     /// <summary>
-    /// Gets or sets selection for authentication type.
+    /// Selection for authentication type.
     /// </summary>
     /// <example>AuthenticationType.UsernamePassword</example>
     [DisplayFormat(DataFormatString = "Text")]
     public AuthenticationType Authentication { get; set; } = AuthenticationType.UsernamePassword;
 
     /// <summary>
-    /// Gets or sets username to use for authentication to the server. Note that the file endpoint only supports
+    /// Username to use for authentication to the server. Note that the file endpoint only supports
     /// username for remote shares and the username must be in the format DOMAIN\Username.
     /// </summary>
     /// <example>foo</example>
@@ -56,7 +56,7 @@ public class Connection
     public string UserName { get; set; }
 
     /// <summary>
-    /// Gets or sets password to use in the authentication to the server.
+    /// Password to use in the authentication to the server.
     /// </summary>
     /// <example>pass</example>
     [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePassword, AuthenticationType.UsernamePasswordPrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyString)]
@@ -65,7 +65,7 @@ public class Connection
     public string Password { get; set; }
 
     /// <summary>
-    /// Gets or sets full path to private key file.
+    /// Full path to private key file.
     /// </summary>
     /// <example>C:\path\to\private\key</example>
     [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyFile)]
@@ -73,7 +73,7 @@ public class Connection
     public string PrivateKeyFile { get; set; }
 
     /// <summary>
-    /// Gets or sets private key as a string, supported private key formats: OpenSSH and ssh.com.
+    /// Private key as a string, supported private key formats: OpenSSH and ssh.com.
     /// PuTTY keys can be converted with puttygen.exe application.
     /// 1. Load your key file into puttygen.exe
     /// 2. Conversion > Export OpenSSH key (not the "force new file format" option).
@@ -93,7 +93,7 @@ public class Connection
     public string PrivateKeyString { get; set; }
 
     /// <summary>
-    /// Gets or sets passphrase for the private key file.
+    /// Passphrase for the private key file.
     /// </summary>
     /// <example>passphrase</example>
     [UIHint(
@@ -108,7 +108,7 @@ public class Connection
     public string PrivateKeyPassphrase { get; set; }
 
     /// <summary>
-    /// Gets or sets fingerprint of the SFTP server. When using "Username-Password"
+    /// Fingerprint of the SFTP server. When using "Username-Password"
     /// authentication it is recommended to use server fingerprint in
     /// order to be sure of the server you are connecting.
     /// </summary>
@@ -120,7 +120,7 @@ public class Connection
     public string ServerFingerPrint { get; set; }
 
     /// <summary>
-    /// Gets or sets host key algorithm to use when connecting to server.
+    /// Host key algorithm to use when connecting to server.
     /// Default value is Any which doesn't force the task to use
     /// specific algorithm.
     /// </summary>
@@ -129,7 +129,7 @@ public class Connection
     public HostKeyAlgorithms HostKeyAlgorithm { get; set; }
 
     /// <summary>
-    /// Gets or sets integer value of used buffer size as KB.
+    /// Integer value of used buffer size as KB.
     /// Default value is 32 KB.
     /// </summary>
     /// <example>32</example>
@@ -137,14 +137,14 @@ public class Connection
     public uint BufferSize { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether enable if the server uses keyboard-interactive authentication method.
+    /// Enable if the server uses keyboard-interactive authentication method.
     /// </summary>
     /// <example>false</example>
     [DefaultValue(false)]
     public bool UseKeyboardInteractiveAuthentication { get; set; }
 
     /// <summary>
-    /// Gets or sets responses for the server prompts when using Keyboard Interactive authentication method.
+    /// Responses for the server prompts when using Keyboard Interactive authentication method.
     /// </summary>
     /// <example>[object { Prompt = "Continue? (yes/no)", Response = "yes" }]</example>
     [UIHint(nameof(UseKeyboardInteractiveAuthentication), "", true)]
