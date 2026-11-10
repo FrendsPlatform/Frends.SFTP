@@ -1,0 +1,24 @@
+name: DeleteDirectory_build_main
+
+on:
+  push:
+    branches:    
+      - main
+    paths:
+      - 'Frends.SFTP.DeleteDirectory/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/linux_build_main.yml@main
+    with:
+      workdir: Frends.SFTP.DeleteDirectory
+      env_var_name_1: SFTP_DockerAddress
+      env_var_name_2: SFTP_DockerUsername
+      env_var_name_3: SFTP_DockerPassword
+      prebuild_command: docker-compose -f ./Frends.SFTP.DeleteDirectory.Tests/docker-compose.yml up -d
+    secrets:
+      badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
+      env_var_value_1: ${{ secrets.SFTP_DOCKERADDRESS }}
+      env_var_value_2: ${{ secrets.SFTP_DOCKERUSERNAME }}
+      env_var_value_3: ${{ secrets.SFTP_DOCKERPASSWORD }}
