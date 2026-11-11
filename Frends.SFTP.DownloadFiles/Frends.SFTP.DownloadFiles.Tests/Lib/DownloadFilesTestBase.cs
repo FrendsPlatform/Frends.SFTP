@@ -41,6 +41,12 @@ namespace Frends.SFTP.DownloadFiles.Tests.Lib
                 EnableBomForFileName = true
             };
 
+        }
+
+        [SetUp]
+        public virtual void Setup()
+        {
+            Helpers.UploadTestFiles(_source.Directory, 3);
             _options = new Options
             {
                 ThrowErrorOnFailure = true,
@@ -50,12 +56,6 @@ namespace Frends.SFTP.DownloadFiles.Tests.Lib
                 PreserveLastModified = false,
                 OperationLog = true
             };
-        }
-
-        [SetUp]
-        public virtual void Setup()
-        {
-            Helpers.UploadTestFiles(_source.Directory, 3);
             _info = new Info
             {
                 WorkDir = null,
