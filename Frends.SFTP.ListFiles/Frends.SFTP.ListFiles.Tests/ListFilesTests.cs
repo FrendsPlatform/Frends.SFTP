@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.SFTP.ListFiles.Enums;
+using Frends.SFTP.ListFiles.Tests.Lib;
 using NUnit.Framework;
 
 namespace Frends.SFTP.ListFiles.Tests;

@@ -1,8 +1,8 @@
-using Frends.SFTP.ListFiles.Definitions;
+﻿using Frends.SFTP.ListFiles.Definitions;
 using Frends.SFTP.ListFiles.Enums;
 using NUnit.Framework;
 
-namespace Frends.SFTP.ListFiles.Tests;
+namespace Frends.SFTP.ListFiles.Tests.Lib;
 
 public class ListFilesTestBase
 {

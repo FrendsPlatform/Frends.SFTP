@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.SFTP.ListFiles.Definitions;
 using Frends.SFTP.ListFiles.Enums;
+using Frends.SFTP.ListFiles.Tests.Lib;
 using NUnit.Framework;
 using Renci.SshNet.Common;
 
@@ -51,7 +52,7 @@ public class ErrorTests : ListFilesTestBase
     [Test]
     public void ListFiles_TestThrowsWithWrongPort()
     {
-        var connection = Helpers.GetSftpConnection();
+        var connection = Lib.Helpers.GetSftpConnection();
         connection.Port = 51644;
         var input = new Input
         {
@@ -68,7 +69,7 @@ public class ErrorTests : ListFilesTestBase
     [Test]
     public void ListFiles_TestThrowsWithIncorrectCredentials()
     {
-        var connection = Helpers.GetSftpConnection();
+        var connection = Lib.Helpers.GetSftpConnection();
         connection.Password = "demo";
         connection.Username = "demo";
 
@@ -88,7 +89,7 @@ public class ErrorTests : ListFilesTestBase
     [Test]
     public void ListFiles_TestThrowsWithIncorrectPrivateKeyPassphrase()
     {
-        var connection = Helpers.GetSftpConnection();
+        var connection = Lib.Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
         connection.PrivateKeyPassphrase = "demo";
         connection.PrivateKeyFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");
@@ -109,7 +110,7 @@ public class ErrorTests : ListFilesTestBase
     [Test]
     public void ListFiles_TestThrowsWithEmptyPrivateKeyFile()
     {
-        var connection = Helpers.GetSftpConnection();
+        var connection = Lib.Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
         connection.PrivateKeyPassphrase = "passphrase";
         connection.PrivateKeyFile = string.Empty;
@@ -130,9 +131,9 @@ public class ErrorTests : ListFilesTestBase
     [Test]
     public void ListFiles_TestThrowsWithIncorrectPrivateKeyString()
     {
-        var key = Helpers.GenerateDummySshKey();
+        var key = Lib.Helpers.GenerateDummySshKey();
 
-        var connection = Helpers.GetSftpConnection();
+        var connection = Lib.Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
         connection.PrivateKeyPassphrase = "passphrase";
         connection.PrivateKeyString = key.ToString();
@@ -155,7 +156,7 @@ public class ErrorTests : ListFilesTestBase
     {
         var fingerprint = "f6:fc:1c:03:17:5f:67:4f:1f:0b:50:5a:9f:f9:30:e5";
 
-        var connection = Helpers.GetSftpConnection();
+        var connection = Lib.Helpers.GetSftpConnection();
         connection.ServerFingerPrint = fingerprint;
 
         var input = new Input
@@ -174,7 +175,7 @@ public class ErrorTests : ListFilesTestBase
     [Test]
     public void ListFiles_TestThrowsWithNullPrivateKeyFilePath()
     {
-        var connection = Helpers.GetSftpConnection();
+        var connection = Lib.Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
         connection.PrivateKeyFile = string.Empty;
 
@@ -194,7 +195,7 @@ public class ErrorTests : ListFilesTestBase
     [Test]
     public void ListFiles_TestThrowsWithNullPrivateKeyString()
     {
-        var connection = Helpers.GetSftpConnection();
+        var connection = Lib.Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
         connection.PrivateKeyString = string.Empty;
 
