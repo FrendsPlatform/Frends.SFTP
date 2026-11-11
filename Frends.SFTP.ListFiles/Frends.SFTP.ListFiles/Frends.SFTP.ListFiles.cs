@@ -27,8 +27,6 @@ namespace Frends.SFTP.ListFiles
             [PropertyTab] Options options,
             CancellationToken cancellationToken)
         {
-            options ??= new Options();
-
             using var timeoutCts = connection.MaxExecutionTimeout > 0
                 ? CancellationTokenSource.CreateLinkedTokenSource(cancellationToken)
                 : null;
