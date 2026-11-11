@@ -1,9 +1,10 @@
-using System.Text;
+﻿using System.Text;
+using Frends.SFTP.RenameFile.Definitions;
 using Frends.SFTP.RenameFile.Enums;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 
-namespace Frends.SFTP.RenameFile.Definitions;
+namespace Frends.SFTP.RenameFile.Helpers;
 
 internal class ConnectionInfoBuilder
 {

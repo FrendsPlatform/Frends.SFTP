@@ -9,7 +9,7 @@
 ### Changed
 
 - **[Breaking Change]** Renamed host key algorithm options to use PascalCase.
-- Updated SSH.NET to a release that addresses known security vulnerabilities.
+- Updated SSH.NET to 2026.0.0 to a release that addresses known security vulnerabilities.
 
 ## [3.0.0] - 2026-01-27
 

@@ -3,10 +3,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Frends.SFTP.RenameFile.Enums;
 using Renci.SshNet;
-using Renci.SshNet.Common;
 using Renci.SshNet.Security;
 
-namespace Frends.SFTP.RenameFile.Definitions;
+namespace Frends.SFTP.RenameFile.Helpers;
 
 /// <summary>
 /// Helper methods for file modifications
