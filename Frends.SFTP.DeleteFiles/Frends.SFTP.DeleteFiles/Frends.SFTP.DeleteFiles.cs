@@ -1,6 +1,5 @@
-﻿namespace Frends.SFTP.DeleteFiles;
+namespace Frends.SFTP.DeleteFiles;
 
-using Renci.SshNet;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,6 +9,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Frends.SFTP.DeleteFiles.Definitions;
 using Frends.SFTP.DeleteFiles.Enums;
+using Frends.SFTP.DeleteFiles.Helpers;
+using Renci.SshNet;
 using Renci.SshNet.Common;
 
 /// <summary>
@@ -23,56 +24,59 @@ public static class SFTP
     /// </summary>
     /// <param name="input">Input parameters</param>
     /// <param name="connection">Connection parameters.</param>
+    /// <param name="options">Additional parameters.</param>
     /// <param name="cancellationToken">Cancellation token given by Frends.</param>
-    /// <returns>Object { List&lt;FileItem&gt; Files[ Object { string Name, string Path, Double SizeInMegaBytes } ] }.</returns>
-    public static async Task<Result> DeleteFiles([PropertyTab] Input input, [PropertyTab] Connection connection, CancellationToken cancellationToken)
+    /// <returns>object { bool Success, List&lt;FileItem&gt; Files, object Error { string Message, Exception AdditionalInfo } }</returns>
+    public static async Task<Result> DeleteFiles(
+        [PropertyTab] Input input,
+        [PropertyTab] Connection connection,
+        [PropertyTab] Options options,
+        CancellationToken cancellationToken)
     {
-        var deletedFiles = new List<FileItem>();
-
-        ConnectionInfo connectionInfo;
-
-        // Establish connectionInfo with connection parameters
         try
         {
+            var deletedFiles = new List<FileItem>();
             var builder = new ConnectionInfoBuilder(input, connection, cancellationToken);
-            connectionInfo = builder.BuildConnectionInfo();
-        }
-        catch (Exception e)
-        {
-            throw new ArgumentException($"Error when initializing connection info: {e}");
-        }
+            var connectionInfo = builder.BuildConnectionInfo();
 
-        using var client = new SftpClient(connectionInfo);
-        client.OperationTimeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
-        client.KeepAliveInterval = TimeSpan.FromSeconds(connection.ConnectionTimeout);
-        client.BufferSize = connection.BufferSize * 1024;
+            using var client = new SftpClient(connectionInfo);
+            client.OperationTimeout = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+            client.KeepAliveInterval = TimeSpan.FromSeconds(connection.ConnectionTimeout);
+            client.BufferSize = connection.BufferSize * 1024;
 
-        if (connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
-            Util.ForceHostKeyAlgorithm(client, connection.HostKeyAlgorithm);
+            if (connection.HostKeyAlgorithm != HostKeyAlgorithms.Any)
+                Util.ForceHostKeyAlgorithm(client, connection.HostKeyAlgorithm);
 
-        // Check the fingerprint of the server if given.
-        if (!string.IsNullOrEmpty(connection.ServerFingerPrint))
-        {
-            Util.AddServerFingerprintCheck(client, connection.ServerFingerPrint);
-        }
+            if (!string.IsNullOrEmpty(connection.ServerFingerPrint))
+                Util.AddServerFingerprintCheck(client, connection.ServerFingerPrint);
 
-        await client.ConnectAsync(cancellationToken);
+            await client.ConnectAsync(cancellationToken);
 
-        if (!client.IsConnected)
-            throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
+            if (!client.IsConnected)
+                throw new ArgumentException($"Error while connecting to destination: {connection.Address}");
 
-        var files = await GetFiles(client, input, cancellationToken);
+            var files = await GetFiles(client, input, cancellationToken);
 
-        foreach (var file in files)
-        {
-            if (client.Exists(file.Path))
+            foreach (var file in files)
             {
-                client.DeleteFile(file.Path);
-                deletedFiles.Add(file);
+                if (client.Exists(file.Path))
+                {
+                    client.DeleteFile(file.Path);
+                    deletedFiles.Add(file);
+                }
             }
-        }
 
-        return new Result(deletedFiles);
+            return new Result
+            {
+                Success = true,
+                Files = deletedFiles,
+                Error = null,
+            };
+        }
+        catch (Exception ex)
+        {
+            return ex.Handle(options);
+        }
     }
 
     private static async Task<List<FileItem>> GetFiles(SftpClient sftp, Input input, CancellationToken cancellationToken)

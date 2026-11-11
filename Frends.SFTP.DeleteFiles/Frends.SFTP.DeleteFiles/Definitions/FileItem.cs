@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.DeleteFiles.Definitions;
+namespace Frends.SFTP.DeleteFiles.Definitions;
 
 using Renci.SshNet.Sftp;
 
@@ -21,15 +21,18 @@ public class FileItem
     /// <summary>
     /// Name of the deleted file.
     /// </summary>
+    /// <example>report.csv</example>
     public string Name { get; set; }
 
     /// <summary>
     /// Full path of the deleted file.
     /// </summary>
+    /// <example>/upload/report.csv</example>
     public string Path { get; set; }
 
     /// <summary>
     /// Size of the deleted file in mega bytes.
     /// </summary>
+    /// <example>1.25</example>
     public double SizeInMegaBytes { get; set; }
 }

@@ -1,8 +1,8 @@
-﻿// This file is used by Code Analysis to maintain SuppressMessage
-// attributes that are applied to this project.
-// Project-level suppressions either have no target or are given
-// a specific target and scoped to a namespace, type, member, etc.
-
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:Elements should be documented", Justification = "No documentation needed for Tests", Scope = "namespaceanddescendants", Target = "Frends.SFTP.DeleteFiles.Tests")]
+[assembly: SuppressMessage("StyleCop.CSharp.SpecialRules", "SA0001::XmlCommentAnalysisDisabled", Justification = "Following Frends documentation guidelines")]
+[assembly: SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1101:PrefixLocalCallsWithThis", Justification = "Following Frends documentation guidelines")]
+[assembly: SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1200:UsingDirectivesMustBePlacedWithinNamespace", Justification = "Following Frends documentation guidelines")]
+[assembly: SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1503:BracesMustNotBeOmitted", Justification = "Following Frends documentation guidelines")]
+[assembly: SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Documentation checked by custom analyzers")]
+[assembly: SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1633:FileMustHaveHeader", Justification = "Following Frends documentation guidelines")]
