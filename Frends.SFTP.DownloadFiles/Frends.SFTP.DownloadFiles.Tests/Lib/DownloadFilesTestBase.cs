@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
-using Renci.SshNet;
 using Frends.SFTP.DownloadFiles.Definitions;
 using NUnit.Framework;
+using Renci.SshNet;
 
-namespace Frends.SFTP.DownloadFiles.Tests
+namespace Frends.SFTP.DownloadFiles.Tests.Lib
 {
     public class DownloadFilesTestBase
     {
@@ -41,21 +41,21 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 EnableBomForFileName = true
             };
 
-            _options = new Options
-            {
-                ThrowErrorOnFail = true,
-                RenameSourceFileBeforeTransfer = true,
-                RenameDestinationFileDuringTransfer = true,
-                CreateDestinationDirectories = true,
-                PreserveLastModified = false,
-                OperationLog = true
-            };
         }
 
         [SetUp]
         public virtual void Setup()
         {
             Helpers.UploadTestFiles(_source.Directory, 3);
+            _options = new Options
+            {
+                ThrowErrorOnFailure = true,
+                RenameSourceFileBeforeTransfer = true,
+                RenameDestinationFileDuringTransfer = true,
+                CreateDestinationDirectories = true,
+                PreserveLastModified = false,
+                OperationLog = true
+            };
             _info = new Info
             {
                 WorkDir = null,
