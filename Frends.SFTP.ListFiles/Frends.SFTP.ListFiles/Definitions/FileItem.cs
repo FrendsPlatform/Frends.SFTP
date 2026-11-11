@@ -1,4 +1,4 @@
-﻿using Renci.SshNet.Sftp;
+using Renci.SshNet.Sftp;
 
 namespace Frends.SFTP.ListFiles.Definitions;
 
@@ -7,6 +7,19 @@ namespace Frends.SFTP.ListFiles.Definitions;
 /// </summary>
 public class FileItem
 {
+    internal FileItem(ISftpFile file)
+    {
+        FullPath = file.FullName;
+        IsDirectory = file.IsDirectory;
+        IsFile = file.IsRegularFile;
+        Length = file.Length;
+        Name = file.Name;
+        LastWriteTimeUtc = file.LastWriteTimeUtc;
+        LastAccessTimeUtc = file.LastAccessTimeUtc;
+        LastWriteTime = file.LastWriteTime;
+        LastAccessTime = file.LastAccessTime;
+    }
+
     /// <summary>
     /// Full path of directory or file.
     /// </summary>
@@ -60,18 +73,4 @@ public class FileItem
     /// </summary>
     /// <example>2022-06-28T14:05:58+03:00</example>
     public DateTime LastAccessTime { get; private set; }
-
-    internal FileItem(ISftpFile file)
-    {
-        FullPath = file.FullName;
-        IsDirectory = file.IsDirectory;
-        IsFile = file.IsRegularFile;
-        Length = file.Length;
-        Name = file.Name;
-        LastWriteTimeUtc = file.LastWriteTimeUtc;
-        LastAccessTimeUtc = file.LastAccessTimeUtc;
-        LastWriteTime = file.LastWriteTime;
-        LastAccessTime = file.LastAccessTime;
-    }
 }
-

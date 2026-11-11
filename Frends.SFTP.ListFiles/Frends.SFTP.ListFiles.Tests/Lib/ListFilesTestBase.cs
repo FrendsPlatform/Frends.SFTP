@@ -1,25 +1,29 @@
-﻿using NUnit.Framework;
-using Frends.SFTP.ListFiles.Definitions;
+﻿using Frends.SFTP.ListFiles.Definitions;
 using Frends.SFTP.ListFiles.Enums;
+using NUnit.Framework;
 
-namespace Frends.SFTP.ListFiles.Tests;
+namespace Frends.SFTP.ListFiles.Tests.Lib;
 
 public class ListFilesTestBase
 {
-    protected static Connection _connection;
-    protected static Input _input;
+    protected static Connection Connection { get; private set; }
+
+    protected static Input Input { get; private set; }
+
+    protected static Options Options { get; private set; }
 
     [SetUp]
     public void Setup()
     {
-        _connection = Helpers.GetSftpConnection();
-        _input = new Input
+        Connection = Helpers.GetSftpConnection();
+        Options = new Options();
+        Input = new Input
         {
             Directory = "/upload",
-            FileMask = "",
+            FileMask = string.Empty,
             IncludeType = IncludeType.File,
             IncludeSubdirectories = false,
-            FileEncoding = FileEncoding.ANSI
+            FileEncoding = FileEncoding.ANSI,
         };
 
         Helpers.GenerateDummyFiles();
@@ -31,4 +35,3 @@ public class ListFilesTestBase
         Helpers.DeleteTestFiles();
     }
 }
-

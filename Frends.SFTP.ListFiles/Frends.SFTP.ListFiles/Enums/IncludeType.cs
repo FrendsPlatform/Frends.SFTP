@@ -1,6 +1,3 @@
-﻿// Pragma for self-explanatory enum attributes.
-#pragma warning disable 1591
-
 namespace Frends.SFTP.ListFiles.Enums;
 
 /// <summary>
@@ -8,8 +5,18 @@ namespace Frends.SFTP.ListFiles.Enums;
 /// </summary>
 public enum IncludeType
 {
+    /// <summary>
+    /// Include files only.
+    /// </summary>
     File,
-    Directory,
-    Both
-}
 
+    /// <summary>
+    /// Include directories only.
+    /// </summary>
+    Directory,
+
+    /// <summary>
+    /// Include both files and directories.
+    /// </summary>
+    Both,
+}
