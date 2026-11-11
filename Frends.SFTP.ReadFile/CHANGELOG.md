@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.0.0] - 2026-11-09
+
+### Changed
+
+- **[Breaking Change]** Renamed the `HostKeyAlgorithms.nistp256`, `nistp384`, and `nistp521` enum values to `Nistp256`, `Nistp384`, and `Nistp521`.
+
+### Added
+
+- Added the option to return structured errors instead of throwing when a file read fails when `ThrowErrorOnFailure` is set to false (default is true).
+- Updated SSH.NET to 2026.0.0, which includes security fixes.
+
 ## [3.2.0] - 2026-10-21
 
 ### Changed
