@@ -3,10 +3,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Frends.SFTP.WriteFile.Enums;
 using Renci.SshNet;
-using Renci.SshNet.Common;
 using Renci.SshNet.Security;
 
-namespace Frends.SFTP.WriteFile.Definitions;
+namespace Frends.SFTP.WriteFile.Helpers;
 
 /// <summary>
 /// Helper methods for file modifications
