@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Frends.SFTP.DownloadFiles.Definitions;
+using Frends.SFTP.DownloadFiles.Tests.Lib;
 
 namespace Frends.SFTP.DownloadFiles.Tests
 {
@@ -348,7 +349,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public async Task DownloadFiles_TestWithFilePaths()
         {
-            var filePaths = Helpers.UploadTestFiles(_source.Directory, 3);
+            var filePaths = Lib.Helpers.UploadTestFiles(_source.Directory, 3);
 
             var source = new Source
             {
@@ -367,7 +368,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public async Task DownloadFiles_TestWithFilePathsEvenIfSourceFileIsAssigned()
         {
-            var filePaths = Helpers.UploadTestFiles(_source.Directory, 3);
+            var filePaths = Lib.Helpers.UploadTestFiles(_source.Directory, 3);
 
             var source = new Source
             {
@@ -428,7 +429,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         {
             // upload test files
             var files = new List<string> { "this is a test file.txt", "This_is(a test file).txt", "this is  { a test} file.txt" };
-            Helpers.UploadTestFiles(_source.Directory, 0, null, files);
+            Lib.Helpers.UploadTestFiles(_source.Directory, 0, null, files);
 
             var source = new Source
             {
@@ -470,7 +471,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public async Task DownloadFile_TestTimeoutWithValue0()
         {
-            Helpers.UploadLargeTestFiles(_source.Directory, 10);
+            Lib.Helpers.UploadLargeTestFiles(_source.Directory, 10);
 
             var source = new Source
             {
@@ -486,10 +487,10 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public async Task DownloadFiles_TestWithIncludeSubdirectories()
         {
-            Helpers.UploadTestFiles("/upload/other", 1, null, new List<string> { "test1.txt" });
-            Helpers.UploadTestFiles("/upload/test", 1, null, new List<string> { "test2.txt" });
-            Helpers.UploadTestFiles("/upload/Upload", 1, null, new List<string> { "test3.txt" });
-            Helpers.UploadTestFiles("/upload/Upload/another", 1, null, new List<string> { "test4.txt" });
+            Lib.Helpers.UploadTestFiles("/upload/other", 1, null, new List<string> { "test1.txt" });
+            Lib.Helpers.UploadTestFiles("/upload/test", 1, null, new List<string> { "test2.txt" });
+            Lib.Helpers.UploadTestFiles("/upload/Upload", 1, null, new List<string> { "test3.txt" });
+            Lib.Helpers.UploadTestFiles("/upload/Upload/another", 1, null, new List<string> { "test4.txt" });
 
             var source = new Source
             {
@@ -514,9 +515,9 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             // Upload test file with safe name first
             var files = new List<string> { safeTempFileName };
-            Helpers.UploadTestFiles(_source.Directory, 0, null, files);
+            Lib.Helpers.UploadTestFiles(_source.Directory, 0, null, files);
 
-            Helpers.RenameFileOnSftpServer(_source.Directory, safeTempFileName, sourceFileName);
+            Lib.Helpers.RenameFileOnSftpServer(_source.Directory, safeTempFileName, sourceFileName);
 
             var source = new Source
             {
@@ -570,7 +571,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public async Task DownloadFiles_TestPreserveDirectoryStructureWithMacro()
         {
-            Helpers.UploadTestFilesMultiDir(new Dictionary<string, List<string>>
+            Lib.Helpers.UploadTestFilesMultiDir(new Dictionary<string, List<string>>
             {
                 { "/upload/",                  new List<string> { "root.txt" } },
                 { "/upload/sub1/",             new List<string> { "file1.txt" } },
@@ -613,7 +614,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public async Task DownloadFiles_TestRecursiveWithoutMacro()
         {
-            Helpers.UploadTestFilesMultiDir(new Dictionary<string, List<string>>
+            Lib.Helpers.UploadTestFilesMultiDir(new Dictionary<string, List<string>>
             {
                 { "/upload/",                  new List<string> { "root.txt" } },
                 { "/upload/sub1/",             new List<string> { "file1.txt" } },
@@ -653,7 +654,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         public async Task DownloadFiles_TestWithoutIncludeSubdirectories_OnlyRootFiles()
         {
 
-            Helpers.UploadTestFilesMultiDir(new Dictionary<string, List<string>>
+            Lib.Helpers.UploadTestFilesMultiDir(new Dictionary<string, List<string>>
             {
                 { "/upload/",           new List<string> { "root1.txt", "root2.txt" } },
                 { "/upload/sub1/",      new List<string> { "file1.txt" } },

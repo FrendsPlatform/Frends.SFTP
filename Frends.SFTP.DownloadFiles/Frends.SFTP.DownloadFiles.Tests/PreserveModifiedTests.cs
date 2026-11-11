@@ -1,9 +1,10 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.SFTP.DownloadFiles.Definitions;
+using Frends.SFTP.DownloadFiles.Tests.Lib;
 
 namespace Frends.SFTP.DownloadFiles.Tests
 {
@@ -39,7 +40,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             sourcePath = Path.Combine(_workDir, _source.FileName);
             date = File.GetLastWriteTime(sourcePath);
-            Helpers.SetTestFileLastModified(_source.Directory + "/" + _source.FileName, date);
+            Lib.Helpers.SetTestFileLastModified(_source.Directory + "/" + _source.FileName, date);
         }
 
         [Test]

@@ -6,8 +6,8 @@
 
 - **[Breaking Change]** The Task now takes `Input`, `Connection` and `Options` parameters. The `Source`, `Destination` and `Info` parameters have moved under the new `Input` parameter as `Input.Source`, `Input.Destination` and `Input.Info`.
 - **[Breaking Change]** Renamed the `Options.ThrowErrorOnFail` property to `Options.ThrowErrorOnFailure`.
-- **[Breaking Change]** The Task is now built for .NET 8.
-- Updated the SSH.NET library to a version without known security vulnerabilities.
+- The Task is now built for .NET 8.
+- Updated the SSH.NET library to a version 2026.0.0 without known security vulnerabilities.
 
 ### Added
 

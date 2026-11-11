@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.IO;
-using Renci.SshNet;
 using Frends.SFTP.DownloadFiles.Definitions;
 using NUnit.Framework;
+using Renci.SshNet;
 
-namespace Frends.SFTP.DownloadFiles.Tests
+namespace Frends.SFTP.DownloadFiles.Tests.Lib
 {
     public class DownloadFilesTestBase
     {

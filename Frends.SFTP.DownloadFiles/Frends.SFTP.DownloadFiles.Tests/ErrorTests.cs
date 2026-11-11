@@ -1,9 +1,10 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System.IO;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.SFTP.DownloadFiles.Definitions;
+using Frends.SFTP.DownloadFiles.Tests.Lib;
 
 namespace Frends.SFTP.DownloadFiles.Tests
 {
@@ -42,7 +43,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public void DownloadFiles_TestCustomErrorMessageOnFailure()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.Port = 51651;
             _options.ErrorMessageOnFailure = "Download failed";
 
@@ -55,7 +56,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public async Task DownloadFiles_TestErrorIsReturnedWhenThrowErrorOnFailureIsFalse()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.Port = 51651;
             _options.ThrowErrorOnFailure = false;
 
@@ -67,7 +68,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public void DownloadFiles_TestThrowsWithWrongPort()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.Port = 51651;
 
             var ex = Assert.ThrowsAsync<Exception>(async () =>
@@ -80,7 +81,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         public void DownloadFiles_TestWithSubDirNameAsFileMask()
         {
             var path = "/upload/test";
-            Helpers.CreateSubDirectory(path);
+            Lib.Helpers.CreateSubDirectory(path);
             var source = new Source
             {
                 Directory = "/upload",
@@ -93,7 +94,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, _connection, _options, new CancellationToken()));
             Assert.IsTrue(
                 ex.Message.StartsWith("SFTP transfer failed: 1 Errors: No source files found from directory"));
-            Helpers.DeleteSubDirectory(path);
+            Lib.Helpers.DeleteSubDirectory(path);
         }
 
         [Test]
@@ -114,14 +115,14 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, _connection, _options, new CancellationToken()));
             Assert.IsTrue(ex.Message.Contains(
                 $"Operation failed: Source file {_source.FileName} couldn't be moved to given directory {source.DirectoryToMoveAfterTransfer} because the directory didn't exist."));
-            Assert.IsTrue(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
+            Assert.IsTrue(Lib.Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
         }
 
         [Test]
         public void DownloadFiles_TestThrowsSourceMoveToDestinationFileExists()
         {
             Directory.CreateDirectory(_destWorkDir);
-            Helpers.CreateSubDirectory("/upload/uploaded");
+            Lib.Helpers.CreateSubDirectory("/upload/uploaded");
             File.Copy(Path.Combine(_workDir, _source.FileName), Path.Combine(_destWorkDir, _source.FileName));
 
             var source = new Source
@@ -146,14 +147,14 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.That(ex.Message.StartsWith("SFTP transfer failed: 2 Errors: Failure in GetFile"),
                 $"Actual message: {ex.Message}");
             Assert.IsTrue(
-                Helpers.SourceFileExists(Path.Combine(_source.Directory, _source.FileName).Replace("\\", "/")));
+                Lib.Helpers.SourceFileExists(Path.Combine(_source.Directory, _source.FileName).Replace("\\", "/")));
         }
 
         [Test]
         public void DownloadFiles_TestThrowsSourceMoveToDestinationFileExistsWithRenameSourceFileBeforeTransfer()
         {
             Directory.CreateDirectory(_destWorkDir);
-            Helpers.CreateSubDirectory("/upload/uploaded");
+            Lib.Helpers.CreateSubDirectory("/upload/uploaded");
             File.Copy(Path.Combine(_workDir, _source.FileName), Path.Combine(_destWorkDir, _source.FileName));
 
             var source = new Source
@@ -178,13 +179,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.That(ex.Message.StartsWith("SFTP transfer failed: 2 Errors: Failure in GetFile"),
                 $"Actual message: {ex.Message}");
             Assert.IsTrue(
-                Helpers.SourceFileExists(Path.Combine(_source.Directory, _source.FileName).Replace("\\", "/")));
+                Lib.Helpers.SourceFileExists(Path.Combine(_source.Directory, _source.FileName).Replace("\\", "/")));
         }
 
         [Test]
         public void DownloadFiles_TestErrorMessage()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.Password = Guid.NewGuid().ToString();
 
             var ex = Assert.ThrowsAsync<Exception>(async () =>
@@ -196,8 +197,8 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public void DownloadFiles_TestCancellationToken()
         {
-            Helpers.UploadLargeTestFiles(_source.Directory, 1);
-            var connection = Helpers.GetSftpConnection();
+            Lib.Helpers.UploadLargeTestFiles(_source.Directory, 1);
+            var connection = Lib.Helpers.GetSftpConnection();
             var source = new Source
             {
                 Directory = _source.Directory,
@@ -211,14 +212,14 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, connection, _options, cancellationTokenSource.Token));
             Assert.IsTrue(ex.Message.Contains("No files transferred."));
             Assert.IsTrue(ex.Message.Contains("Error: The operation was canceled.."));
-            Assert.IsTrue(Helpers.SourceFileExists($"{source.Directory}/{source.FileName}"));
+            Assert.IsTrue(Lib.Helpers.SourceFileExists($"{source.Directory}/{source.FileName}"));
         }
 
         [Test]
         public void DownloadFiles_TestTimeout()
         {
-            Helpers.UploadLargeTestFiles(_source.Directory, 1);
-            var connection = Helpers.GetSftpConnection();
+            Lib.Helpers.UploadLargeTestFiles(_source.Directory, 1);
+            var connection = Lib.Helpers.GetSftpConnection();
             var source = new Source
             {
                 Directory = _source.Directory,
@@ -243,7 +244,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             Assert.IsTrue(ex.Message.Contains("The operation was canceled."));
             Assert.IsTrue(ex.Message.Contains("No files transferred."));
-            Assert.IsTrue(Helpers.SourceFileExists($"{source.Directory}/LargeTestFile1.bin"));
+            Assert.IsTrue(Lib.Helpers.SourceFileExists($"{source.Directory}/LargeTestFile1.bin"));
         }
 
         [Test]
@@ -251,8 +252,8 @@ namespace Frends.SFTP.DownloadFiles.Tests
         {
             Directory.CreateDirectory(_destWorkDir);
             const string archiveDir = "/upload/archive";
-            Helpers.CreateSubDirectory(archiveDir);
-            Helpers.UploadTestFiles(archiveDir, 1, null, [Path.Combine(_workDir, _source.FileName)]);
+            Lib.Helpers.CreateSubDirectory(archiveDir);
+            Lib.Helpers.UploadTestFiles(archiveDir, 1, null, [Path.Combine(_workDir, _source.FileName)]);
 
             var source = new Source
             {
@@ -275,8 +276,8 @@ namespace Frends.SFTP.DownloadFiles.Tests
         {
             Directory.CreateDirectory(_destWorkDir);
             const string archiveDir = "/upload/archive";
-            Helpers.CreateSubDirectory(archiveDir);
-            Helpers.UploadTestFiles(archiveDir, 1, null, [Path.Combine(_workDir, _source.FileName)]);
+            Lib.Helpers.CreateSubDirectory(archiveDir);
+            Lib.Helpers.UploadTestFiles(archiveDir, 1, null, [Path.Combine(_workDir, _source.FileName)]);
             File.WriteAllText(Path.Combine(_destWorkDir, _source.FileName), "Original file content");
 
             var source = new Source

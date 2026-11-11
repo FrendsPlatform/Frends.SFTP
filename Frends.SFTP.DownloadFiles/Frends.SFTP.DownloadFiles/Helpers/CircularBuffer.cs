@@ -1,6 +1,6 @@
-namespace Frends.SFTP.DownloadFiles.Definitions;
+﻿using System.Collections.Concurrent;
 
-using System.Collections.Concurrent;
+namespace Frends.SFTP.DownloadFiles.Helpers;
 
 /// <summary>
 ///     Circular buffer impl, original from https://codereview.stackexchange.com/a/134147

@@ -1,8 +1,9 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.SFTP.DownloadFiles.Definitions;
+using Frends.SFTP.DownloadFiles.Tests.Lib;
 
 namespace Frends.SFTP.DownloadFiles.Tests
 {
@@ -24,14 +25,14 @@ namespace Frends.SFTP.DownloadFiles.Tests
             var result = await SFTP.DownloadFiles(new Input { Source = _source, Destination = _destination, Info = _info }, _connection, options, new CancellationToken());
             Assert.IsTrue(result.Success);
 
-            Assert.IsTrue(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
+            Assert.IsTrue(Lib.Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
         }
 
         [Test]
         public async Task DownloadFiles_TestSourceOperationMove()
         {
             var to = "uploaded";
-            Helpers.UploadTestFiles(_source.Directory, 1, to);
+            Lib.Helpers.UploadTestFiles(_source.Directory, 1, to);
             to = "upload/Upload/" + to;
             var source = new Source
             {
@@ -46,7 +47,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.SourceFileExists(source.DirectoryToMoveAfterTransfer + "/" + source.FileName));
+            Assert.IsTrue(Lib.Helpers.SourceFileExists(source.DirectoryToMoveAfterTransfer + "/" + source.FileName));
         }
 
         [Test]
@@ -75,7 +76,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             var result = await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, _connection, options, new CancellationToken());
             Assert.IsFalse(result.Success);
-            Assert.IsTrue(Helpers.SourceFileExists(Path.Combine(_source.Directory, _source.FileName).Replace("\\", "/")));
+            Assert.IsTrue(Lib.Helpers.SourceFileExists(Path.Combine(_source.Directory, _source.FileName).Replace("\\", "/")));
         }
 
         [Test]
@@ -94,14 +95,14 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.SourceFileExists(source.Directory + "/uploaded_" + source.FileName));
+            Assert.IsTrue(Lib.Helpers.SourceFileExists(source.Directory + "/uploaded_" + source.FileName));
         }
 
         [Test]
         public async Task DownloadFiles_TestSourceOperationMoveWithRenameFilesDuringTransfer()
         {
             var to = "uploaded";
-            Helpers.UploadTestFiles(_source.Directory, 3, to);
+            Lib.Helpers.UploadTestFiles(_source.Directory, 3, to);
             to = "upload/Upload/" + to;
 
             var options = new Options
@@ -127,7 +128,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.SourceFileExists(source.DirectoryToMoveAfterTransfer + "/" + source.FileName));
+            Assert.IsTrue(Lib.Helpers.SourceFileExists(source.DirectoryToMoveAfterTransfer + "/" + source.FileName));
         }
 
         [Test]
@@ -156,14 +157,14 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.SourceFileExists(source.Directory + "/uploaded_" + source.FileName));
+            Assert.IsTrue(Lib.Helpers.SourceFileExists(source.Directory + "/uploaded_" + source.FileName));
         }
 
         [Test]
         public async Task DownloadFiles_TestSourceOperationMoveWithRenameFilesDuringTransferWithRenameSourceAndDestinationFilesEnabled()
         {
             var to = "uploaded";
-            Helpers.UploadTestFiles(_source.Directory, 3, to);
+            Lib.Helpers.UploadTestFiles(_source.Directory, 3, to);
             to = "upload/Upload/" + to;
 
             var options = new Options
@@ -189,7 +190,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.SourceFileExists(source.DirectoryToMoveAfterTransfer + "/" + source.FileName));
+            Assert.IsTrue(Lib.Helpers.SourceFileExists(source.DirectoryToMoveAfterTransfer + "/" + source.FileName));
         }
 
         [Test]
@@ -218,7 +219,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.SourceFileExists(source.Directory + "/uploaded_" + source.FileName));
+            Assert.IsTrue(Lib.Helpers.SourceFileExists(source.Directory + "/uploaded_" + source.FileName));
         }
 
         [Test]
@@ -246,7 +247,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             var result = await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, _connection, options, new CancellationToken());
             Assert.IsTrue(result.Success);
-            Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
+            Assert.IsFalse(Lib.Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
         }
 
         [Test]
@@ -274,7 +275,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             var result = await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, _connection, options, new CancellationToken());
             Assert.IsTrue(result.Success);
-            Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
+            Assert.IsFalse(Lib.Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
         }
 
         [Test]
@@ -302,7 +303,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             var result = await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, _connection, options, new CancellationToken());
             Assert.IsTrue(result.Success);
-            Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
+            Assert.IsFalse(Lib.Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
         }
 
         [Test]
@@ -330,13 +331,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
 
             var result = await SFTP.DownloadFiles(new Input { Source = source, Destination = _destination, Info = _info }, _connection, options, new CancellationToken());
             Assert.IsTrue(result.Success);
-            Assert.IsFalse(Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
+            Assert.IsFalse(Lib.Helpers.SourceFileExists(_source.Directory + "/" + _source.FileName));
         }
 
         [Test]
         public async Task DownloadFiles_TestSourceOperationRenameWithDifferentDirectory()
         {
-            Helpers.CreateSubDirectory("upload/moved");
+            Lib.Helpers.CreateSubDirectory("upload/moved");
 
             var source = new Source
             {
@@ -351,7 +352,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.SourceFileExists("upload/moved/uploaded_" + source.FileName));
+            Assert.IsTrue(Lib.Helpers.SourceFileExists("upload/moved/uploaded_" + source.FileName));
         }
     }
 }

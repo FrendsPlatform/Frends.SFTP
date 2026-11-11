@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Frends.SFTP.DownloadFiles.Definitions;
+using Frends.SFTP.DownloadFiles.Tests.Lib;
 
 namespace Frends.SFTP.DownloadFiles.Tests
 {
@@ -18,9 +19,9 @@ namespace Frends.SFTP.DownloadFiles.Tests
         public override void OneTimeSetup()
         {
             base.OneTimeSetup();
-            var (MD5, SHA, hostKey) = Helpers.GetServerFingerPrintsAndHostKey();
+            var (MD5, SHA, hostKey) = Lib.Helpers.GetServerFingerPrintsAndHostKey();
             _MD5 = MD5;
-            _Sha256Hex = Helpers.ConvertToSHA256Hex(hostKey);
+            _Sha256Hex = Lib.Helpers.ConvertToSHA256Hex(hostKey);
             _Sha256Hash = SHA;
         }
 
@@ -28,13 +29,13 @@ namespace Frends.SFTP.DownloadFiles.Tests
         public override void Setup()
         {
             base.Setup();
-            Helpers.UploadTestFiles(_source.Directory, 3);
+            Lib.Helpers.UploadTestFiles(_source.Directory, 3);
         }
 
         [Test]
         public async Task DownloadFiles_TestTransferWithExpectedServerFingerprintAsHexSha256()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.ServerFingerPrint = _Sha256Hex;
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
@@ -47,7 +48,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public async Task DownloadFiles_TestTransferWithExpectedServerFingerprintAsHexSha256WithAltercations()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
             connection.ServerFingerPrint = _Sha256Hash.Replace("=", "");
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
@@ -61,7 +62,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public async Task DownloadFiles_TestTransferWithExpectedServerFingerprintAsSha256()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.ServerFingerPrint = _Sha256Hash;
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
@@ -74,7 +75,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public async Task DownloadFiles_TestTransferWithExpectedServerFingerprintAsMD5()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.ServerFingerPrint = _MD5;
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
@@ -87,7 +88,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public async Task DownloadFiles_TestTransferWithExpectedServerFingerprintAsMD5ToLower()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.ServerFingerPrint = _MD5.ToLower();
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
@@ -100,7 +101,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public async Task DownloadFiles_TestTransferWithExpectedServerFingerprintAsMD5Hash()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.ServerFingerPrint = _MD5.Replace(":", "");
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
@@ -113,7 +114,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public void DownloadFiles_TestThrowsTransferWithInvalidExpectedServerFingerprintAsMD5()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.ServerFingerPrint = "73:58:DF:2D:CD:12:35:AB:7D:00:41:F0:1E:62:15:E0";
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
@@ -125,7 +126,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public void DownloadFiles_TestThrowsTransferWithInvalidExpectedServerFingerprintAsHexSha256()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.ServerFingerPrint = "c4b56fba6167c11f62e26b192c839d394e5c8d278b614b81345d037d178442f2";
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
@@ -137,7 +138,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public void DownloadFiles_TestThrowsTransferWithInvalidExpectedServerFingerprintAsSha256()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.ServerFingerPrint = "nuDEsWN4tfEQ684+x+7RySiCwj+GXmX2CfBaBHeSqO8=";
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
@@ -149,7 +150,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public void DownloadFiles_TestThrowsTransferWithInvalidExpectedServerFingerprint()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.ServerFingerPrint = "nuDEsWN4tfEQ684x7RySiCwjGXmX2CfBaBHeSqO8vfiurenvire56";
             connection.HostKeyAlgorithm = HostKeyAlgorithms.RSA;
 
@@ -163,7 +164,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public void DownloadFiles_TestShouldThrowWithoutPromptAndResponse()
         {
-            var connection = Helpers.GetSftpConnection();
+            var connection = Lib.Helpers.GetSftpConnection();
             connection.Authentication = AuthenticationType.UsernamePrivateKeyFile;
             connection.PrivateKeyFile =
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Volumes/ssh_host_rsa_key");

@@ -1,8 +1,8 @@
-namespace Frends.SFTP.DownloadFiles.Definitions;
-
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using Serilog.Core;
 using Serilog.Events;
+
+namespace Frends.SFTP.DownloadFiles.Helpers;
 
 /// <summary>
 /// Sink that is used to store messages and events from seriolog Logger

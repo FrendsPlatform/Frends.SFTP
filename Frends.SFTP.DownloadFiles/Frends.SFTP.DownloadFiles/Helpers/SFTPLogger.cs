@@ -1,7 +1,8 @@
-namespace Frends.SFTP.DownloadFiles.Definitions;
-
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
+using Frends.SFTP.DownloadFiles.Definitions;
 using Serilog;
+
+namespace Frends.SFTP.DownloadFiles.Helpers;
 
 /// <summary>
 /// SFTP internal logger interface

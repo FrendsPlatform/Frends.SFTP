@@ -1,8 +1,9 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.SFTP.DownloadFiles.Definitions;
+using Frends.SFTP.DownloadFiles.Tests.Lib;
 
 namespace Frends.SFTP.DownloadFiles.Tests
 {
@@ -12,7 +13,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [SetUp]
         public void IndividualSetup()
         {
-            Helpers.UploadTestFiles(_source.Directory, 3);
+            Lib.Helpers.UploadTestFiles(_source.Directory, 3);
         }
 
         [Test]

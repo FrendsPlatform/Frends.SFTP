@@ -1,15 +1,15 @@
-using System;
-using System.Linq;
-using System.IO;
-using System.Text;
-using System.Security.Cryptography;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using Frends.SFTP.DownloadFiles.Definitions;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using Renci.SshNet.Security;
-using Frends.SFTP.DownloadFiles.Definitions;
 
-namespace Frends.SFTP.DownloadFiles.Tests
+namespace Frends.SFTP.DownloadFiles.Tests.Lib
 {
     internal static class Helpers
     {

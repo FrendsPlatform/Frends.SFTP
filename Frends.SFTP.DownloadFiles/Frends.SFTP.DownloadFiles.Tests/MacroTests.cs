@@ -1,4 +1,4 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System.IO;
 using System;
 using System.Linq;
@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Frends.SFTP.DownloadFiles.Definitions;
 using System.Collections.Generic;
+using Frends.SFTP.DownloadFiles.Tests.Lib;
 
 namespace Frends.SFTP.DownloadFiles.Tests
 {
@@ -33,7 +34,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         [Test]
         public async Task DownloadFiles_TestSourceDirectoryWithMacros()
         {
-            Helpers.UploadTestFiles(_source.Directory + "/testfolder_" + DateTime.Now.Year, 3);
+            Lib.Helpers.UploadTestFiles(_source.Directory + "/testfolder_" + DateTime.Now.Year, 3);
 
             var source = new Source
             {
@@ -77,7 +78,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         {
             var year = DateTime.Now.Year.ToString();
             var to = "/upload/Upload/" + year + "_uploaded/" + Path.GetFileNameWithoutExtension(_source.FileName) + year + Path.GetExtension(_source.FileName);
-            Helpers.CreateSubDirectory(Path.GetDirectoryName(to).Replace("\\", "/"));
+            Lib.Helpers.CreateSubDirectory(Path.GetDirectoryName(to).Replace("\\", "/"));
 
             var source = new Source
             {
@@ -92,7 +93,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.SourceFileExists(to));
+            Assert.IsTrue(Lib.Helpers.SourceFileExists(to));
         }
 
         [Test]
@@ -111,7 +112,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.SourceFileExists(_source.Directory + "/uploaded_" + source.FileName));
+            Assert.IsTrue(Lib.Helpers.SourceFileExists(_source.Directory + "/uploaded_" + source.FileName));
         }
 
         [Test]
@@ -119,7 +120,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
         {
             var year = DateTime.Now.Year.ToString();
             var to = $"/upload/Upload/{year}_uploaded";
-            Helpers.UploadTestFiles(_source.Directory, 1, to);
+            Lib.Helpers.UploadTestFiles(_source.Directory, 1, to);
 
             var source = new Source
             {
@@ -134,7 +135,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.SourceFileExists(Path.Combine(to, _source.FileName).Replace("\\", "/")));
+            Assert.IsTrue(Lib.Helpers.SourceFileExists(Path.Combine(to, _source.FileName).Replace("\\", "/")));
         }
 
         [Test]
@@ -158,7 +159,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileContentEncoding = FileEncoding.ANSI,
             };
 
-            Helpers.UploadTestFiles("/upload/Upload", 1, null, new List<string> { "test1.txt" });
+            Lib.Helpers.UploadTestFiles("/upload/Upload", 1, null, new List<string> { "test1.txt" });
 
             for (var i = 0; i <= 10; i++)
             {
@@ -190,7 +191,7 @@ namespace Frends.SFTP.DownloadFiles.Tests
                 FileContentEncoding = FileEncoding.ANSI,
             };
 
-            Helpers.UploadTestFiles("/upload/Upload", 10, null, new List<string> { "test.txt" });
+            Lib.Helpers.UploadTestFiles("/upload/Upload", 10, null, new List<string> { "test.txt" });
 
             for (var i = 0; i <= 10; i++)
             {
