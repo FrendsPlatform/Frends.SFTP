@@ -6,14 +6,14 @@ namespace Frends.SFTP.MoveFile.Definitions;
 public class Error
 {
     /// <summary>
-    /// Gets or sets the summary of the error.
+    /// Summary of the error.
     /// </summary>
     /// <example>Unable to move files to the destination directory.</example>
     public string Message { get; set; }
 
     /// <summary>
-    /// Gets or sets additional information about the error.
+    /// Additional information about the error.
     /// </summary>
-    /// <example><c>System.IO.IOException</c>: Access denied while moving report.csv.</example>
+    /// <example>object { Exception AdditionalInfo }</example>
     public Exception AdditionalInfo { get; set; }
 }

@@ -1,4 +1,4 @@
-namespace Frends.SFTP.MoveFile.Definitions;
+﻿namespace Frends.SFTP.MoveFile.Definitions;
 
 /// <summary>
 /// Helper class for file items to be moved in SFTP server.
@@ -12,13 +12,13 @@ public class FileItem
     }
 
     /// <summary>
-    /// Gets or sets source path of the moved file.
+    /// Source path of the moved file.
     /// </summary>
     /// <example><c>/source/report.csv</c>.</example>
     public string SourcePath { get; set; }
 
     /// <summary>
-    /// Gets or sets destination path of the moved file.
+    /// Destination path of the moved file.
     /// </summary>
     /// <example><c>/destination/report.csv</c>.</example>
     public string DestinationPath { get; set; }
