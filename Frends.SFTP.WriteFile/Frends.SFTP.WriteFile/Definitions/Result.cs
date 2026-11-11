@@ -1,5 +1,5 @@
-﻿using Renci.SshNet.Sftp;
 using System.ComponentModel.DataAnnotations;
+using Renci.SshNet.Sftp;
 
 namespace Frends.SFTP.WriteFile.Definitions;
 
@@ -8,6 +8,23 @@ namespace Frends.SFTP.WriteFile.Definitions;
 /// </summary>
 public class Result
 {
+    internal Result(ISftpFile file = null)
+    {
+        if (file is null)
+            return;
+
+        Path = file.FullName;
+        SizeInMegaBytes = Math.Round(file.Length / 1024d / 1024d, 3);
+        Success = true;
+        Error = null;
+    }
+
+    /// <summary>
+    /// Indicates if the task completed successfully.
+    /// </summary>
+    /// <example>true</example>
+    public bool Success { get; set; }
+
     /// <summary>
     /// Full path to the written file.
     /// </summary>
@@ -21,10 +38,9 @@ public class Result
     /// <example>3.2</example>
     public double SizeInMegaBytes { get; private set; }
 
-    internal Result(ISftpFile file)
-    {
-        Path = file.FullName;
-        SizeInMegaBytes = Math.Round((file.Length / 1024d / 1024d), 3);
-    }
+    /// <summary>
+    /// Error that occurred during the task.
+    /// </summary>
+    /// <example>null</example>
+    public Error Error { get; set; }
 }
-

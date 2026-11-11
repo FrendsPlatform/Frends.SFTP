@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.0.0] - 2026-11-09
+
+### Changed
+
+- **[Breaking Change]** Renamed the NIST elliptic-curve host key algorithm options to PascalCase.
+
+### Added
+
+- Added cancellation support and configurable error handling for file writes.
+
+### Updated
+
+- Updated SSH.NET to 2026.0.0 to address security advisories.
+
 ## [3.1.0] - 2026-10-21
 
 ### Changed
