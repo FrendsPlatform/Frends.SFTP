@@ -1,14 +1,15 @@
-namespace Frends.SFTP.DeleteFiles.Definitions;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Frends.SFTP.DeleteFiles.Definitions;
 using Frends.SFTP.DeleteFiles.Enums;
 using Renci.SshNet;
 using Renci.SshNet.Common;
+
+namespace Frends.SFTP.DeleteFiles.Helpers;
 
 internal class ConnectionInfoBuilder
 {

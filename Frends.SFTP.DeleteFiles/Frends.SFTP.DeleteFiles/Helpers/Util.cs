@@ -1,5 +1,3 @@
-namespace Frends.SFTP.DeleteFiles.Definitions;
-
 using System;
 using System.Linq;
 using System.Security.Cryptography;
@@ -9,6 +7,8 @@ using Frends.SFTP.DeleteFiles.Enums;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using Renci.SshNet.Security;
+
+namespace Frends.SFTP.DeleteFiles.Helpers;
 
 /// <summary>
 /// Helper methods for connection builder.

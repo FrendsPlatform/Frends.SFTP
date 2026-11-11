@@ -5,7 +5,7 @@
 ### Changed
 
 - Added options to choose whether task failures throw exceptions or are returned in the result.
-- Upgraded the task and test projects to .NET 8.
+- Upgraded the task to .NET 8.
 - Updated SSH.NET to 2026.0.0 to address known security vulnerabilities.
 
 ## [3.1.0] - 2026-10-21
