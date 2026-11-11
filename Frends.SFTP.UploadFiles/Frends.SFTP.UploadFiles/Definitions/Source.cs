@@ -1,10 +1,10 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Frends.SFTP.UploadFiles.Definitions;
 
 /// <summary>
-/// Source transfer options
+/// Source transfer options.
 /// </summary>
 public class Source
 {
@@ -48,9 +48,9 @@ public class Source
     public SourceOperation Operation { get; set; }
 
     /// <summary>
-    /// Parameter for Rename operation. You can use file macros and also specify a directory 
-    /// where to move the files to, e.g. C:\subdir\%Date%file.txt. If you don't define a 
-    /// directory path, the source directory is used. When using rename, this parameter 
+    /// Parameter for Rename operation. You can use file macros and also specify a directory
+    /// where to move the files to, e.g. C:\subdir\%Date%file.txt. If you don't define a
+    /// directory path, the source directory is used. When using rename, this parameter
     /// must always contain a file name.
     /// </summary>
     /// <example>transferred.txt</example>
@@ -58,7 +58,7 @@ public class Source
     public string FileNameAfterTransfer { get; set; }
 
     /// <summary>
-    /// Parameter for Move operation. Set the full path to the directory without the 
+    /// Parameter for Move operation. Set the full path to the directory without the
     /// file name. You can use some macros in the directory name, e.g. C:\subdir\%Year%_uploaded\.
     /// </summary>
     /// <example>C:\directory\transferred\</example>
@@ -68,10 +68,9 @@ public class Source
     /// <summary>
     /// The paths to the files to transfer, mainly meant to be used with the file trigger with the syntax: #trigger.data.filePaths
     /// Type: System.Object[]
-    /// example: string[]
+    /// example: string[].
     /// </summary>
     /// <example>#trigger.data.filePaths</example>
     [DefaultValue("")]
     public object FilePaths { get; set; }
 }
-

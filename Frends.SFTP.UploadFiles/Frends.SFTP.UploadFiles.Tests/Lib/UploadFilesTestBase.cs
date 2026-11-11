@@ -1,91 +1,95 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using Renci.SshNet;
-using Frends.SFTP.UploadFiles.Definitions;
+﻿using Frends.SFTP.UploadFiles.Definitions;
 using NUnit.Framework;
+using Renci.SshNet;
 
-namespace Frends.SFTP.UploadFiles.Tests
+namespace Frends.SFTP.UploadFiles.Tests.Lib
 {
     public class UploadFilesTestBase
     {
-        protected static Connection _connection;
-        protected static Source _source;
-        protected static Destination _destination;
-        protected static Options _options;
-        protected static Info _info;
-        protected static string _workDir;
-        protected static string _testResultFile = "testResultFile.txt";
+        protected static Connection TestConnection { get; set; }
+
+        protected static Source TestSource { get; set; }
+
+        protected static Destination TestDestination { get; set; }
+
+        protected static Options TestOptions { get; set; }
+
+        protected static Info TestInfo { get; set; }
+
+        protected static string TestWorkDir { get; set; }
+
+        protected static string TestResultFile { get; set; } = "testResultFile.txt";
 
         [OneTimeSetUp]
         public virtual void OneTimeSetup()
         {
-            _workDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
+            TestWorkDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
 
-            _connection = Helpers.GetSftpConnection();
+            TestConnection = Helpers.GetSftpConnection();
 
-            _source = new Source
+            TestSource = new Source
             {
-                Directory = _workDir,
+                Directory = TestWorkDir,
                 FileName = "SFTPUploadTestFile1.txt",
                 Action = SourceAction.Error,
-                Operation = SourceOperation.Nothing
+                Operation = SourceOperation.Nothing,
             };
 
-            _destination = new Destination
+            TestDestination = new Destination
             {
                 Directory = "/upload/Upload",
                 Action = DestinationAction.Error,
                 FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true
+                EnableBomForFileName = true,
             };
 
-            _options = new Options
+            TestOptions = new Options
             {
-                ThrowErrorOnFail = true,
+                ThrowErrorOnFailure = true,
                 RenameSourceFileBeforeTransfer = true,
                 RenameDestinationFileDuringTransfer = true,
                 CreateDestinationDirectories = true,
                 PreserveLastModified = false,
-                OperationLog = true
+                OperationLog = true,
             };
 
-            _info = new Info
+            TestInfo = new Info
             {
                 WorkDir = null,
             };
 
-            Directory.CreateDirectory(_workDir);
+            Directory.CreateDirectory(TestWorkDir);
             Helpers.CreateLargeDummyFile();
         }
 
         [SetUp]
         public void Setup()
         {
+            CleanRemoteTestDirectory();
             Helpers.CreateDummyFiles(2);
         }
-
 
         [TearDown]
         public void TearDown()
         {
-            using (var sftp = new SftpClient(_connection.Address, _connection.Port, _connection.UserName, _connection.Password))
-            {
-                sftp.Connect();
-                if (sftp.Exists(_destination.Directory))
-                    Helpers.DeleteDirectory(sftp, _destination.Directory);
-                sftp.Disconnect();
-            }
-
+            CleanRemoteTestDirectory();
             Helpers.DeleteDummyFiles();
         }
 
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
-            Directory.Delete(_workDir, true);
+            Directory.Delete(TestWorkDir, true);
+        }
+
+        private static void CleanRemoteTestDirectory()
+        {
+            using (var sftp = new SftpClient(TestConnection.Address, TestConnection.Port, TestConnection.UserName, TestConnection.Password))
+            {
+                sftp.Connect();
+                Helpers.CleanDirectory(sftp, "/upload");
+                sftp.Disconnect();
+            }
         }
     }
 }
-

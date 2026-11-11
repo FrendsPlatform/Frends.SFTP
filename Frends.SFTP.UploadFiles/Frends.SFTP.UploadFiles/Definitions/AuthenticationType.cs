@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.UploadFiles.Definitions;
+namespace Frends.SFTP.UploadFiles.Definitions;
 
 /// <summary>
 /// Enumeration to specify authentication type for the transfer.
@@ -9,21 +9,24 @@ public enum AuthenticationType
     /// Authentication type which uses username and password.
     /// </summary>
     UsernamePassword,
+
     /// <summary>
-    /// Authentication type which uses username and private key file
+    /// Authentication type which uses username and private key file.
     /// </summary>
     UsernamePrivateKeyFile,
+
     /// <summary>
     /// Authentication type which uses username and private key as a string.
     /// </summary>
     UsernamePrivateKeyString,
+
     /// <summary>
     /// Authentication type which uses username, password and private key file.
     /// </summary>
     UsernamePasswordPrivateKeyFile,
+
     /// <summary>
     /// Authentication type which uses username, password and private key as a string.
     /// </summary>
-    UsernamePasswordPrivateKeyString
+    UsernamePasswordPrivateKeyString,
 }
-
