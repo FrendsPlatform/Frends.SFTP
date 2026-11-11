@@ -14,6 +14,6 @@ public class Error
     /// <summary>
     /// Additional information about the error.
     /// </summary>
-    /// <example>System.IO.IOException: Connection timed out</example>
+    /// <example>object { Exception AdditionalInfo }</example>
     public Exception AdditionalInfo { get; set; }
 }

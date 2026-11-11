@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.SFTP.ReadFile.Enums;
@@ -17,9 +17,9 @@ public class ServerFingerprintTests : ReadFileTestBase
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        var (newMd5, sha256, hostKey) = Helpers.GetServerFingerPrintsAndHostKey();
+        var (newMd5, sha256, hostKey) = Lib.Helpers.GetServerFingerPrintsAndHostKey();
         md5 = newMd5;
-        sha256Hex = Helpers.ConvertToSHA256Hex(hostKey);
+        sha256Hex = Lib.Helpers.ConvertToSHA256Hex(hostKey);
         sha256Hash = sha256;
     }
 

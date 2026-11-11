@@ -8,7 +8,7 @@
 
 ### Added
 
-- Added the option to return structured errors instead of throwing when a file read fails.
+- Added the option to return structured errors instead of throwing when a file read fails when `ThrowErrorOnFailure` is set to false (default is true).
 - Updated SSH.NET to 2026.0.0, which includes security fixes.
 
 ## [3.2.0] - 2026-10-21

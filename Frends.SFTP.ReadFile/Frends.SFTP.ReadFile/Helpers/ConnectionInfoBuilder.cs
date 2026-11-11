@@ -1,9 +1,10 @@
-using System.Text;
+﻿using System.Text;
+using Frends.SFTP.ReadFile.Definitions;
 using Frends.SFTP.ReadFile.Enums;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 
-namespace Frends.SFTP.ReadFile.Definitions;
+namespace Frends.SFTP.ReadFile.Helpers;
 
 internal class ConnectionInfoBuilder
 {

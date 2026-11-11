@@ -1,13 +1,12 @@
-using System;
+﻿using System;
 using System.Security.Cryptography;
 using System.Text;
 using Frends.SFTP.ReadFile.Definitions;
 using Frends.SFTP.ReadFile.Enums;
 using Renci.SshNet;
-using Renci.SshNet.Common;
 using Renci.SshNet.Security;
 
-namespace Frends.SFTP.ReadFile.Tests;
+namespace Frends.SFTP.ReadFile.Tests.Lib;
 
 internal static class Helpers
 {

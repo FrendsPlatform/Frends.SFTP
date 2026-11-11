@@ -54,7 +54,7 @@ internal class ReadTests : ReadFileTestBase
     {
         var content = string.Empty;
 
-        Helpers.OverrideDummyFile(Input.Path, content);
+        Lib.Helpers.OverrideDummyFile(Input.Path, content);
 
         var result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
         Assert.AreEqual(string.Empty, result.TextContent);
@@ -65,7 +65,7 @@ internal class ReadTests : ReadFileTestBase
     {
         Input.FileEncoding = FileEncoding.ANSI;
 
-        Helpers.GenerateDummyFile(Input.Path, Content);
+        Lib.Helpers.GenerateDummyFile(Input.Path, Content);
 
         var result = await SFTP.ReadFile(Input, Connection, Options, CancellationToken.None);
         Assert.AreEqual(Content, result.TextContent);
