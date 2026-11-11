@@ -1,15 +1,15 @@
-﻿using System.Text.RegularExpressions;
-using System.Text;
 using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
+using Frends.SFTP.MoveFile.Enums;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using Renci.SshNet.Security;
-using Frends.SFTP.MoveFile.Enums;
 
 namespace Frends.SFTP.MoveFile.Definitions;
 
 /// <summary>
-/// Helper methods for file modifications
+/// Helper methods for file modifications.
 /// </summary>
 internal static class Util
 {
@@ -76,19 +76,19 @@ internal static class Util
     internal static void AddServerFingerprintCheck(SftpClient client, string expectedServerFingerprint)
     {
         var userResultMessage = string.Empty;
-        var MD5serverFingerprint = string.Empty;
-        var SHAServerFingerprint = string.Empty;
+        var mD5serverFingerprint = string.Empty;
+        var sHAServerFingerprint = string.Empty;
 
-        client.HostKeyReceived += delegate (object _, HostKeyEventArgs e)
+        client.HostKeyReceived += (_, e) =>
         {
             try
             {
-                MD5serverFingerprint = e.FingerPrintMD5;
-                SHAServerFingerprint = e.FingerPrintSHA256;
+                mD5serverFingerprint = e.FingerPrintMD5;
+                sHAServerFingerprint = e.FingerPrintSHA256;
 
                 if (!string.IsNullOrEmpty(expectedServerFingerprint))
                 {
-                    if (IsMD5(expectedServerFingerprint.Replace(":", "").Replace("-", "")))
+                    if (IsMD5(expectedServerFingerprint.Replace(":", string.Empty).Replace("-", string.Empty)))
                     {
                         if (!expectedServerFingerprint.Contains(':'))
                         {
@@ -96,24 +96,28 @@ internal static class Util
                                 .Replace(":", string.Empty)
                                 .Replace("-", string.Empty)
                                 .ToLowerInvariant();
-                            var normalizedActual = MD5serverFingerprint
+                            var normalizedActual = mD5serverFingerprint
                                 .Replace(":", string.Empty)
                                 .Replace("-", string.Empty)
                                 .ToLowerInvariant();
                             e.CanTrust = normalizedActual == normalizedExpected;
                             if (!e.CanTrust)
+                            {
                                 userResultMessage =
                                     $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                    $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{MD5serverFingerprint}'.";
+                                    $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{mD5serverFingerprint}'.";
+                            }
                         }
                         else
                         {
                             e.CanTrust =
                                 e.FingerPrint.SequenceEqual(ConvertFingerprintToByteArray(expectedServerFingerprint));
                             if (!e.CanTrust)
+                            {
                                 userResultMessage =
                                     $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                    $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{MD5serverFingerprint}'.";
+                                    $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{mD5serverFingerprint}'.";
+                            }
                         }
                     }
                     else if (IsSha256(expectedServerFingerprint))
@@ -122,32 +126,36 @@ internal static class Util
                         {
                             using (var mySHA256 = SHA256.Create())
                             {
-                                SHAServerFingerprint = ToHex(mySHA256.ComputeHash(e.HostKey));
+                                sHAServerFingerprint = ToHex(mySHA256.ComputeHash(e.HostKey));
                             }
 
                             e.CanTrust = string.Equals(
-                                SHAServerFingerprint,
+                                sHAServerFingerprint,
                                 expectedServerFingerprint,
                                 StringComparison.OrdinalIgnoreCase);
                             if (!e.CanTrust)
+                            {
                                 userResultMessage =
                                     $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                    $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{SHAServerFingerprint}'.";
+                                    $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{sHAServerFingerprint}'.";
+                            }
                         }
                         else
                         {
-                            e.CanTrust = (string.Equals(
-                                              SHAServerFingerprint,
+                            e.CanTrust = string.Equals(
+                                              sHAServerFingerprint,
                                               expectedServerFingerprint,
                                               StringComparison.OrdinalIgnoreCase) ||
                                           string.Equals(
-                                              SHAServerFingerprint.Replace("=", ""),
+                                              sHAServerFingerprint.Replace("=", string.Empty),
                                               expectedServerFingerprint,
-                                              StringComparison.OrdinalIgnoreCase));
+                                              StringComparison.OrdinalIgnoreCase);
                             if (!e.CanTrust)
+                            {
                                 userResultMessage =
                                     $"Can't trust SFTP server. The server fingerprint does not match. " +
-                                    $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{SHAServerFingerprint}'.";
+                                    $"Expected fingerprint: '{expectedServerFingerprint}', but was: '{sHAServerFingerprint}'.";
+                            }
                         }
                     }
                     else
@@ -190,7 +198,7 @@ internal static class Util
                 });
 
                 break;
-            case HostKeyAlgorithms.nistp256:
+            case HostKeyAlgorithms.Nistp256:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp256", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
@@ -199,7 +207,7 @@ internal static class Util
                 });
 
                 break;
-            case HostKeyAlgorithms.nistp384:
+            case HostKeyAlgorithms.Nistp384:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp384", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
@@ -208,7 +216,7 @@ internal static class Util
                 });
 
                 break;
-            case HostKeyAlgorithms.nistp521:
+            case HostKeyAlgorithms.Nistp521:
                 client.ConnectionInfo.HostKeyAlgorithms.Add("ecdsa-sha2-nistp521", (data) =>
                 {
                     var sshKeyData = new SshKeyData(data);
@@ -226,21 +234,26 @@ internal static class Util
     /// Checks if the file name matches the given file mask.
     /// The file mask is checked with a kludgey regular expression.
     /// </summary>
+    /// <param name="filename">The file name to check.</param>
+    /// <param name="mask">The file mask to match.</param>
+    /// <returns><see langword="true"/> if the file name matches the mask; otherwise, <see langword="false"/>.</returns>
     internal static bool FileMatchesMask(string filename, string mask)
     {
         const string regexEscape = "<regex>";
         string pattern;
 
-        //check is pure regex wished to be used for matching
+        // check is pure regex wished to be used for matching
         if (mask.StartsWith(regexEscape))
-            //use substring instead of string.replace just in case some has regex like '<regex>//File<regex>' or something else like that
+        {
+            // use substring instead of string.replace just in case some has regex like '<regex>//File<regex>' or something else like that
             pattern = mask.Substring(regexEscape.Length);
+        }
         else
         {
             pattern = mask.Replace(".", "\\.");
             pattern = pattern.Replace("*", ".*");
             pattern = pattern.Replace("?", ".+");
-            pattern = String.Concat("^", pattern, "$");
+            pattern = string.Concat("^", pattern, "$");
         }
 
         return Regex.IsMatch(filename, pattern, RegexOptions.IgnoreCase);
@@ -267,23 +280,6 @@ internal static class Util
         }
     }
 
-    private static Encoding GetOtherEncoding(string encodingString)
-    {
-        if (string.IsNullOrWhiteSpace(encodingString))
-            throw new ArgumentException("Encoding name was not given.");
-
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
-        try
-        {
-            return Encoding.GetEncoding(encodingString);
-        }
-        catch (ArgumentException)
-        {
-            throw new ArgumentException($"Unknown encoding: '{encodingString}'.");
-        }
-    }
-
     internal static void CreateDirectoriesRecursively(SftpClient client, string path)
     {
         path = path.Replace(@"\", "/");
@@ -303,6 +299,23 @@ internal static class Util
                 CreateDirectoriesRecursively(client, parent);
                 client.CreateDirectory(path);
             }
+        }
+    }
+
+    private static Encoding GetOtherEncoding(string encodingString)
+    {
+        if (string.IsNullOrWhiteSpace(encodingString))
+            throw new ArgumentException("Encoding name was not given.");
+
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+        try
+        {
+            return Encoding.GetEncoding(encodingString);
+        }
+        catch (ArgumentException)
+        {
+            throw new ArgumentException($"Unknown encoding: '{encodingString}'.");
         }
     }
 }

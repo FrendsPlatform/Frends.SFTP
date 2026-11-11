@@ -1,32 +1,34 @@
-﻿using NUnit.Framework;
-using Renci.SshNet;
 using Frends.SFTP.MoveFile.Definitions;
 using Frends.SFTP.MoveFile.Enums;
+using NUnit.Framework;
+using Renci.SshNet;
 
 namespace Frends.SFTP.MoveFile.Tests;
-public class MoveFileTestBase
-{
-    internal static Connection _connection;
-    internal static Input _input;
 
-    /// <summary>
-    /// Test credentials for docker server.
-    /// </summary>
-    readonly static string _dockerAddress = "localhost";
-    readonly static string _dockerUsername = "foo";
-    readonly static string _dockerPassword = "pass";
+internal class MoveFileTestBase
+{
+    private static readonly string DockerAddress = "localhost";
+    private static readonly string DockerUsername = "foo";
+    private static readonly string DockerPassword = "pass";
+
+    protected static Connection TestConnection { get; set; }
+
+    protected static Input TestInput { get; set; }
+
+    protected static Options TestOptions { get; set; }
 
     [SetUp]
     public void SetUp()
     {
-        _connection = Helpers.GetSftpConnection();
-        _input = new Input
+        TestConnection = Helpers.GetSftpConnection();
+        TestOptions = new Options();
+        TestInput = new Input
         {
             Directory = "/upload/",
             Pattern = "test.txt",
             TargetDirectory = "upload/moved",
             CreateTargetDirectories = true,
-            IfTargetFileExists = FileExistsOperation.Throw
+            IfTargetFileExists = FileExistsOperation.Throw,
         };
 
         Helpers.GenerateDummyFile("test.txt");
@@ -35,9 +37,9 @@ public class MoveFileTestBase
     [TearDown]
     public void TearDown()
     {
-        using var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword);
+        using var client = new SftpClient(DockerAddress, 2222, DockerUsername, DockerPassword);
         client.Connect();
-        Helpers.DeleteSourceFiles(client, _input.Directory);
+        Helpers.DeleteSourceFiles(client, TestInput.Directory);
         client.Disconnect();
     }
 }
