@@ -4,12 +4,13 @@
 
 ### Changed
 
-- **[Breaking Change]** Grouped source, destination, and transfer metadata under the `Input` parameter and replaced `ThrowErrorOnFail` with `ThrowErrorOnFailure`; existing task configurations must be updated.
+- **[Breaking Change]** Grouped source, destination, and transfer metadata under the `Input` parameter and replaced `ThrowErrorOnFail` with `ThrowErrorOnFailure`
 - Upgraded the task to .NET 8 and the SFTP client library to address known security advisories.
 
 ### Added
 
 - Added structured error details to failed task results.
+- Added `ErrorMessageOnFailure` in Options tab.
 
 ## [4.4.0] - 2026-10-21
 
