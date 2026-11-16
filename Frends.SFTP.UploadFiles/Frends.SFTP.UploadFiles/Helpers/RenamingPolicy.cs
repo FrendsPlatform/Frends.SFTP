@@ -82,7 +82,8 @@ internal class RenamingPolicy
             path,
             Regex.Escape("%SourceRelativeDirectory%"),
             relativeDirectoryPath ?? string.Empty,
-            RegexOptions.IgnoreCase);
+            RegexOptions.IgnoreCase,
+            TimeSpan.FromSeconds(1));
     }
 
     /// <summary>
@@ -257,7 +258,7 @@ internal class RenamingPolicy
         {
             while (fileName.ToUpperInvariant().Contains(key.ToUpperInvariant()))
             {
-                fileName = Regex.Replace(fileName, Regex.Escape(key), macroHandlers[key](fileName), RegexOptions.IgnoreCase);
+                fileName = Regex.Replace(fileName, Regex.Escape(key), macroHandlers[key](fileName), RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
             }
         }
 
@@ -274,7 +275,8 @@ internal class RenamingPolicy
                     fileName,
                     Regex.Escape(key),
                     sourceFileNameMacroHandlers[key].Invoke(originalFilePath),
-                    RegexOptions.IgnoreCase);
+                    RegexOptions.IgnoreCase,
+                    TimeSpan.FromSeconds(1));
             }
         }
 
