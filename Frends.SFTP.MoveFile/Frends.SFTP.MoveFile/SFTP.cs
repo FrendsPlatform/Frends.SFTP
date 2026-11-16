@@ -37,7 +37,7 @@ public static class SFTP
             }
             catch (Exception e)
             {
-                return new ArgumentException($"Error when initializing connection info: {e}").Handle(options);
+                throw new ArgumentException($"Error when initializing connection info: {e}");
             }
 
             using var client = new SftpClient(connectionInfo);
@@ -86,9 +86,8 @@ public static class SFTP
                     }
                     catch (Exception ex)
                     {
-                        return new ArgumentException(
-                            $"Error while creating destination directory '{input.TargetDirectory}': {ex.Message}",
-                            ex).Handle(options);
+                        throw new ArgumentException(
+                            $"Error while creating destination directory '{input.TargetDirectory}': {ex.Message}", ex);
                     }
                 }
                 else
@@ -200,9 +199,9 @@ public static class SFTP
             var tempFileName = $"{Path.GetFileNameWithoutExtension(sourceFilePath)}({count++})";
             destFilePath =
                 Path.Combine(
-                    Path.GetDirectoryName(destFilePath),
-                    path2: tempFileName + Path.GetExtension(sourceFilePath))
-                .Replace("\\", "/");
+                        Path.GetDirectoryName(destFilePath),
+                        path2: tempFileName + Path.GetExtension(sourceFilePath))
+                    .Replace("\\", "/");
         }
 
         return destFilePath;
