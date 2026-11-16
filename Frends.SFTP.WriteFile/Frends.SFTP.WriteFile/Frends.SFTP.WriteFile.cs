@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Frends.SFTP.WriteFile.Definitions;
 using Frends.SFTP.WriteFile.Enums;
 using Frends.SFTP.WriteFile.Helpers;
@@ -39,7 +39,7 @@ public static class SFTP
             }
             catch (Exception ex)
             {
-                return new ArgumentException($"Error when initializing connection info: {ex}", ex).Handle(options);
+                throw new ArgumentException($"Error when initializing connection info: {ex}", ex);
             }
 
             using var client = new SftpClient(connectionInfo);
@@ -85,9 +85,9 @@ public static class SFTP
                             }
                             catch (Exception ex)
                             {
-                                return new ArgumentException(
-                                    $"Error while creating destination directory '{targetDirectory}': {ex.Message}", ex)
-                                    .Handle(options);
+                                throw new ArgumentException(
+                                    $"Error while creating destination directory '{targetDirectory}': {ex.Message}",
+                                    ex);
                             }
                         }
                         else
