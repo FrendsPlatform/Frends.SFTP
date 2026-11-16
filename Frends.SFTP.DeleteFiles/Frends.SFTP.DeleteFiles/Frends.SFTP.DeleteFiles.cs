@@ -26,7 +26,7 @@ public static class SFTP
     /// <param name="connection">Connection parameters.</param>
     /// <param name="options">Additional parameters.</param>
     /// <param name="cancellationToken">Cancellation token given by Frends.</param>
-    /// <returns>object { bool Success, List&lt;FileItem&gt; Files, object Error { string Message, Exception AdditionalInfo } }</returns>
+    /// <returns>object { bool Success, List&lt;object { string Name, string Path, double SizeInMegaBytes }&gt; Files, object Error { string Message, Exception AdditionalInfo } }</returns>
     public static async Task<Result> DeleteFiles(
         [PropertyTab] Input input,
         [PropertyTab] Connection connection,
