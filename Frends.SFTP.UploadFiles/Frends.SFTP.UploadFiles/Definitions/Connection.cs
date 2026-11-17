@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Frends.SFTP.UploadFiles.Definitions;
@@ -9,7 +9,7 @@ namespace Frends.SFTP.UploadFiles.Definitions;
 public class Connection
 {
     /// <summary>
-    /// The lenght of time, in seconds, until the connection times out.
+    /// The length of time, in seconds, until the connection times out.
     /// You can use value -1 to indicate that the connection does not time out.
     /// Connection will only time out if the client is idle for assigned period of time.
     /// Default value is 60 seconds.
@@ -27,7 +27,7 @@ public class Connection
     public int KeepAliveInterval { get; set; }
 
     /// <summary>
-    /// SFTP host address
+    /// SFTP host address.
     /// </summary>
     /// <example>localhost</example>
     [DisplayFormat(DataFormatString = "Text")]
@@ -41,7 +41,7 @@ public class Connection
     public int Port { get; set; } = 22;
 
     /// <summary>
-    /// Selection for authentication type
+    /// Selection for authentication type.
     /// </summary>
     /// <example>AuthenticationType.UsernamePassword</example>
     [DisplayFormat(DataFormatString = "Text")]
@@ -76,7 +76,7 @@ public class Connection
     /// Private key as a string, supported private key formats: OpenSSH and ssh.com.
     /// PuTTY keys can be converted with puttygen.exe application.
     /// 1. Load your key file into puttygen.exe
-    /// 2. Conversion > Export OpenSSH key (not the "force new file format" option)
+    /// 2. Conversion > Export OpenSSH key (not the "force new file format" option).
     /// </summary>
     /// <example>
     /// -----BEGIN RSA PRIVATE KEY-----
@@ -85,7 +85,7 @@ public class Connection
     /// ...
     /// OX7Q/wO4lqOlFhLtRnSL0cfuhRmt59pM75Zd+euX5tv9jmCj+AQT/kiBoMhNrDGk
     /// N2gTujnH7HCr/afSBeL3xnYcEmeCQTxTPZofBjPC+TPd9g7MntSGBeU/Fstv0jbg
-    /// -----END RSA PRIVATE KEY-----
+    /// -----END RSA PRIVATE KEY-----.
     /// </example>
     [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyString, AuthenticationType.UsernamePasswordPrivateKeyString)]
     [PasswordPropertyText]
@@ -96,7 +96,9 @@ public class Connection
     /// Passphrase for the private key file.
     /// </summary>
     /// <example>passphrase</example>
-    [UIHint(nameof(Authentication), "",
+    [UIHint(
+        nameof(Authentication),
+        "",
         AuthenticationType.UsernamePrivateKeyFile,
         AuthenticationType.UsernamePasswordPrivateKeyFile,
         AuthenticationType.UsernamePrivateKeyString,
@@ -106,20 +108,20 @@ public class Connection
     public string PrivateKeyPassphrase { get; set; }
 
     /// <summary>
-    /// Fingerprint of the SFTP server. When using "Username-Password" 
-    /// authentication it is recommended to use server fingerprint in 
+    /// Fingerprint of the SFTP server. When using "Username-Password"
+    /// authentication it is recommended to use server fingerprint in
     /// order to be sure of the server you are connecting.
     /// </summary>
     /// <example>
     /// MD5: '41:76:EA:65:62:6E:D3:68:DC:41:9A:F2:F2:20:69:9D'
-    /// SHA256: 'FBQn5eyoxpAl33Ly0gyScCGAqZeMVsfY7qss3KOM/hY='
+    /// SHA256: 'FBQn5eyoxpAl33Ly0gyScCGAqZeMVsfY7qss3KOM/hY='.
     /// </example>
     [DefaultValue("")]
     public string ServerFingerPrint { get; set; }
 
     /// <summary>
-    /// Host key algorithm to use when connecting to server. 
-    /// Default value is Any which doesn't force the task to use 
+    /// Host key algorithm to use when connecting to server.
+    /// Default value is Any which doesn't force the task to use
     /// specific algorithm.
     /// </summary>
     /// <example>HostKeyAlgorithms.RSA</example>
@@ -144,7 +146,7 @@ public class Connection
     /// <summary>
     /// Responses for the server prompts when using Keyboard Interactive authentication method.
     /// </summary>
+    /// <example>[object { Prompt = "Continue? (yes/no)", Response = "yes" }]</example>
     [UIHint(nameof(UseKeyboardInteractiveAuthentication), "", true)]
     public PromptResponse[] PromptAndResponse { get; set; } = Array.Empty<PromptResponse>();
 }
-

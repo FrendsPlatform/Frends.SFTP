@@ -1,15 +1,15 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Frends.SFTP.UploadFiles.Definitions;
 
 /// <summary>
-/// Options for file transfer
+/// Options for file transfer.
 /// </summary>
 public class Options
 {
     /// <summary>
-    /// Timeout in seconds when the Task is cancelled after.
+    /// Timeout in seconds after which the Task is cancelled.
     /// Cancellation with the Timeout will stop the operation even if the transfer is occuring.
     /// Task will try to restore the source file. Destination file will be deleted if the cancellation happens during the transfer.
     /// Versus to the Connection.ConnectionTimeout which will only timeout the connection to the SFTP server if client is idle.
@@ -20,14 +20,7 @@ public class Options
     public int Timeout { get; set; }
 
     /// <summary>
-    /// Should an exception be thrown when file transfer fails.
-    /// </summary>
-    /// <example>true</example>
-    [DefaultValue(true)]
-    public bool ThrowErrorOnFail { get; set; }
-
-    /// <summary>
-    /// Should the destination file be renamed with temporary file name during file transfer as a locking mechanism.
+    /// Should the destination file be renamed with a temporary file name during file transfer as a locking mechanism.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
@@ -43,7 +36,7 @@ public class Options
     public string SourceFileExtension { get; set; }
 
     /// <summary>
-    /// Should the destination file be renamed with temporary file name during file transfer as a locking mechanism.
+    /// Should the destination file be renamed with a temporary file name during file transfer as a locking mechanism.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
@@ -59,7 +52,7 @@ public class Options
     public string DestinationFileExtension { get; set; }
 
     /// <summary>
-    /// Should the destination directories be created if they do not exist. May not work on all servers. 
+    /// Should the destination directories be created if they do not exist. May not work on all servers.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(false)]
@@ -73,7 +66,7 @@ public class Options
     public bool PreserveLastModified { get; set; }
 
     /// <summary>
-    /// While enabled all operations logs of executions will be returned with the result.
+    /// While enabled, all operation logs of executions will be returned with the result.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
@@ -87,6 +80,19 @@ public class Options
     /// <example>false</example>
     [DefaultValue(false)]
     public bool AssumeFileExistence { get; set; }
+
+    /// <summary>
+    /// Whether to throw an error when the transfer fails.
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(true)]
+    public bool ThrowErrorOnFailure { get; set; } = true;
+
+    /// <summary>
+    /// Overrides the error message when the transfer fails.
+    /// </summary>
+    /// <example>SFTP upload failed during transfer</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    [DefaultValue("")]
+    public string ErrorMessageOnFailure { get; set; } = string.Empty;
 }
-
-

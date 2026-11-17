@@ -1,6 +1,3 @@
-﻿// Pragma is for self-explanatory enum attributes.
-#pragma warning disable 1591
-
 namespace Frends.SFTP.UploadFiles.Definitions;
 
 /// <summary>
@@ -8,8 +5,18 @@ namespace Frends.SFTP.UploadFiles.Definitions;
 /// </summary>
 public enum SourceAction
 {
+    /// <summary>
+    /// Returns a task failure when no source files are found.
+    /// </summary>
     Error,
-    Info,
-    Ignore
-}
 
+    /// <summary>
+    /// Writes an informational message when no source files are found.
+    /// </summary>
+    Info,
+
+    /// <summary>
+    /// Ignores the absence of source files.
+    /// </summary>
+    Ignore,
+}

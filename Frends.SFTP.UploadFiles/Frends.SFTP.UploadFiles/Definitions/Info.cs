@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace Frends.SFTP.UploadFiles.Definitions;
 
@@ -8,8 +8,8 @@ namespace Frends.SFTP.UploadFiles.Definitions;
 public class Info
 {
     /// <summary>
-    /// Optional descriptive name for the transfer. 
-    /// Will be included in the file transfer log 
+    /// Optional descriptive name for the transfer.
+    /// Will be included in the file transfer log
     /// entries and also in all error messages in the event log.
     /// </summary>
     /// <example>SFTPUpload</example>
@@ -24,18 +24,16 @@ public class Info
     public string WorkDir { get; set; }
 
     /// <summary>
-    /// The process URI, use #process.uri
+    /// The process URI, use #process.uri.
     /// </summary>
     /// <example>#process.uri</example>
     [DefaultValue("#process.uri")]
     public string ProcessUri { get; set; }
 
     /// <summary>
-    /// Reference to the Task execution id, use #process.executionid
+    /// Reference to the Task execution id, use #process.executionid.
     /// </summary>
     /// <example>#process.executionid</example>
     [DefaultValue("#process.executionid")]
     public string TaskExecutionID { get; set; }
-
 }
-

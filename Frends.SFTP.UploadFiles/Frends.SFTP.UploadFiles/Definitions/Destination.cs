@@ -1,7 +1,8 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Frends.SFTP.UploadFiles.Definitions;
+
 /// <summary>
 /// Destination transfer options.
 /// </summary>
@@ -24,8 +25,8 @@ public class Destination
     public string FileName { get; set; }
 
     /// <summary>
-    /// If set, this ecoding will be used to encode and decode command 
-    /// parameters and server responses, such as file names. 
+    /// If set, this encoding will be used to encode and decode command
+    /// parameters and server responses, such as file names.
     /// By selecting 'Other' you can use any encoding.
     /// </summary>
     /// <example>FileEncoding.ANSI</example>
@@ -33,7 +34,7 @@ public class Destination
     public FileEncoding FileNameEncoding { get; set; }
 
     /// <summary>
-    /// Additional option for UTF-8 encoding to enable bom.
+    /// Additional option for UTF-8 encoding to enable BOM.
     /// </summary>
     /// <example>true</example>
     [UIHint(nameof(FileNameEncoding), "", FileEncoding.UTF8)]
@@ -55,7 +56,7 @@ public class Destination
     public DestinationAction Action { get; set; }
 
     /// <summary>
-    /// If enabled new line is added to the existing file before appending the content.
+    /// If enabled, a new line is added to the existing file before appending the content.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(false)]
@@ -78,11 +79,10 @@ public class Destination
     public string FileContentEncodingInString { get; set; }
 
     /// <summary>
-    /// Additional option for UTF-8 encoding to enable bom.
+    /// Additional option for UTF-8 encoding to enable BOM.
     /// </summary>
     /// <example>true</example>
     [UIHint(nameof(FileContentEncoding), "", FileEncoding.UTF8)]
     [DefaultValue(false)]
     public bool EnableBomForContent { get; set; }
 }
-

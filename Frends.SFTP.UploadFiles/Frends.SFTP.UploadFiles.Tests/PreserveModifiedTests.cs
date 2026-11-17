@@ -1,16 +1,12 @@
-﻿using NUnit.Framework;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Frends.SFTP.UploadFiles.Definitions;
+﻿using Frends.SFTP.UploadFiles.Definitions;
+using Frends.SFTP.UploadFiles.Tests.Lib;
+using NUnit.Framework;
 
 namespace Frends.SFTP.UploadFiles.Tests
 {
     [TestFixture]
-    class PreserveModifiedTests : UploadFilesTestBase
+    internal class PreserveModifiedTests : UploadFilesTestBase
     {
-
         private Destination destination;
         private Options options;
         private string sourcePath;
@@ -25,33 +21,33 @@ namespace Frends.SFTP.UploadFiles.Tests
                 Directory = "/upload/Upload/destination",
                 Action = DestinationAction.Overwrite,
                 FileNameEncoding = FileEncoding.UTF8,
-                EnableBomForFileName = true
+                EnableBomForFileName = true,
             };
 
             options = new Options
             {
-                ThrowErrorOnFail = true,
+                ThrowErrorOnFailure = true,
                 RenameSourceFileBeforeTransfer = false,
                 RenameDestinationFileDuringTransfer = false,
                 CreateDestinationDirectories = true,
                 PreserveLastModified = true,
-                OperationLog = true
+                OperationLog = true,
             };
 
-            sourcePath = Path.Combine(_workDir, _source.FileName);
-            destFilePath = destination.Directory + "/" + _source.FileName;
+            sourcePath = Path.Combine(TestWorkDir, TestSource.FileName);
+            destFilePath = destination.Directory + "/" + TestSource.FileName;
             date = File.GetLastWriteTime(sourcePath);
         }
 
         [Test]
         public async Task UploadFiles_TestPreserveLastModifiedWithoutRename()
         {
-            var result = await SFTP.UploadFiles(_source, destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, options, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination(destFilePath));
-            Assert.AreEqual(date.ToString(), Helpers.GetLastWriteTimeFromDestination(destFilePath));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination(destFilePath));
+            Assert.AreEqual(date.ToString(), Lib.Helpers.GetLastWriteTimeFromDestination(destFilePath));
         }
 
         [Test]
@@ -60,12 +56,12 @@ namespace Frends.SFTP.UploadFiles.Tests
             options.RenameSourceFileBeforeTransfer = true;
             options.RenameDestinationFileDuringTransfer = true;
 
-            var result = await SFTP.UploadFiles(_source, destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, options, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination(destFilePath));
-            Assert.AreEqual(date.ToString(), Helpers.GetLastWriteTimeFromDestination(destFilePath));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination(destFilePath));
+            Assert.AreEqual(date.ToString(), Lib.Helpers.GetLastWriteTimeFromDestination(destFilePath));
         }
 
         [Test]
@@ -74,12 +70,12 @@ namespace Frends.SFTP.UploadFiles.Tests
             options.RenameSourceFileBeforeTransfer = true;
             options.RenameDestinationFileDuringTransfer = false;
 
-            var result = await SFTP.UploadFiles(_source, destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, options, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination(destFilePath));
-            Assert.AreEqual(date.ToString(), Helpers.GetLastWriteTimeFromDestination(destFilePath));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination(destFilePath));
+            Assert.AreEqual(date.ToString(), Lib.Helpers.GetLastWriteTimeFromDestination(destFilePath));
         }
 
         [Test]
@@ -88,12 +84,12 @@ namespace Frends.SFTP.UploadFiles.Tests
             options.RenameSourceFileBeforeTransfer = false;
             options.RenameDestinationFileDuringTransfer = true;
 
-            var result = await SFTP.UploadFiles(_source, destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(TestSource, destination, TestConnection, options, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination(destFilePath));
-            Assert.AreEqual(date.ToString(), Helpers.GetLastWriteTimeFromDestination(destFilePath));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination(destFilePath));
+            Assert.AreEqual(date.ToString(), Lib.Helpers.GetLastWriteTimeFromDestination(destFilePath));
         }
 
         [Test]
@@ -104,25 +100,22 @@ namespace Frends.SFTP.UploadFiles.Tests
 
             var source = new Source
             {
-                Directory = _workDir,
+                Directory = TestWorkDir,
                 FileName = "SFTPUploadTestFile(Copy).txt",
                 Action = SourceAction.Error,
                 Operation = SourceOperation.Delete,
             };
 
-            File.Copy(Path.Combine(_workDir, _source.FileName), Path.Combine(_workDir, source.FileName), true);
+            File.Copy(Path.Combine(TestWorkDir, TestSource.FileName), Path.Combine(TestWorkDir, source.FileName), true);
 
-            var result = await SFTP.UploadFiles(source, destination, _connection, options, _info, new CancellationToken());
+            var result = await SFTP.UploadFiles(source, destination, TestConnection, options, TestInfo, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1, result.SuccessfulTransferCount);
 
             var destFilePath = destination.Directory + "/" + source.FileName;
 
-            Assert.IsTrue(Helpers.CheckFileExistsInDestination(destFilePath));
-            Assert.AreEqual(date.ToString(), Helpers.GetLastWriteTimeFromDestination(destFilePath));
+            Assert.IsTrue(Lib.Helpers.CheckFileExistsInDestination(destFilePath));
+            Assert.AreEqual(date.ToString(), Lib.Helpers.GetLastWriteTimeFromDestination(destFilePath));
         }
     }
 }
-
-
-

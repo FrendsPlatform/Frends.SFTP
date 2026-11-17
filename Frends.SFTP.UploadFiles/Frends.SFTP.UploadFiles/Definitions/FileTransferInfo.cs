@@ -2,40 +2,45 @@
 
 internal class FileTransferInfo
 {
-    public string TransferName { get; set; } // 0
+    internal string TransferName { get; set; } // 0
 
-    public Guid BatchId { get; set; } // 1
+    internal Guid BatchId { get; set; } // 1
 
-    public string SourceFile { get; set; } // 2
+    internal string SourceFile { get; set; } // 2
 
-    public DateTime TransferStarted { get; set; } // 3
+    internal DateTime TransferStarted { get; set; } // 3
 
-    public DateTime TransferEnded { get; set; } // 4
+    internal DateTime TransferEnded { get; set; } // 4
 
-    public string DestinationFile { get; set; } // 5
+    internal string DestinationFile { get; set; } // 5
 
-    public long FileSize { get; set; } // 6
+    internal long FileSize { get; set; } // 6
 
-    public string ErrorInfo { get; set; } // 7
+    internal string ErrorInfo { get; set; } // 7
 
-    public TransferResult Result { get; set; } // 10
+    internal TransferResult Result { get; set; } // 10
 
-    public string DestinationAddress { get; set; } // 13
+    internal string DestinationAddress { get; set; } // 13
 
-    public string SourcePath { get; set; } // 15
+    internal string SourcePath { get; set; } // 15
 
-    public string DestinationPath { get; set; } // 16
+    internal string DestinationPath { get; set; } // 16
 
-    public string ServiceId { get; set; } // 17
+    internal string ServiceId { get; set; } // 17
 
-    public string RoutineUri { get; set; } // 18
+    internal string RoutineUri { get; set; } // 18
 
-    public Guid SingleFileTransferId { get; set; }
+    internal Guid SingleFileTransferId { get; set; }
 
+    /// <summary>
+    /// Formats the transfer details for diagnostic logging.
+    /// </summary>
+    /// <example>TransferName: OutboundTransfer; Sourcefile: invoice-2026-11.csv</example>
+    /// <returns>Formatted transfer details for diagnostic logging.</returns>
     public override string ToString()
     {
         return string.Format(
-        $@"{ErrorInfo}
+            $@"{ErrorInfo}
 
         TransferName: {TransferName}
         BatchId: {BatchId}
@@ -52,4 +57,3 @@ internal class FileTransferInfo
         RoutineUri: {ServiceId}");
     }
 }
-
