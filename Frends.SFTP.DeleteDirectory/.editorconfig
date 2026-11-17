@@ -1,0 +1,46 @@
+﻿[*.cs]
+
+# SA1649: File name should match first type name
+dotnet_diagnostic.SA1649.severity = none
+
+# SA1633: File should have header
+dotnet_diagnostic.SA1633.severity = none
+
+# IDE0160: Convert to block scoped namespace
+csharp_style_namespace_declarations = file_scoped
+
+# SA0001: XML comment analysis is disabled due to project configuration
+dotnet_diagnostic.SA0001.severity = none
+
+# SA1101: Prefix local calls with this
+dotnet_diagnostic.SA1101.severity = none
+
+# SA1600: Elements should be documented
+dotnet_diagnostic.SA1600.severity = none
+
+# SA1503: Braces should not be omitted
+dotnet_diagnostic.SA1503.severity = none
+
+# SA1130: Use lambda syntax
+dotnet_diagnostic.SA1130.severity = none
+
+# S3267: Loops should be simplified with "LINQ" expressions
+dotnet_diagnostic.S3267.severity = none
+
+# SA1309: Field names should not begin with underscore
+dotnet_diagnostic.SA1309.severity = none
+
+# SA1401: Fields should be private
+dotnet_diagnostic.SA1401.severity = none
+
+# CA2211: Non-constant fields should not be visible
+dotnet_diagnostic.CA2211.severity = none
+
+# S3010: Static fields should not be updated in constructors
+dotnet_diagnostic.S3010.severity = none
+
+# SA1501: Statement should not be on a single line
+dotnet_diagnostic.SA1501.severity = none
+
+# SA1008: Opening parenthesis should be spaced correctly
+dotnet_diagnostic.SA1008.severity = none
