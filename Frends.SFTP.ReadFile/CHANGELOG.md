@@ -8,6 +8,7 @@
 
 ### Added
 
+- Added `Success` and `Error` properties to the result. The task can now return `Success = false` with error details in `Error` instead of throwing.
 - Added the option to return structured errors instead of throwing when a file read fails when `ThrowErrorOnFailure` is set to false (default is true).
 - Updated SSH.NET to 2026.0.0, which includes security fixes.
 

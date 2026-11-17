@@ -37,7 +37,7 @@ public static class SFTP
             }
             catch (Exception e)
             {
-                return new ArgumentException($"Error when initializing connection info: {e}").Handle(options);
+                throw new ArgumentException($"Error when initializing connection info: {e}");
             }
 
             using var client = new SftpClient(connectionInfo);
