@@ -1,30 +1,32 @@
-﻿using NUnit.Framework;
 using Frends.SFTP.WriteFile.Definitions;
 using Frends.SFTP.WriteFile.Enums;
+using NUnit.Framework;
 
 namespace Frends.SFTP.WriteFile.Tests;
 
 public class WriteFileTestBase
 {
-    internal static Input _input;
-    internal static Connection _connection;
-    internal static Options _options;
-    internal static string _content;
+    internal static Input TestInput { get; set; }
 
+    internal static Connection TestConnection { get; set; }
+
+    internal static Options TestOptions { get; set; }
+
+    internal static string TestContent { get; set; }
 
     [SetUp]
     public void SetUp()
     {
-        _content = "This is a test file.";
-        _connection = Helpers.GetSftpConnection();
-        _input = new Input
+        TestContent = "This is a test file.";
+        TestConnection = Helpers.GetSftpConnection();
+        TestInput = new Input
         {
             Path = "/upload/test.txt",
-            Content = _content,
+            Content = TestContent,
             FileEncoding = FileEncoding.ANSI,
-            WriteBehaviour = WriteOperation.Error
+            WriteBehaviour = WriteOperation.Error,
         };
-        _options = new Options();
+        TestOptions = new Options();
     }
 
     [TearDown]
@@ -33,4 +35,3 @@ public class WriteFileTestBase
         Helpers.DeleteDestinationFiles();
     }
 }
-

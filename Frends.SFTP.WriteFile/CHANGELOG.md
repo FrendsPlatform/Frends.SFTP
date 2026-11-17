@@ -1,5 +1,21 @@
 # Changelog
 
+## [4.0.0] - 2026-11-09
+
+### Changed
+
+- **[Breaking Change]** Renamed the NIST elliptic-curve host key algorithm options to PascalCase.
+
+### Added
+
+- Added `Success` and `Error` properties to the result. The task can now return `Success = false` with error details in `Error` instead of throwing.
+- Added `ThrowErrorOnFailure` option (default `true`) to choose whether failures throw an exception or are returned in the result.
+- Added `ErrorMessageOnFailure` option to specify a custom error message used when a failure occurs.
+
+### Updated
+
+- Updated SSH.NET to 2026.0.0 to address security advisories.
+
 ## [3.1.0] - 2026-10-21
 
 ### Changed

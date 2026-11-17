@@ -1,11 +1,11 @@
-﻿using System;
-using System.Text;
+using System;
 using System.Security.Cryptography;
+using System.Text;
+using Frends.SFTP.WriteFile.Definitions;
+using Frends.SFTP.WriteFile.Enums;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using Renci.SshNet.Security;
-using Frends.SFTP.WriteFile.Definitions;
-using Frends.SFTP.WriteFile.Enums;
 
 namespace Frends.SFTP.WriteFile.Tests;
 
@@ -14,22 +14,22 @@ internal static class Helpers
     /// <summary>
     /// Test credentials for docker server.
     /// </summary>
-    readonly static string _dockerAddress = "localhost";
-    readonly static string _dockerUsername = "foo";
-    readonly static string _dockerPassword = "pass";
+    private static readonly string DockerAddress = "localhost";
+    private static readonly string DockerUsername = "foo";
+    private static readonly string DockerPassword = "pass";
 
     internal static Connection GetSftpConnection()
     {
         var connection = new Connection
         {
             ConnectionTimeout = 60,
-            Address = _dockerAddress,
+            Address = DockerAddress,
             Port = 2222,
-            Username = _dockerUsername,
+            Username = DockerUsername,
             Authentication = AuthenticationType.UsernamePassword,
-            Password = _dockerPassword,
+            Password = DockerPassword,
             ServerFingerPrint = null,
-            BufferSize = 32
+            BufferSize = 32,
         };
 
         return connection;
@@ -38,16 +38,16 @@ internal static class Helpers
     internal static Tuple<string, string, byte[]> GetServerFingerPrintsAndHostKey()
     {
         Tuple<string, string, byte[]> result = null;
-        using (var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword))
+        using (var client = new SftpClient(DockerAddress, 2222, DockerUsername, DockerPassword))
         {
             client.ConnectionInfo.HostKeyAlgorithms.Clear();
-            client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", (data) =>
+            client.ConnectionInfo.HostKeyAlgorithms.Add("ssh-rsa", data =>
             {
                 var sshKeyData = new SshKeyData(data);
                 return new KeyHostAlgorithm("ssh-rsa", new RsaKey(sshKeyData));
             });
 
-            client.HostKeyReceived += delegate (object sender, HostKeyEventArgs e)
+            client.HostKeyReceived += (_, e) =>
             {
                 result = new Tuple<string, string, byte[]>(e.FingerPrintMD5, e.FingerPrintSHA256, e.HostKey);
                 e.CanTrust = true;
@@ -55,16 +55,18 @@ internal static class Helpers
             client.Connect();
             client.Disconnect();
         }
+
         return result;
     }
 
     internal static string ConvertToSHA256Hex(byte[] hostKey)
     {
-        var fingerprint = "";
+        var fingerprint = string.Empty;
         using (var mySHA256 = SHA256.Create())
         {
             fingerprint = ToHex(mySHA256.ComputeHash(hostKey));
         }
+
         return fingerprint;
     }
 
@@ -91,7 +93,7 @@ internal static class Helpers
     internal static bool DestinationFileExists(string path)
     {
         bool exists;
-        using var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword);
+        using var client = new SftpClient(DockerAddress, 2222, DockerUsername, DockerPassword);
         client.Connect();
         exists = client.Exists(path);
         client.Disconnect();
@@ -101,7 +103,7 @@ internal static class Helpers
 
     internal static string GetDestinationFileContent(string path)
     {
-        using var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword);
+        using var client = new SftpClient(DockerAddress, 2222, DockerUsername, DockerPassword);
         client.Connect();
         var content = client.ReadAllText(path);
         client.Disconnect();
@@ -110,7 +112,7 @@ internal static class Helpers
 
     internal static void DeleteDestinationFiles()
     {
-        using var client = new SftpClient(_dockerAddress, 2222, _dockerUsername, _dockerPassword);
+        using var client = new SftpClient(DockerAddress, 2222, DockerUsername, DockerPassword);
         client.Connect();
         DeleteDirectory(client, "/upload");
         client.Disconnect();

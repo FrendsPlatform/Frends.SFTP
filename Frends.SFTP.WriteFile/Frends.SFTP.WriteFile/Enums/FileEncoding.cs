@@ -1,6 +1,3 @@
-﻿// Pragma for self-explanatory enum attributes.
-#pragma warning disable 1591
-
 namespace Frends.SFTP.WriteFile.Enums;
 
 /// <summary>
@@ -8,13 +5,33 @@ namespace Frends.SFTP.WriteFile.Enums;
 /// </summary>
 public enum FileEncoding
 {
-    UTF8,
-    ANSI,
-    ASCII,
-    WINDOWS1252,
-    Unicode,
     /// <summary>
-    /// Other enables users to add other encoding options as string.
+    /// UTF-8 encoding.
     /// </summary>
-    Other
+    UTF8,
+
+    /// <summary>
+    /// ANSI encoding.
+    /// </summary>
+    ANSI,
+
+    /// <summary>
+    /// ASCII encoding.
+    /// </summary>
+    ASCII,
+
+    /// <summary>
+    /// Windows-1252 encoding.
+    /// </summary>
+    WINDOWS1252,
+
+    /// <summary>
+    /// Unicode encoding.
+    /// </summary>
+    Unicode,
+
+    /// <summary>
+    /// Use a custom encoding name.
+    /// </summary>
+    Other,
 }

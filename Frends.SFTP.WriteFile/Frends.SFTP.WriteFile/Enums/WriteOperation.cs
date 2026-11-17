@@ -1,6 +1,3 @@
-﻿// Pragma for self-explanatory enum attributes.
-#pragma warning disable 1591
-
 namespace Frends.SFTP.WriteFile.Enums;
 
 /// <summary>
@@ -8,8 +5,18 @@ namespace Frends.SFTP.WriteFile.Enums;
 /// </summary>
 public enum WriteOperation
 {
+    /// <summary>
+    /// Append content to the existing file.
+    /// </summary>
     Append,
-    Overwrite,
-    Error
-}
 
+    /// <summary>
+    /// Replace the existing file content.
+    /// </summary>
+    Overwrite,
+
+    /// <summary>
+    /// Fail if the destination file already exists.
+    /// </summary>
+    Error,
+}
