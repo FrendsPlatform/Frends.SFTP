@@ -4,6 +4,7 @@
 
 ### Added
 
+- Added `Success` and `Error` properties to the result. The task can now return `Success = false` with error details in `Error` instead of throwing.
 - Added options to return task errors as a result or throw them with a custom message.
 
 ### Changed

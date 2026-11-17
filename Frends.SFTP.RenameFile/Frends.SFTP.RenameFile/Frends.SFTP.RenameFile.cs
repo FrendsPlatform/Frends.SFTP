@@ -26,8 +26,6 @@ public static class SFTP
         [PropertyTab] Options options,
         CancellationToken cancellationToken)
     {
-        options ??= new Options();
-
         try
         {
             ConnectionInfo connectionInfo;
@@ -39,7 +37,7 @@ public static class SFTP
             }
             catch (Exception ex)
             {
-                return new ArgumentException($"Error when initializing connection info: {ex}", ex).Handle(options);
+                throw new ArgumentException($"Error when initializing connection info: {ex}", ex);
             }
 
             using var client = new SftpClient(connectionInfo);
