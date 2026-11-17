@@ -59,7 +59,12 @@ public class Connection
     /// Password to use in the authentication to the server.
     /// </summary>
     /// <example><c>pass</c>.</example>
-    [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePassword, AuthenticationType.UsernamePasswordPrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyString)]
+    [UIHint(
+        nameof(Authentication),
+        "",
+        AuthenticationType.UsernamePassword,
+        AuthenticationType.UsernamePasswordPrivateKeyFile,
+        AuthenticationType.UsernamePasswordPrivateKeyString)]
     [PasswordPropertyText]
     public string Password { get; set; }
 
@@ -70,7 +75,11 @@ public class Connection
     /// 2. Conversion > Export OpenSSH key (not the "force new file format" option).
     /// </summary>
     /// <example><c>C:\path\to\private\key</c>.</example>
-    [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyFile)]
+    [UIHint(
+        nameof(Authentication),
+        "",
+        AuthenticationType.UsernamePrivateKeyFile,
+        AuthenticationType.UsernamePasswordPrivateKeyFile)]
     [DisplayFormat(DataFormatString = "Text")]
     public string PrivateKeyFile { get; set; }
 
@@ -89,7 +98,11 @@ public class Connection
     /// N2gTujnH7HCr/afSBeL3xnYcEmeCQTxTPZofBjPC+TPd9g7MntSGBeU/Fstv0jbg
     /// <c>-----END RSA PRIVATE KEY-----</c>.
     /// </example>
-    [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyString, AuthenticationType.UsernamePasswordPrivateKeyString)]
+    [UIHint(
+        nameof(Authentication),
+        "",
+        AuthenticationType.UsernamePrivateKeyString,
+        AuthenticationType.UsernamePasswordPrivateKeyString)]
     [PasswordPropertyText]
     public string PrivateKeyString { get; set; }
 
@@ -97,13 +110,19 @@ public class Connection
     /// Passphrase for the private key file.
     /// </summary>
     /// <example><c>passphrase</c>.</example>
-    [UIHint(nameof(Authentication), "", AuthenticationType.UsernamePrivateKeyFile, AuthenticationType.UsernamePasswordPrivateKeyFile, AuthenticationType.UsernamePrivateKeyString, AuthenticationType.UsernamePasswordPrivateKeyString)]
+    [UIHint(
+        nameof(Authentication),
+        "",
+        AuthenticationType.UsernamePrivateKeyFile,
+        AuthenticationType.UsernamePasswordPrivateKeyFile,
+        AuthenticationType.UsernamePrivateKeyString,
+        AuthenticationType.UsernamePasswordPrivateKeyString)]
     [PasswordPropertyText]
     public string PrivateKeyPassphrase { get; set; }
 
     /// <summary>
-    /// Fingerprint of the SFTP server. When using "Username-Password" 
-    /// authentication it is recommended to use server fingerprint in 
+    /// Fingerprint of the SFTP server. When using "Username-Password"
+    /// authentication it is recommended to use server fingerprint in
     /// order to be sure of the server you are connecting.
     /// </summary>
     /// <example>
@@ -114,8 +133,8 @@ public class Connection
     public string ServerFingerPrint { get; set; }
 
     /// <summary>
-    /// Host key algorithm to use when connecting to server. 
-    /// Default value is Any which doesn't force the task to use 
+    /// Host key algorithm to use when connecting to server.
+    /// Default value is Any which doesn't force the task to use
     /// specific algorithm.
     /// </summary>
     /// <example><c>HostKeyAlgorithms.RSA</c>.</example>
