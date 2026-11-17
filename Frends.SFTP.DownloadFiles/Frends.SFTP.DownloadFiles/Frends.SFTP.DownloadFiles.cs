@@ -172,16 +172,16 @@ public static class SFTP
             var fileTransporter = new FileTransporter(logger, batchContext, executionId);
             var result = await fileTransporter.Run(cancellationToken);
 
+            if (result.OperationsLog == null)
+                result.OperationsLog = new Dictionary<string, string>();
+            else if (options.OperationLog)
+                result.OperationsLog = GetLogDictionary(transferSink.GetBufferedLogMessages());
+            
             if (options.ThrowErrorOnFailure && !result.Success)
             {
                 throw new Exception($"SFTP transfer failed: {result.UserResultMessage}. " +
                                     $"Latest operations: \n{GetLogLines(transferSink.GetBufferedLogMessages())}.");
             }
-
-            if (result.OperationsLog == null)
-                result.OperationsLog = new Dictionary<string, string>();
-            else if (options.OperationLog)
-                result.OperationsLog = GetLogDictionary(transferSink.GetBufferedLogMessages());
 
             return new Result
             {
