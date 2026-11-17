@@ -176,7 +176,7 @@ public static class SFTP
                 result.OperationsLog = new Dictionary<string, string>();
             else if (options.OperationLog)
                 result.OperationsLog = GetLogDictionary(transferSink.GetBufferedLogMessages());
-            
+
             if (options.ThrowErrorOnFailure && !result.Success)
             {
                 throw new Exception($"SFTP transfer failed: {result.UserResultMessage}. " +
@@ -256,9 +256,7 @@ public static class SFTP
         {
             return new Dictionary<string, string>
             {
-                {
-                    DateTimeOffset.Now.ToString(dateFormat), $"Error while creating operation log: \n{e}."
-                },
+                { DateTimeOffset.Now.ToString(dateFormat), $"Error while creating operation log: \n{e}." },
             };
         }
     }
