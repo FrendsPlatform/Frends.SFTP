@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Frends.SFTP.ListFiles.Enums;
 
@@ -104,8 +104,8 @@ public class Connection
     public string PrivateKeyPassphrase { get; set; }
 
     /// <summary>
-    /// Fingerprint of the SFTP server. When using "Username-Password" 
-    /// authentication it is recommended to use server fingerprint in 
+    /// Fingerprint of the SFTP server. When using "Username-Password"
+    /// authentication it is recommended to use server fingerprint in
     /// order to be sure of the server you are connecting.
     /// </summary>
     /// <example>
@@ -116,8 +116,8 @@ public class Connection
     public string ServerFingerPrint { get; set; }
 
     /// <summary>
-    /// Host key algorithm to use when connecting to server. 
-    /// Default value is Any which doesn't force the task to use 
+    /// Host key algorithm to use when connecting to server.
+    /// Default value is Any which doesn't force the task to use
     /// specific algorithm.
     /// </summary>
     /// <example>HostKeyAlgorithms.RSA</example>
@@ -134,7 +134,7 @@ public class Connection
     /// <summary>
     /// Responses for the server prompts when using Keyboard Interactive authentication method.
     /// </summary>
+    /// <example>[{"Prompt":"Verification code","Response":"123456789"}]</example>
     [UIHint(nameof(UseKeyboardInteractiveAuthentication), "", true)]
     public PromptResponse[] PromptAndResponse { get; set; } = Array.Empty<PromptResponse>();
 }
-

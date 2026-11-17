@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Frends.SFTP.ListFiles.Enums;
 
@@ -55,11 +55,10 @@ public class Input
 
     /// <summary>
     /// File encoding to be used.
-    /// Encoding don't support any unicode encoding. It only support the code page encodings. 
+    /// Encoding don't support any unicode encoding. It only support the code page encodings.
     /// A partial list of possible encodings: https://en.wikipedia.org/wiki/Windows_code_page#List.
     /// </summary>
     /// <example>utf-8</example>
     [UIHint(nameof(FileEncoding), "", FileEncoding.Other)]
     public string EncodingInString { get; set; }
 }
-
