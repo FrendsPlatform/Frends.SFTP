@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <LangVersion>Latest</LangVersion>
-        <Version>3.1.0</Version>
+        <Version>3.2.0</Version>
         <Authors>Frends</Authors>
         <Copyright>Frends</Copyright>
         <Company>Frends</Company>
@@ -21,6 +21,7 @@
         <None Include="FrendsTaskMetadata.json" Pack="true" PackagePath="/">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+        <AdditionalFiles Include="FrendsTaskMetadata.json" />
     </ItemGroup>
 
     <ItemGroup>
@@ -33,22 +34,21 @@
         <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0"/>
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0"/>
-        <PackageReference Include="SSH.NET" Version="2025.1.0"/>
+        <PackageReference Include="SSH.NET" Version="2026.0.0"/>
         <PackageReference Include="SshKeyGenerator" Version="1.1.50"/>
         <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0"/>
         <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+        <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="9.8.0.76515">
+        <PackageReference Include="FrendsTaskAnalyzers" Version="1.11.0">
             <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
 
 </Project>
-
