@@ -256,7 +256,7 @@ internal static class Util
             pattern = string.Concat("^", pattern, "$");
         }
 
-        return Regex.IsMatch(filename, pattern, RegexOptions.IgnoreCase);
+        return Regex.IsMatch(filename, pattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(3));
     }
 
     internal static Encoding GetEncoding(FileEncoding encoding, string encodingString, bool enableBom)

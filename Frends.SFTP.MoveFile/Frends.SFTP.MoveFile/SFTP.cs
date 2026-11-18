@@ -76,7 +76,7 @@ public static class SFTP
                 AssertNoTargetFileConflicts(client, targetFiles);
             }
 
-            if (!client.Exists(input.TargetDirectory))
+            if (!await client.ExistsAsync(input.TargetDirectory, cancellationToken))
             {
                 if (input.CreateTargetDirectories)
                 {
@@ -103,7 +103,7 @@ public static class SFTP
                 switch (input.IfTargetFileExists)
                 {
                     case FileExistsOperation.Throw:
-                        if (client.Exists(file.DestinationPath))
+                        if (await client.ExistsAsync(file.DestinationPath, cancellationToken))
                             throw new ArgumentException($"File '{file}' already exists.");
 
                         transferredFiles.Add(Move(client, file));
@@ -116,8 +116,8 @@ public static class SFTP
 
                         break;
                     case FileExistsOperation.Overwrite:
-                        if (client.Exists(file.DestinationPath))
-                            client.Delete(file.DestinationPath);
+                        if (await client.ExistsAsync(file.DestinationPath, cancellationToken))
+                            await client.DeleteAsync(file.DestinationPath, cancellationToken);
                         transferredFiles.Add(Move(client, file));
 
                         break;
