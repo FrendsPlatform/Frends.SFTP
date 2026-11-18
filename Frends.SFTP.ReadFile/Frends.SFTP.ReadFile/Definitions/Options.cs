@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Frends.SFTP.ReadFile.Definitions;
 
@@ -13,4 +14,19 @@ public class Options
     /// <example>ContentType.Text</example>
     [DefaultValue(ContentType.Text)]
     public ContentType ContentType { get; set; } = ContentType.Text;
+
+    /// <summary>
+    /// Whether to throw an error on failure.
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(true)]
+    public bool ThrowErrorOnFailure { get; set; } = true;
+
+    /// <summary>
+    /// Overrides the error message on failure.
+    /// </summary>
+    /// <example>Unable to read the requested SFTP file</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    [DefaultValue("")]
+    public string ErrorMessageOnFailure { get; set; } = string.Empty;
 }

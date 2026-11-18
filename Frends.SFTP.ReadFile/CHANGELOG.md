@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.0.0] - 2026-11-09
+
+### Changed
+
+- **[Breaking Change]** Renamed the `HostKeyAlgorithms.nistp256`, `nistp384`, and `nistp521` enum values to `Nistp256`, `Nistp384`, and `Nistp521`.
+
+### Added
+
+- Added `Success` and `Error` properties to the result. The task can now return `Success = false` with error details in `Error` or throw actual error.
+- Added the option `ThrowErrorOnFailure` (default is true) how to handle errors and `ErrorMessageOnFailure` to optionally add custom error message.
+- Updated SSH.NET to 2026.0.0, which includes security fixes.
+
 ## [3.2.0] - 2026-10-21
 
 ### Changed

@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.SFTP.ReadFile.Definitions;
-using NUnit.Framework;
 using Frends.SFTP.ReadFile.Enums;
 using Frends.SFTP.ReadFile.Tests.Lib;
+using NUnit.Framework;
 
 namespace Frends.SFTP.ReadFile.Tests;
 
@@ -38,8 +38,10 @@ public class ConnectivityTests : ReadFileTestBase
     [Test]
     public async Task ReadFile_TestWithPrivateKeyFileRsaFromString()
     {
-        var key = await File.ReadAllTextAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-            "../../../Volumes/ssh_host_rsa_key"));
+        var key = await File.ReadAllTextAsync(
+            Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "../../../Volumes/ssh_host_rsa_key"));
 
         Connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyString;
         Connection.PrivateKeyPassphrase = "passphrase";
@@ -72,7 +74,7 @@ public class ConnectivityTests : ReadFileTestBase
             new()
             {
                 Prompt = "password",
-                Response = "pass"
+                Response = "pass",
             },
         };
 

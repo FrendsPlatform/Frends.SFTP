@@ -1,4 +1,4 @@
-﻿using Frends.SFTP.ReadFile.Definitions;
+using Frends.SFTP.ReadFile.Definitions;
 using Frends.SFTP.ReadFile.Enums;
 using NUnit.Framework;
 
@@ -6,10 +6,13 @@ namespace Frends.SFTP.ReadFile.Tests.Lib;
 
 public class ReadFileTestBase
 {
-    internal static Connection Connection;
-    internal static Input Input;
-    internal static Options Options;
-    internal static string Content;
+    protected static Connection Connection { get; set; }
+
+    protected static Input Input { get; set; }
+
+    protected static Options Options { get; set; }
+
+    protected static string Content { get; set; }
 
     [SetUp]
     public void SetUp()
@@ -19,7 +22,7 @@ public class ReadFileTestBase
         Input = new Input
         {
             Path = "/upload/test.txt",
-            FileEncoding = FileEncoding.ANSI
+            FileEncoding = FileEncoding.ANSI,
         };
         Options = new Options
         {
