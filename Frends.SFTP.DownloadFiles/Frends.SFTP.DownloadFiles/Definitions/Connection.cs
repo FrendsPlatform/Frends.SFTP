@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.DownloadFiles.Definitions;
+namespace Frends.SFTP.DownloadFiles.Definitions;
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -139,6 +139,7 @@ public class Connection
     /// <summary>
     /// Responses for the server prompts when using Keyboard Interactive authentication method.
     /// </summary>
+    /// <example>[{ "Prompt": "Password:", "Response": "secret" }]</example>
     [UIHint(nameof(UseKeyboardInteractiveAuthentication), "", true)]
     public PromptResponse[] PromptAndResponse { get; set; } = Array.Empty<PromptResponse>();
 }

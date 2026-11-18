@@ -1,53 +1,39 @@
-﻿namespace Frends.SFTP.DownloadFiles.Definitions;
+namespace Frends.SFTP.DownloadFiles.Definitions;
 
 /// <summary>
-/// Return object with private setters.
+/// Result of the task.
 /// </summary>
 public class Result
 {
-    internal Result(FileTransferResult result)
-    {
-        ActionSkipped = result.ActionSkipped;
-        Success = result.Success;
-        UserResultMessage = result.UserResultMessage;
-        SuccessfulTransferCount = result.SuccessfulTransferCount;
-        FailedTransferCount = result.FailedTransferCount;
-        TransferredFileNames = result.TransferredFileNames;
-        TransferErrors = result.TransferErrors;
-        TransferredFilePaths = result.TransferredFilePaths;
-        TransferredDestinationFilePaths = result.TransferredDestinationFilePaths;
-        OperationsLog = result.OperationsLog;
-    }
-
     /// <summary>
     /// Boolean value of the skipped Action.
     /// </summary>
     /// <example>false</example>
-    public bool ActionSkipped { get; private set; }
+    public bool ActionSkipped { get; set; }
 
     /// <summary>
     /// Boolean value of the successful transfer.
     /// </summary>
     /// <example>true</example>
-    public bool Success { get; private set; }
+    public bool Success { get; set; }
 
     /// <summary>
     /// Message of the transfer operations.
     /// </summary>
-    /// <example>1 files transferred: test.txt"</example>
-    public string UserResultMessage { get; private set; }
+    /// <example>1 files transferred: test.txt</example>
+    public string UserResultMessage { get; set; }
 
     /// <summary>
     /// Count of files that has been successfully transferred.
     /// </summary>
     /// <example>1</example>
-    public int SuccessfulTransferCount { get; private set; }
+    public int SuccessfulTransferCount { get; set; }
 
     /// <summary>
     /// Count of files that have not been transferred.
     /// </summary>
     /// <example>0</example>
-    public int FailedTransferCount { get; private set; }
+    public int FailedTransferCount { get; set; }
 
     /// <summary>
     /// List of transferred file names.
@@ -60,7 +46,7 @@ public class Result
     /// ]
     /// </code>
     /// </example>
-    public IEnumerable<string> TransferredFileNames { get; private set; }
+    public IEnumerable<string> TransferredFileNames { get; set; }
 
     /// <summary>
     /// Dictionary of file names and errors messages of the failed transfers.
@@ -83,7 +69,7 @@ public class Result
     /// }
     /// </code>
     /// </example>
-    public Dictionary<string, IList<string>> TransferErrors { get; private set; }
+    public Dictionary<string, IList<string>> TransferErrors { get; set; }
 
     /// <summary>
     /// List of transferred file paths.
@@ -96,7 +82,7 @@ public class Result
     /// ]
     /// </code>
     /// </example>
-    public IEnumerable<string> TransferredFilePaths { get; private set; }
+    public IEnumerable<string> TransferredFilePaths { get; set; }
 
     /// <summary>
     /// List of destination file paths of the transferred files.
@@ -107,7 +93,7 @@ public class Result
     ///     "C:\\test\\test2.txt"
     /// ]
     /// </example>
-    public string[] TransferredDestinationFilePaths { get; private set; }
+    public string[] TransferredDestinationFilePaths { get; set; }
 
     /// <summary>
     /// Operations logs for the transfer.
@@ -121,4 +107,10 @@ public class Result
     /// </code>
     /// </example>
     public IDictionary<string, string> OperationsLog { get; set; }
+
+    /// <summary>
+    /// Error that occurred during task execution.
+    /// </summary>
+    /// <example>object { string Message, Exception AdditionalInfo }</example>
+    public Error Error { get; set; }
 }

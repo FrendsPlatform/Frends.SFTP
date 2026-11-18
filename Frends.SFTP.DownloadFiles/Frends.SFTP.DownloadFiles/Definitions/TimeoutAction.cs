@@ -1,10 +1,10 @@
-﻿namespace Frends.SFTP.DownloadFiles.Definitions
+namespace Frends.SFTP.DownloadFiles.Definitions
 {
     internal class TimeoutAction
     {
-        private bool _success;
+        private bool success;
 
-        private bool _timout;
+        private bool timout;
 
         public TimeoutAction(int waitLimit, Action action)
         {
@@ -12,18 +12,18 @@
             ActionThread = new Thread(new ThreadStart(delegate
             {
                 action.Invoke();
-                if (_timout) return;
-                _timout = true;
-                _success = true;
+                if (timout) return;
+                timout = true;
+                success = true;
                 ThreadSynchronizer.Set();
             }));
 
             TimeoutThread = new Thread(new ThreadStart(delegate
             {
                 Thread.Sleep(waitLimit * 1000);
-                if (_success) return;
-                _timout = true;
-                _success = false;
+                if (success) return;
+                timout = true;
+                success = false;
                 ThreadSynchronizer.Set();
             }));
         }
@@ -44,7 +44,7 @@
 
             ThreadSynchronizer.WaitOne();
 
-            if (!_success)
+            if (!success)
             {
                 throw new TimeoutException();
             }

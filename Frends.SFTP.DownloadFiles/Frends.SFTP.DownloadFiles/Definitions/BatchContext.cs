@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.DownloadFiles.Definitions;
+namespace Frends.SFTP.DownloadFiles.Definitions;
 
 using Renci.SshNet.Sftp;
 
@@ -7,27 +7,27 @@ using Renci.SshNet.Sftp;
 /// </summary>
 internal class BatchContext
 {
-    public Info Info { get; set; }
+    internal Info Info { get; set; }
 
-    public string TempWorkDir { get; set; }
+    internal string TempWorkDir { get; set; }
 
-    public Options Options { get; set; }
+    internal Options Options { get; set; }
 
-    public Guid InstanceId { get; set; }
+    internal Guid InstanceId { get; set; }
 
-    public string ServiceId { get; set; }
+    internal string ServiceId { get; set; }
 
-    public IEnumerable<SftpFile> SourceFiles { get; set; }
+    internal IEnumerable<SftpFile> SourceFiles { get; set; }
 
-    public IEnumerable<FileItem> DestinationFiles { get; set; }
+    internal IEnumerable<FileItem> DestinationFiles { get; set; }
 
-    public string RoutineUri { get; set; }
+    internal string RoutineUri { get; set; }
 
-    public DateTime BatchTransferStartTime { get; set; }
+    internal DateTime BatchTransferStartTime { get; set; }
 
-    public Source Source { get; set; }
+    internal Source Source { get; set; }
 
-    public Destination Destination { get; set; }
+    internal Destination Destination { get; set; }
 
-    public Connection Connection { get; set; }
+    internal Connection Connection { get; set; }
 }

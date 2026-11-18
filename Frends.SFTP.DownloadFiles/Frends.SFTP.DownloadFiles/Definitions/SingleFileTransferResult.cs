@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.DownloadFiles.Definitions;
+namespace Frends.SFTP.DownloadFiles.Definitions;
 
 /// <summary>
 /// Result object of one individual file transfer.

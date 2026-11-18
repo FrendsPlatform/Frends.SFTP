@@ -1,4 +1,4 @@
-﻿namespace Frends.SFTP.DownloadFiles.Definitions;
+namespace Frends.SFTP.DownloadFiles.Definitions;
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -18,13 +18,6 @@ public class Options
     /// <example>30</example>
     [DefaultValue(0)]
     public int Timeout { get; set; }
-
-    /// <summary>
-    /// Should an exception be thrown when file transfer fails.
-    /// </summary>
-    /// <example>true</example>
-    [DefaultValue(true)]
-    public bool ThrowErrorOnFail { get; set; } = true;
 
     /// <summary>
     /// Should the source file be renamed with temporary file name during file transfer as a locking mechanism.
@@ -78,4 +71,19 @@ public class Options
     /// <example>true</example>
     [DefaultValue(true)]
     public bool OperationLog { get; set; } = true;
+
+    /// <summary>
+    /// Whether to throw an error on failure.
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(true)]
+    public bool ThrowErrorOnFailure { get; set; } = true;
+
+    /// <summary>
+    /// Overrides the error message on failure.
+    /// </summary>
+    /// <example>Download from the SFTP server failed</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    [DefaultValue("")]
+    public string ErrorMessageOnFailure { get; set; } = string.Empty;
 }
