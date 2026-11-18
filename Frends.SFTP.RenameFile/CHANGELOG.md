@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.0.0] - 2026-11-09
+
+### Added
+
+- Added `Success` and `Error` properties to the result. The task can now return `Success = false` with error details in `Error` instead of throwing.
+- Added options to return task errors as a result or throw them with a custom message.
+
+### Changed
+
+- **[Breaking Change]** Renamed host key algorithm options to use PascalCase.
+- Updated SSH.NET to 2026.0.0 to a release that addresses known security vulnerabilities.
+
 ## [3.0.0] - 2026-01-27
 
 ### Changed

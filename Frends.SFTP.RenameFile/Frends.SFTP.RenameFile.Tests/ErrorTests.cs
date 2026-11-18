@@ -1,10 +1,11 @@
-﻿using NUnit.Framework;
-using Renci.SshNet.Common;
 using System;
 using System.IO;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using Frends.SFTP.RenameFile.Definitions;
 using Frends.SFTP.RenameFile.Enums;
+using NUnit.Framework;
+using Renci.SshNet.Common;
 
 namespace Frends.SFTP.RenameFile.Tests;
 
@@ -19,12 +20,30 @@ public class ErrorTests
         {
             Path = "/upload/test.txt",
             NewFileName = "newTest.txt",
-            RenameBehaviour = RenameBehaviour.Throw
+            RenameBehaviour = RenameBehaviour.Throw,
         };
 
-        var ex = Assert.ThrowsAsync<SftpPathNotFoundException>(async () => await SFTP.RenameFile(input, connection, default));
+        var ex = Assert.ThrowsAsync<SftpPathNotFoundException>(async () => await SFTP.RenameFile(input, connection, new Options(), default));
         Assert.That(ex.Message.Contains("No such file"), ex.Message);
+    }
 
+    [Test]
+    public async Task RenameFile_ReturnsErrorWhenThrowingIsDisabled()
+    {
+        var connection = Helpers.GetSftpConnection();
+        var input = new Input
+        {
+            Path = "/upload/missing.txt",
+            NewFileName = "newTest.txt",
+            RenameBehaviour = RenameBehaviour.Throw,
+        };
+        var options = new Options { ThrowErrorOnFailure = false };
+
+        var result = await SFTP.RenameFile(input, connection, options, default);
+
+        Assert.IsFalse(result.Success);
+        Assert.That(result.Error.Message, Does.Contain("No such file"));
+        Assert.That(result.Error.AdditionalInfo, Is.Not.Null);
     }
 
     [Test]
@@ -35,10 +54,10 @@ public class ErrorTests
         var input = new Input
         {
             Path = "/upload/t",
-            RenameBehaviour = RenameBehaviour.Throw
+            RenameBehaviour = RenameBehaviour.Throw,
         };
 
-        Assert.ThrowsAsync<SocketException>(async () => await SFTP.RenameFile(input, connection, default));
+        Assert.ThrowsAsync<SocketException>(async () => await SFTP.RenameFile(input, connection, new Options(), default));
     }
 
     [Test]
@@ -52,10 +71,10 @@ public class ErrorTests
         {
             Path = "/upload/test.txt",
             NewFileName = "newTest.txt",
-            RenameBehaviour = RenameBehaviour.Throw
+            RenameBehaviour = RenameBehaviour.Throw,
         };
 
-        var ex = Assert.ThrowsAsync<SshAuthenticationException>(async () => await SFTP.RenameFile(input, connection, default));
+        var ex = Assert.ThrowsAsync<SshAuthenticationException>(async () => await SFTP.RenameFile(input, connection, new Options(), default));
         Assert.AreEqual("Permission denied (password).", ex.Message);
     }
 
@@ -71,10 +90,10 @@ public class ErrorTests
         {
             Path = "/upload/test.txt",
             NewFileName = "newTest.txt",
-            RenameBehaviour = RenameBehaviour.Throw
+            RenameBehaviour = RenameBehaviour.Throw,
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.RenameFile(input, connection, default));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.RenameFile(input, connection, new Options(), default));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info:"));
     }
 
@@ -84,16 +103,16 @@ public class ErrorTests
         var connection = Helpers.GetSftpConnection();
         connection.Authentication = AuthenticationType.UsernamePasswordPrivateKeyFile;
         connection.PrivateKeyPassphrase = "passphrase";
-        connection.PrivateKeyFile = "";
+        connection.PrivateKeyFile = string.Empty;
 
         var input = new Input
         {
             Path = "/upload/test.txt",
             NewFileName = "newTest.txt",
-            RenameBehaviour = RenameBehaviour.Throw
+            RenameBehaviour = RenameBehaviour.Throw,
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.RenameFile(input, connection, default));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.RenameFile(input, connection, new Options(), default));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
@@ -111,10 +130,10 @@ public class ErrorTests
         {
             Path = "/upload/test.txt",
             NewFileName = "newTest.txt",
-            RenameBehaviour = RenameBehaviour.Throw
+            RenameBehaviour = RenameBehaviour.Throw,
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.RenameFile(input, connection, default));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.RenameFile(input, connection, new Options(), default));
         Assert.IsTrue(ex.Message.StartsWith("Error when initializing connection info: "));
     }
 
@@ -130,11 +149,10 @@ public class ErrorTests
         {
             Path = "/upload/test.txt",
             NewFileName = "newTest.txt",
-            RenameBehaviour = RenameBehaviour.Throw
+            RenameBehaviour = RenameBehaviour.Throw,
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.RenameFile(input, connection, default));
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () => await SFTP.RenameFile(input, connection, new Options(), default));
         Assert.IsTrue(ex.Message.StartsWith("Error when checking the server fingerprint:"), ex.Message);
     }
 }
-
