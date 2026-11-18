@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0] - 2026-11-09
+
+### Changed
+- **[Breaking Change]** The task uses PascalCase host key algorithm names.
+- The task now support an `Options` tab with `ThrowErrorOnFailure` and `ErrorMessageOnFailure` properties.
+- Updated the task to .NET 8 
+
+### Added
+- Added `Success` and `Error` properties to the result. The task can now return `Success = false` with error details in `Error` instead of throwing.
+- Added configurable failure handling.
+
 ## [2.1.0] - 2026-10-21
 
 ### Changed

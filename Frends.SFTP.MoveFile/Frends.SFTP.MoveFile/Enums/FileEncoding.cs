@@ -1,19 +1,32 @@
-﻿namespace Frends.SFTP.MoveFile.Enums;
-
-// Pragma for self-explanatory enum attributes.
-#pragma warning disable 1591
+namespace Frends.SFTP.MoveFile.Enums;
 
 /// <summary>
 /// Enumeration of file encoding options.
 /// </summary>
 public enum FileEncoding
 {
+    /// <summary>
+    /// UTF-8 encoding.
+    /// </summary>
     UTF8,
+
+    /// <summary>
+    /// ANSI encoding.
+    /// </summary>
     ANSI,
+
+    /// <summary>
+    /// ASCII encoding.
+    /// </summary>
     ASCII,
+
+    /// <summary>
+    /// Windows-1252 encoding.
+    /// </summary>
     WINDOWS1252,
+
     /// <summary>
     /// Other enables users to add other encoding options as string.
     /// </summary>
-    Other
+    Other,
 }
